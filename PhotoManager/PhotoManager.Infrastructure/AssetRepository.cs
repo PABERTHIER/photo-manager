@@ -110,7 +110,8 @@ public class AssetRepository : IAssetRepository
 
             if (string.IsNullOrWhiteSpace(asset.Folder.Path))
             {
-                Log.Error($"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
+                Log.Error(
+                    $"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
                 return;
             }
 
@@ -487,6 +488,7 @@ public class AssetRepository : IAssetRepository
     }
 
     #region private
+
     private void Initialize()
     {
         if (!IsInitialized)
@@ -519,7 +521,8 @@ public class AssetRepository : IAssetRepository
 
         _database.SetDataTableProperties(new()
         {
-            TableName = _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName =
+                _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         });
 
@@ -539,8 +542,9 @@ public class AssetRepository : IAssetRepository
 
         for (int i = 0; i < _assets.Count; i++)
         {
+            // If the folder is not found, that means the DB has been modified manually
             // TODO: Improve the mapping for perf
-            _assets[i].Folder = GetFolderById(_assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
+            _assets[i].Folder = GetFolderById(_assets[i].FolderId)!;
 
             // Not saved in DB because it is computed each time to detect file update
             _imageMetadataService.UpdateAssetFileProperties(_assets[i]);

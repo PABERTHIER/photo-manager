@@ -32,7 +32,8 @@ public class AssetRepositoryWriteBackupTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -77,9 +78,11 @@ public class AssetRepositoryWriteBackupTests
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0"); // 0 backups, so that, the new created is directly deleted
+        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP,
+            "0"); // 0 backups, so that, the new created is directly deleted
 
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);

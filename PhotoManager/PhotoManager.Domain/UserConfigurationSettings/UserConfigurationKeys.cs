@@ -35,6 +35,7 @@ public static class UserConfigurationKeys
     public const string ASSETS_TABLE_NAME = "appsettings:Storage:Tables:AssetsTableName";
     public const string FOLDERS_TABLE_NAME = "appsettings:Storage:Tables:FoldersTableName";
     public const string RECENT_TARGET_PATHS_TABLE_NAME = "appsettings:Storage:Tables:RecentTargetPathsTableName";
-    public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME = "appsettings:Storage:Tables:SyncAssetsDirectoriesDefinitionsTableName";
+    public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME =
+        "appsettings:Storage:Tables:SyncAssetsDirectoriesDefinitionsTableName";
     public const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:Storage:ThumbnailsDictionaryEntriesToKeep";
 }

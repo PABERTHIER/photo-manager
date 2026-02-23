@@ -36,7 +36,8 @@ public class FolderNavigationControlTests
         _folderNavigationViewModel = null;
     }
 
-    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -81,7 +82,8 @@ public class FolderNavigationControlTests
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsNotSameAsSource_UpdatesSelectedPath()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2, Directories.NON_EXISTENT_FOLDER);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+            Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -138,7 +140,8 @@ public class FolderNavigationControlTests
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsSameAsSource_UpdatesSelectedPath()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2, Directories.NON_EXISTENT_FOLDER);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+            Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -250,21 +253,26 @@ public class FolderNavigationControlTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SelectedAssets, Is.Empty);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath,
+            Is.EqualTo(expectedRootDirectory));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ObservableAssets, Is.Empty);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.GlobalAssetsCounterWording,
+            Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanGoToPreviousAsset, Is.False);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanGoToNextAsset, Is.False);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Product,
+            Is.EqualTo("PhotoManager"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Version,
+            Is.EqualTo(Constants.VERSION));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -281,8 +289,10 @@ public class FolderNavigationControlTests
 
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
-            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Id,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -311,26 +321,36 @@ public class FolderNavigationControlTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortAscending, Is.True);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsRefreshingFolders, Is.False);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria,
+            Is.EqualTo(SortCriteria.FileName));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ThumbnailsVisible,
+            Is.EqualTo(Visibility.Visible));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerVisible,
+            Is.EqualTo(Visibility.Hidden));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SelectedAssets, Is.Empty);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath,
+            Is.EqualTo(expectedLastDirectoryInspected));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ObservableAssets, Is.Empty);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ExecutionTimeWording, Is.EqualTo(string.Empty));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.TotalFilesCountWording, Is.EqualTo(string.Empty));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.GlobalAssetsCounterWording,
+            Is.EqualTo(string.Empty));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ExecutionTimeWording,
+            Is.EqualTo(string.Empty));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.TotalFilesCountWording,
+            Is.EqualTo(string.Empty));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentAsset, Is.Null);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanGoToPreviousAsset, Is.False);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanGoToNextAsset, Is.False);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Product,
+            Is.EqualTo("PhotoManager"));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Version,
+            Is.EqualTo(Constants.VERSION));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -356,8 +376,10 @@ public class FolderNavigationControlTests
 
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -373,11 +395,13 @@ public class FolderNavigationControlTests
         }
         else
         {
-            Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Has.Count.EqualTo(expectedRecentTargetPaths.Count));
+            Assert.That(folderNavigationViewModelInstance.RecentTargetPaths,
+                Has.Count.EqualTo(expectedRecentTargetPaths.Count));
 
             for (int i = 0; i < expectedRecentTargetPaths.Count; i++)
             {
-                Assert.That(folderNavigationViewModelInstance.RecentTargetPaths[i], Is.EqualTo(expectedRecentTargetPaths[i]));
+                Assert.That(folderNavigationViewModelInstance.RecentTargetPaths[i],
+                    Is.EqualTo(expectedRecentTargetPaths[i]));
             }
         }
 

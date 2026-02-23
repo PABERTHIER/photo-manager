@@ -11,7 +11,8 @@ public class FileOperationsServiceBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "FileOperationsServiceBenchmark_" + Guid.NewGuid().ToString("N"));
+        _testDirectory = Path.Combine(Path.GetTempPath(),
+            "FileOperationsServiceBenchmark_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDirectory);
 
         // Create nested directory structure for recursive tests

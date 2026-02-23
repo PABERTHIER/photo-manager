@@ -30,9 +30,12 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 1)]
     [TestCase(FileNames.IMAGE_11_HEIC, 1)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -124,12 +127,14 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 6)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 3)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8)]
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName,
+        int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = ExifHelper.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        ushort orientation = ExifHelper.GetHeicExifOrientation(buffer,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
@@ -139,7 +144,8 @@ public class ExifHelperTests
     {
         byte[] invalidHeicBuffer = [0x00, 0x01, 0x02, 0x03];
 
-        ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
@@ -151,7 +157,8 @@ public class ExifHelperTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
         {
-            ExifHelper.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+            ExifHelper.GetHeicExifOrientation(nullBuffer!,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
@@ -164,7 +171,8 @@ public class ExifHelperTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
         {
-            ExifHelper.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+            ExifHelper.GetHeicExifOrientation(emptyBuffer,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
@@ -185,7 +193,8 @@ public class ExifHelperTests
     [TestCase((ushort)10000, Rotation.Rotate0)]
     [TestCase(ushort.MinValue, Rotation.Rotate0)]
     [TestCase(ushort.MaxValue, Rotation.Rotate0)]
-    public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation, Rotation expectedRotation)
+    public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
+        Rotation expectedRotation)
     {
         Rotation rotation = ExifHelper.GetImageRotation(exifOrientation);
 
@@ -206,7 +215,8 @@ public class ExifHelperTests
     {
         ushort? exifOrientation = null;
 
-        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
+        InvalidOperationException? exception =
+            Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
 
         Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
     }

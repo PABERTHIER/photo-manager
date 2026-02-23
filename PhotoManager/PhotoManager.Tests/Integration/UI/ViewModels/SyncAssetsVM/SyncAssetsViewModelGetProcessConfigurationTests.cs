@@ -22,7 +22,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -68,7 +69,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -119,7 +121,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -146,7 +149,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -213,7 +217,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         }
     }
 
-    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) NotifyPropertyChangedEvents()
+    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
@@ -254,10 +259,14 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
 
         for (int i = 0; i < definitions.Count; i++)
         {
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory, Is.EqualTo(definitions[i].SourceDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory, Is.EqualTo(definitions[i].DestinationDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders, Is.EqualTo(definitions[i].IncludeSubFolders));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource, Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory,
+                Is.EqualTo(definitions[i].SourceDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory,
+                Is.EqualTo(definitions[i].DestinationDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders,
+                Is.EqualTo(definitions[i].IncludeSubFolders));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource,
+                Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
         }
 
         // From BaseProcessViewModel

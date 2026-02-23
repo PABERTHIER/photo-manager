@@ -56,7 +56,8 @@ public static class CatalogAssetsAsyncAsserts
             {
                 Assert.That(dataRead.ContainsKey(assetsFromRepositoryByFolder[i].FileName), Is.True);
                 Assert.That(assetNameToByteSizeMapping.ContainsKey(assetsFromRepositoryByFolder[i].FileName), Is.True);
-                Assert.That(dataRead[assetsFromRepositoryByFolder[i].FileName], Has.Length.EqualTo(assetNameToByteSizeMapping[assetsFromRepositoryByFolder[i].FileName]));
+                Assert.That(dataRead[assetsFromRepositoryByFolder[i].FileName],
+                    Has.Length.EqualTo(assetNameToByteSizeMapping[assetsFromRepositoryByFolder[i].FileName]));
             }
         }
 
@@ -66,11 +67,19 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
         Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
-        List<Asset> assetsFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-        List<Folder> foldersFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
+        List<Asset> assetsFromDatabase =
+            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
+                AssetConfigs.ReadFunc);
+        List<Folder> foldersFromDatabase =
+            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
+                FolderConfigs.ReadFunc);
         List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitionsFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
-        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
+            database.ReadObjectList(
+                userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
+                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(
+            userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
+            RecentPathsConfigs.ReadFunc);
 
         Assert.That(assetsFromDatabase, Has.Count.EqualTo(assetsFromRepository.Count));
 
@@ -79,7 +88,8 @@ public static class CatalogAssetsAsyncAsserts
 
         foreach (Asset assetFromDatabase in assetsFromDatabase)
         {
-            Asset expectedAsset = assetToFolderMapping.Keys.First(a => a.FileName == assetFromDatabase.FileName && a.FolderId == assetFromDatabase.FolderId);
+            Asset expectedAsset = assetToFolderMapping.Keys.First(a =>
+                a.FileName == assetFromDatabase.FileName && a.FolderId == assetFromDatabase.FolderId);
             Folder expectedFolder = assetToFolderMapping[expectedAsset];
 
             AssertAssetFromDatabaseValidity(assetFromDatabase, expectedAsset, expectedFolder.Id);
@@ -129,11 +139,19 @@ public static class CatalogAssetsAsyncAsserts
             Assert.That(tableFiles, Is.Empty);
         }
 
-        List<Asset> assetsFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-        List<Folder> foldersFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
+        List<Asset> assetsFromDatabase =
+            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
+                AssetConfigs.ReadFunc);
+        List<Folder> foldersFromDatabase =
+            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
+                FolderConfigs.ReadFunc);
         List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitionsFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
-        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
+            database.ReadObjectList(
+                userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
+                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(
+            userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
+            RecentPathsConfigs.ReadFunc);
 
         Assert.That(assetsFromDatabase, Is.Empty);
 
@@ -173,8 +191,10 @@ public static class CatalogAssetsAsyncAsserts
         Dictionary<Folder, List<Asset>> folderToAssetsMapping,
         Dictionary<string, int> assetNameToByteSizeMapping)
     {
-        string backupBlobsDirectory = Path.Combine(databaseBackupPath, userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
-        string backupTablesDirectory = Path.Combine(databaseBackupPath, userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
+        string backupBlobsDirectory = Path.Combine(databaseBackupPath,
+            userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
+        string backupTablesDirectory = Path.Combine(databaseBackupPath,
+            userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
 
         Assert.That(Directory.Exists(backupBlobsDirectory), Is.False);
         Assert.That(Directory.Exists(backupTablesDirectory), Is.False);
@@ -239,8 +259,10 @@ public static class CatalogAssetsAsyncAsserts
     {
         int expectedTablesCount = hasEmptyTables ? 4 : 0;
 
-        string backupBlobsDirectory = Path.Combine(databaseBackupPath, userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
-        string backupTablesDirectory = Path.Combine(databaseBackupPath, userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
+        string backupBlobsDirectory = Path.Combine(databaseBackupPath,
+            userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
+        string backupTablesDirectory = Path.Combine(databaseBackupPath,
+            userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
 
         Assert.That(Directory.Exists(backupBlobsDirectory), Is.False);
         Assert.That(Directory.Exists(backupTablesDirectory), Is.False);
@@ -273,16 +295,19 @@ public static class CatalogAssetsAsyncAsserts
         string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
         Assert.That(tablesBackup, Has.Length.EqualTo(expectedTablesCount));
 
-        CheckBlobsAndTablesAfterSaveCatalogEmpty(database, userConfigurationService, backupBlobsDirectory, backupTablesDirectory, hasEmptyTables, hasOneFolder, folder);
+        CheckBlobsAndTablesAfterSaveCatalogEmpty(database, userConfigurationService, backupBlobsDirectory,
+            backupTablesDirectory, hasEmptyTables, hasOneFolder, folder);
     }
 
-    public static void AssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    public static void AssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath,
+        string folderPath, Folder folder)
     {
         AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
     }
 
-    public static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath,
+    public static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
+        string folderPath,
         Folder folder)
     {
         DateTime actualDate = DateTime.Now.Date;
@@ -304,7 +329,8 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(expectedAsset.Metadata.Rotated.Message));
         Assert.That(asset.FullPath, Is.EqualTo(assetPath));
         Assert.That(asset.Folder.Path, Is.EqualTo(folderPath));
-        Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate)); // Because files are generated by tests (ThumbnailCreationDateTime and FileModificationDateTime have the same value)
+        Assert.That(asset.FileProperties.Creation.Date,
+            Is.EqualTo(actualDate)); // Because files are generated by tests (ThumbnailCreationDateTime and FileModificationDateTime have the same value)
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
     }
 
@@ -334,7 +360,8 @@ public static class CatalogAssetsAsyncAsserts
         {
             Asset currentAsset = assetsFromRepository[i];
 
-            Asset expectedAsset = assetToFolderMapping.Keys.First(a => a.FileName == currentAsset.FileName && a.FolderId == currentAsset.FolderId);
+            Asset expectedAsset = assetToFolderMapping.Keys.First(a =>
+                a.FileName == currentAsset.FileName && a.FolderId == currentAsset.FolderId);
             Folder expectedFolder = assetToFolderMapping[expectedAsset];
 
             Assert.That(thumbnails[expectedFolder.Path].ContainsKey(currentAsset.FileName), Is.True);
@@ -353,7 +380,7 @@ public static class CatalogAssetsAsyncAsserts
 
         Assert.That(assetFromDatabase.FileName, Is.EqualTo(expectedAsset.FileName));
         Assert.That(assetFromDatabase.FolderId, Is.EqualTo(folderId));
-        Assert.That(assetFromDatabase.Folder.Path, Is.EqualTo(string.Empty));  // Not saved in Db, loaded at the runtime
+        Assert.That(assetFromDatabase.Folder.Path, Is.EqualTo(string.Empty)); // Not saved in Db, loaded at the runtime
         Assert.That(assetFromDatabase.FileProperties.Size, Is.Zero); // Not saved in Db, loaded at the runtime
         Assert.That(assetFromDatabase.Pixel.Asset.Width, Is.EqualTo(expectedAsset.Pixel.Asset.Width));
         Assert.That(assetFromDatabase.Pixel.Asset.Height, Is.EqualTo(expectedAsset.Pixel.Asset.Height));
@@ -366,13 +393,17 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(assetFromDatabase.Metadata.Corrupted.Message, Is.EqualTo(string.Empty));
         Assert.That(assetFromDatabase.Metadata.Rotated.IsTrue, Is.EqualTo(expectedAsset.Metadata.Rotated.IsTrue));
         Assert.That(assetFromDatabase.Metadata.Rotated.Message, Is.EqualTo(string.Empty));
-        Assert.That(assetFromDatabase.FullPath, Is.EqualTo(expectedAsset.FileName)); // Folder is not saved in Db, loaded at the runtime
+        Assert.That(assetFromDatabase.FullPath,
+            Is.EqualTo(expectedAsset.FileName)); // Folder is not saved in Db, loaded at the runtime
         Assert.That(assetFromDatabase.ImageData, Is.Null); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Creation.Date, Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Modification.Date, Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
+        Assert.That(assetFromDatabase.FileProperties.Creation.Date,
+            Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
+        Assert.That(assetFromDatabase.FileProperties.Modification.Date,
+            Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
     }
 
-    public static void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    public static void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -387,19 +418,22 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void CheckCatalogChangesFolderInspected(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
+    public static void CheckCatalogChangesFolderInspected(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.FolderInspectionCompleted));
-        Assert.That(catalogChange.Message, Is.EqualTo($"Folder inspection for {assetsDirectory}, subfolders included, has been completed."));
+        Assert.That(catalogChange.Message,
+            Is.EqualTo($"Folder inspection for {assetsDirectory}, subfolders included, has been completed."));
         Assert.That(catalogChange.Exception, Is.Null);
         increment++;
     }
 
-    public static void CheckCatalogChangesFolderAdded(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    public static void CheckCatalogChangesFolderAdded(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -414,7 +448,8 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void CheckCatalogChangesFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
+    public static void CheckCatalogChangesFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -438,7 +473,8 @@ public static class CatalogAssetsAsyncAsserts
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Not.Null);
-        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath,
+            assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPath(expectedAssets, catalogChange);
@@ -476,7 +512,8 @@ public static class CatalogAssetsAsyncAsserts
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Not.Null);
-        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath,
+            assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPath(expectedAssets, catalogChange);
@@ -495,11 +532,14 @@ public static class CatalogAssetsAsyncAsserts
         bool isCorrupted,
         ref int increment)
     {
-        string expectedStatusMessage = isCorrupted ? $"Image {expectedAsset.FullPath} deleted from catalog (corrupted)." : $"Image {expectedAsset.FullPath} deleted from catalog.";
+        string expectedStatusMessage = isCorrupted
+            ? $"Image {expectedAsset.FullPath} deleted from catalog (corrupted)."
+            : $"Image {expectedAsset.FullPath} deleted from catalog.";
 
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Not.Null);
-        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        AssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath,
+            assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPath(expectedAssets, catalogChange);
@@ -509,18 +549,23 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    private static void AssertCataloguedAssetsByPath(IReadOnlyList<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange)
+    private static void AssertCataloguedAssetsByPath(IReadOnlyList<Asset> expectedAssets,
+        CatalogChangeCallbackEventArgs catalogChange)
     {
         for (int i = 0; i < catalogChange.CataloguedAssetsByPath.Count; i++)
         {
             Asset currentExpectedAsset = expectedAssets[i];
-            AssertAssetPropertyValidityAndImageData(catalogChange.CataloguedAssetsByPath[i], currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            AssertAssetPropertyValidityAndImageData(catalogChange.CataloguedAssetsByPath[i], currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
         }
     }
 
-    public static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
+    public static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        string expectedMessage, ref int increment)
     {
-        CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CREATING_BACKUP_MESSAGE) ? CatalogChangeReason.BackupCreationStarted : CatalogChangeReason.BackupUpdateStarted;
+        CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CREATING_BACKUP_MESSAGE)
+            ? CatalogChangeReason.BackupCreationStarted
+            : CatalogChangeReason.BackupUpdateStarted;
 
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -541,7 +586,8 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void CheckCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    public static void CheckCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -553,7 +599,8 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void CheckCatalogChangesEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    public static void CheckCatalogChangesEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -565,7 +612,8 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void CheckCatalogChangesException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
+    public static void CheckCatalogChangesException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        Exception exceptionExpected, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -599,7 +647,8 @@ public static class CatalogAssetsAsyncAsserts
         // Delete all tables in Tables directory
         string assetsTablePath = Path.Combine(tablesPath, Tables.ASSETS_DB);
         string foldersTablePath = Path.Combine(tablesPath, Tables.FOLDERS_DB);
-        string syncAssetsDirectoriesDefinitionsTablePath = Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB);
+        string syncAssetsDirectoriesDefinitionsTablePath =
+            Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB);
         string recentTargetPathsTablePath = Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB);
 
         File.Delete(assetsTablePath);

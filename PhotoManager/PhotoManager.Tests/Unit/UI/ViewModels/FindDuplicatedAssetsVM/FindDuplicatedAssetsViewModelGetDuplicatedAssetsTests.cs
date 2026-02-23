@@ -242,7 +242,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndThreeSetsAndCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
+    public void
+        GetDuplicatedAssets_DuplicatesAndThreeSetsAndCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -327,15 +328,16 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             // First GetDuplicatedAssets
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -353,7 +355,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel4);
@@ -371,7 +374,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 2;
 
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel6);
@@ -420,7 +424,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndThreeSetsAndCurrentDuplicatedAssetFromSecondSet_ReturnsOtherDuplicatedAssetsInTheSet()
+    public void
+        GetDuplicatedAssets_DuplicatesAndThreeSetsAndCurrentDuplicatedAssetFromSecondSet_ReturnsOtherDuplicatedAssetsInTheSet()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -505,17 +510,18 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             // First GetDuplicatedAssets
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel4);
@@ -533,7 +539,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 2;
 
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel6);
@@ -551,7 +558,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 0;
 
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -605,7 +613,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndThreeSetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
+    public void
+        GetDuplicatedAssets_DuplicatesAndThreeSetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -690,15 +699,16 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             // First GetDuplicatedAssets
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel3);
@@ -714,7 +724,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             // Second GetDuplicatedAssets
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -730,7 +741,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             // Third GetDuplicatedAssets
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel5);
@@ -850,11 +862,13 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             // First GetDuplicatedAssets
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -874,7 +888,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel5);
@@ -920,7 +935,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndTwoSetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
+    public void
+        GetDuplicatedAssets_DuplicatesAndTwoSetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssetsInTheSet()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1001,11 +1017,13 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             // First GetDuplicatedAssets
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[2].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[2].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1023,7 +1041,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             // Second GetDuplicatedAssets
             duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1].Asset);
 
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel4);
             AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset3);
@@ -1063,7 +1082,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithMultipleAssetsAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithMultipleAssetsAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1136,7 +1156,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(4));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -1181,7 +1202,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithMultipleAssetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithMultipleAssetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1254,7 +1276,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(4));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1299,7 +1322,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAssetIsTheCurrent_ReturnsNotCurrentDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAssetIsTheCurrent_ReturnsNotCurrentDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1354,7 +1378,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -1395,7 +1420,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAsset_ReturnsOtherDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAsset_ReturnsOtherDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1452,7 +1478,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[0].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[0].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -1496,7 +1523,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAssetIsTheCurrent_ReturnsNotCurrentAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAssetIsTheCurrent_ReturnsNotCurrentAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1553,7 +1581,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1597,7 +1626,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAsset_ReturnsOtherDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAsset_ReturnsOtherDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1652,7 +1682,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1693,7 +1724,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAssetIsTheCurrent_ReturnsNotCurrentAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAssetIsTheCurrent_ReturnsNotCurrentAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1750,7 +1782,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 2;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1794,7 +1827,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAsset_ReturnsOtherDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAsset_ReturnsOtherDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1849,7 +1883,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[2].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[2].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -1890,7 +1925,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAsset()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1937,7 +1973,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -1976,7 +2013,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAssetAndNewAssetPosition_ReturnsNotCurrentDuplicatedAsset()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAssetAndNewAssetPosition_ReturnsNotCurrentDuplicatedAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2025,7 +2063,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -2067,7 +2106,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAsset_ReturnsCurrentDuplicatedAsset()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAsset_ReturnsCurrentDuplicatedAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2114,7 +2154,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -2153,7 +2194,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAssetAndNewAssetPosition_ReturnsCurrentDuplicatedAsset()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAssetAndNewAssetPosition_ReturnsCurrentDuplicatedAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2202,7 +2244,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[0].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[0].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -2245,7 +2288,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
     // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2289,7 +2333,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Is.Empty);
 
@@ -2327,7 +2372,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
     // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2371,7 +2417,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Is.Empty);
 
@@ -2408,7 +2455,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetNotVisibleAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetNotVisibleAndCurrentDuplicatedAsset_ReturnsNotCurrentDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2468,7 +2516,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Is.Empty);
 
@@ -2505,7 +2554,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetNotVisibleAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetNotVisibleAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2565,7 +2615,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -2604,7 +2655,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetContainsOneAssetNotVisibleAndCurrentDuplicatedAsset_ReturnsVisibleDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetContainsOneAssetNotVisibleAndCurrentDuplicatedAsset_ReturnsVisibleDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2662,7 +2714,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                    _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
@@ -2701,7 +2754,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetContainsOneAssetNotVisibleAndNotCurrentDuplicatedAsset_ReturnsVisibleDuplicatedAssets()
+    public void
+        GetDuplicatedAssets_DuplicatesAndOneSetContainsOneAssetNotVisibleAndNotCurrentDuplicatedAsset_ReturnsVisibleDuplicatedAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2759,7 +2813,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
+                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel
+                    .CurrentDuplicatedAssetSet[1].Asset);
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
@@ -3021,7 +3076,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(null!));
@@ -3075,7 +3131,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            List<DuplicatedAssetViewModel> duplicatedAssets = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(null!);
+            List<DuplicatedAssetViewModel>
+                duplicatedAssets = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(null!);
 
             Assert.That(duplicatedAssets, Is.Empty);
 
@@ -3123,10 +3180,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return (notifyPropertyChangedEvents, messagesInformationSent, findDuplicatedAssetsViewModelInstances);
     }
@@ -3150,11 +3208,15 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -3176,7 +3238,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -3205,7 +3268,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -3219,9 +3283,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

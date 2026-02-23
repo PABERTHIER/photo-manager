@@ -25,7 +25,8 @@ public class ApplicationSyncAssetsAsyncTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -50,7 +51,8 @@ public class ApplicationSyncAssetsAsyncTests
         _assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetCreationService assetCreationService = new(_assetRepository, _fileOperationsService, imageProcessingService,
+        AssetCreationService assetCreationService = new(_assetRepository, _fileOperationsService,
+            imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(_assetRepository, _fileOperationsService, imageMetadataService,
@@ -79,16 +81,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -99,7 +110,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.Zero);
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
         finally
@@ -159,16 +171,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -203,7 +224,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(4));
-            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
@@ -220,7 +242,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsEmptyAndDestinationIsNotEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceToCopyPath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceToCopyPath =
+            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceDirectory = Path.Combine(sourceToCopyPath, Directories.SOURCE);
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
@@ -288,16 +311,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -338,7 +370,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.Zero);
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
         finally
@@ -405,16 +438,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -449,7 +491,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(2));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
@@ -520,16 +563,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -564,7 +616,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
         }
@@ -576,10 +629,13 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
     {
-        string firstSourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
-        string secondSourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
+        string firstSourceDirectory =
+            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string secondSourceDirectory =
+            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
         string firstDestinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC_1);
         string secondDestinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC_2);
 
@@ -676,21 +732,38 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = firstSourceDirectory, DestinationDirectory = firstDestinationDirectory });
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = secondSourceDirectory, DestinationDirectory = secondDestinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = firstSourceDirectory,
+                DestinationDirectory = firstDestinationDirectory
+            });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = secondSourceDirectory,
+                DestinationDirectory = secondDestinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[1].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[1].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[1].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[1].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[1].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[1].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -750,12 +823,14 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(firstSourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(firstDestinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(secondSourceDirectory));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(secondDestinationDirectory));
             Assert.That(result[1].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[1].Message, Is.EqualTo($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."));
+            Assert.That(result[1].Message,
+                Is.EqualTo($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."));
 
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
@@ -772,7 +847,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -830,11 +906,13 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
@@ -860,16 +938,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -920,7 +1007,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
@@ -932,7 +1020,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -992,11 +1081,13 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(2));
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName4), Is.True);
@@ -1023,16 +1114,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1083,7 +1183,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.Zero);
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
         finally
@@ -1094,7 +1195,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
@@ -1138,9 +1240,11 @@ public class ApplicationSyncAssetsAsyncTests
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path,
+                assetDestinationToCopySubDirectory1Path);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path,
+                assetDestinationToCopySubDirectory2Path);
             Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _fileOperationsService!.GetFileNames(sourceDirectory);
@@ -1181,16 +1285,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1240,7 +1353,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(3));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
@@ -1256,7 +1370,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
@@ -1303,9 +1418,11 @@ public class ApplicationSyncAssetsAsyncTests
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path,
+                assetDestinationToCopySubDirectory1Path);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path,
+                assetDestinationToCopySubDirectory2Path);
             Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _fileOperationsService!.GetFileNames(sourceDirectory);
@@ -1357,11 +1474,16 @@ public class ApplicationSyncAssetsAsyncTests
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1389,11 +1511,13 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName6), Is.True);
 
@@ -1419,24 +1543,29 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
             Assert.That(result[1].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
+            Assert.That(result[1].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
             Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
             Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
+            Assert.That(result[2].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
             Assert.That(statusChanges, Has.Count.EqualTo(5));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
-            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
-            Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+            Assert.That(statusChanges[3].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
+            Assert.That(statusChanges[4].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
         }
         finally
         {
@@ -1448,7 +1577,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
@@ -1497,11 +1627,14 @@ public class ApplicationSyncAssetsAsyncTests
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path,
+                assetDestinationToCopySubDirectory1Path);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path,
+                assetDestinationToCopySubDirectory2Path);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationSubDirectory1Path);
+            assetHasBeenCopied =
+                _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationSubDirectory1Path);
             Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _fileOperationsService!.GetFileNames(sourceDirectory);
@@ -1523,11 +1656,13 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Is.Empty);
 
             Assert.That(_fileOperationsService.FileExists(assetSourcePath1), Is.True);
@@ -1559,11 +1694,16 @@ public class ApplicationSyncAssetsAsyncTests
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1620,23 +1760,27 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
             Assert.That(result[1].SyncedImages, Is.Zero);
-            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
+            Assert.That(result[1].Message,
+                Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
             Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
             Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
+            Assert.That(result[2].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
-            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+            Assert.That(statusChanges[3].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
         }
         finally
         {
@@ -1648,12 +1792,15 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, $"{Directories.SUB_DIRECTORY_2}\\{Directories.SUB_DIRECTORY_2}");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, $"{Directories.SUB_DIRECTORY_3}\\{Directories.SUB_DIRECTORY_4}\\{Directories.SUB_DIRECTORY_5}");
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory,
+            $"{Directories.SUB_DIRECTORY_2}\\{Directories.SUB_DIRECTORY_2}");
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory,
+            $"{Directories.SUB_DIRECTORY_3}\\{Directories.SUB_DIRECTORY_4}\\{Directories.SUB_DIRECTORY_5}");
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1706,11 +1853,13 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
@@ -1736,16 +1885,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1796,7 +1954,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
@@ -1808,7 +1967,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
@@ -1858,9 +2018,11 @@ public class ApplicationSyncAssetsAsyncTests
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path,
+                assetDestinationToCopySubDirectory2Path);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory3Path, assetDestinationToCopySubDirectory3Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory3Path,
+                assetDestinationToCopySubDirectory3Path);
             Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _fileOperationsService!.GetFileNames(sourceDirectory);
@@ -1916,11 +2078,16 @@ public class ApplicationSyncAssetsAsyncTests
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -1951,14 +2118,17 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Is.Empty);
 
-            string[] fileNamesInDestinationSubDirectory2 = _fileOperationsService!.GetFileNames(destinationSubDirectory2);
+            string[] fileNamesInDestinationSubDirectory2 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory2);
             Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName5), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory3 = _fileOperationsService!.GetFileNames(destinationSubDirectory3);
+            string[] fileNamesInDestinationSubDirectory3 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory3);
             Assert.That(fileNamesInDestinationSubDirectory3, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory3.Any(x => x == assetName6), Is.True);
 
@@ -1985,29 +2155,35 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
             Assert.That(result[1].SyncedImages, Is.Zero);
-            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
+            Assert.That(result[1].Message,
+                Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
             Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
             Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
+            Assert.That(result[2].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
             Assert.That(result[3].SourceDirectory, Is.EqualTo(sourceSubDirectory3));
             Assert.That(result[3].DestinationDirectory, Is.EqualTo(destinationSubDirectory3));
             Assert.That(result[3].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[3].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'."));
+            Assert.That(result[3].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'."));
 
             Assert.That(statusChanges, Has.Count.EqualTo(5));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
-            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
-            Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory3Path}' => '{assetDestinationSubDirectory3Path}'"));
+            Assert.That(statusChanges[3].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+            Assert.That(statusChanges[4].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory3Path}' => '{assetDestinationSubDirectory3Path}'"));
         }
         finally
         {
@@ -2019,7 +2195,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
@@ -2055,7 +2232,8 @@ public class ApplicationSyncAssetsAsyncTests
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
             Assert.That(assetHasBeenCopied, Is.True);
-            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
+            assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path,
+                assetDestinationToCopySubDirectory1Path);
             Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _fileOperationsService!.GetFileNames(sourceDirectory);
@@ -2099,11 +2277,16 @@ public class ApplicationSyncAssetsAsyncTests
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2127,7 +2310,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            string[] fileNamesInDestinationSubDirectory1 = _fileOperationsService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 =
+                _fileOperationsService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
             Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
@@ -2148,18 +2332,21 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
             Assert.That(result[1].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
+            Assert.That(result[1].Message,
+                Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
-            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
+            Assert.That(statusChanges[3].NewStatus,
+                Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
         }
         finally
         {
@@ -2170,7 +2357,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2261,11 +2449,16 @@ public class ApplicationSyncAssetsAsyncTests
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2304,7 +2497,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(8));
-            Assert.That(result[0].Message, Is.EqualTo($"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(8));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
@@ -2323,7 +2517,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2409,7 +2604,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
+    public void
+        SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2469,7 +2665,9 @@ public class ApplicationSyncAssetsAsyncTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _application!.SyncAssetsAsync(statusChanges.Add));
+            NullReferenceException? exception =
+                Assert.ThrowsAsync<NullReferenceException>(async () =>
+                    await _application!.SyncAssetsAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
@@ -2480,7 +2678,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2563,7 +2762,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
+    public void
+        SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2618,7 +2818,9 @@ public class ApplicationSyncAssetsAsyncTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _application!.SyncAssetsAsync(statusChanges.Add));
+            NullReferenceException? exception =
+                Assert.ThrowsAsync<NullReferenceException>(async () =>
+                    await _application!.SyncAssetsAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
@@ -2642,16 +2844,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2686,17 +2897,26 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory!, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory!,
+                DestinationDirectory = destinationDirectory
+            });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2718,7 +2938,8 @@ public class ApplicationSyncAssetsAsyncTests
     }
 
     [Test]
-    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
+    public async Task
+        SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
@@ -2758,16 +2979,25 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
 
             _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2802,7 +3032,8 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(4));
-            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(result[0].Message,
+                Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
@@ -2852,17 +3083,26 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory! });
+            syncAssetsConfiguration.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory!
+            });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions,
+                Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource,
+                Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 

@@ -488,7 +488,8 @@ public class MainWindowMoveAssetsTests
 
             string result = MoveAssets();
 
-            Assert.That(result, appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
+            Assert.That(result,
+                appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -980,7 +981,8 @@ public class MainWindowMoveAssetsTests
 
             string result = MoveAssets();
 
-            Assert.That(result, appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
+            Assert.That(result,
+                appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -1479,7 +1481,8 @@ public class MainWindowMoveAssetsTests
 
             string result = MoveAssets();
 
-            Assert.That(result, appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
+            Assert.That(result,
+                appMode == AppMode.Viewer ? Is.EqualTo("ShowImage for ViewerUserControl") : Is.EqualTo(string.Empty));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
@@ -2760,14 +2763,17 @@ public class MainWindowMoveAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
 
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
-            Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder!.Id,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -2805,7 +2811,8 @@ public class MainWindowMoveAssetsTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
@@ -2825,8 +2832,10 @@ public class MainWindowMoveAssetsTests
         {
             // Because the VM is doing a Guid.NewGuid()
             Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder!.Id, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder!.Id, Is.Not.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder!.Id,
+                Is.Not.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -2902,8 +2911,10 @@ public class MainWindowMoveAssetsTests
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
             Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.Not.EqualTo(folderNavigationViewModelInstance.SelectedFolder!.Id));
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id,
+                Is.Not.EqualTo(folderNavigationViewModelInstance.SelectedFolder!.Id));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -2919,11 +2930,13 @@ public class MainWindowMoveAssetsTests
         }
         else
         {
-            Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Has.Count.EqualTo(expectedRecentTargetPaths.Count));
+            Assert.That(folderNavigationViewModelInstance.RecentTargetPaths,
+                Has.Count.EqualTo(expectedRecentTargetPaths.Count));
 
             for (int i = 0; i < expectedRecentTargetPaths.Count; i++)
             {
-                Assert.That(folderNavigationViewModelInstance.RecentTargetPaths[i], Is.EqualTo(expectedRecentTargetPaths[i]));
+                Assert.That(folderNavigationViewModelInstance.RecentTargetPaths[i],
+                    Is.EqualTo(expectedRecentTargetPaths[i]));
             }
         }
 
@@ -2970,7 +2983,8 @@ public class MainWindowMoveAssetsTests
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
             Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
@@ -3004,13 +3018,15 @@ public class MainWindowMoveAssetsTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentSelectedAsset = selectedAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
         }
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -3019,7 +3035,8 @@ public class MainWindowMoveAssetsTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -3125,11 +3142,13 @@ public class MainWindowMoveAssetsTests
 
                 if (_folderNavigationViewModel!.HasConfirmed)
                 {
-                    bool result = _application!.MoveAssets(assets, _folderNavigationViewModel!.SelectedFolder, preserveOriginalFiles);
+                    bool result = _application!.MoveAssets(assets, _folderNavigationViewModel!.SelectedFolder,
+                        preserveOriginalFiles);
 
                     if (result)
                     {
-                        _applicationViewModel!.MoveAssetsLastSelectedFolder = _folderNavigationViewModel!.SelectedFolder;
+                        _applicationViewModel!.MoveAssetsLastSelectedFolder =
+                            _folderNavigationViewModel!.SelectedFolder;
                         _applicationViewModel!.IsRefreshingFolders = true;
                         _applicationViewModel!.IsRefreshingFolders = false;
 
@@ -3169,6 +3188,8 @@ public class MainWindowMoveAssetsTests
 
     private string ShowImage()
     {
-        return _applicationViewModel!.AppMode == AppMode.Viewer ? "ShowImage for ViewerUserControl" : "ShowImage for ThumbnailsUserControl";
+        return _applicationViewModel!.AppMode == AppMode.Viewer
+            ? "ShowImage for ViewerUserControl"
+            : "ShowImage for ThumbnailsUserControl";
     }
 }

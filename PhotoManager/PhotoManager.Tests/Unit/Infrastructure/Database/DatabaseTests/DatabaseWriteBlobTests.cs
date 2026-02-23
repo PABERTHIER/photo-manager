@@ -33,11 +33,12 @@ public class DatabaseWriteBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { FileNames.IMAGE1_JPG, [1, 2, 3]},
-            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3] },
+            { FileNames.IMAGE_2_PNG, [4, 5, 6] }
         };
 
         try
@@ -77,11 +78,12 @@ public class DatabaseWriteBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { FileNames.IMAGE1_JPG, [1, 2, 3]},
-            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3] },
+            { FileNames.IMAGE_2_PNG, [4, 5, 6] }
         };
 
         try
@@ -121,7 +123,8 @@ public class DatabaseWriteBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]>? blobToWrite = null;
 
         try
@@ -132,7 +135,8 @@ public class DatabaseWriteBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _database!.WriteBlob(blobToWrite!, blobName));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => _database!.WriteBlob(blobToWrite!, blobName));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
             Assert.That(File.Exists(blobFilePath), Is.True);
@@ -151,7 +155,8 @@ public class DatabaseWriteBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = [];
 
         try

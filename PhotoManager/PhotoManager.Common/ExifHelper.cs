@@ -12,7 +12,8 @@ public static class ExifHelper
     // 3: Upside-down (180 deg rotation)
     // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
     // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
-    public static ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation)
+    public static ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation,
+        ushort corruptedImageOrientation)
     {
         try
         {
@@ -147,8 +148,7 @@ public static class ExifHelper
     // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
     private static ushort GetMagickHeicOrientation(OrientationType orientationType, ushort corruptedImageOrientation)
     {
-        ushort result = orientationType
-        switch
+        ushort result = orientationType switch
         {
             (OrientationType.TopLeft or OrientationType.LeftTop) => 1,
             (OrientationType.BottomLeft or OrientationType.LeftBottom) => 8,

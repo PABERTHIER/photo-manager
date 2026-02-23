@@ -33,7 +33,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -75,10 +76,14 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     }
 
     [Test]
-    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
-    [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG)]
-    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
-    [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+        ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
+        ThumbnailHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+        ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
+        ThumbnailHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(
         Rotation rotation,
@@ -165,7 +170,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+                false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -205,8 +211,16 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    }
                 },
                 FileProperties = new()
                 {
@@ -255,7 +269,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+                false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -296,7 +311,11 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 FileProperties = new()
                 {
@@ -328,7 +347,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
 
             Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
@@ -341,7 +361,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+                false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -383,7 +404,11 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                    }
                 },
                 FileProperties = new()
                 {
@@ -420,7 +445,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(rotation));
-            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image.Width,
+                Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
             Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
             Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
             Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
@@ -436,7 +462,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+                false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -497,7 +524,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -526,17 +554,20 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
 
         if (expectedCurrentAsset != null)
         {
-            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedCurrentAsset.Folder);
+            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset,
+                expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedCurrentAsset.Folder);
         }
         else
         {
@@ -564,7 +595,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
             Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
                 Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
@@ -583,7 +615,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         }
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -592,7 +625,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -605,7 +639,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         }
     }
 
-    private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
+        string folderPath, Folder folder)
     {
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
         Assert.That(asset.ImageData, Is.Not.Null); // Unlike below (Application, CatalogAssetsService), it is set here

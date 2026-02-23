@@ -50,7 +50,8 @@ public class SyncAssetsService(
                 string[] sourceFileNames = fileOperationsService.GetFileNames(definition.SourceDirectory);
                 string[] destinationFileNames = fileOperationsService.GetFileNames(definition.DestinationDirectory);
                 string[] newFileNames = assetsComparator.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
-                newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, definition.DestinationDirectory);
+                newFileNames =
+                    GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, definition.DestinationDirectory);
 
                 foreach (string newFileName in newFileNames)
                 {
@@ -66,7 +67,8 @@ public class SyncAssetsService(
 
                 if (definition.DeleteAssetsNotInSource)
                 {
-                    string[] deletedFileNames = assetsComparator.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
+                    string[] deletedFileNames =
+                        assetsComparator.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
                     foreach (string deletedImage in deletedFileNames)
                     {
@@ -79,23 +81,28 @@ public class SyncAssetsService(
 
                 syncAssetsResult.Message = syncAssetsResult.SyncedImages switch
                 {
-                    0 => $"No images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
-                    1 => $"{syncAssetsResult.SyncedImages} image synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
-                    _ => $"{syncAssetsResult.SyncedImages} images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
+                    0 =>
+                        $"No images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
+                    1 =>
+                        $"{syncAssetsResult.SyncedImages} image synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
+                    _ =>
+                        $"{syncAssetsResult.SyncedImages} images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
                 };
 
                 result.Add(syncAssetsResult);
 
                 if (definition.IncludeSubFolders)
                 {
-                    DirectoryInfo[] subdirectories = fileOperationsService.GetSubDirectories(definition.SourceDirectory);
+                    DirectoryInfo[] subdirectories =
+                        fileOperationsService.GetSubDirectories(definition.SourceDirectory);
 
                     for (int i = 0; i < subdirectories.Length; i++)
                     {
                         SyncAssetsDirectoriesDefinition subDefinition = new()
                         {
                             SourceDirectory = subdirectories[i].FullName,
-                            DestinationDirectory = Path.Combine(definition.DestinationDirectory, subdirectories[i].Name),
+                            DestinationDirectory =
+                                Path.Combine(definition.DestinationDirectory, subdirectories[i].Name),
                             IncludeSubFolders = definition.IncludeSubFolders,
                             DeleteAssetsNotInSource = definition.DeleteAssetsNotInSource
                         };
@@ -114,7 +121,8 @@ public class SyncAssetsService(
 
     private string[] GetFilesNotAlreadyInDestinationSubDirectories(string[] newFileNames, string destinationDirectory)
     {
-        DirectoryInfo[] destinationSubDirectories = fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
+        DirectoryInfo[] destinationSubDirectories =
+            fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
 
         for (int i = 0; i < destinationSubDirectories.Length; i++)
         {

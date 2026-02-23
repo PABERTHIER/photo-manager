@@ -23,7 +23,8 @@ public class SyncAssetsViewModelTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -69,7 +70,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -103,7 +105,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -127,7 +130,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -159,7 +163,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -183,12 +188,14 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -215,7 +222,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -245,7 +253,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -296,7 +305,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -406,7 +416,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -474,7 +485,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -482,7 +494,11 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
-            _syncAssetsViewModel.DeleteDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" });
+            _syncAssetsViewModel.DeleteDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots",
+                DestinationDirectory = @"C:\Images\Screenshots"
+            });
 
             Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
@@ -503,7 +519,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -525,7 +542,11 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
-            _syncAssetsViewModel.DeleteDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" });
+            _syncAssetsViewModel.DeleteDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots",
+                DestinationDirectory = @"C:\Images\Screenshots"
+            });
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
@@ -557,7 +578,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -585,7 +607,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -617,7 +640,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -663,7 +687,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -687,7 +712,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
@@ -709,7 +735,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -737,7 +764,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -769,7 +797,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -815,7 +844,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -842,7 +872,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -883,7 +914,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -915,7 +947,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -956,12 +989,14 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -988,7 +1023,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1008,7 +1044,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1030,7 +1067,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1053,12 +1091,17 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
+            _syncAssetsViewModel!.MoveUpDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots1",
+                DestinationDirectory = @"C:\Toto\Screenshots2"
+            });
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1090,7 +1133,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1102,7 +1146,11 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
+            _syncAssetsViewModel!.MoveUpDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots1",
+                DestinationDirectory = @"C:\Toto\Screenshots2"
+            });
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
@@ -1159,7 +1207,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1187,7 +1236,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1219,7 +1269,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1265,7 +1316,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -1292,7 +1344,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1333,7 +1386,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1365,7 +1419,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1406,7 +1461,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1438,7 +1494,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1479,7 +1536,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1489,7 +1547,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
@@ -1511,7 +1570,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1531,7 +1591,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1553,7 +1614,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1576,12 +1638,17 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
+            _syncAssetsViewModel!.MoveDownDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots1",
+                DestinationDirectory = @"C:\Toto\Screenshots2"
+            });
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1613,7 +1680,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1625,7 +1693,11 @@ public class SyncAssetsViewModelTests
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
+            _syncAssetsViewModel!.MoveDownDefinition(new()
+            {
+                SourceDirectory = @"C:\Toto\Screenshots1",
+                DestinationDirectory = @"C:\Toto\Screenshots2"
+            });
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
@@ -1682,7 +1754,8 @@ public class SyncAssetsViewModelTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -1710,7 +1783,8 @@ public class SyncAssetsViewModelTests
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
             Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+                Is.EqualTo(@"C:\Images\Screenshots"));
             Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
@@ -1737,7 +1811,8 @@ public class SyncAssetsViewModelTests
         }
     }
 
-    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) NotifyPropertyChangedEvents()
+    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
@@ -1778,10 +1853,14 @@ public class SyncAssetsViewModelTests
 
         for (int i = 0; i < definitions.Count; i++)
         {
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory, Is.EqualTo(definitions[i].SourceDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory, Is.EqualTo(definitions[i].DestinationDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders, Is.EqualTo(definitions[i].IncludeSubFolders));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource, Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory,
+                Is.EqualTo(definitions[i].SourceDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory,
+                Is.EqualTo(definitions[i].DestinationDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders,
+                Is.EqualTo(definitions[i].IncludeSubFolders));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource,
+                Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
         }
 
         // From BaseProcessViewModel

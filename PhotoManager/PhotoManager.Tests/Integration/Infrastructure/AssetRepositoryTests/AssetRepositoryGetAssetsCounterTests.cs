@@ -44,7 +44,8 @@ public class AssetRepositoryGetAssetsCounterTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -110,7 +111,11 @@ public class AssetRepositoryGetAssetsCounterTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {

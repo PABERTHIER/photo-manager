@@ -24,7 +24,8 @@ public class ApplicationViewModelGetSubFoldersTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -350,7 +351,8 @@ public class ApplicationViewModelGetSubFoldersTests
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _applicationViewModel!.GetSubFolders(parentFolder1!));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _applicationViewModel!.GetSubFolders(parentFolder1!));
 
             Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 
@@ -419,7 +421,8 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -449,7 +452,8 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
         Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
@@ -469,7 +473,8 @@ public class ApplicationViewModelGetSubFoldersTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
             Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
                 Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));

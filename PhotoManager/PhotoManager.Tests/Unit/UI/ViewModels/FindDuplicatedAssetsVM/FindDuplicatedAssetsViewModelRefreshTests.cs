@@ -498,7 +498,8 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_DuplicatesAndPreviousSameDuplicatedAssetSetsAndSomeFilesDoNotExistAnymore_SetsNewDuplicatedAssetSets()
+    public void
+        Refresh_DuplicatesAndPreviousSameDuplicatedAssetSetsAndSomeFilesDoNotExistAnymore_SetsNewDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -958,10 +959,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return (notifyPropertyChangedEvents, messagesInformationSent, findDuplicatedAssetsViewModelInstances);
     }
@@ -985,11 +987,15 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -1011,7 +1017,8 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -1040,7 +1047,8 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -1054,9 +1062,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

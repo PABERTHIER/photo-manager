@@ -38,8 +38,16 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -88,8 +96,16 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -114,7 +130,11 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -133,7 +153,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         };
     }
 
-    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -205,8 +226,10 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image2, Is.Not.Null);
             Assert.That(image2.StreamSource, Is.Not.Null);
             Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
-            Assert.That((int)image2.Width, Is.EqualTo(1307)); // Should be _asset2.Pixel.Asset.Width -> 1280 (weird result for png)
-            Assert.That((int)image2.Height, Is.EqualTo(735)); // Should be _asset2.Pixel.Asset.Height -> 720 (weird result for png)
+            Assert.That((int)image2.Width,
+                Is.EqualTo(1307)); // Should be _asset2.Pixel.Asset.Width -> 1280 (weird result for png)
+            Assert.That((int)image2.Height,
+                Is.EqualTo(735)); // Should be _asset2.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
             Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
             Assert.That(image2.DecodePixelWidth, Is.Zero);
@@ -215,8 +238,10 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image3, Is.Not.Null);
             Assert.That(image3.StreamSource, Is.Not.Null);
             Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
-            Assert.That((int)image3.Width, Is.EqualTo(1307)); // Should be _asset3.Pixel.Asset.Width -> 1280 (weird result for png)
-            Assert.That((int)image3.Height, Is.EqualTo(735)); // Should be _asset3.Pixel.Asset.Height -> 720 (weird result for png)
+            Assert.That((int)image3.Width,
+                Is.EqualTo(1307)); // Should be _asset3.Pixel.Asset.Width -> 1280 (weird result for png)
+            Assert.That((int)image3.Height,
+                Is.EqualTo(735)); // Should be _asset3.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
             Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
             Assert.That(image3.DecodePixelWidth, Is.Zero);

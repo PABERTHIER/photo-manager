@@ -230,7 +230,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -238,7 +239,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -306,7 +308,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -351,11 +354,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndNewSetPositionAndNewAssetPositionAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndNewSetPositionAndNewAssetPositionAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -363,7 +368,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -434,7 +440,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -487,11 +494,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndFirstAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndFirstAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -499,7 +508,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -569,7 +579,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -615,11 +626,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndMiddleAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndMiddleAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -627,7 +640,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -695,7 +709,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -738,11 +753,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndLastAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndLastAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -750,7 +767,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -818,7 +836,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -861,11 +880,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndFirstAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndFirstAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -873,7 +894,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -941,7 +963,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -984,11 +1007,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndMiddleAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndMiddleAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -996,7 +1021,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1064,7 +1090,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1107,11 +1134,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndLastAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndLastAssetOfTheSetAndDuplicateIsNotInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1119,7 +1148,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1187,7 +1217,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1230,11 +1261,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndOneSetWithMultipleAssetsAndDeleteAll_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndOneSetWithMultipleAssetsAndDeleteAll_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1242,7 +1275,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1565,7 +1599,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets 4
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1655,9 +1690,11 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets 5
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(2));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-            Assert.That(messagesInformationSent[1].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[1].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[1].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1691,11 +1728,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1703,7 +1742,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1764,7 +1804,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1790,11 +1831,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNewAssetPositionAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNewAssetPositionAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1802,7 +1845,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1868,7 +1912,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1894,11 +1939,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1906,7 +1953,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -1967,7 +2015,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1993,11 +2042,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNewAssetPositionAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndOneSetWithTwoAssetsAndNewAssetPositionAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2005,7 +2056,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -2071,7 +2123,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -2097,11 +2150,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndTwoSetsAndDeleteAllTillNotVisibleAndFirstCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndTwoSetsAndDeleteAllTillNotVisibleAndFirstCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2109,7 +2164,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -2178,7 +2234,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2364,7 +2421,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -2394,11 +2452,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndTwoSetsAndDeleteAllTillNotVisibleAndSecondCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
+    public void
+        DeleteLabel_DuplicatesAndTwoSetsAndDeleteAllTillNotVisibleAndSecondCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2406,7 +2466,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -2477,7 +2538,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2674,7 +2736,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets 3
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -2708,7 +2771,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2716,7 +2780,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -2790,7 +2855,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // CollapseAssets
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -2816,11 +2882,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndNewSetPositionAndNewAssetPositionAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsAssetPosition()
+    public void
+        DeleteLabel_DuplicatesAndNewSetPositionAndNewAssetPositionAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsAssetPosition()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2828,7 +2896,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -2900,7 +2969,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2951,11 +3021,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndNewAssetPositionAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsAssetPosition()
+    public void
+        DeleteLabel_DuplicatesAndNewAssetPositionAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsAssetPosition()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2963,7 +3035,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -3066,11 +3139,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndUnknownDuplicateFromVisibleSet_SendsDeleteDuplicatedAssetsEventAndAndResetsPosition()
+    public void
+        DeleteLabel_DuplicatesAndUnknownDuplicateFromVisibleSet_SendsDeleteDuplicatedAssetsEventAndAndResetsPosition()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3078,7 +3153,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -3181,11 +3257,13 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     }
 
     [Test]
-    public void DeleteLabel_DuplicatesAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsPosition()
+    public void
+        DeleteLabel_DuplicatesAndUnknownDuplicateFromNotVisibleSet_SendsDeleteDuplicatedAssetsEventAndResetsPosition()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3193,7 +3271,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -3295,7 +3374,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3303,7 +3383,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<string> getExemptedFolderPathEvents =
+            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
         List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
         List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
@@ -3333,7 +3414,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -3377,10 +3459,11 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return (notifyPropertyChangedEvents, messagesInformationSent, findDuplicatedAssetsViewModelInstances);
     }
@@ -3442,11 +3525,15 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -3468,7 +3555,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -3497,7 +3585,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -3511,9 +3600,11 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

@@ -17,7 +17,8 @@ public class Application(
     : IApplication
 {
     // Catalog
-    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) => await catalogAssetsService.CatalogAssetsAsync(callback, token);
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) =>
+        await catalogAssetsService.CatalogAssetsAsync(callback, token);
 
     /// <summary>
     /// Detects duplicated assets in the catalog.
@@ -57,7 +58,8 @@ public class Application(
 
     public void LoadThumbnail(Asset asset)
     {
-        asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+        asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width,
+            asset.Pixel.Thumbnail.Height);
     }
 
     public Folder[] GetSubFolders(Folder parentFolder) => assetRepository.GetSubFolders(parentFolder);
@@ -75,12 +77,15 @@ public class Application(
 
     public string GetExemptedFolderPath() => userConfigurationService.PathSettings.ExemptedFolderPath;
 
-    public AboutInformation GetAboutInformation(Assembly assembly) => userConfigurationService.GetAboutInformation(assembly);
+    public AboutInformation GetAboutInformation(Assembly assembly) =>
+        userConfigurationService.GetAboutInformation(assembly);
 
     // ImageProcessingService
-    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) =>
+        imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
 
-    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) =>
+        imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
     // FileOperationsService
     public bool FileExists(string fullPath) => fileOperationsService.FileExists(fullPath);
@@ -88,7 +93,8 @@ public class Application(
     public int GetTotalFilesCount() => fileOperationsService.GetTotalFilesCount();
 
     // MoveAssetsService
-    public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
+    public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) =>
+        moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
 
     public void DeleteAssets(Asset[] assets) => moveAssetsService.DeleteAssets(assets);
 
@@ -102,5 +108,6 @@ public class Application(
         assetRepository.SaveCatalog(null);
     }
 
-    public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await syncAssetsService.ExecuteAsync(callback);
+    public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) =>
+        await syncAssetsService.ExecuteAsync(callback);
 }

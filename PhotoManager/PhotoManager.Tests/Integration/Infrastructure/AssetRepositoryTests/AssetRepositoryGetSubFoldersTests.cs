@@ -32,7 +32,8 @@ public class AssetRepositoryGetSubFoldersTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -164,7 +165,8 @@ public class AssetRepositoryGetSubFoldersTests
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!));
 
             Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 

@@ -86,8 +86,16 @@ public class DuplicatedSetViewModelTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -125,10 +133,12 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 =
+                new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 =
+                new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel2);
 
             CheckBeforeChanges(
@@ -214,10 +224,12 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 =
+                new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 =
+                new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel2);
 
             CheckBeforeChanges(
@@ -281,10 +293,12 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 =
+                new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 =
+                new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel2);
 
             CheckBeforeChanges(
@@ -348,10 +362,12 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 =
+                new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 =
+                new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel2);
 
             CheckBeforeChanges(
@@ -415,7 +431,8 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 =
+                new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             CheckBeforeChanges(
@@ -490,7 +507,8 @@ public class DuplicatedSetViewModelTests
         }
     }
 
-    private (List<string> notifyPropertyChangedEvents, List<DuplicatedSetViewModel> duplicatedSetViewModelInstances) NotifyPropertyChangedEvents()
+    private (List<string> notifyPropertyChangedEvents, List<DuplicatedSetViewModel> duplicatedSetViewModelInstances)
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedSetViewModel> duplicatedSetViewModelInstances = [];
@@ -556,8 +574,10 @@ public class DuplicatedSetViewModelTests
 
             for (int i = 0; i < expectedDuplicatedSetViewModel.Count; i++)
             {
-                Assert.That(duplicatedSetViewModelInstance[i].Visible, Is.EqualTo(expectedDuplicatedSetViewModel[i].Visible));
-                AssertAssetPropertyValidity(duplicatedSetViewModelInstance[i].Asset, expectedDuplicatedSetViewModel[i].Asset);
+                Assert.That(duplicatedSetViewModelInstance[i].Visible,
+                    Is.EqualTo(expectedDuplicatedSetViewModel[i].Visible));
+                AssertAssetPropertyValidity(duplicatedSetViewModelInstance[i].Asset,
+                    expectedDuplicatedSetViewModel[i].Asset);
 
                 AssertDuplicatedSetViewModelValidity(
                     duplicatedSetViewModelInstance,
@@ -612,9 +632,11 @@ public class DuplicatedSetViewModelTests
 
         if (duplicatedSetViewModelInstancesCount > 1)
         {
-            Assert.That(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 2], Is.EqualTo(duplicatedSetViewModelInstances[0]));
+            Assert.That(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 2],
+                Is.EqualTo(duplicatedSetViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 1], Is.EqualTo(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 2]));
+            Assert.That(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 1],
+                Is.EqualTo(duplicatedSetViewModelInstances[duplicatedSetViewModelInstancesCount - 2]));
         }
 
         if (duplicatedSetViewModelInstancesCount > 0)

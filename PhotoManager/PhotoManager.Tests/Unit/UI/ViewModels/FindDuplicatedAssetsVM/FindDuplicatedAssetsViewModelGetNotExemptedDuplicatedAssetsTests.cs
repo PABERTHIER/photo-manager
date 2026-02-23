@@ -244,11 +244,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -332,11 +334,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -380,11 +382,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndNewPositions_ReturnsAllOtherMatchingDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndNewPositions_ReturnsAllOtherMatchingDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -471,11 +475,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -527,11 +531,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentAsset_ReturnsMatchingDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentAsset_ReturnsMatchingDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -615,11 +621,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -661,11 +667,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentSet_ReturnsMatchingDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentSet_ReturnsMatchingDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -749,11 +757,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -795,11 +803,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSets_ReturnsMatchingDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSets_ReturnsMatchingDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -885,11 +895,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -936,11 +946,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasDuplicates_ReturnsAllOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasDuplicates_ReturnsAllOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1067,11 +1079,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsDifferentFolders_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsDifferentFolders_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1177,11 +1191,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsSameFolder_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsSameFolder_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1288,7 +1304,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1361,7 +1378,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -1403,11 +1421,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatching_ReturnsAssetInTheRootDirectory()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatching_ReturnsAssetInTheRootDirectory()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1501,11 +1521,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
     // This case cannot happen (having same file in same folder)
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsWithSameNameAndTwoSetsOfDuplicates_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsWithSameNameAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1577,7 +1599,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -1618,11 +1641,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
     // This case cannot happen (having same file in same folder)
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetMatchingAndTwoSetsOfDuplicatesWithTwoAssetsWithSameName_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetMatchingAndTwoSetsOfDuplicatesWithTwoAssetsWithSameName_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1695,7 +1720,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -1740,11 +1766,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
     // Visibility start ------------------------------------------------------------------------------------------------
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsThatHasOneCollapsedDuplicatesAndThreeSets_ReturnsOtherDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsThatHasOneCollapsedDuplicatesAndThreeSets_ReturnsOtherDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1831,11 +1859,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -1877,11 +1905,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneAssetCollapsedThatHasOneDuplicatesAndThreeSets_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneAssetCollapsedThatHasOneDuplicatesAndThreeSets_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1968,11 +1998,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2016,11 +2046,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetAndOneDuplicateIsCollapsedAndTwoSets_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetAndOneDuplicateIsCollapsedAndTwoSets_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2098,10 +2130,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2145,11 +2177,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetThatHasOneCollapsedDuplicateAndThreeSets_ReturnsOtherDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetThatHasOneCollapsedDuplicateAndThreeSets_ReturnsOtherDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2238,11 +2272,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2284,11 +2318,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndAllOtherAssetsAreCollapsed_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndAllOtherAssetsAreCollapsed_ReturnsEmptyList()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2381,11 +2417,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2425,11 +2461,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsCollapsedThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsCollapsedThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2518,11 +2556,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2566,11 +2604,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsAndThreeSetsWithOneCollapsed_ReturnsOtherDuplicatedAssets()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsAndThreeSetsWithOneCollapsed_ReturnsOtherDuplicatedAssets()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2659,11 +2699,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3
+            ];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2712,7 +2752,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2778,7 +2819,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -2822,7 +2864,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2914,11 +2957,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameAndHash_ReturnsOtherDuplicatedAsset()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameAndHash_ReturnsOtherDuplicatedAsset()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2980,7 +3025,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3022,11 +3068,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameButDifferentHash_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameButDifferentHash_ReturnsEmptyList()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3111,11 +3159,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
         string exemptedFolderPath = _dataDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3186,7 +3236,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3226,13 +3277,15 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheOtherDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheOtherDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
         string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
         string exemptedFolderPath = Path.Combine(otherDirectory);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3301,7 +3354,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3341,11 +3395,13 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_ReturnsEmptyList()
+    public void
+        GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_ReturnsEmptyList()
     {
         string exemptedFolderPath = _dataDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3413,7 +3469,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3457,7 +3514,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3528,7 +3586,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3572,7 +3631,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3621,7 +3681,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3694,7 +3755,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3739,7 +3801,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3791,7 +3854,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3862,7 +3926,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -3906,7 +3971,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3955,7 +4021,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = string.Empty;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4024,7 +4091,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -4068,7 +4136,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = string.Empty;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4115,7 +4184,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = null!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4184,7 +4254,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
@@ -4228,7 +4299,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = null!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+            false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4289,10 +4361,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return (notifyPropertyChangedEvents, messagesInformationSent, findDuplicatedAssetsViewModelInstances);
     }
@@ -4316,11 +4389,15 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -4342,7 +4419,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -4371,7 +4449,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -4385,9 +4464,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

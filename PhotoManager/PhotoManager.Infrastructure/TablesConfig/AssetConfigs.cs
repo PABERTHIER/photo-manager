@@ -28,7 +28,8 @@ public static class AssetConfigs
     {
         string[] formats = ["M/dd/yyyy HH:mm:ss"];
 
-        if (!DateTime.TryParseExact(values[7], formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime thumbnailCreationDateTime))
+        if (!DateTime.TryParseExact(values[7], formats, CultureInfo.InvariantCulture, DateTimeStyles.None,
+                out DateTime thumbnailCreationDateTime))
         {
             thumbnailCreationDateTime = DateTime.Now;
         }

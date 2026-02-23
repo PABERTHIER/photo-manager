@@ -33,11 +33,12 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { FileNames.IMAGE1_JPG, [1, 2, 3]},
-            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3] },
+            { FileNames.IMAGE_2_PNG, [4, 5, 6] }
         };
 
         try
@@ -75,11 +76,12 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { FileNames.IMAGE1_JPG, [1, 2, 3]},
-            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3] },
+            { FileNames.IMAGE_2_PNG, [4, 5, 6] }
         };
 
         try
@@ -117,7 +119,8 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
         {

@@ -10,22 +10,28 @@ public class DomainServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        ServiceDescriptor? assetsComparatorDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetsComparator));
+        ServiceDescriptor? assetsComparatorDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(IAssetsComparator));
         Assert.That(assetsComparatorDescriptor, Is.Null);
 
-        ServiceDescriptor? assetCreationServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetCreationService));
+        ServiceDescriptor? assetCreationServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(IAssetCreationService));
         Assert.That(assetCreationServiceDescriptor, Is.Null);
 
-        ServiceDescriptor? catalogAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ICatalogAssetsService));
+        ServiceDescriptor? catalogAssetsServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(ICatalogAssetsService));
         Assert.That(catalogAssetsServiceDescriptor, Is.Null);
 
-        ServiceDescriptor? findDuplicatedAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
+        ServiceDescriptor? findDuplicatedAssetsServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
         Assert.That(findDuplicatedAssetsServiceDescriptor, Is.Null);
 
-        ServiceDescriptor? moveAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IMoveAssetsService));
+        ServiceDescriptor? moveAssetsServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(IMoveAssetsService));
         Assert.That(moveAssetsServiceDescriptor, Is.Null);
 
-        ServiceDescriptor? syncAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ISyncAssetsService));
+        ServiceDescriptor? syncAssetsServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(ISyncAssetsService));
         Assert.That(syncAssetsServiceDescriptor, Is.Null);
 
         Assert.That(services, Is.Empty);
@@ -55,12 +61,14 @@ public class DomainServiceCollectionExtensionsTests
         Assert.That(catalogAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(catalogAssetsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(CatalogAssetsService)));
 
-        findDuplicatedAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
+        findDuplicatedAssetsServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
         Assert.That(findDuplicatedAssetsServiceDescriptor, Is.Not.Null);
         Assert.That(findDuplicatedAssetsServiceDescriptor, Is.EqualTo(services[3]));
         Assert.That(findDuplicatedAssetsServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(findDuplicatedAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(findDuplicatedAssetsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(FindDuplicatedAssetsService)));
+        Assert.That(findDuplicatedAssetsServiceDescriptor.ImplementationType,
+            Is.EqualTo(typeof(FindDuplicatedAssetsService)));
 
         moveAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IMoveAssetsService));
         Assert.That(moveAssetsServiceDescriptor, Is.Not.Null);

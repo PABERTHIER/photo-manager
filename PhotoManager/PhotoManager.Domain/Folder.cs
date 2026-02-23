@@ -10,7 +10,9 @@ public class Folder
     {
         get
         {
-            string[] pathParts = !string.IsNullOrWhiteSpace(Path) ? Path.Split(['\\'], StringSplitOptions.RemoveEmptyEntries) : [];
+            string[] pathParts = !string.IsNullOrWhiteSpace(Path)
+                ? Path.Split(['\\'], StringSplitOptions.RemoveEmptyEntries)
+                : [];
             string result = pathParts.Length > 0 ? pathParts[^1] : string.Empty;
 
             return result;
@@ -29,8 +31,8 @@ public class Folder
     public bool IsParentOf(Folder folder)
     {
         return !string.IsNullOrWhiteSpace(Path)
-            && !string.IsNullOrWhiteSpace(folder.Parent?.Path)
-            && string.Compare(Path, folder.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
+               && !string.IsNullOrWhiteSpace(folder.Parent?.Path)
+               && string.Compare(Path, folder.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
     }
 
     private static string? GetParentPath(string? path)

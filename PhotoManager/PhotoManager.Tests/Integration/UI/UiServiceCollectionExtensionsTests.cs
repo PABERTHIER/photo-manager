@@ -15,7 +15,8 @@ public class UiServiceCollectionExtensionsTests
         ServiceDescriptor? mainWindowDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(MainWindow));
         Assert.That(mainWindowDescriptor, Is.Null);
 
-        ServiceDescriptor? applicationViewModelDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ApplicationViewModel));
+        ServiceDescriptor? applicationViewModelDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(ApplicationViewModel));
         Assert.That(applicationViewModelDescriptor, Is.Null);
 
         Assert.That(services, Is.Empty);

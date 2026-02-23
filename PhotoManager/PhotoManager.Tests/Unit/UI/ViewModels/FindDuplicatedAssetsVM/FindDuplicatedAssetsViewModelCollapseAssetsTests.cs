@@ -165,7 +165,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         };
     }
 
-    private void ConfigureFindDuplicatedAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureFindDuplicatedAssetsViewModel(int catalogBatchSize, string assetsDirectory,
+        int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash,
+        bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -241,13 +243,13 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -292,7 +294,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -311,7 +314,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -357,13 +361,13 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -408,7 +412,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -425,7 +430,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsAllAssetsAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsAllAssetsAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -461,13 +467,13 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -512,7 +518,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -541,7 +548,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -559,7 +567,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsTwoAssetsOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsTwoAssetsOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -595,10 +604,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -640,7 +649,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -685,7 +695,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsSecondAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsSecondAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -762,7 +773,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -808,7 +820,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsFirstAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsFirstAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -884,7 +897,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -927,7 +941,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsAssetsInCurrentAndNotInCurrentSetAndDuplicatedAssets_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsAssetsInCurrentAndNotInCurrentSetAndDuplicatedAssets_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -961,11 +976,11 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1008,7 +1023,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1027,7 +1043,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -1079,10 +1096,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1124,7 +1141,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1164,7 +1182,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetWithTheCurrentDuplicatedAssetAndDuplicatedAssets_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetWithTheCurrentDuplicatedAssetAndDuplicatedAssets_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1196,10 +1215,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
@@ -1312,11 +1331,11 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1359,7 +1378,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1429,10 +1449,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1474,7 +1494,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1580,7 +1601,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -1672,7 +1694,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1786,7 +1809,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -1824,7 +1848,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1858,10 +1883,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][2]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][2]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1903,7 +1928,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2046,7 +2072,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2082,7 +2109,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsOneAssetInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsOneAssetInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2156,7 +2184,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2251,10 +2280,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -2296,7 +2325,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2406,7 +2436,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2442,7 +2473,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsTwoAssetsNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsTwoAssetsNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2476,10 +2508,10 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
             _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]
-                ]);
+            [
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][0],
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]
+            ]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -2521,7 +2553,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2582,7 +2615,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     }
 
     [Test]
-    public void CollapseAssets_DuplicatedAssetsContainsOneAssetNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
+    public void
+        CollapseAssets_DuplicatedAssetsContainsOneAssetNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2656,7 +2690,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2766,7 +2801,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -2837,7 +2873,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -2990,7 +3027,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Message,
+                Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
             CheckInstance(
@@ -3026,10 +3064,11 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return (notifyPropertyChangedEvents, messagesInformationSent, findDuplicatedAssetsViewModelInstances);
     }
@@ -3053,11 +3092,15 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -3079,7 +3122,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -3108,7 +3152,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -3122,9 +3167,11 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

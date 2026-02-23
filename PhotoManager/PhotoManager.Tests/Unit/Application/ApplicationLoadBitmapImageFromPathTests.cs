@@ -22,7 +22,8 @@ public class ApplicationLoadBitmapImageFromPathTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -67,7 +68,8 @@ public class ApplicationLoadBitmapImageFromPathTests
     [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
+    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith,
+        int expectedHeight)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -151,7 +153,8 @@ public class ApplicationLoadBitmapImageFromPathTests
             string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
             const Rotation rotation = (Rotation)999;
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
 
             Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
         }
@@ -179,7 +182,8 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Assert.That(image, Is.Not.Null);
                 Assert.That(image.StreamSource, Is.Null);
                 Assert.That(image.Rotation, Is.EqualTo(rotation));
-                Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+                Assert.That(image.Width,
+                    Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
                 Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
                 Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
                 Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));

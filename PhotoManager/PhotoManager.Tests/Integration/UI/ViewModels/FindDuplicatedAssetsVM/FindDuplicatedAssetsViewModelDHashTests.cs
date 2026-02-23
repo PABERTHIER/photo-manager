@@ -134,8 +134,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1_180_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_180_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_180_DEG_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_180_DEG_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_180_DEG_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG
+                }
             },
             FileProperties = new()
             {
@@ -160,8 +168,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1_270_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_270_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_270_DEG_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_270_DEG_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_270_DEG_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG
+                }
             },
             FileProperties = new()
             {
@@ -186,8 +202,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1_90_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_90_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_90_DEG_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_90_DEG_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_90_DEG_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG
+                }
             },
             FileProperties = new()
             {
@@ -212,8 +236,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_2_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
+                    Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG
+                }
             },
             FileProperties = new()
             {
@@ -395,7 +427,11 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_8_JPEG, Height = PixelHeightAsset.IMAGE_8_JPEG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_8_JPEG, Height = ThumbnailHeightAsset.IMAGE_8_JPEG }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_8_JPEG,
+                    Height = ThumbnailHeightAsset.IMAGE_8_JPEG
+                }
             },
             FileProperties = new()
             {
@@ -447,7 +483,11 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -472,8 +512,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_11_270_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_270_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_270_DEG_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
+                    Height = PixelHeightAsset.IMAGE_11_270_DEG_HEIC
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -498,8 +546,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, Height = PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, Height = ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
+                    Height = PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG
+                }
             },
             FileProperties = new()
             {
@@ -550,8 +606,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -602,8 +666,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -629,7 +701,11 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -706,8 +782,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_BOTTOM_LEFT_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG, Height = PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, Height = ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
+                    Height = PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -732,8 +816,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_BOTTOM_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_BOTTOM_PART_JPG, Height = PixelHeightAsset._1336_BOTTOM_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_BOTTOM_PART_JPG, Height = ThumbnailHeightAsset._1336_BOTTOM_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_BOTTOM_PART_JPG,
+                    Height = PixelHeightAsset._1336_BOTTOM_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_BOTTOM_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -758,8 +850,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_LEFT_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_LEFT_PART_JPG, Height = PixelHeightAsset._1336_LEFT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_LEFT_PART_JPG, Height = ThumbnailHeightAsset._1336_LEFT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_LEFT_PART_JPG,
+                    Height = PixelHeightAsset._1336_LEFT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_LEFT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_LEFT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -784,8 +884,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_ORIGINAL_JPG, Height = PixelHeightAsset._1336_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_ORIGINAL_JPG,
+                    Height = PixelHeightAsset._1336_ORIGINAL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG,
+                    Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -810,8 +918,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_RIGHT_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_RIGHT_PART_JPG, Height = PixelHeightAsset._1336_RIGHT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_RIGHT_PART_JPG, Height = ThumbnailHeightAsset._1336_RIGHT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_RIGHT_PART_JPG,
+                    Height = PixelHeightAsset._1336_RIGHT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_RIGHT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -836,8 +952,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_TOP_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_TOP_PART_JPG, Height = PixelHeightAsset._1336_TOP_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_TOP_PART_JPG, Height = ThumbnailHeightAsset._1336_TOP_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_TOP_PART_JPG,
+                    Height = PixelHeightAsset._1336_TOP_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_TOP_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_TOP_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -862,8 +986,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_TOP_RIGHT_PART_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_TOP_RIGHT_PART_JPG, Height = PixelHeightAsset._1336_TOP_RIGHT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, Height = ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
+                    Height = PixelHeightAsset._1336_TOP_RIGHT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -888,8 +1020,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames._1336_4_K_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
+                    Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG,
+                    Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -914,8 +1054,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
+                    Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -940,8 +1088,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
+                    Height = PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG
+                }
             },
             FileProperties = new()
             {
@@ -966,8 +1122,16 @@ public class FindDuplicatedAssetsViewModelDHashTests
             FileName = FileNames.IMAGE_1336_SMALL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_SMALL_JPG, Height = PixelHeightAsset.IMAGE_1336_SMALL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1336_SMALL_JPG,
+                    Height = PixelHeightAsset.IMAGE_1336_SMALL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -1013,7 +1177,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
         };
     }
 
-    private void ConfigureFindDuplicatedAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureFindDuplicatedAssetsViewModel(int catalogBatchSize, string assetsDirectory,
+        int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash,
+        bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -1648,7 +1814,8 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1],
+                Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
@@ -1701,10 +1868,11 @@ public class FindDuplicatedAssetsViewModelDHashTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
-        {
-            messagesInformationSent.Add(e);
-        };
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
+            delegate (object _, MessageBoxInformationSentEventArgs e)
+            {
+                messagesInformationSent.Add(e);
+            };
 
         return
         (
@@ -1734,11 +1902,15 @@ public class FindDuplicatedAssetsViewModelDHashTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -1760,7 +1932,8 @@ public class FindDuplicatedAssetsViewModelDHashTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -1789,7 +1962,8 @@ public class FindDuplicatedAssetsViewModelDHashTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -1803,9 +1977,11 @@ public class FindDuplicatedAssetsViewModelDHashTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

@@ -118,12 +118,14 @@ public class AboutWindowTests
     [Test]
     [TestCase("Manager Photo", "Toto")]
     [TestCase("Photo Toto", "Tutu")]
-    public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName, string expectedProjectOwner)
+    public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName,
+        string expectedProjectOwner)
     {
         ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
-        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        AssemblyBuilder assemblyBuilder =
+            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
         try
         {

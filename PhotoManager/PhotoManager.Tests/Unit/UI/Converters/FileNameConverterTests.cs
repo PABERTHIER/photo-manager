@@ -8,10 +8,14 @@ public class FileNameConverterTests
     [Test]
     [TestCase("", "")]
     [TestCase("example.jpg", "example.jpg")]
-    [TestCase("_example.jpg", "__example.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
-    [TestCase("_toto_toto_toto_toto.jpg", "__toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
-    [TestCase("_____toto_toto_toto_toto.jpg", "__________toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
-    [TestCase("toto_tutu", "toto__tutu")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("_example.jpg",
+        "__example.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("_toto_toto_toto_toto.jpg",
+        "__toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("_____toto_toto_toto_toto.jpg",
+        "__________toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("toto_tutu",
+        "toto__tutu")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
     public void Convert_InputStringNotNull_ReturnsFormattedFileName(string name, string expected)
     {
         FileNameConverter fileNameConverter = new();
@@ -30,7 +34,8 @@ public class FileNameConverterTests
 
         object? parameter = null;
 
-        string? result = (string?)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        string? result = (string?)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!,
+            CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -64,7 +69,8 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Type? targetType = null;
 
-        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
+            fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }

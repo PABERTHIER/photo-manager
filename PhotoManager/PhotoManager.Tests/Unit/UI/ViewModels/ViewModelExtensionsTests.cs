@@ -64,7 +64,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "tutu", "toto" })] // Unchanged
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
-    public void MoveUp_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveUpItem(string[] collection, string[] expectedCollection)
+    public void MoveUp_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveUpItem(string[] collection,
+        string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 
@@ -86,7 +87,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
-    public void MoveUp_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    public void MoveUp_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(
+        string[] collection, string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 
@@ -108,7 +110,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "tutu", "toto" })] // Unchanged
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "tutu", "toto" })]
-    public void MoveUp_LastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    public void MoveUp_LastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection,
+        string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 
@@ -252,7 +255,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
-    public void MoveDown_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveDownItem(string[] collection, string[] expectedCollection)
+    public void MoveDown_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveDownItem(string[] collection,
+        string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 
@@ -274,7 +278,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "toto", "tutu" })]
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
-    public void MoveDown_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    public void MoveDown_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(
+        string[] collection, string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 
@@ -296,7 +301,8 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
     [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
-    public void MoveDown_LastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    public void MoveDown_LastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection,
+        string[] expectedCollection)
     {
         ObservableCollection<string> items = [.. collection];
 

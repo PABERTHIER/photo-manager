@@ -11,7 +11,8 @@ public class BackupStorage : IBackupStorage
 
     public void WriteFolderToZipFile(string sourceDirectoryName, string destinationArchiveFileName)
     {
-        ZipFile.CreateFromDirectory(sourceDirectoryName, destinationArchiveFileName, CompressionLevel.NoCompression, false);
+        ZipFile.CreateFromDirectory(sourceDirectoryName, destinationArchiveFileName, CompressionLevel.NoCompression,
+            false);
     }
 
     public void DeleteBackupFile(string backupFilePath)

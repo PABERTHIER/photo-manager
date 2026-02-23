@@ -99,7 +99,11 @@ public class AssetsComparatorTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new() { Size = FileSize.IMAGE_11_HEIC },
             ThumbnailCreationDateTime = _oldDateTime2,
@@ -475,7 +479,9 @@ public class AssetsComparatorTests
             }
         ];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() =>
+                _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }
@@ -498,7 +504,9 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() =>
+                _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
@@ -506,7 +514,8 @@ public class AssetsComparatorTests
     [Test]
     public void GetNewFileNamesToSync_AllNewFiles_ReturnsArrayOfNewFileNames()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = ["file6.jpg", "file7.png", "file8.gif", "file9.heic"];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
@@ -518,8 +527,10 @@ public class AssetsComparatorTests
     [Test]
     public void GetNewFileNamesToSync_SomeNewFiles_ReturnsArrayOfNewFileNames()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
-        string[] destinationFileNames = ["file1.jpg", "file4.heic", "file6.jpg", "file7.png", "file8.gif", "file9.heic"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] destinationFileNames =
+            ["file1.jpg", "file4.heic", "file6.jpg", "file7.png", "file8.gif", "file9.heic"];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
@@ -530,7 +541,8 @@ public class AssetsComparatorTests
     [Test]
     public void GetNewFileNamesToSync_NoNewFiles_ReturnsEmptyArray()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
@@ -555,7 +567,8 @@ public class AssetsComparatorTests
         string[]? sourceFileNames = null;
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }
@@ -563,7 +576,8 @@ public class AssetsComparatorTests
     [Test]
     public void GetNewFileNamesToSync_DestinationFileNamesIsEmpty_ReturnsArrayOfNewFileNames()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = [];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
@@ -575,23 +589,30 @@ public class AssetsComparatorTests
     [Test]
     public void GetNewFileNamesToSync_DestinationFileNamesIsNull_ThrowsArgumentNullException()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[]? destinationFileNames = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
 
     [Test]
-    [TestCase(new[] { "image1.jpg", "video1.mp4", "file2.txt", "image2.png", "image3.gif", "image4.heic" }, new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
-    [TestCase(new[] { "file2.txt", "image2.png", "image1.jpg", "video1.mp4", "image3.gif", "image4.heic" }, new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
-    [TestCase(new[] { "image1.jpg", "video1.mp4", "image2.png", "image3.gif", "image4.heic" }, new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
-    [TestCase(new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new string[] { })]
+    [TestCase(new[] { "image1.jpg", "video1.mp4", "file2.txt", "image2.png", "image3.gif", "image4.heic" },
+        new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
+    [TestCase(new[] { "file2.txt", "image2.png", "image1.jpg", "video1.mp4", "image3.gif", "image4.heic" },
+        new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
+    [TestCase(new[] { "image1.jpg", "video1.mp4", "image2.png", "image3.gif", "image4.heic" },
+        new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new[] { "video1.mp4" })]
+    [TestCase(new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" },
+        new[] { "image1.jpg", "image2.png", "image3.gif", "image4.heic" }, new string[] { })]
     [TestCase(new[] { "video1.mp4", "video2.mov" }, new string[] { }, new[] { "video1.mp4", "video2.mov" })]
     [TestCase(new[] { "file1.txt", "file2.doc", "file3.pdf" }, new string[] { }, new string[] { })]
     [TestCase(new string[] { }, new string[] { }, new string[] { })]
-    public void GetImageAndVideoNames_ReturnsImageAndVideoNamesArray(string[] fileNames, string[] expectedImageNames, string[] expectedVideoNames)
+    public void GetImageAndVideoNames_ReturnsImageAndVideoNamesArray(string[] fileNames, string[] expectedImageNames,
+        string[] expectedVideoNames)
     {
         (string[] imageNames, string[] videoNames) = _assetsComparator!.GetImageAndVideoNames(fileNames);
 
@@ -604,13 +625,15 @@ public class AssetsComparatorTests
     {
         string[]? fileNames = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetImageAndVideoNames(fileNames!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetImageAndVideoNames(fileNames!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
-    public void GetUpdatedFileNames_ThumbnailCreationDateTimeBeforeFileCreationOrModificationDateTime_ReturnsArrayOfNamesOfAssetsUpdated()
+    public void
+        GetUpdatedFileNames_ThumbnailCreationDateTimeBeforeFileCreationOrModificationDateTime_ReturnsArrayOfNamesOfAssetsUpdated()
     {
         string[] expectedFileNames = [_asset1!.FileName, _asset2!.FileName, _asset3!.FileName, _asset4!.FileName];
 
@@ -644,7 +667,8 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetUpdatedFileNames_ThumbnailCreationDateTimeIsSameAsFileCreationOrModificationDateTime_ReturnsEmptyArray()
+    public void
+        GetUpdatedFileNames_ThumbnailCreationDateTimeIsSameAsFileCreationOrModificationDateTime_ReturnsEmptyArray()
     {
         _asset1!.FileProperties = new()
         {
@@ -699,7 +723,8 @@ public class AssetsComparatorTests
     {
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
@@ -984,7 +1009,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
+        Assert.That(deletedFileNames, Is.EquivalentTo([
+            "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
         ]));
     }
 
@@ -1056,7 +1082,8 @@ public class AssetsComparatorTests
             }
         ];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
@@ -1078,7 +1105,8 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
@@ -1086,33 +1114,39 @@ public class AssetsComparatorTests
     [Test]
     public void GetDeletedFileNamesToSync_AllDeletedFiles_ReturnsArrayOfDeletedFileNames()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = ["file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
+        Assert.That(deletedFileNames, Is.EquivalentTo([
+            "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
         ]));
     }
 
     [Test]
     public void GetDeletedFileNamesToSync_SomeDeletedFiles_ReturnsArrayOfDeletedFileNames()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
-        string[] destinationFileNames = ["file1.jpg", "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] destinationFileNames =
+            ["file1.jpg", "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
+        Assert.That(deletedFileNames, Is.EquivalentTo([
+            "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
         ]));
     }
 
     [Test]
     public void GetDeletedFileNamesToSync_NoDeletedFiles_ReturnsEmptyArray()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
@@ -1129,7 +1163,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
+        Assert.That(deletedFileNames, Is.EquivalentTo([
+            "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
         ]));
     }
 
@@ -1139,7 +1174,8 @@ public class AssetsComparatorTests
         string[]? sourceFileNames = null;
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
@@ -1147,7 +1183,8 @@ public class AssetsComparatorTests
     [Test]
     public void GetDeletedFileNamesToSync_DestinationFileNamesIsEmpty_ReturnsEmptyArray()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[] destinationFileNames = [];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
@@ -1158,10 +1195,12 @@ public class AssetsComparatorTests
     [Test]
     public void GetDeletedFileNamesToSync_DestinationFileNamesIsNull_ThrowsArgumentNullException()
     {
-        string[] sourceFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
+        string[] sourceFileNames =
+            ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[]? destinationFileNames = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }

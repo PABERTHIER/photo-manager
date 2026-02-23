@@ -28,7 +28,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES, syncAssetsEveryXMinutes.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES,
+            syncAssetsEveryXMinutes.ToString());
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
@@ -61,7 +62,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void GetSyncAssetsEveryXMinutes_CorrectValue_ReturnsSyncAssetsEveryXMinutesValue(bool expectedSyncAssetsEveryXMinutes)
+    public void GetSyncAssetsEveryXMinutes_CorrectValue_ReturnsSyncAssetsEveryXMinutesValue(
+        bool expectedSyncAssetsEveryXMinutes)
     {
         ConfigureApplicationViewModel(_dataDirectory!, expectedSyncAssetsEveryXMinutes);
 
@@ -144,7 +146,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -155,7 +158,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
-    private static void CheckAfterChanges(ApplicationViewModel applicationViewModelInstance, string expectedLastDirectoryInspected)
+    private static void CheckAfterChanges(ApplicationViewModel applicationViewModelInstance,
+        string expectedLastDirectoryInspected)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
@@ -171,7 +175,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
@@ -182,13 +187,15 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
-    private static void CheckInstance(List<ApplicationViewModel> applicationViewModelInstances, string expectedLastDirectoryInspected)
+    private static void CheckInstance(List<ApplicationViewModel> applicationViewModelInstances,
+        string expectedLastDirectoryInspected)
     {
         int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
             Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
                 Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));

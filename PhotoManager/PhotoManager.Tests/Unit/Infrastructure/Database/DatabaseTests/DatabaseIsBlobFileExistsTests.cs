@@ -35,8 +35,8 @@ public class DatabaseIsBlobFileExistsTests
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { FileNames.IMAGE1_JPG, [1, 2, 3]},
-            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3] },
+            { FileNames.IMAGE_2_PNG, [4, 5, 6] }
         };
 
         try

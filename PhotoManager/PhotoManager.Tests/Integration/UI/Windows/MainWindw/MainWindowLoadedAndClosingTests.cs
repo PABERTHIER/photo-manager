@@ -65,8 +65,16 @@ public class MainWindowLoadedAndClosingTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -117,8 +125,16 @@ public class MainWindowLoadedAndClosingTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -144,7 +160,11 @@ public class MainWindowLoadedAndClosingTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -192,11 +212,13 @@ public class MainWindowLoadedAndClosingTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
-        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, catalogCooldownMinutes.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES,
+            catalogCooldownMinutes.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, thumbnailMaxWidth.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, thumbnailMaxHeight.ToString());
-        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES, syncAssetsEveryXMinutes.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES,
+            syncAssetsEveryXMinutes.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
@@ -233,7 +255,8 @@ public class MainWindowLoadedAndClosingTests
     }
 
     [Test]
-    public async Task WindowLoaded_CataloguedAssetsAndSyncAssetsEveryXMinutesAndIsCancellationRequestedAndWindowClosing_CatalogsAssetsThreeTimesAndClosesWindowSafely()
+    public async Task
+        WindowLoaded_CataloguedAssetsAndSyncAssetsEveryXMinutesAndIsCancellationRequestedAndWindowClosing_CatalogsAssetsThreeTimesAndClosesWindowSafely()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
@@ -268,7 +291,8 @@ public class MainWindowLoadedAndClosingTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 4";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
@@ -417,7 +441,8 @@ public class MainWindowLoadedAndClosingTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
@@ -536,7 +561,8 @@ public class MainWindowLoadedAndClosingTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 4";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
@@ -662,7 +688,8 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
             const string expectedTotalFilesCountWording = "0 files found";
@@ -770,7 +797,8 @@ public class MainWindowLoadedAndClosingTests
 
             MainWindowsInit();
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             TaskCompletionSource<bool> taskCompletionSource = new();
             _catalogTask = taskCompletionSource.Task;
@@ -866,7 +894,8 @@ public class MainWindowLoadedAndClosingTests
 
             MainWindowsInit();
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             TaskCompletionSource<bool> taskCompletionSource = new();
             _catalogTask = taskCompletionSource.Task;
@@ -988,7 +1017,8 @@ public class MainWindowLoadedAndClosingTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -1020,8 +1050,10 @@ public class MainWindowLoadedAndClosingTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(expectedGlobalAssetsCounterWording));
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording,
+            Is.EqualTo(expectedGlobalAssetsCounterWording));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(expectedExecutionTimeWording));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(expectedTotalFilesCountWording));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
@@ -1095,9 +1127,11 @@ public class MainWindowLoadedAndClosingTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
+                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)
@@ -1116,7 +1150,8 @@ public class MainWindowLoadedAndClosingTests
         }
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -1125,7 +1160,8 @@ public class MainWindowLoadedAndClosingTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -1172,7 +1208,8 @@ public class MainWindowLoadedAndClosingTests
         try
         {
             _stopwatch = Stopwatch.StartNew();
-            _applicationViewModel!.StatusMessage = $"Cataloging thumbnails for {_applicationViewModel!.CurrentFolderPath}";
+            _applicationViewModel!.StatusMessage =
+                $"Cataloging thumbnails for {_applicationViewModel!.CurrentFolderPath}";
 
             await InitializeOnceAsync().ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
 
@@ -1187,14 +1224,16 @@ public class MainWindowLoadedAndClosingTests
                 {
                     try
                     {
-                        await Task.Delay(delay, _cancellationTokenSource!.Token).ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
+                        await Task.Delay(delay, _cancellationTokenSource!.Token)
+                            .ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
                     }
                     catch (OperationCanceledException)
                     {
                         break;
                     }
 
-                    await InitializeOnceAsync().ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
+                    await InitializeOnceAsync()
+                        .ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
                     counter++;
                 }
             }

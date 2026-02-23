@@ -303,25 +303,36 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
     // The hamming distance is about 121 between these hashes
     [Test]
-    [Category("NotDuplicate folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
+    [Category(
+        "NotDuplicate folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
     [TestCase("20", 0, new string[] { })]
     [TestCase("40", 0, new string[] { })]
     [TestCase("60", 0, new string[] { })]
     [TestCase("80", 0, new string[] { })]
     [TestCase("100", 0, new string[] { })]
     [TestCase("110", 0, new string[] { })]
-    [TestCase("128", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("128", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateBasicHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            string folderPath2 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            string folderPath3 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
             string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -336,7 +347,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_HASH);
             _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_HASH);
             _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_HASH);
-            _asset8 = _asset8!.WithFolder(folder4).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder4)
+                .WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -373,18 +385,28 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase("15", 0, new string[] { })]
     [TestCase("20", 0, new string[] { })]
     [TestCase("25", 0, new string[] { })]
-    [TestCase("32", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("32", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateMD5HashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            string folderPath2 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            string folderPath3 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
             string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -399,7 +421,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_MD5_HASH);
             _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_MD5_HASH);
             _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_MD5_HASH);
-            _asset8 = _asset8!.WithFolder(folder4).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder4)
+                .WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -435,15 +458,18 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase("9", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG })]
     [TestCase("11", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG })]
     [TestCase("14", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
             string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -451,7 +477,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_D_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder4).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder4)
+                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -482,15 +509,18 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase("9", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG })]
     [TestCase("11", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG })]
     [TestCase("14", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -498,7 +528,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
             _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET1349_D_HASH);
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET1350_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -529,15 +560,18 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase("9", 0, new string[] { })]
     [TestCase("11", 0, new string[] { })]
     [TestCase("14", 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -546,7 +580,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET1413_D_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET1414_D_HASH);
             _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1415_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -577,28 +612,84 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("30", 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { }, new string[] { })]
-    [TestCase("40", 3, new[] { FileNames._1336_JPG, FileNames._1350_JPG }, new[] { FileNames._1337_JPG, FileNames._1350_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG })]
-    [TestCase("50", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { }, new string[] { })]
-    [TestCase("60", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG }, new string[] { }, new string[] { })]
-    [TestCase("80", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("90", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("100", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("120", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("140", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("160", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("180", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("210", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicatePHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase("40", 3, new[] { FileNames._1336_JPG, FileNames._1350_JPG },
+        new[] { FileNames._1337_JPG, FileNames._1350_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG })]
+    [TestCase("50", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("60", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("80", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("90", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("100", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("120", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("140", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("160", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("180", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("210", 1,
+        new[]
+        {
+            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
+            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicatePHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+            string folderPath1 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            string folderPath2 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            string folderPath3 = Path.Combine(_dataDirectory!,
+                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
             string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
@@ -613,7 +704,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_P_HASH);
             _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_P_HASH);
             _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_P_HASH);
-            _asset8 = _asset8!.WithFolder(folder4).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
+            _asset8 = _asset8!.WithFolder(folder4)
+                .WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 

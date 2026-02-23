@@ -24,7 +24,8 @@ public class ApplicationGetSyncAssetsEveryXMinutesTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES, syncAssetsEveryXMinutes.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES,
+            syncAssetsEveryXMinutes.ToString());
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
@@ -55,7 +56,8 @@ public class ApplicationGetSyncAssetsEveryXMinutesTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void GetSyncAssetsEveryXMinutes_CorrectValue_ReturnsSyncAssetsEveryXMinutesValue(bool expectedSyncAssetsEveryXMinutes)
+    public void GetSyncAssetsEveryXMinutes_CorrectValue_ReturnsSyncAssetsEveryXMinutesValue(
+        bool expectedSyncAssetsEveryXMinutes)
     {
         ConfigureApplication(_dataDirectory!, expectedSyncAssetsEveryXMinutes);
 

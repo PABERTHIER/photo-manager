@@ -24,7 +24,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
-    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -39,7 +40,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        _syncAssetsDirectoriesDefinitionsTableName = userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
+        _syncAssetsDirectoriesDefinitionsTableName = userConfigurationService.StorageSettings.TablesSettings
+            .SyncAssetsDirectoriesDefinitionsTableName;
 
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
@@ -72,7 +74,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -81,9 +84,21 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
 
             // Different source and destination
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "C:\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "C:\\Valid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\Server\\Valid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "\\Server\\Valid2\\Path"
+            });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "\\Server\\Valid1\\Path",
@@ -93,9 +108,20 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             });
 
             // Same source and destination
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "C:\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes1", DestinationDirectory = @"C:\Some\\Extra\Backslashes1" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "C:\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\Server\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes1", DestinationDirectory = @"C:\Some\\Extra\Backslashes1"
+            });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes",
@@ -104,8 +130,16 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             });
 
             // Different source and destination not normalized
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes1", DestinationDirectory = "C:\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = @"C:\Some\\Extra\Backslashes2" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes1",
+                DestinationDirectory = "C:\\Valid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = @"C:\Some\\Extra\Backslashes2"
+            });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = @"C:\Some\\Extra\Backslashes1",
@@ -113,12 +147,32 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
                 IncludeSubFolders = true
             });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes", DestinationDirectory = "C:\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes1", DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes2" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes",
+                DestinationDirectory = "C:\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes1",
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes2"
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes1", DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes2" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes1", DestinationDirectory = @"C:\Some\\Extra\Backslashes2" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes1",
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes2"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes1",
+                DestinationDirectory = @"C:\Some\\Extra\Backslashes2"
+            });
 
             _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
@@ -153,8 +207,10 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [TestCase("\\Server\\Valid1\\Path", "\\Server\\Valid2\\Path", "\\Server\\Valid1\\Path", "\\Server\\Valid2\\Path")]
     [TestCase("C:\\Valid1\\Path", "\\Server\\Valid2\\Path", "C:\\Valid1\\Path", "\\Server\\Valid2\\Path")]
     [TestCase("\\Server\\Valid1\\Path", "C:\\Valid2\\Path", "\\Server\\Valid1\\Path", "C:\\Valid2\\Path")]
-    [TestCase(@"C:\Some\\Extra\Backslashes1", @"\\Remote\With\\\\Extra\Backslashes2", "C:\\Some\\Extra\\Backslashes1", "\\Remote\\With\\Extra\\Backslashes2")]
-    [TestCase(@"\\Remote\With\\\\Extra\Backslashes1", @"C:\Some\\Extra\Backslashes2", "\\Remote\\With\\Extra\\Backslashes1", "C:\\Some\\Extra\\Backslashes2")]
+    [TestCase(@"C:\Some\\Extra\Backslashes1", @"\\Remote\With\\\\Extra\Backslashes2", "C:\\Some\\Extra\\Backslashes1",
+        "\\Remote\\With\\Extra\\Backslashes2")]
+    [TestCase(@"\\Remote\With\\\\Extra\Backslashes1", @"C:\Some\\Extra\Backslashes2",
+        "\\Remote\\With\\Extra\\Backslashes1", "C:\\Some\\Extra\\Backslashes2")]
     public void SetProcessConfiguration_SameValidDefinitions_SavesConfigurationWithDuplicateDefinitions(
         string sourceDirectory,
         string destinationDirectory,
@@ -163,7 +219,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -171,8 +228,16 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = sourceDirectory,
+                DestinationDirectory = destinationDirectory
+            });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = sourceDirectory,
@@ -200,27 +265,32 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(5));
 
             Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsConfiguration.Definitions[2].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsConfiguration.Definitions[2].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsConfiguration.Definitions[2].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsConfiguration.Definitions[2].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsConfiguration.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(syncAssetsConfiguration.Definitions[3].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsConfiguration.Definitions[3].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsConfiguration.Definitions[3].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsConfiguration.Definitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[3].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(syncAssetsConfiguration.Definitions[4].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsConfiguration.Definitions[4].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsConfiguration.Definitions[4].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsConfiguration.Definitions[4].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsConfiguration.Definitions[4].DeleteAssetsNotInSource, Is.False);
 
@@ -231,27 +301,32 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(5));
 
             Assert.That(syncAssetsDirectoriesDefinitions[0].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsDirectoriesDefinitions[0].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsDirectoriesDefinitions[0].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsDirectoriesDefinitions[0].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsDirectoriesDefinitions[1].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsDirectoriesDefinitions[1].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsDirectoriesDefinitions[1].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsDirectoriesDefinitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[1].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsDirectoriesDefinitions[2].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsDirectoriesDefinitions[2].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsDirectoriesDefinitions[2].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsDirectoriesDefinitions[2].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsDirectoriesDefinitions[2].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(syncAssetsDirectoriesDefinitions[3].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsDirectoriesDefinitions[3].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsDirectoriesDefinitions[3].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsDirectoriesDefinitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[3].DeleteAssetsNotInSource, Is.True);
 
             Assert.That(syncAssetsDirectoriesDefinitions[4].SourceDirectory, Is.EqualTo(expectedSourceDirectory));
-            Assert.That(syncAssetsDirectoriesDefinitions[4].DestinationDirectory, Is.EqualTo(expectedDestinationDirectory));
+            Assert.That(syncAssetsDirectoriesDefinitions[4].DestinationDirectory,
+                Is.EqualTo(expectedDestinationDirectory));
             Assert.That(syncAssetsDirectoriesDefinitions[4].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsDirectoriesDefinitions[4].DeleteAssetsNotInSource, Is.False);
 
@@ -272,23 +347,56 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
             CheckBeforeChanges();
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "C:\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "Invalid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "\\Server\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "Invalid2\\Path" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = "C:\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "Invalid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = "\\Server\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = "Invalid2\\Path"
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "C:\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "C:\\Valid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\Server\\Valid2\\Path"
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes1", DestinationDirectory = "C:\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes1",
+                DestinationDirectory = "C:\\Valid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes"
+            });
 
             _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
@@ -302,17 +410,20 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("\\Server\\Valid2\\Path"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory,
+                Is.EqualTo("\\Server\\Valid2\\Path"));
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(syncAssetsConfiguration.Definitions[2].SourceDirectory, Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
+            Assert.That(syncAssetsConfiguration.Definitions[2].SourceDirectory,
+                Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
             Assert.That(syncAssetsConfiguration.Definitions[2].DestinationDirectory, Is.EqualTo("C:\\Valid2\\Path"));
             Assert.That(syncAssetsConfiguration.Definitions[2].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsConfiguration.Definitions[3].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
-            Assert.That(syncAssetsConfiguration.Definitions[3].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+            Assert.That(syncAssetsConfiguration.Definitions[3].DestinationDirectory,
+                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
             Assert.That(syncAssetsConfiguration.Definitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[3].DeleteAssetsNotInSource, Is.False);
 
@@ -331,13 +442,15 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsDirectoriesDefinitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(syncAssetsDirectoriesDefinitions[2].SourceDirectory, Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
+            Assert.That(syncAssetsDirectoriesDefinitions[2].SourceDirectory,
+                Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
             Assert.That(syncAssetsDirectoriesDefinitions[2].DestinationDirectory, Is.EqualTo("C:\\Valid2\\Path"));
             Assert.That(syncAssetsDirectoriesDefinitions[2].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[2].DeleteAssetsNotInSource, Is.False);
 
             Assert.That(syncAssetsDirectoriesDefinitions[3].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
-            Assert.That(syncAssetsDirectoriesDefinitions[3].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+            Assert.That(syncAssetsDirectoriesDefinitions[3].DestinationDirectory,
+                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
             Assert.That(syncAssetsDirectoriesDefinitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[3].DeleteAssetsNotInSource, Is.False);
 
@@ -354,11 +467,13 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     }
 
     [Test]
-    public void SetProcessConfiguration_SyncAssetsConfigurationWithDifferentConfigurations_SavesConfigurationAndEraseThePreviousOne()
+    public void
+        SetProcessConfiguration_SyncAssetsConfigurationWithDifferentConfigurations_SavesConfigurationAndEraseThePreviousOne()
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -366,8 +481,16 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Toto\\Screenshots", DestinationDirectory = "C:\\Images\\Toto" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Tutu\\Screenshots", DestinationDirectory = "C:\\Images\\Tutu" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu"
+            });
 
             _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
@@ -402,7 +525,11 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsDirectoriesDefinitions[1].DeleteAssetsNotInSource, Is.False);
 
             syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Toto\\Screenshots", DestinationDirectory = "C:\\Images\\Toto" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto"
+            });
 
             // New save
             _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
@@ -457,7 +584,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -492,29 +620,74 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
             CheckBeforeChanges();
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "Invalid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "https://www.some-site.com", DestinationDirectory = "ftp://some-location.com" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid@Value.com", DestinationDirectory = "Invalid@Value.com" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = "Invalid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "https://www.some-site.com",
+                DestinationDirectory = "ftp://some-location.com"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid@Value.com",
+                DestinationDirectory = "Invalid@Value.com"
+            });
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "", DestinationDirectory = " " });
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = " ", DestinationDirectory = "" });
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "", DestinationDirectory = null! });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "C:\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "Invalid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "\\Server\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "Invalid2\\Path" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = "C:\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = "Invalid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = "\\Server\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = "Invalid2\\Path"
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = @"C:\Some\\Extra\Backslashes" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes", DestinationDirectory = "Invalid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes", DestinationDirectory = "Invalid1\\Path" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = @"C:\Some\\Extra\Backslashes"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes",
+                DestinationDirectory = "Invalid2\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "Invalid1\\Path",
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes",
+                DestinationDirectory = "Invalid1\\Path"
+            });
 
             _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
@@ -541,30 +714,69 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     }
 
     [Test]
-    public void SetProcessConfiguration_DefinitionsWithNullPathsForSourceOrDestination_ThrowsArgumentNullExceptionAndDoesNotSaveConfiguration()
+    public void
+        SetProcessConfiguration_DefinitionsWithNullPathsForSourceOrDestination_ThrowsArgumentNullExceptionAndDoesNotSaveConfiguration()
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
             CheckBeforeChanges();
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = null!, DestinationDirectory = "C:\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = null! });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = null!, DestinationDirectory = "\\Server\\Valid1\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = null! });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = null!,
+                DestinationDirectory = "C:\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Valid1\\Path",
+                DestinationDirectory = null!
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = null!,
+                DestinationDirectory = "\\Server\\Valid1\\Path"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "\\Server\\Valid1\\Path",
+                DestinationDirectory = null!
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = null!, DestinationDirectory = @"C:\Some\\Extra\Backslashes" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"C:\Some\\Extra\Backslashes", DestinationDirectory = null! });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = null!, DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes", DestinationDirectory = null! });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = null!,
+                DestinationDirectory = @"C:\Some\\Extra\Backslashes"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"C:\Some\\Extra\Backslashes",
+                DestinationDirectory = null!
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = null!,
+                DestinationDirectory = @"\\Remote\With\\\\Extra\Backslashes"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = @"\\Remote\With\\\\Extra\Backslashes",
+                DestinationDirectory = null!
+            });
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = null!, DestinationDirectory = null! });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = null!,
+                DestinationDirectory = null!
+            });
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave));
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'input')"));
 
@@ -595,7 +807,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     {
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
 
         try
         {
@@ -603,8 +816,16 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
 
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Toto\\Screenshots", DestinationDirectory = "C:\\Images\\Toto" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Tutu\\Screenshots", DestinationDirectory = "C:\\Images\\Tutu" });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto"
+            });
+            syncAssetsConfigurationToSave.Definitions.Add(new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu"
+            });
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -738,7 +959,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         Assert.That(definitions[15].DeleteAssetsNotInSource, Is.False);
     }
 
-    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) NotifyPropertyChangedEvents()
+    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
@@ -779,10 +1001,14 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
         for (int i = 0; i < definitions.Count; i++)
         {
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory, Is.EqualTo(definitions[i].SourceDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory, Is.EqualTo(definitions[i].DestinationDirectory));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders, Is.EqualTo(definitions[i].IncludeSubFolders));
-            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource, Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory,
+                Is.EqualTo(definitions[i].SourceDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory,
+                Is.EqualTo(definitions[i].DestinationDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders,
+                Is.EqualTo(definitions[i].IncludeSubFolders));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource,
+                Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
         }
 
         // From BaseProcessViewModel
