@@ -69,8 +69,16 @@ public class MainWindowFindDuplicatesTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -121,8 +129,16 @@ public class MainWindowFindDuplicatesTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -148,7 +164,11 @@ public class MainWindowFindDuplicatesTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -261,7 +281,8 @@ public class MainWindowFindDuplicatesTests
     }
 
     [Test]
-    public async Task FindDuplicates_CataloguedAssetsAndRefreshAndDeleteNotExempted_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
+    public async Task
+        FindDuplicates_CataloguedAssetsAndRefreshAndDeleteNotExempted_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
@@ -275,11 +296,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -311,7 +332,8 @@ public class MainWindowFindDuplicatesTests
 
             _asset1Temp = _asset1Temp!.WithFolder(exemptedFolder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             string result = FindDuplicates();
@@ -442,11 +464,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -469,7 +491,8 @@ public class MainWindowFindDuplicatesTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             string result = FindDuplicates();
@@ -589,11 +612,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -616,7 +639,8 @@ public class MainWindowFindDuplicatesTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             string result = FindDuplicates();
@@ -738,11 +762,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -765,7 +789,8 @@ public class MainWindowFindDuplicatesTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             string result = FindDuplicates();
@@ -871,7 +896,8 @@ public class MainWindowFindDuplicatesTests
     }
 
     [Test]
-    public async Task FindDuplicates_NoCataloguedAssetsAndRefreshAndDelete_ShowsNoDuplicatesHaveBeenFoundAndDoesNotSendEvents()
+    public async Task
+        FindDuplicates_NoCataloguedAssetsAndRefreshAndDelete_ShowsNoDuplicatesHaveBeenFoundAndDoesNotSendEvents()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
@@ -885,11 +911,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -905,7 +931,8 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string result = FindDuplicates();
 
@@ -994,11 +1021,11 @@ public class MainWindowFindDuplicatesTests
         ) = NotifyPropertyChangedEvents();
 
         (
-            List<string> getExemptedFolderPathEvents,
-            List<Asset[]> deleteDuplicatedAssetsEvents,
-            List<string> refreshAssetsCounterEvents
-        )
-        = NotifyFindDuplicatedAssetsWindowsEvents();
+                List<string> getExemptedFolderPathEvents,
+                List<Asset[]> deleteDuplicatedAssetsEvents,
+                List<string> refreshAssetsCounterEvents
+            )
+            = NotifyFindDuplicatedAssetsWindowsEvents();
 
         try
         {
@@ -1014,7 +1041,8 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string result = FindDuplicates();
 
@@ -1150,7 +1178,8 @@ public class MainWindowFindDuplicatesTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -1178,7 +1207,8 @@ public class MainWindowFindDuplicatesTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
@@ -1241,9 +1271,11 @@ public class MainWindowFindDuplicatesTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
+                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)
@@ -1258,7 +1290,8 @@ public class MainWindowFindDuplicatesTests
         }
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -1267,7 +1300,8 @@ public class MainWindowFindDuplicatesTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -1290,11 +1324,15 @@ public class MainWindowFindDuplicatesTests
     {
         AssertDuplicatedAssetSets(findDuplicatedAssetsViewModelInstance, expectedDuplicatedAssetSets);
 
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition, Is.EqualTo(expectedDuplicatedAssetSetsPosition));
-        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition, Is.EqualTo(expectedDuplicatedAssetPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSetsPosition,
+            Is.EqualTo(expectedDuplicatedAssetSetsPosition));
+        Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetPosition,
+            Is.EqualTo(expectedDuplicatedAssetPosition));
 
-        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet, expectedCurrentDuplicatedAssetSet);
-        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset, expectedCurrentDuplicatedAsset);
+        AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAssetSet,
+            expectedCurrentDuplicatedAssetSet);
+        AssertDuplicatedAsset(findDuplicatedAssetsViewModelInstance.CurrentDuplicatedAsset,
+            expectedCurrentDuplicatedAsset);
     }
 
     private static void AssertDuplicatedAssetSets(
@@ -1316,7 +1354,8 @@ public class MainWindowFindDuplicatesTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet, DuplicatedSetViewModel expectedDuplicatedAssetSet)
+    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+        DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
@@ -1345,7 +1384,8 @@ public class MainWindowFindDuplicatesTests
         Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
     }
 
-    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset, DuplicatedAssetViewModel? expectedDuplicatedAsset)
+    private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
+        DuplicatedAssetViewModel? expectedDuplicatedAsset)
     {
         if (expectedDuplicatedAsset != null)
         {
@@ -1359,9 +1399,11 @@ public class MainWindowFindDuplicatesTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
+                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else
@@ -1412,7 +1454,8 @@ public class MainWindowFindDuplicatesTests
 
     private void DeleteAll(DuplicatedAssetViewModel duplicatedAssetViewModel)
     {
-        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel?.GetDuplicatedAssets(duplicatedAssetViewModel.Asset) ?? [];
+        List<DuplicatedAssetViewModel> assetsToDelete =
+            _findDuplicatedAssetsViewModel?.GetDuplicatedAssets(duplicatedAssetViewModel.Asset) ?? [];
 
         DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 
@@ -1423,7 +1466,8 @@ public class MainWindowFindDuplicatesTests
     {
         string exemptedFolderPath = GetExemptedFolderPathEvent?.Invoke(this) ?? string.Empty;
 
-        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel?.GetNotExemptedDuplicatedAssets(exemptedFolderPath) ?? [];
+        List<DuplicatedAssetViewModel> assetsToDelete =
+            _findDuplicatedAssetsViewModel?.GetNotExemptedDuplicatedAssets(exemptedFolderPath) ?? [];
 
         DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 

@@ -4,7 +4,8 @@ namespace PhotoManager.Infrastructure.Database.Storage;
 
 public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 {
-    public List<T> ReadObjectList<T>(string dataFilePath, Func<string[], T> mapObjectFromCsvFields, Diagnostics diagnostics)
+    public List<T> ReadObjectList<T>(string dataFilePath, Func<string[], T> mapObjectFromCsvFields,
+        Diagnostics diagnostics)
     {
         List<T> list = [];
 
@@ -18,7 +19,8 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
         return list;
     }
 
-    public void WriteObjectList<T>(string dataFilePath, List<T> list, Func<T, int, object> mapCsvFieldIndexToCsvField, Diagnostics diagnostics)
+    public void WriteObjectList<T>(string dataFilePath, List<T> list, Func<T, int, object> mapCsvFieldIndexToCsvField,
+        Diagnostics diagnostics)
     {
         string tableName = Properties?.TableName ?? "NoTableName";
         string csv = GetCsvFromObjectList(list, tableName, mapCsvFieldIndexToCsvField);
@@ -57,8 +59,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
                         string[] fields = GetValuesFromCsvLine(line);
                         list.Add(mapObjectFromCsvFields(fields));
                     }
-                }
-                while (hasRecord);
+                } while (hasRecord);
             }
             else
             {
@@ -77,15 +78,15 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
                         string[] fields = line.Split(Separator);
                         list.Add(mapObjectFromCsvFields(fields));
                     }
-                }
-                while (hasRecord);
+                } while (hasRecord);
             }
         }
 
         return list;
     }
 
-    private string GetCsvFromObjectList<T>(List<T> list, string tableName, Func<T, int, object> mapCsvFieldIndexToCsvField)
+    private string GetCsvFromObjectList<T>(List<T> list, string tableName,
+        Func<T, int, object> mapCsvFieldIndexToCsvField)
     {
         StringBuilder builder = new();
 

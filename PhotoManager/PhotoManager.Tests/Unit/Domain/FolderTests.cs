@@ -20,9 +20,14 @@ public class FolderTests
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder", false)]
     [TestCase("TestFolder\\TestSubFolder1\\TestSubFolder2", "TestFolder", false)]
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder\\TestSubFolder2", false)]
-    public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2, bool expected)
+    public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2,
+        bool expected)
     {
-        Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, parentFolderSubPath1) };
+        Folder parentFolder1 = new()
+        {
+            Id = Guid.NewGuid(),
+            Path = Path.Combine(_dataDirectory!, parentFolderSubPath1)
+        };
         Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, childFolderSubPath2) };
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
@@ -35,7 +40,8 @@ public class FolderTests
     [TestCase("TestFolder", "", false)]
     [TestCase(" ", "TestFolder", false)]
     [TestCase("TestFolder", " ", false)]
-    public void IsParentOf_PathIsInvalid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2, bool expected)
+    public void IsParentOf_PathIsInvalid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2,
+        bool expected)
     {
         Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderSubPath1 };
         Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = childFolderSubPath2 };

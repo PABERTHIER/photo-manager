@@ -32,7 +32,8 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -86,7 +87,11 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         {
             for (int i = 0; i < 30; i++)
             {
-                _assetRepository!.UpdateTargetPathToRecent(new() { Id = Guid.NewGuid(), Path = $"D:\\Workspace\\PhotoManager\\Folder{i}" });
+                _assetRepository!.UpdateTargetPathToRecent(new()
+                {
+                    Id = Guid.NewGuid(),
+                    Path = $"D:\\Workspace\\PhotoManager\\Folder{i}"
+                });
             }
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
@@ -194,7 +199,8 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.UpdateTargetPathToRecent(folder3!));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => _assetRepository!.UpdateTargetPathToRecent(folder3!));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 

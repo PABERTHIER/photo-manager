@@ -83,13 +83,15 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderIsNull_ThrowsNullReferenceException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             Folder? folder = null;
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
@@ -106,7 +108,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderExistsWithThumbnails_RemovesThumbnailsAndFolder()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -123,11 +126,13 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.True);
 
-            _testableAssetRepository.SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
+            _testableAssetRepository
+                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
@@ -174,7 +179,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderExistsNoThumbnails_RemovesOnlyFolder()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -187,7 +193,8 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            _testableAssetRepository.SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
+            _testableAssetRepository
+                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
@@ -229,7 +236,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderExistsNoThumbnailsButCreated_RemovesFolderAndThumbnail()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -242,11 +250,13 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.False);
 
-            _testableAssetRepository.SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
+            _testableAssetRepository
+                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
@@ -289,7 +299,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderExistsNoThumbnailsButBinExists_RemovesFolderAndBinFile()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -302,7 +313,8 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            _testableAssetRepository.SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
+            _testableAssetRepository
+                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
@@ -346,7 +358,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_FolderDoesNotExist_RemovesNothing()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -391,7 +404,8 @@ public class AssetRepositoryDeleteFolderTests
     public void DeleteFolder_ConcurrentAccess_ThumbnailsAndFoldersAreHandledSafely()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
@@ -408,11 +422,13 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.True);
 
-            _testableAssetRepository.SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
+            _testableAssetRepository
+                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 

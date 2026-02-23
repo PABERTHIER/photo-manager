@@ -163,7 +163,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         };
     }
 
-    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -220,7 +221,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             int expectedViewerPosition = 3;
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 4 of 5 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 4 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -264,7 +266,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
             // Second GoToPreviousAsset
             expectedViewerPosition = 2;
-            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 3 of 5 - sorted by file name ascending";
+            expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 3 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToPreviousAsset();
 
@@ -307,7 +310,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
             // Third GoToPreviousAsset
             expectedViewerPosition = 1;
-            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
+            expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToPreviousAsset();
 
@@ -356,7 +360,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
             // Fourth GoToPreviousAsset
             expectedViewerPosition = 0;
-            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToPreviousAsset();
 
@@ -449,7 +454,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -516,7 +522,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.GoToPreviousAsset();
 
@@ -609,7 +616,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -643,7 +651,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
@@ -652,7 +661,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
         if (expectedCurrentAsset != null)
         {
-            AssertAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+            AssertAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset,
+                expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
         }
         else
         {
@@ -667,7 +677,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
-    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
+        string folderPath, Folder folder)
     {
         Assert.That(asset.FileName, Is.EqualTo(expectedAsset.FileName));
         Assert.That(asset.FolderId, Is.EqualTo(folder.Id));
@@ -691,7 +702,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -700,7 +712,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath,
+                currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -731,9 +744,11 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
+                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)

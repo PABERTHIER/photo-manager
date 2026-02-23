@@ -58,7 +58,8 @@ public class RecentPathsConfigsTests
     {
         string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArray));
+        IndexOutOfRangeException? exception =
+            Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArray));
 
         Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
@@ -78,9 +79,11 @@ public class RecentPathsConfigsTests
     {
         const string recentPath = "D:\\folder\\newFolder";
 
-        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
+        ArgumentOutOfRangeException? exception =
+            Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
 
-        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
+        Assert.That(exception?.Message,
+            Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]

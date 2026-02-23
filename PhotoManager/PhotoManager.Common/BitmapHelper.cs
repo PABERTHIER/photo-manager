@@ -73,7 +73,8 @@ public static class BitmapHelper
             {
                 using (MagickImage magickImage = new(stream))
                 {
-                    MagickImageApplyRotation(magickImage, rotation, true); // Apply Rotation because MagickImage does not rotate the image in-place
+                    // Apply Rotation because MagickImage does not rotate the image in-place
+                    MagickImageApplyRotation(magickImage, rotation, true);
 
                     // Convert the MagickImage to a BitmapImage
                     using (MemoryStream bitmapStream = new())
@@ -83,7 +84,8 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                        // To keep the imageData after dispose of the using block
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
@@ -115,7 +117,8 @@ public static class BitmapHelper
             {
                 using (MagickImage magickImage = new(stream))
                 {
-                    MagickImageApplyRotation(magickImage, rotation, false); // Apply Rotation because MagickImage does not rotate the image in-place
+                    // Apply Rotation because MagickImage does not rotate the image in-place
+                    MagickImageApplyRotation(magickImage, rotation, false);
 
                     // Resize the MagickImage
                     magickImage.Resize((uint)width, (uint)height);
@@ -128,7 +131,8 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                        // To keep the imageData after dispose of the using block
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
@@ -177,7 +181,8 @@ public static class BitmapHelper
         {
             using (MagickImage magickImage = new(imagePath))
             {
-                MagickImageApplyRotation(magickImage, rotation, false); // Apply Rotation because MagickImage does not rotate the image in-place
+                // Apply Rotation because MagickImage does not rotate the image in-place
+                MagickImageApplyRotation(magickImage, rotation, false);
 
                 // Convert the MagickImage to a byte array (supported format: JPG)
                 byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);

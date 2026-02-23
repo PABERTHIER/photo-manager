@@ -21,7 +21,8 @@ public class MoveAssetsService(
         ValidateParameters(assets);
 
         bool result = false;
-        Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means it is not present in the catalog
+        // If the folder is null, it means it is not present in the catalog
+        Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path);
 
         // TODO: IF THE DESTINATION FOLDER IS NEW, THE FOLDER NAVIGATION CONTROL SHOULD DISPLAY IT WHEN THE USER GOES BACK TO THE MAIN WINDOW.
         bool isDestinationFolderInCatalog = folder != null;
@@ -128,7 +129,8 @@ public class MoveAssetsService(
         {
             if (fileOperationsService.FileExists(destinationFilePath))
             {
-                Log.Error($"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.");
+                Log.Error(
+                    $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.");
                 return fileOperationsService.FileExists(sourceFilePath);
             }
 
@@ -141,7 +143,8 @@ public class MoveAssetsService(
 
             File.Copy(sourceFilePath, destinationFilePath);
 
-            return fileOperationsService.FileExists(sourceFilePath) && fileOperationsService.FileExists(destinationFilePath);
+            return fileOperationsService.FileExists(sourceFilePath) &&
+                   fileOperationsService.FileExists(destinationFilePath);
         }
         catch (FileNotFoundException)
         {
@@ -165,7 +168,8 @@ public class MoveAssetsService(
         }
         catch (Exception ex)
         {
-            Log.Error($"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {ex.Message}");
+            Log.Error(
+                $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {ex.Message}");
             return false;
         }
     }

@@ -815,7 +815,8 @@ public class ImageProcessingServiceTests
         const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => _imageProcessingService!.LoadBitmapHeicImageFromPath(filePath, rotation));
+            Assert.Throws<ArgumentException>(() =>
+                _imageProcessingService!.LoadBitmapHeicImageFromPath(filePath, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }

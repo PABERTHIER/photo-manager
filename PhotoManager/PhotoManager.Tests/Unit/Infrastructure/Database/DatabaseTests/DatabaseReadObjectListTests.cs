@@ -27,23 +27,28 @@ public class DatabaseReadObjectListTests
 
         _userConfigurationService = new(configurationRootMock.Object);
 
-        _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
+        _csvEscapedTextWithSemicolon =
+            "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"false\";\"\";\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175816_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\";\"The asset is corrupted\";\"true\";\"The asset has been rotated\";\"true\"\r\n";
 
-        _csvUnescapedTextWithSemicolon = "FolderId;FileName;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;CorruptedMessage;IsCorrupted;RotatedMessage;IsRotated\r\n" +
+        _csvUnescapedTextWithSemicolon =
+            "FolderId;FileName;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;CorruptedMessage;IsCorrupted;RotatedMessage;IsRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4;;false;;false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124;The asset is corrupted;true;The asset has been rotated;true\r\n";
 
-        _csvEscapedTextWithPipe = "\"FolderId\"|\"FileName\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"CorruptedMessage\"|\"IsCorrupted\"|\"RotatedMessage\"|\"IsRotated\"\r\n" +
+        _csvEscapedTextWithPipe =
+            "\"FolderId\"|\"FileName\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"CorruptedMessage\"|\"IsCorrupted\"|\"RotatedMessage\"|\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175810_3.jpg\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\"|\"\"|\"false\"|\"\"|\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175816_3.jpg\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\"|\"The asset is corrupted\"|\"true\"|\"The asset has been rotated\"|\"true\"\r\n";
 
-        _csvUnescapedTextWithPipe = "FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|IsRotated\r\n" +
+        _csvUnescapedTextWithPipe =
+            "FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|IsRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175810_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175816_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|true\r\n";
 
-        _csvSomeUnescapedTextWithPipe = "\"FolderId\"|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|\"IsRotated\"\r\n" +
+        _csvSomeUnescapedTextWithPipe =
+            "\"FolderId\"|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175810_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175816_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|\"true\"\r\n";
 
@@ -65,11 +70,13 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, Constants.SEMICOLON_SEPARATOR, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, Constants.SEMICOLON_SEPARATOR, filePath, csv, tableName,
+                escapeText);
 
             Asserts(assets, filePath, csv);
         }
@@ -89,11 +96,13 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator,
+                filePath, csv, tableName, escapeText);
 
             Asserts(assets, filePath, csv);
         }
@@ -111,12 +120,13 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
-            $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
-            $"LastReadFilePath: {filePath}\n" +
-            $"LastReadFileRaw: {csv}";
+                                  $"DataDirectory: {directoryPath}\n" +
+                                  $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
+                                  $"LastReadFilePath: {filePath}\n" +
+                                  $"LastReadFileRaw: {csv}";
 
         try
         {
@@ -128,7 +138,8 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
@@ -145,7 +156,8 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -175,7 +187,8 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -226,7 +239,8 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -279,11 +293,13 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv!, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator,
+                filePath, csv!, tableName, escapeText);
 
             Assert.That(assets, Is.Empty);
         }
@@ -303,11 +319,13 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator,
+                filePath, csv, tableName, escapeText);
 
             Assert.That(assets, Is.Empty);
         }
@@ -327,18 +345,20 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
-            $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
-            $"LastReadFilePath: {filePath}\n" +
-            $"LastReadFileRaw: {csv}";
+                                  $"DataDirectory: {directoryPath}\n" +
+                                  $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
+                                  $"LastReadFilePath: {filePath}\n" +
+                                  $"LastReadFileRaw: {csv}";
 
         try
         {
             ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
             {
-                ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
+                ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv,
+                    tableName, escapeText);
             });
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
@@ -356,13 +376,14 @@ public class DatabaseReadObjectListTests
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         Func<string[], Asset>? nullFunc = null;
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
-            $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
-            $"LastReadFilePath: {filePath}\n" +
-            $"LastReadFileRaw: {csv}";
+                                  $"DataDirectory: {directoryPath}\n" +
+                                  $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
+                                  $"LastReadFilePath: {filePath}\n" +
+                                  $"LastReadFileRaw: {csv}";
 
         try
         {
@@ -380,7 +401,8 @@ public class DatabaseReadObjectListTests
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
@@ -396,18 +418,22 @@ public class DatabaseReadObjectListTests
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
-            $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
-            $"LastReadFilePath: {filePath}\n" +
-            $"LastReadFileRaw: {null}";
+                                  $"DataDirectory: {directoryPath}\n" +
+                                  $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
+                                  $"LastReadFilePath: {filePath}\n" +
+                                  $"LastReadFileRaw: {null}";
 
         try
         {
             Mock<IObjectListStorage> objectListStorageMock = new();
-            objectListStorageMock.Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(), It.IsAny<Diagnostics>())).Throws(new Exception());
-            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
+            objectListStorageMock
+                .Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(),
+                    It.IsAny<Diagnostics>())).Throws(new Exception());
+            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
+                new BlobStorage(), new BackupStorage());
 
             database.Initialize(
                 directoryPath,
@@ -423,7 +449,8 @@ public class DatabaseReadObjectListTests
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
@@ -433,13 +460,14 @@ public class DatabaseReadObjectListTests
         }
     }
 
-    private List<Asset> ReadObjectList(string directoryPath, char separator, string filePath, string csv, string tableName, bool escapeText)
+    private List<Asset> ReadObjectList(string directoryPath, char separator, string filePath, string csv,
+        string tableName, bool escapeText)
     {
         _database!.Initialize(
-                directoryPath,
-                separator,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            directoryPath,
+            separator,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
         File.WriteAllText(filePath, csv);
 
@@ -482,7 +510,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset1.Pixel.Thumbnail.Width, Is.EqualTo(200));
         Assert.That(asset1.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset1.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
-        Assert.That(asset1.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset1.Hash,
+            Is.EqualTo(
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.False);
         Assert.That(asset1.Metadata.Corrupted.Message, Is.EqualTo(""));
         Assert.That(asset1.Metadata.Rotated.IsTrue, Is.False);
@@ -497,7 +527,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset2.Pixel.Thumbnail.Width, Is.EqualTo(200));
         Assert.That(asset2.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset2.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
-        Assert.That(asset2.Hash, Is.EqualTo("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124"));
+        Assert.That(asset2.Hash,
+            Is.EqualTo(
+                "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124"));
         Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset2.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset2.Metadata.Rotated.IsTrue, Is.True);

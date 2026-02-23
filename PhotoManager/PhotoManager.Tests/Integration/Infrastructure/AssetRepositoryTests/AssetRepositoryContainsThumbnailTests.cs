@@ -82,7 +82,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_ThumbnailsExistInRepository_ReturnsTrue()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -98,7 +99,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.True);
 
@@ -116,7 +118,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_ConcurrentAccess_ThumbnailsAreHandledSafely()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -138,9 +141,12 @@ public class AssetRepositoryContainsThumbnailTests
 
             // Simulate concurrent access
             Parallel.Invoke(
-                () => isContainingThumbnail1 = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName),
-                () => isContainingThumbnail2 = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName),
-                () => isContainingThumbnail3 = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName)
+                () => isContainingThumbnail1 =
+                    _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName),
+                () => isContainingThumbnail2 =
+                    _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName),
+                () => isContainingThumbnail3 =
+                    _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName)
             );
 
             Assert.That(isContainingThumbnail1, Is.True);
@@ -161,7 +167,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_FolderDoesNotExistButAdded_ReturnsTrue()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -181,7 +188,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.True);
 
@@ -199,7 +207,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_FolderDoesNotExist_ReturnsFalse()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -216,7 +225,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(thumbnails, Is.Empty);
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
@@ -247,7 +257,8 @@ public class AssetRepositoryContainsThumbnailTests
             imageProcessingService, imageMetadataService, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -262,11 +273,13 @@ public class AssetRepositoryContainsThumbnailTests
 
             testableAssetRepository.AddAsset(_asset1!, []);
 
-            Assert.That(testableAssetRepository.HasChanges(), Is.True); // Set by AddFolder method, called by AddAsset method
+            Assert.That(testableAssetRepository.HasChanges(),
+                Is.True); // Set by AddFolder method, called by AddAsset method
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
-            bool isContainingThumbnail = testableAssetRepository.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                testableAssetRepository.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(isContainingThumbnail, Is.False);
 
@@ -283,7 +296,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_ThumbnailsDoNotExistInRepository_ReturnsFalse()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -300,7 +314,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(thumbnails, Is.Empty);
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
@@ -320,7 +335,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_ThumbnailsDoNotExistInRepositoryButBinExists_ReturnsTrue()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -349,7 +365,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(thumbnails, Is.Empty);
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
-            bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
+            bool isContainingThumbnail =
+                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_asset1.Folder.Path), Is.True);
@@ -372,7 +389,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_DifferentFileName_ReturnsFalse()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -407,7 +425,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_NullFileName_ReturnsFalse()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -442,7 +461,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_NullDirectoryName_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -459,7 +479,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.ContainsThumbnail(directoryName!, _asset1!.FileName));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _testableAssetRepository!.ContainsThumbnail(directoryName!, _asset1!.FileName));
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
 

@@ -12,7 +12,7 @@ public partial class SyncAssetsDirectoriesDefinition
     internal bool IsValid()
     {
         return (IsValidLocalPath(SourceDirectory) || IsValidRemotePath(SourceDirectory))
-            && (IsValidLocalPath(DestinationDirectory) || IsValidRemotePath(DestinationDirectory));
+               && (IsValidLocalPath(DestinationDirectory) || IsValidRemotePath(DestinationDirectory));
     }
 
     internal void Normalize()

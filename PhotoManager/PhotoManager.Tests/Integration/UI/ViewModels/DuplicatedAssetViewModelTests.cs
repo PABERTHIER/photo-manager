@@ -62,8 +62,16 @@ public class DuplicatedAssetViewModelTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -114,8 +122,16 @@ public class DuplicatedAssetViewModelTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -141,7 +157,11 @@ public class DuplicatedAssetViewModelTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -311,7 +331,8 @@ public class DuplicatedAssetViewModelTests
         }
     }
 
-    private (List<string> notifyPropertyChangedEvents, List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances) NotifyPropertyChangedEvents()
+    private (List<string> notifyPropertyChangedEvents, List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances)
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances = [];
@@ -345,20 +366,29 @@ public class DuplicatedAssetViewModelTests
 
         if (expectedParentViewModel.Count > 0)
         {
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel.FileName));
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModelFileName));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModel.FileName));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModelFileName));
 
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.Count));
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModelDuplicatesCount));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModel.DuplicatesCount));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModel.Count));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModelDuplicatesCount));
 
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.Visible,
+                Is.EqualTo(expectedParentViewModel.Visible));
 
             for (int i = 0; i < expectedParentViewModel.Count; i++)
             {
-                Assert.That(_duplicatedAssetViewModel!.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
-                AssertAssetPropertyValidity(_duplicatedAssetViewModel!.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+                Assert.That(_duplicatedAssetViewModel!.ParentViewModel[i].Visible,
+                    Is.EqualTo(expectedParentViewModel[i].Visible));
+                AssertAssetPropertyValidity(_duplicatedAssetViewModel!.ParentViewModel[i].Asset,
+                    expectedParentViewModel[i].Asset);
             }
         }
         else
@@ -388,20 +418,29 @@ public class DuplicatedAssetViewModelTests
 
         if (expectedParentViewModel.Count > 0)
         {
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel.FileName));
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModelFileName));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModel.FileName));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName,
+                Is.EqualTo(expectedParentViewModelFileName));
 
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.Count));
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModelDuplicatesCount));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModel.DuplicatesCount));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModel.Count));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount,
+                Is.EqualTo(expectedParentViewModelDuplicatesCount));
 
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.Visible,
+                Is.EqualTo(expectedParentViewModel.Visible));
 
             for (int i = 0; i < expectedParentViewModel.Count; i++)
             {
-                AssertAssetPropertyValidity(duplicatedAssetViewModelInstance.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
-                Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
+                AssertAssetPropertyValidity(duplicatedAssetViewModelInstance.ParentViewModel[i].Asset,
+                    expectedParentViewModel[i].Asset);
+                Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible,
+                    Is.EqualTo(expectedParentViewModel[i].Visible));
             }
         }
         else
@@ -433,9 +472,11 @@ public class DuplicatedAssetViewModelTests
 
         if (duplicatedAssetViewModelInstancesCount > 1)
         {
-            Assert.That(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 2], Is.EqualTo(duplicatedAssetViewModelInstances[0]));
+            Assert.That(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 2],
+                Is.EqualTo(duplicatedAssetViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 1], Is.EqualTo(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 2]));
+            Assert.That(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 1],
+                Is.EqualTo(duplicatedAssetViewModelInstances[duplicatedAssetViewModelInstancesCount - 2]));
         }
 
         if (duplicatedAssetViewModelInstancesCount > 0)

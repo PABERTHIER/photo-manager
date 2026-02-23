@@ -24,7 +24,8 @@ public class FileSizeConverterTests
         FileSizeConverter fileSizeConverter = new();
         object? parameter = null;
 
-        string? result = (string?)fileSizeConverter.Convert(size, typeof(long), parameter!, CultureInfo.InvariantCulture);
+        string? result =
+            (string?)fileSizeConverter.Convert(size, typeof(long), parameter!, CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -103,7 +104,8 @@ public class FileSizeConverterTests
         FileSizeConverter fileSizeConverter = new();
         object? parameter = null;
 
-        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
+            fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter!, CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }

@@ -41,7 +41,8 @@ public static class DirectoryHelper
 
         // Deny the "ListFolder" and "ReadData" permissions to everyone.
         // This effectively denies access to the folder.
-        directorySecurity.AddAccessRule(new(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData, AccessControlType.Deny));
+        directorySecurity.AddAccessRule(new(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData,
+            AccessControlType.Deny));
 
         directoryInfo.SetAccessControl(directorySecurity);
     }
@@ -56,7 +57,8 @@ public static class DirectoryHelper
 
         // Remove the "Deny" rule for the "ListFolder" and "ReadData" permissions.
         // This effectively allows access to the folder.
-        directorySecurity.RemoveAccessRule(new(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData, AccessControlType.Deny));
+        directorySecurity.RemoveAccessRule(new(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData,
+            AccessControlType.Deny));
 
         directoryInfo.SetAccessControl(directorySecurity);
     }

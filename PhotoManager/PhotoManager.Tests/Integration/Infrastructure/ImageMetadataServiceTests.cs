@@ -40,9 +40,12 @@ public class ImageMetadataServiceTests
     [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 1)]
     [TestCase(FileNames.IMAGE_11_HEIC, 1)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC,
+        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -134,12 +137,14 @@ public class ImageMetadataServiceTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 6)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 3)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8)]
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName,
+        int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = _imageMetadataService!.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        ushort orientation = _imageMetadataService!.GetHeicExifOrientation(buffer,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
@@ -149,7 +154,8 @@ public class ImageMetadataServiceTests
     {
         byte[] invalidHeicBuffer = [0x00, 0x01, 0x02, 0x03];
 
-        ushort orientation = _imageMetadataService!.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        ushort orientation = _imageMetadataService!.GetHeicExifOrientation(invalidHeicBuffer,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
@@ -161,7 +167,8 @@ public class ImageMetadataServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
         {
-            _imageMetadataService!.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+            _imageMetadataService!.GetHeicExifOrientation(nullBuffer!,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
@@ -174,7 +181,8 @@ public class ImageMetadataServiceTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
         {
-            _imageMetadataService!.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+            _imageMetadataService!.GetHeicExifOrientation(emptyBuffer,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
@@ -239,7 +247,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -251,7 +263,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
+                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -263,7 +279,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                    }
                 },
                 Hash = string.Empty
             };
@@ -274,8 +294,16 @@ public class ImageMetadataServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -331,7 +359,8 @@ public class ImageMetadataServiceTests
     {
         List<Asset>? assets = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetsFileProperties(assets!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetsFileProperties(assets!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
@@ -397,7 +426,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -409,7 +442,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
+                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -421,7 +458,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                    }
                 },
                 Hash = string.Empty
             };
@@ -432,8 +473,16 @@ public class ImageMetadataServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -454,7 +503,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _imageMetadataService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _imageMetadataService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]));
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
@@ -539,7 +589,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -552,7 +606,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                    }
                 },
                 Hash = string.Empty
             };
@@ -563,8 +621,16 @@ public class ImageMetadataServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -582,7 +648,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetsFileProperties([asset1, asset2, asset3!, asset4, asset5]));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
+                _imageMetadataService!.UpdateAssetsFileProperties([asset1, asset2, asset3!, asset4, asset5]));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
@@ -636,7 +703,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -676,8 +747,15 @@ public class ImageMetadataServiceTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -734,7 +812,11 @@ public class ImageMetadataServiceTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 Hash = string.Empty
             };
@@ -743,7 +825,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _imageMetadataService!.UpdateAssetFileProperties(asset));
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _imageMetadataService!.UpdateAssetFileProperties(asset));
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
@@ -762,7 +845,8 @@ public class ImageMetadataServiceTests
     {
         Asset? asset = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetFileProperties(asset!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetFileProperties(asset!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }

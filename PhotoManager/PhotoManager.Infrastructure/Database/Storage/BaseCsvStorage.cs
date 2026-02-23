@@ -41,7 +41,9 @@ public abstract class BaseCsvStorage
             }
             else if (endIndex == -1)
             {
-                string field = escapeText ? line.Substring(startIndex, line.Length - startIndex - 1) : line[startIndex..];
+                string field = escapeText
+                    ? line.Substring(startIndex, line.Length - startIndex - 1)
+                    : line[startIndex..];
                 fields[i] = field;
             }
         }
@@ -51,7 +53,8 @@ public abstract class BaseCsvStorage
 
     protected bool EscapeText(string columnName)
     {
-        bool? result = Properties?.ColumnProperties.Any(c => string.Compare(c.ColumnName, columnName, StringComparison.OrdinalIgnoreCase) == 0 && c.EscapeText);
+        bool? result = Properties?.ColumnProperties.Any(c =>
+            string.Compare(c.ColumnName, columnName, StringComparison.OrdinalIgnoreCase) == 0 && c.EscapeText);
 
         return result.HasValue && result.Value;
     }

@@ -103,7 +103,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_1_K_JPG, Height = PixelHeightAsset._1336_1_K_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_1_K_JPG, Height = ThumbnailHeightAsset._1336_1_K_JPG }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_1_K_JPG,
+                    Height = ThumbnailHeightAsset._1336_1_K_JPG
+                }
             },
             FileProperties = new()
             {
@@ -128,7 +132,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_2_K_JPG, Height = PixelHeightAsset._1336_2_K_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_2_K_JPG, Height = ThumbnailHeightAsset._1336_2_K_JPG }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_2_K_JPG,
+                    Height = ThumbnailHeightAsset._1336_2_K_JPG
+                }
             },
             FileProperties = new()
             {
@@ -153,7 +161,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_3_K_JPG, Height = PixelHeightAsset._1336_3_K_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_3_K_JPG, Height = ThumbnailHeightAsset._1336_3_K_JPG }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_3_K_JPG,
+                    Height = ThumbnailHeightAsset._1336_3_K_JPG
+                }
             },
             FileProperties = new()
             {
@@ -177,8 +189,16 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
+                    Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG,
+                    Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -203,7 +223,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_8_K_JPG, Height = PixelHeightAsset._1336_8_K_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_8_K_JPG, Height = ThumbnailHeightAsset._1336_8_K_JPG }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_8_K_JPG,
+                    Height = ThumbnailHeightAsset._1336_8_K_JPG
+                }
             },
             FileProperties = new()
             {
@@ -227,8 +251,16 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_THUMBNAIL_JPG, Height = PixelHeightAsset._1336_THUMBNAIL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_THUMBNAIL_JPG, Height = ThumbnailHeightAsset._1336_THUMBNAIL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_THUMBNAIL_JPG,
+                    Height = PixelHeightAsset._1336_THUMBNAIL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_THUMBNAIL_JPG,
+                    Height = ThumbnailHeightAsset._1336_THUMBNAIL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -280,14 +312,21 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [TestCase("80", 0, new string[] { })]
     [TestCase("100", 0, new string[] { })]
     [TestCase("110", 0, new string[] { })]
-    [TestCase("128", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("128", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionBasicHashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -301,7 +340,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_HASH);
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_HASH);
-            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
+            _asset7 = _asset7!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -337,14 +377,21 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [TestCase("15", 0, new string[] { })]
     [TestCase("20", 0, new string[] { })]
     [TestCase("25", 0, new string[] { })]
-    [TestCase("32", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("32", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionMD5HashDifferentThresholdValues(
+        string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -358,7 +405,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_MD5_HASH);
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_MD5_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_MD5_HASH);
-            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
+            _asset7 = _asset7!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -390,16 +438,32 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [Category("Resolution folder, DHash")] // The DHash is a 14-hex digits
     [TestCase("3", 0, new string[] { }, new string[] { })]
     [TestCase("5", 0, new string[] { }, new string[] { })]
-    [TestCase("9", 2, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new[] { FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("11", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new string[] { })]
-    [TestCase("14", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2)
+    [TestCase("9", 2,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        }, new[] { FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("11", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        }, new string[] { })]
+    [TestCase("14", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName1, string[] assetsName2)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -413,7 +477,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_D_HASH);
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_D_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_D_HASH);
-            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+            _asset7 = _asset7!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -451,25 +516,87 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [Category("Resolution folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase("10", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
     [TestCase("20", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("30", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("40", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("50", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("60", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("80", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("90", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("100", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("120", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("140", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("160", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("180", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("210", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionPHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("30", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        })]
+    [TestCase("40", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        })]
+    [TestCase("50", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        })]
+    [TestCase("60", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+        })]
+    [TestCase("80", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("90", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("100", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("120", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("140", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("160", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("180", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    [TestCase("210", 1,
+        new[]
+        {
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionPHashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -483,7 +610,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_P_HASH);
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_P_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_P_HASH);
-            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
+            _asset7 = _asset7!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 

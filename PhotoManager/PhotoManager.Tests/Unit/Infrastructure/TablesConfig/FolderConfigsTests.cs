@@ -56,7 +56,8 @@ public class FolderConfigsTests
     {
         string[] nullValues = new string[2];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'g')"));
     }
@@ -66,7 +67,8 @@ public class FolderConfigsTests
     {
         string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArray));
+        IndexOutOfRangeException? exception =
+            Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArray));
 
         Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
@@ -99,9 +101,11 @@ public class FolderConfigsTests
             Path = "D:\\folder\\newFolder"
         };
 
-        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => FolderConfigs.WriteFunc(folder, 15));
+        ArgumentOutOfRangeException? exception =
+            Assert.Throws<ArgumentOutOfRangeException>(() => FolderConfigs.WriteFunc(folder, 15));
 
-        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
+        Assert.That(exception?.Message,
+            Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -111,7 +115,8 @@ public class FolderConfigsTests
 
         for (int i = 0; i < 2; i++)
         {
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => FolderConfigs.WriteFunc(folder!, i));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => FolderConfigs.WriteFunc(folder!, i));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }

@@ -13,7 +13,8 @@ public class PathProviderServiceBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "PathProviderServiceBenchmark_" + Guid.NewGuid().ToString("N"));
+        _testDirectory =
+            Path.Combine(Path.GetTempPath(), "PathProviderServiceBenchmark_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDirectory);
 
         Dictionary<string, string?> configDict = new()

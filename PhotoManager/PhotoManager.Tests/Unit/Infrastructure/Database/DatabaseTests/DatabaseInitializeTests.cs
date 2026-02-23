@@ -43,11 +43,16 @@ public class DatabaseInitializeTests
             string tablesDirectory = _testableDatabase!.GetTablesDirectory();
             string blobsDirectory = _testableDatabase!.GetBlobsDirectory();
             string backupsDirectory = _testableDatabase!.GetBackupsDirectory();
-            Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
+            Dictionary<string, DataTableProperties> dataTablePropertiesDictionary =
+                _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.That(_testableDatabase!.DataDirectory, Is.EqualTo(directoryPath));
-            Assert.That(tablesDirectory, Is.EqualTo(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables)));
-            Assert.That(blobsDirectory, Is.EqualTo(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs)));
+            Assert.That(tablesDirectory,
+                Is.EqualTo(Path.Combine(directoryPath,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables)));
+            Assert.That(blobsDirectory,
+                Is.EqualTo(Path.Combine(directoryPath,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs)));
             Assert.That(backupsDirectory, Is.EqualTo(directoryPath + "_Backups"));
             Assert.That(_testableDatabase!.Separator, Is.EqualTo(_userConfigurationService!.StorageSettings.Separator));
             Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
@@ -83,7 +88,8 @@ public class DatabaseInitializeTests
         string tablesDirectory = _testableDatabase!.GetTablesDirectory();
         string blobsDirectory = _testableDatabase!.GetBlobsDirectory();
         string backupsDirectory = _testableDatabase!.GetBackupsDirectory();
-        Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
+        Dictionary<string, DataTableProperties> dataTablePropertiesDictionary =
+            _testableDatabase!.GetDataTablePropertiesDictionary();
 
         Assert.That(_testableDatabase!.DataDirectory, Is.EqualTo(directoryPath));
         Assert.That(tablesDirectory, Is.EqualTo(string.Empty));

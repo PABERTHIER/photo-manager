@@ -48,8 +48,16 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -98,8 +106,16 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -124,7 +140,11 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -143,7 +163,8 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         };
     }
 
-    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -209,12 +230,14 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
 
             int globalAssetsCounter = analyseVideos ? 52 : 51;
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, $"Total number of assets: {globalAssetsCounter}");
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!,
+                $"Total number of assets: {globalAssetsCounter}");
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, $"Total number of assets: {globalAssetsCounter}");
+            CheckInstance(applicationViewModelInstances, _dataDirectory!,
+                $"Total number of assets: {globalAssetsCounter}");
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -487,7 +510,8 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -513,11 +537,13 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         Assert.That(applicationViewModelInstance.ObservableAssets, Is.Empty);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(expectedGlobalAssetsCounterWording));
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording,
+            Is.EqualTo(expectedGlobalAssetsCounterWording));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
@@ -537,7 +563,8 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
             Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
                 Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));

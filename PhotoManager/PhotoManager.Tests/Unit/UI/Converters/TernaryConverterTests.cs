@@ -32,7 +32,8 @@ public class TernaryConverterTests
         object[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
         object? parameter = null;
 
-        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
+        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,
+            CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -64,7 +65,8 @@ public class TernaryConverterTests
         object[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
         object? parameter = null;
 
-        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
+        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,
+            CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -77,7 +79,8 @@ public class TernaryConverterTests
         Type[]? targetTypes = null;
         object? parameter = null;
 
-        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
+            ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }

@@ -79,10 +79,12 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_FolderAndAssetExist_ReturnsDeletedAssetAndThumbnailsAndAssetAreDeletedAndAssetsUpdatedIsUpdated()
+    public void
+        DeleteAsset_FolderAndAssetExist_ReturnsDeletedAssetAndThumbnailsAndAssetAreDeletedAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -140,7 +142,8 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_AssetDoesNotExistAndThumbnailsDictionaryEntriesToKeepIs0_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
+    public void
+        DeleteAsset_AssetDoesNotExistAndThumbnailsDictionaryEntriesToKeepIs0_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -154,7 +157,8 @@ public class AssetRepositoryDeleteAssetTests
             imageProcessingService, imageMetadataService, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -191,7 +195,8 @@ public class AssetRepositoryDeleteAssetTests
     public void DeleteAsset_DirectoryDoesNotExist_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -245,10 +250,12 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_ThumbnailsDoNotExistInRepositoryButBinExists_ReturnsDeletedAssetAndThumbnailsAndAssetAreDeletedAndAssetsUpdatedIsNotUpdated()
+    public void
+        DeleteAsset_ThumbnailsDoNotExistInRepositoryButBinExists_ReturnsDeletedAssetAndThumbnailsAndAssetAreDeletedAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -256,8 +263,8 @@ public class AssetRepositoryDeleteAssetTests
             const string fileName = FileNames.NON_EXISTENT_IMAGE_PNG;
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, [1, 2, 3]},
-                { fileName, [4, 5, 6]}
+                { _asset1!.FileName, [1, 2, 3] },
+                { fileName, [4, 5, 6] }
             };
 
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath);
@@ -299,7 +306,8 @@ public class AssetRepositoryDeleteAssetTests
     public void DeleteAsset_DirectoryIsNull_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -357,7 +365,8 @@ public class AssetRepositoryDeleteAssetTests
     public void DeleteAsset_FileNameIsNull_ThrowsArgumentNullExceptionAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -387,7 +396,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.DeleteAsset(folderPath1, assetFileName!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _testableAssetRepository!.DeleteAsset(folderPath1, assetFileName!));
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
             Assert.That(thumbnails, Has.Count.EqualTo(1));
@@ -414,7 +424,8 @@ public class AssetRepositoryDeleteAssetTests
     public void DeleteAsset_FolderAndAssetDoNotExist_ReturnsNullAndHasChangesIsFalseAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -442,7 +453,8 @@ public class AssetRepositoryDeleteAssetTests
     public void DeleteAsset_ConcurrentAccess_ReturnsDeletedAssetsAndAssetsAreHandledSafelyAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -477,9 +489,13 @@ public class AssetRepositoryDeleteAssetTests
             // Simulate concurrent access
             Parallel.Invoke(
                 () =>
-                { assetDeleted1 = _testableAssetRepository!.DeleteAsset(folderPath1, _asset1.FileName); },
+                {
+                    assetDeleted1 = _testableAssetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
+                },
                 () =>
-                { assetDeleted2 = _testableAssetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG); }
+                {
+                    assetDeleted2 = _testableAssetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG);
+                }
             );
 
             Assert.That(assetDeleted1, Is.Not.Null);

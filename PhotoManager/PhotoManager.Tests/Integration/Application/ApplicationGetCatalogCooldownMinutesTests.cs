@@ -24,7 +24,8 @@ public class ApplicationGetCatalogCooldownMinutesTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, catalogCooldownMinutes.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES,
+            catalogCooldownMinutes.ToString());
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
@@ -56,7 +57,8 @@ public class ApplicationGetCatalogCooldownMinutesTests
     [TestCase((ushort)0)]
     [TestCase((ushort)2)]
     [TestCase((ushort)15)]
-    public void GetCatalogCooldownMinutes_CorrectValue_ReturnsCatalogCooldownMinutesValue(ushort expectedCatalogCooldownMinutes)
+    public void GetCatalogCooldownMinutes_CorrectValue_ReturnsCatalogCooldownMinutesValue(
+        ushort expectedCatalogCooldownMinutes)
     {
         ConfigureApplication(_dataDirectory!, expectedCatalogCooldownMinutes);
 

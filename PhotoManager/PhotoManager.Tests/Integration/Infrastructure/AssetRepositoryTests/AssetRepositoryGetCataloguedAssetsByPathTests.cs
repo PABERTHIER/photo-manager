@@ -42,7 +42,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -104,7 +105,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets2, Is.Empty);
 
-            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName,
+                Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -217,7 +219,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets2, Is.Empty);
 
-            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName,
+                Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

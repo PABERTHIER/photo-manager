@@ -24,7 +24,8 @@ public class PixelSizeConverterTests
         };
         object? parameter = null;
 
-        string? result = (string?)pixelSizeConverter.Convert(asset, typeof(Asset), parameter!, CultureInfo.InvariantCulture);
+        string? result =
+            (string?)pixelSizeConverter.Convert(asset, typeof(Asset), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -59,7 +60,9 @@ public class PixelSizeConverterTests
         PixelSizeConverter pixelSizeConverter = new();
         object? parameter = null;
 
-        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
+            pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!,
+                CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }

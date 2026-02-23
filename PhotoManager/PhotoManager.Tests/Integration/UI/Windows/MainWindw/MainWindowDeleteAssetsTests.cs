@@ -212,7 +212,8 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0], observableAssets[1]]);
@@ -346,7 +347,8 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0]]);
@@ -482,7 +484,8 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset2Temp];
 
             DeleteDuplicatedAssets([_applicationViewModel.CurrentAsset!]);
@@ -617,7 +620,8 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp];
 
             DeleteDuplicatedAssets([observableAssets[1]]);
@@ -750,7 +754,8 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             DeleteDuplicatedAssets([]);
@@ -882,7 +887,8 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             DeleteDuplicatedAssets([_asset1Temp, _asset2Temp]);
@@ -959,7 +965,8 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException()
+    public async Task
+        DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -1013,14 +1020,16 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             File.Delete(imagePath2ToCopy);
 
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => DeleteDuplicatedAssets([observableAssets[1]]));
+            FileNotFoundException? exception =
+                Assert.Throws<FileNotFoundException>(() => DeleteDuplicatedAssets([observableAssets[1]]));
 
             Assert.That(exception?.Message, Is.EqualTo($"File does not exist: '{imagePath2ToCopy}'."));
 
@@ -1126,7 +1135,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([]);
@@ -1268,7 +1278,10 @@ public class MainWindowDeleteAssetsTests
 
             string result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -1450,7 +1463,10 @@ public class MainWindowDeleteAssetsTests
 
             string result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             expectedSelectedAssets = [_applicationViewModel.CurrentAsset!];
 
@@ -1458,7 +1474,10 @@ public class MainWindowDeleteAssetsTests
 
             result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -1650,7 +1669,10 @@ public class MainWindowDeleteAssetsTests
 
             string result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
@@ -1835,7 +1857,10 @@ public class MainWindowDeleteAssetsTests
 
             string result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -2188,7 +2213,10 @@ public class MainWindowDeleteAssetsTests
 
             string result = DeleteSelectedAssets();
 
-            Assert.That(result, Is.EqualTo(appMode == AppMode.Thumbnails ? "ShowImage for ThumbnailsUserControl" : "ShowImage for ViewerUserControl"));
+            Assert.That(result,
+                Is.EqualTo(appMode == AppMode.Thumbnails
+                    ? "ShowImage for ThumbnailsUserControl"
+                    : "ShowImage for ViewerUserControl"));
 
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
@@ -2292,10 +2320,11 @@ public class MainWindowDeleteAssetsTests
     [Test]
     [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
     [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
-    public async Task DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException(
-        AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+    public async Task
+        DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException(
+            AppMode appMode,
+            Visibility expectedThumbnailsVisible,
+            Visibility expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2648,7 +2677,8 @@ public class MainWindowDeleteAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -2680,7 +2710,8 @@ public class MainWindowDeleteAssetsTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
@@ -2755,9 +2786,11 @@ public class MainWindowDeleteAssetsTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
+                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)
@@ -2785,13 +2818,15 @@ public class MainWindowDeleteAssetsTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentSelectedAsset = selectedAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
         }
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -2800,7 +2835,8 @@ public class MainWindowDeleteAssetsTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset,
+                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -2865,6 +2901,8 @@ public class MainWindowDeleteAssetsTests
 
     private string ShowImage()
     {
-        return _applicationViewModel!.AppMode == AppMode.Viewer ? "ShowImage for ViewerUserControl" : "ShowImage for ThumbnailsUserControl";
+        return _applicationViewModel!.AppMode == AppMode.Viewer
+            ? "ShowImage for ViewerUserControl"
+            : "ShowImage for ThumbnailsUserControl";
     }
 }

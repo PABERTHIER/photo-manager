@@ -227,7 +227,8 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - {_asset4!.FileName} - image 4 of 5 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - {_asset4!.FileName} - image 4 of 5 - sorted by file name ascending";
             const int expectedViewerPosition = 3;
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4, _asset5!];
@@ -283,7 +284,8 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
             // Second ChangeAppMode
-            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 4 of 5 - sorted by file name ascending";
+            expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 4 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -373,7 +375,8 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -397,7 +400,8 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
-            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -498,7 +502,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo(
+                $"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -532,7 +537,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets,
+            applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
@@ -541,7 +547,8 @@ public class ApplicationViewModelChangeAppModeTests
 
         if (expectedCurrentAsset != null)
         {
-            AssertAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+            AssertAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset,
+                expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
         }
         else
         {
@@ -556,7 +563,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
-    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
+        string folderPath, Folder folder)
     {
         Assert.That(asset.FileName, Is.EqualTo(expectedAsset.FileName));
         Assert.That(asset.FolderId, Is.EqualTo(folder.Id));
@@ -580,7 +588,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
     }
 
-    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets, ObservableCollection<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, Asset[] expectedAssets,
+        ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Length));
 
@@ -589,7 +598,8 @@ public class ApplicationViewModelChangeAppModeTests
             Asset currentExpectedAsset = expectedAssets[i];
             Asset currentObservableAsset = observableAssets[i];
 
-            AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath,
+                currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
@@ -620,9 +630,11 @@ public class ApplicationViewModelChangeAppModeTests
 
         if (applicationViewModelInstancesCount > 1)
         {
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2],
+                Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
+                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)

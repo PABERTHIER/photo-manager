@@ -48,8 +48,16 @@ public class ApplicationGetAssetsByPathTests
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
+                }
             },
             FileProperties = new()
             {
@@ -98,8 +106,16 @@ public class ApplicationGetAssetsByPathTests
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
+                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
+                }
             },
             FileProperties = new()
             {
@@ -124,7 +140,11 @@ public class ApplicationGetAssetsByPathTests
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
+                }
             },
             FileProperties = new()
             {
@@ -143,7 +163,8 @@ public class ApplicationGetAssetsByPathTests
         };
     }
 
-    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -168,12 +189,15 @@ public class ApplicationGetAssetsByPathTests
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService,
             assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService);
+        MoveAssetsService moveAssetsService =
+            new(_testableAssetRepository, fileOperationsService, assetCreationService);
         SyncAssetsService syncAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
@@ -271,10 +295,14 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[3].Hash, Is.EqualTo(_asset4!.Hash));
             Assert.That(assets[3].ImageData, Is.Not.Null);
 
-            CheckThumbnail(assetsDirectory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width, _asset1!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width, _asset2!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width, _asset3!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width, _asset4!.Pixel.Thumbnail.Height);
+            CheckThumbnail(assetsDirectory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width,
+                _asset1!.Pixel.Thumbnail.Height);
+            CheckThumbnail(assetsDirectory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width,
+                _asset2!.Pixel.Thumbnail.Height);
+            CheckThumbnail(assetsDirectory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width,
+                _asset3!.Pixel.Thumbnail.Height);
+            CheckThumbnail(assetsDirectory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width,
+                _asset4!.Pixel.Thumbnail.Height);
         }
         finally
         {
@@ -285,12 +313,16 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task GetAssetsByPath_ValidDirectoryAndFolderExistsAndNavigateAmongDifferentDirectories_ReturnsAssetsArrays(bool analyseVideos)
+    public async Task
+        GetAssetsByPath_ValidDirectoryAndFolderExistsAndNavigateAmongDifferentDirectories_ReturnsAssetsArrays(
+            bool analyseVideos)
     {
         string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
-        string duplicatesNewFolder1Directory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string duplicatesNewFolder2Directory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string duplicatesNewFolder1Directory =
+            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string duplicatesNewFolder2Directory =
+            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string testFolderDirectory = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
@@ -475,37 +507,63 @@ public class ApplicationGetAssetsByPathTests
                 Assert.That(folderExists, Is.False);
             }
 
-            CheckThumbnail(rootDirectory, FileNames.HOMER_GIF, ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_DUPLICATED_JPG, ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_JPG, ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_3_JPG, ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_4_JPG, ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_5_JPG, ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_6_JPG, ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_7_JPG, ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG);
+            CheckThumbnail(rootDirectory, FileNames.HOMER_GIF, ThumbnailWidthAsset.HOMER_GIF,
+                ThumbnailHeightAsset.HOMER_GIF);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG,
+                ThumbnailHeightAsset.IMAGE_1_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
+                ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
+                ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
+                ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
+                ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_DUPLICATED_JPG, ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG,
+                ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_JPG, ThumbnailWidthAsset.IMAGE_2_JPG,
+                ThumbnailHeightAsset.IMAGE_2_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_3_JPG, ThumbnailWidthAsset.IMAGE_3_JPG,
+                ThumbnailHeightAsset.IMAGE_3_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_4_JPG, ThumbnailWidthAsset.IMAGE_4_JPG,
+                ThumbnailHeightAsset.IMAGE_4_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_5_JPG, ThumbnailWidthAsset.IMAGE_5_JPG,
+                ThumbnailHeightAsset.IMAGE_5_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_6_JPG, ThumbnailWidthAsset.IMAGE_6_JPG,
+                ThumbnailHeightAsset.IMAGE_6_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_7_JPG, ThumbnailWidthAsset.IMAGE_7_JPG,
+                ThumbnailHeightAsset.IMAGE_7_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG,
+                ThumbnailHeightAsset.IMAGE_8_JPEG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG,
+                ThumbnailHeightAsset.IMAGE_9_PNG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC,
+                ThumbnailHeightAsset.IMAGE_11_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
+                ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
+                ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
+                ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG,
+                ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG);
 
-            CheckThumbnail(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG);
+            CheckThumbnail(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG,
+                ThumbnailHeightAsset.IMAGE_1_JPG);
 
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width, _asset1!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width, _asset2!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width, _asset3!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width, _asset4!.Pixel.Thumbnail.Height);
+            CheckThumbnail(duplicatesNewFolder2Directory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width,
+                _asset1!.Pixel.Thumbnail.Height);
+            CheckThumbnail(duplicatesNewFolder2Directory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width,
+                _asset2!.Pixel.Thumbnail.Height);
+            CheckThumbnail(duplicatesNewFolder2Directory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width,
+                _asset3!.Pixel.Thumbnail.Height);
+            CheckThumbnail(duplicatesNewFolder2Directory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width,
+                _asset4!.Pixel.Thumbnail.Height);
 
             if (analyseVideos)
             {
-                CheckThumbnail(outputVideoFirstFrameDirectory, FileNames.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG);
+                CheckThumbnail(outputVideoFirstFrameDirectory, FileNames.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG,
+                    ThumbnailHeightAsset.HOMER_JPG);
             }
         }
         finally
@@ -555,7 +613,11 @@ public class ApplicationGetAssetsByPathTests
                 Pixel = new()
                 {
                     Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                    }
                 },
                 FileProperties = new()
                 {
@@ -642,7 +704,8 @@ public class ApplicationGetAssetsByPathTests
     [TestCase(" ", false)]
     [TestCase(null, true)]
     [TestCase(null, false)]
-    public void GetAssetsByPath_DirectoryIsNullOrEmptyAndFolderExistsOrNot_ThrowsArgumentException(string? directory, bool folderExists)
+    public void GetAssetsByPath_DirectoryIsNullOrEmptyAndFolderExistsOrNot_ThrowsArgumentException(string? directory,
+        bool folderExists)
     {
         ConfigureApplication(100, string.Empty, 200, 150, false, false, false, false);
 
@@ -653,7 +716,8 @@ public class ApplicationGetAssetsByPathTests
                 _testableAssetRepository!.AddFolder(directory!);
             }
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.GetAssetsByPath(directory!));
+            ArgumentException? exception =
+                Assert.Throws<ArgumentException>(() => _application!.GetAssetsByPath(directory!));
 
             Assert.That(exception?.Message, Is.EqualTo("Directory cannot be null or empty."));
         }
@@ -669,7 +733,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -771,10 +836,12 @@ public class ApplicationGetAssetsByPathTests
         TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
             imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService, imageProcessingService,
+        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
+            imageProcessingService,
             imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
+        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
+            imageMetadataService,
             assetCreationService, userConfigurationService, assetsComparator);
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService);
         SyncAssetsService syncAssetsService =
@@ -786,7 +853,8 @@ public class ApplicationGetAssetsByPathTests
             fileOperationsService, imageProcessingService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -841,7 +909,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -919,7 +988,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -977,7 +1047,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1020,7 +1091,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1076,7 +1148,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1114,7 +1187,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1167,7 +1241,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1237,7 +1312,8 @@ public class ApplicationGetAssetsByPathTests
             fileOperationsService, imageProcessingService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1311,7 +1387,8 @@ public class ApplicationGetAssetsByPathTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -1406,7 +1483,8 @@ public class ApplicationGetAssetsByPathTests
         bool assetContainsThumbnail = _testableAssetRepository!.ContainsThumbnail(directory, fileName);
         Assert.That(assetContainsThumbnail, Is.True);
 
-        BitmapImage? assetBitmapImage = _testableAssetRepository.LoadThumbnail(directory, fileName, thumbnailWidth, thumbnailHeight);
+        BitmapImage? assetBitmapImage =
+            _testableAssetRepository.LoadThumbnail(directory, fileName, thumbnailWidth, thumbnailHeight);
         Assert.That(assetBitmapImage, Is.Not.Null);
     }
 }

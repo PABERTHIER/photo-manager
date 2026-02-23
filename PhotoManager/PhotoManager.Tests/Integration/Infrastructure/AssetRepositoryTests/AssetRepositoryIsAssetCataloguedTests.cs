@@ -42,7 +42,8 @@ public class AssetRepositoryIsAssetCataloguedTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+            new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new();
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -225,7 +226,8 @@ public class AssetRepositoryIsAssetCataloguedTests
             // Simulate concurrent access
             Parallel.Invoke(
                 () => isAssetCatalogued1 = _assetRepository!.IsAssetCatalogued(folderPath1, _asset1.FileName),
-                () => isAssetCatalogued2 = _assetRepository!.IsAssetCatalogued(folderPath2, FileNames.NON_EXISTENT_FILE_JPG)
+                () => isAssetCatalogued2 =
+                    _assetRepository!.IsAssetCatalogued(folderPath2, FileNames.NON_EXISTENT_FILE_JPG)
             );
 
             Assert.That(isAssetCatalogued1, Is.True);

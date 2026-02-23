@@ -117,8 +117,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG, Height = PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, Height = ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
+                    Height = PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -142,8 +150,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_BOTTOM_PART_JPG, Height = PixelHeightAsset._1336_BOTTOM_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_BOTTOM_PART_JPG, Height = ThumbnailHeightAsset._1336_BOTTOM_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_BOTTOM_PART_JPG,
+                    Height = PixelHeightAsset._1336_BOTTOM_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_BOTTOM_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -167,8 +183,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, Height = PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, Height = ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
+                    Height = PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -192,8 +216,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_LEFT_PART_JPG, Height = PixelHeightAsset._1336_LEFT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_LEFT_PART_JPG, Height = ThumbnailHeightAsset._1336_LEFT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_LEFT_PART_JPG,
+                    Height = PixelHeightAsset._1336_LEFT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_LEFT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_LEFT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -217,8 +249,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_ORIGINAL_JPG, Height = PixelHeightAsset._1336_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_ORIGINAL_JPG,
+                    Height = PixelHeightAsset._1336_ORIGINAL_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG,
+                    Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG
+                }
             },
             FileProperties = new()
             {
@@ -242,8 +282,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_RIGHT_PART_JPG, Height = PixelHeightAsset._1336_RIGHT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_RIGHT_PART_JPG, Height = ThumbnailHeightAsset._1336_RIGHT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_RIGHT_PART_JPG,
+                    Height = PixelHeightAsset._1336_RIGHT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_RIGHT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -267,8 +315,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_TOP_LEFT_PART_JPG, Height = PixelHeightAsset._1336_TOP_LEFT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG, Height = ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_TOP_LEFT_PART_JPG,
+                    Height = PixelHeightAsset._1336_TOP_LEFT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -292,8 +348,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_TOP_PART_JPG, Height = PixelHeightAsset._1336_TOP_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_TOP_PART_JPG, Height = ThumbnailHeightAsset._1336_TOP_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_TOP_PART_JPG,
+                    Height = PixelHeightAsset._1336_TOP_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_TOP_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_TOP_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -317,8 +381,16 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset._1336_TOP_RIGHT_PART_JPG, Height = PixelHeightAsset._1336_TOP_RIGHT_PART_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, Height = ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG }
+                Asset = new()
+                {
+                    Width = PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
+                    Height = PixelHeightAsset._1336_TOP_RIGHT_PART_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG,
+                    Height = ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG
+                }
             },
             FileProperties = new()
             {
@@ -370,14 +442,23 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [TestCase("80", 0, new string[] { })]
     [TestCase("100", 0, new string[] { })]
     [TestCase("110", 0, new string[] { })]
-    [TestCase("128", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("128", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -394,7 +475,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1336_TOP_LEFT_PART_HASH);
             _asset8 = _asset8!.WithFolder(folder1).WithHash(ASSET1336_TOP_PART_HASH);
             _asset9 = _asset9!.WithFolder(folder1).WithHash(ASSET1336_TOP_RIGHT_PART_HASH);
-            _asset10 = _asset10!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
+            _asset10 = _asset10!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -433,14 +515,23 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [TestCase("15", 0, new string[] { })]
     [TestCase("20", 0, new string[] { })]
     [TestCase("25", 0, new string[] { })]
-    [TestCase("32", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase("32", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -457,7 +548,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1336_TOP_LEFT_PART_MD5_HASH);
             _asset8 = _asset8!.WithFolder(folder1).WithHash(ASSET1336_TOP_PART_MD5_HASH);
             _asset9 = _asset9!.WithFolder(folder1).WithHash(ASSET1336_TOP_RIGHT_PART_MD5_HASH);
-            _asset10 = _asset10!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
+            _asset10 = _asset10!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -490,18 +582,44 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
 
     [Test]
     [Category("Part folder, DHash")] // The DHash is a 14-hex digits
-    [TestCase("3", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
-    [TestCase("5", 4, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
-    [TestCase("9", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
-    [TestCase("11", 2, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { }, new string[] { })]
-    [TestCase("14", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3, string[] assetsName4)
+    [TestCase("3", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
+    [TestCase("5", 4, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG },
+        new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
+    [TestCase("9", 3,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_TOP_LEFT_PART_JPG
+        }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
+    [TestCase("11", 2,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_LEFT_PART_JPG,
+            FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG
+        }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { },
+        new string[] { })]
+    [TestCase("14", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3, string[] assetsName4)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -518,7 +636,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1336_TOP_LEFT_PART_D_HASH);
             _asset8 = _asset8!.WithFolder(folder1).WithHash(ASSET1336_TOP_PART_D_HASH);
             _asset9 = _asset9!.WithFolder(folder1).WithHash(ASSET1336_TOP_RIGHT_PART_D_HASH);
-            _asset10 = _asset10!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+            _asset10 = _asset10!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 
@@ -570,24 +689,95 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("30", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("40", 1, new[] { FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { }, new string[] { })]
-    [TestCase("50", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
-    [TestCase("60", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
-    [TestCase("80", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("90", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("100", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("120", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("140", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("160", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("180", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    [TestCase("210", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase("40", 1, new[] { FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG },
+        new string[] { }, new string[] { })]
+    [TestCase("50", 3,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG
+        }, new[] { FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("60", 3,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
+        }, new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("80", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("90", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("100", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("120", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("140", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("160", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("180", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    [TestCase("210", 1,
+        new[]
+        {
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
+            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
+            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
+        }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(string thresholdToMock,
+        int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService =
+                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -604,7 +794,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1336_TOP_LEFT_PART_P_HASH);
             _asset8 = _asset8!.WithFolder(folder1).WithHash(ASSET1336_TOP_PART_P_HASH);
             _asset9 = _asset9!.WithFolder(folder1).WithHash(ASSET1336_TOP_RIGHT_PART_P_HASH);
-            _asset10 = _asset10!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
+            _asset10 = _asset10!.WithFolder(folder2)
+                .WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData = [1, 2, 3];
 

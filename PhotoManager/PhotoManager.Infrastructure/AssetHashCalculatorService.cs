@@ -1,6 +1,7 @@
 ﻿namespace PhotoManager.Infrastructure;
 
-public class AssetHashCalculatorService(IUserConfigurationService userConfigurationService) : IAssetHashCalculatorService
+public class AssetHashCalculatorService(IUserConfigurationService userConfigurationService)
+    : IAssetHashCalculatorService
 {
     public string CalculateHash(byte[] imageBytes, string filePath)
     {

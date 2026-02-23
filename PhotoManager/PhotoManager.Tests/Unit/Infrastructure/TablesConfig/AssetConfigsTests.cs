@@ -85,7 +85,9 @@ public class AssetConfigsTests
         Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(120));
         Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(60));
         Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 12, 30, 12, 0, 0)));
-        Assert.That(asset.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset.Hash,
+            Is.EqualTo(
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
@@ -106,7 +108,9 @@ public class AssetConfigsTests
         Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(120));
         Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(60));
         Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 12, 30, 12, 0, 0)));
-        Assert.That(asset.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset.Hash,
+            Is.EqualTo(
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
@@ -118,7 +122,8 @@ public class AssetConfigsTests
     {
         string[] nullValues = new string[13];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'g')"));
     }
@@ -128,7 +133,8 @@ public class AssetConfigsTests
     {
         string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArray));
+        IndexOutOfRangeException? exception =
+            Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArray));
 
         Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
@@ -174,7 +180,8 @@ public class AssetConfigsTests
             },
             FileProperties = new() { Size = 1000 },
             ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash =
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
@@ -196,7 +203,9 @@ public class AssetConfigsTests
         Assert.That(result[5], Is.EqualTo(120));
         Assert.That(result[6], Is.EqualTo(60));
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
-        Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(result[8],
+            Is.EqualTo(
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
         Assert.That(result[10], Is.True);
         Assert.That(result[11], Is.Null);
@@ -217,7 +226,8 @@ public class AssetConfigsTests
                 Thumbnail = new()
             },
             ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash =
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
                 Corrupted = new() { Message = "The asset is corrupted" },
@@ -239,7 +249,9 @@ public class AssetConfigsTests
         Assert.That(result[5], Is.Zero);
         Assert.That(result[6], Is.Zero);
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
-        Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(result[8],
+            Is.EqualTo(
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
         Assert.That(result[10], Is.False);
         Assert.That(result[11], Is.Null);
@@ -262,7 +274,8 @@ public class AssetConfigsTests
             },
             FileProperties = new() { Size = 1000 },
             ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash =
+                "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
@@ -270,9 +283,11 @@ public class AssetConfigsTests
             }
         };
 
-        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));
+        ArgumentOutOfRangeException? exception =
+            Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));
 
-        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
+        Assert.That(exception?.Message,
+            Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -282,7 +297,8 @@ public class AssetConfigsTests
 
         for (int i = 0; i < 13; i++)
         {
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => AssetConfigs.WriteFunc(asset!, i));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => AssetConfigs.WriteFunc(asset!, i));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }

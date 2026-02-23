@@ -28,7 +28,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             "True"
         ];
 
-        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(validValues);
+        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition =
+            SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(validValues);
 
         Assert.That(syncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("D:\\source\\newFolder"));
@@ -50,7 +51,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             "15"
         ];
 
-        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(tooManyValues);
+        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition =
+            SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(tooManyValues);
 
         Assert.That(syncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("D:\\source\\newFolder"));
@@ -64,7 +66,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     {
         string[] nullValues = new string[4];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(nullValues));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'value')"));
     }
@@ -74,7 +77,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     {
         string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArray));
+        IndexOutOfRangeException? exception =
+            Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArray));
 
         Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
@@ -90,13 +94,15 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             "False"
         ];
 
-        FormatException? exception = Assert.Throws<FormatException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(invalidValues));
+        FormatException? exception =
+            Assert.Throws<FormatException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(invalidValues));
 
         Assert.That(exception?.Message, Is.EqualTo("String '15' was not recognized as a valid Boolean."));
     }
 
     [Test]
-    public void WriteFunc_SyncAssetsDirectoriesDefinitionWithValidValues_ConvertsSyncAssetsDirectoriesDefinitionPropertiesToIndexInArray()
+    public void
+        WriteFunc_SyncAssetsDirectoriesDefinitionWithValidValues_ConvertsSyncAssetsDirectoriesDefinitionPropertiesToIndexInArray()
     {
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
         {
@@ -119,7 +125,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     }
 
     [Test]
-    public void WriteFunc_SyncAssetsDirectoriesDefinitionWithPartialValues_ConvertsSyncAssetsDirectoriesDefinitionPropertiesToIndexInArrayWithSomeDefaultValues()
+    public void
+        WriteFunc_SyncAssetsDirectoriesDefinitionWithPartialValues_ConvertsSyncAssetsDirectoriesDefinitionPropertiesToIndexInArrayWithSomeDefaultValues()
     {
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
         {
@@ -151,9 +158,11 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             DeleteAssetsNotInSource = false
         };
 
-        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition, 5));
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition, 5));
 
-        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
+        Assert.That(exception?.Message,
+            Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -163,7 +172,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
 
         for (int i = 0; i < 4; i++)
         {
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition!, i));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
+                SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition!, i));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
