@@ -4,7 +4,7 @@ public static class Constants
 {
     public const string DATABASE_END_PATH = "v1.0";
     public const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
-    public const string VERSION = "v1.0.0";
+    public const string VERSION = "v1.8.0";
 
     public static class Directories
     {

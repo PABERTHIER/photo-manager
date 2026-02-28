@@ -24,10 +24,10 @@ dotnet_sort_system_directives_first = false
 file_header_template = unset
 
 # this. and Me. preferences
-dotnet_style_qualification_for_event = false
-dotnet_style_qualification_for_field = false
-dotnet_style_qualification_for_method = false
-dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_event = false:warning
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_property = false:warning
 
 # Language keywords vs BCL types preferences
 dotnet_style_predefined_type_for_locals_parameters_members = true
@@ -264,6 +264,16 @@ dotnet_diagnostic.CA1861.severity = warning
 dotnet_diagnostic.CA2208.severity = none
 # CS1591: Missing XML comment
 dotnet_diagnostic.CS1591.severity = none
+# CS8600: Converting null literal or possible null value to non-nullable type
+dotnet_diagnostic.CS8600.severity = error
+# CS8601: Possible null reference assignment
+dotnet_diagnostic.CS8601.severity = error
+# CS8602: Dereference of a possibly null reference
+dotnet_diagnostic.CS8602.severity = error
+# CS8603: Possible null reference return
+dotnet_diagnostic.CS8603.severity = error
+# CS8604: Possible null reference argument for parameter
+dotnet_diagnostic.CS8604.severity = error
 
 # To set the default severity for all code style rules
 dotnet_analyzer_diagnostic.category-Style.severity = warning
