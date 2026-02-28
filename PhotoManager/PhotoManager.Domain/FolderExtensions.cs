@@ -2,8 +2,11 @@
 
 public static class FolderExtensions
 {
-    public static bool IsSameDirectory(this Folder folder1, Folder folder2)
+    extension(Folder folder)
     {
-        return folder1.Path.Equals(folder2.Path);
+        public bool IsSameDirectory(Folder folder2)
+        {
+            return folder.Path.Equals(folder2.Path);
+        }
     }
 }
