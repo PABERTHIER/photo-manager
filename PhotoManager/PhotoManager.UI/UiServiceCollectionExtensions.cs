@@ -6,9 +6,12 @@ namespace PhotoManager.UI;
 
 public static class UiServiceCollectionExtensions
 {
-    public static void AddUi(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddSingleton<MainWindow>();
-        services.AddSingleton<ApplicationViewModel>();
+        public void AddUi()
+        {
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<ApplicationViewModel>();
+        }
     }
 }

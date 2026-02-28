@@ -4,8 +4,11 @@ namespace PhotoManager.Application;
 
 public static class ApplicationServiceCollectionExtensions
 {
-    public static void AddApplication(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddSingleton<IApplication, Application>();
+        public void AddApplication()
+        {
+            services.AddSingleton<IApplication, Application>();
+        }
     }
 }
