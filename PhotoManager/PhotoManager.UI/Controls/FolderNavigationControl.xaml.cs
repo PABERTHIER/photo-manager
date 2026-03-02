@@ -1,9 +1,10 @@
-using log4net;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PhotoManager.Domain;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,7 +16,7 @@ namespace PhotoManager.UI.Controls;
 [ExcludeFromCodeCoverage]
 public partial class FolderNavigationControl
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<FolderNavigationControl> _logger;
 
     private readonly object? _placeholderNode = null;
     private bool _isInitializing = true;
@@ -24,6 +25,8 @@ public partial class FolderNavigationControl
 
     public FolderNavigationControl()
     {
+        _logger = App.ServiceProvider?.GetService<ILogger<FolderNavigationControl>>()
+                  ?? NullLogger<FolderNavigationControl>.Instance;
         InitializeComponent();
 
         SelectedPath = string.Empty;
@@ -58,7 +61,7 @@ public partial class FolderNavigationControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -119,7 +122,7 @@ public partial class FolderNavigationControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -187,7 +190,7 @@ public partial class FolderNavigationControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

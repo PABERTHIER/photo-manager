@@ -1,13 +1,10 @@
-﻿using FFMpegCore;
-using log4net;
-using System.Reflection;
+using FFMpegCore;
+using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Common;
 
 public static class VideoHelper
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
     //.3g2 - Mobile video
     //.3gp - Mobile video
     //.asf - Advanced Systems Format
@@ -46,7 +43,8 @@ public static class VideoHelper
         };
     }
 
-    public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath)
+    public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath,
+        ILogger logger)
     {
         string videoPath = Path.Combine(directoryName, fileName);
 
@@ -79,14 +77,15 @@ public static class VideoHelper
                     "FFmpeg failed to generate the first frame file due to its format or content.");
             }
 
-            Log.Info($"First frame extracted successfully for: {videoPath}");
-            Log.Info($"First frame saved at: {firstFrameVideoPath}");
-
+            logger.LogInformation("First frame extracted successfully for: {videoPath}", videoPath);
+            logger.LogInformation("First frame saved at: {firstFrameVideoPath}", firstFrameVideoPath);
             return firstFrameVideoPath;
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to extract the first frame for: {videoPath}, Message: {ex.Message}");
+            logger.LogError("Failed to extract the first frame for: {videoPath}, Message: {ex.Message}",
+                videoPath,
+                ex.Message);
 
             return null;
         }

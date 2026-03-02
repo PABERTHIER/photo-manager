@@ -1,5 +1,4 @@
-﻿using log4net;
-using System.Reflection;
+﻿using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Domain;
 
@@ -9,18 +8,17 @@ public class AssetCreationService(
     IImageProcessingService imageProcessingService,
     IImageMetadataService imageMetadataService,
     IAssetHashCalculatorService assetHashCalculatorService,
-    IUserConfigurationService userConfigurationService)
+    IUserConfigurationService userConfigurationService,
+    ILogger<AssetCreationService> logger)
     : IAssetCreationService
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
     {
         if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
         {
             // Create an asset from the video file
             VideoHelper.GetFirstFramePath(directoryName, fileName,
-                userConfigurationService.PathSettings.FirstFrameVideosPath);
+                userConfigurationService.PathSettings.FirstFrameVideosPath, logger);
             // The video file is not in the same path as the asset created
             // The asset is null because the target is not the video but the asset created previously
             return null;
@@ -30,7 +28,8 @@ public class AssetCreationService(
 
         if (!File.Exists(imagePath))
         {
-            Log.Error(new FileNotFoundException($"The file {imagePath} does not exist."));
+            FileNotFoundException exception = new($"The file {imagePath} does not exist.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
             return null;
         }
 

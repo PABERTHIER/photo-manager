@@ -32,10 +32,8 @@ Even the database is stored in your computer.**
 - Progress bar.
 - Multithread.
 - Handling corrupted images and videos.
-- New logs system.
-- Event sourcing.
 - Conversion feature (convert heic to jpg for example).
-- Migration to MAUI for full compatibity on macOs.
+- Migration to MAUI (or better) for full compatibility on macOs.
 
 ## Run the application :rocket:
 
@@ -184,7 +182,7 @@ Improvements **WIP**.
 - [NUnit][nunit]
 - [Moq framework for .NET (v4.18.4)][moq]
 - [MagickImage][magickimage]
-- [log4net][log4net]
+- [Microsoft Extensions Logging][microsoft-extensions-logging]
 - [coverlet][coverlet]
 - [ReportGenerator][reportgenerator]
 - [FFMpegCore][ffmpegcore]
@@ -240,7 +238,7 @@ I've made a specific repo for the two customs dll, injected in the project: [pho
 [nunit]: https://nunit.org/
 [moq]: https://github.com/moq/moq4
 [magickimage]: https://github.com/dlemstra/Magick.NET
-[log4net]: https://logging.apache.org/log4net/
+[microsoft-extensions-logging]: https://www.nuget.org/packages/Microsoft.Extensions.Logging/
 [coverlet]: https://github.com/coverlet-coverage/coverlet
 [reportgenerator]: https://github.com/danielpalme/ReportGenerator
 [ffmpegcore]: https://github.com/rosenbjerg/FFMpegCore

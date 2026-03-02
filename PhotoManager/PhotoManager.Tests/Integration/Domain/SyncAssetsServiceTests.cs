@@ -39,17 +39,19 @@ public class SyncAssetsServiceTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         _fileOperationsService = new(_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        _moveAssetsService = new(_assetRepository, _fileOperationsService, assetCreationService);
+        _moveAssetsService = new(_assetRepository, _fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         _syncAssetsService = new(_assetRepository, _fileOperationsService, assetsComparator, _moveAssetsService);
     }
 

@@ -1,15 +1,12 @@
-﻿using log4net;
-using log4net.Config;
-using log4net.Repository;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Windows;
+using Serilog;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Reflection;
 using System.Windows;
 
 namespace PhotoManager.UI;
@@ -20,23 +17,26 @@ namespace PhotoManager.UI;
 [ExcludeFromCodeCoverage]
 public partial class App
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
     private static readonly Mutex AppMutex = new(true, "PhotoManagerStartup");
 
     private readonly ServiceProvider _serviceProvider;
 
+    /// <summary>
+    /// Exposes the DI container for use in XAML-instantiated controls that cannot receive constructor injection
+    /// </summary>
+    public static IServiceProvider? ServiceProvider { get; private set; }
+
     public App()
     {
-        ILoggerRepository logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-
         ServiceCollection serviceCollection = new();
         ConfigureServices(serviceCollection);
         _serviceProvider = serviceCollection.BuildServiceProvider();
+        ServiceProvider = _serviceProvider;
     }
 
     private void App_OnStartup(object sender, StartupEventArgs e)
     {
+        ILogger<App> logger = _serviceProvider.GetRequiredService<ILogger<App>>();
         try
         {
             if (AppMutex.WaitOne(TimeSpan.Zero, true))
@@ -61,7 +61,7 @@ public partial class App
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            logger.LogError(ex, "{ExMessage}", ex.Message);
             MessageBox.Show("The application failed to initialize.", "Error", MessageBoxButton.OK,
                 MessageBoxImage.Error);
             throw;
@@ -74,6 +74,23 @@ public partial class App
             new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
 
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.File(
+                "log.txt",
+                outputTemplate:
+                "{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u5} {SourceContext} - {Message:lj}{NewLine}{Exception}",
+                fileSizeLimitBytes: 10L * 1024 * 1024,
+                rollOnFileSizeLimit: true,
+                retainedFileCountLimit: 10)
+            .CreateLogger();
+
+        services.AddLogging(logging =>
+        {
+            logging.AddConsole();
+            logging.AddSerilog(dispose: true);
+            logging.SetMinimumLevel(LogLevel.Information);
+        });
         services.AddSingleton(configuration);
         services.AddInfrastructure();
         services.AddDomain();

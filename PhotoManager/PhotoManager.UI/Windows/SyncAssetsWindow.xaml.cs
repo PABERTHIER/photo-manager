@@ -1,9 +1,8 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,10 +15,12 @@ namespace PhotoManager.UI.Windows;
 [ExcludeFromCodeCoverage]
 public partial class SyncAssetsWindow
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<SyncAssetsWindow> _logger;
 
-    public SyncAssetsWindow(SyncAssetsViewModel viewModel)
+    public SyncAssetsWindow(SyncAssetsViewModel viewModel, ILogger<SyncAssetsWindow> logger)
     {
+        _logger = logger;
+
         try
         {
             InitializeComponent();
@@ -29,7 +30,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -50,7 +51,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
         finally
         {
@@ -66,7 +67,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -78,7 +79,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -90,7 +91,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -103,7 +104,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
         finally
         {
@@ -122,7 +123,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
         finally
         {
@@ -138,7 +139,7 @@ public partial class SyncAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

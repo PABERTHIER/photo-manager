@@ -1,13 +1,10 @@
-﻿using ImageMagick;
-using log4net;
-using System.Reflection;
+using ImageMagick;
+using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Common;
 
 public static class BitmapHelper
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
     // From CatalogAssetsService for CreateAsset() to get the originalImage
     public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
@@ -63,7 +60,7 @@ public static class BitmapHelper
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
-    public static BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation)
+    public static BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
     {
         BitmapImage image = new();
 
@@ -100,14 +97,15 @@ public static class BitmapHelper
         }
         catch (MagickException)
         {
-            Log.Error("The image is not valid or in an unsupported format");
+            logger.LogError("The image is not valid or in an unsupported format");
         }
 
         return image;
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
-    public static BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
+    public static BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
+        ILogger logger)
     {
         BitmapImage image = new();
 
@@ -147,7 +145,7 @@ public static class BitmapHelper
         }
         catch (MagickException)
         {
-            Log.Error("The image is not valid or in an unsupported format");
+            logger.LogError("The image is not valid or in an unsupported format");
         }
 
         return image;

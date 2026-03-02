@@ -19,6 +19,7 @@ public class MoveAssetsServiceTests
     private AssetRepository? _assetRepository;
     private Database? _database;
     private AssetCreationService? _assetCreationService;
+    private FileOperationsService? _fileOperationsService;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -42,15 +43,17 @@ public class MoveAssetsServiceTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        _fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        _assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
-        _moveAssetsService = new(_assetRepository, fileOperationsService, _assetCreationService);
+        _assetCreationService = new(_assetRepository, _fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
+        _moveAssetsService = new(_assetRepository, _fileOperationsService, _assetCreationService,
+            new TestLogger<MoveAssetsService>());
     }
 
     [Test]
@@ -594,7 +597,9 @@ public class MoveAssetsServiceTests
         bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.NO_MOVE_DIRECTORY);
-        LoggingAssertsService loggingAssertsService = new();
+
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -661,9 +666,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
 
             assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.That(assetsInSource, Is.Not.Empty);
@@ -701,7 +704,7 @@ public class MoveAssetsServiceTests
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -995,7 +998,9 @@ public class MoveAssetsServiceTests
     public void MoveAssets_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
-        LoggingAssertsService loggingAssertsService = new();
+
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -1029,15 +1034,13 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -1946,7 +1949,9 @@ public class MoveAssetsServiceTests
         CopyAsset_SourceAndDestinationAreValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.NO_COPY_DIRECTORY);
-        LoggingAssertsService loggingAssertsService = new();
+
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -1969,9 +1974,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -1981,7 +1984,7 @@ public class MoveAssetsServiceTests
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -1989,7 +1992,9 @@ public class MoveAssetsServiceTests
     public void CopyAsset_SourceFilePathIsADirectory_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
-        LoggingAssertsService loggingAssertsService = new();
+
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2009,15 +2014,13 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{_dataDirectory}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2047,7 +2050,9 @@ public class MoveAssetsServiceTests
     public void CopyAsset_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
-        LoggingAssertsService loggingAssertsService = new();
+
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2071,15 +2076,13 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2219,7 +2222,8 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_FileInSourceDoesNotExistButExistsInTheDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2236,14 +2240,12 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2274,7 +2276,8 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationIsEmpty_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2286,14 +2289,12 @@ public class MoveAssetsServiceTests
             Assert.That(hasBeenCopied, Is.False);
 
             string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2323,7 +2324,8 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceIsNullButFileExistsInDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2336,23 +2338,22 @@ public class MoveAssetsServiceTests
 
             string[] messages =
             [
-                $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
+                $"Cannot copy '(null)' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
     [Test]
     public void CopyAsset_DestinationIsNull_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
+        _moveAssetsService = new(_assetRepository!, _fileOperationsService!, _assetCreationService!, logger);
 
         try
         {
@@ -2364,14 +2365,12 @@ public class MoveAssetsServiceTests
             Assert.That(hasBeenCopied, Is.False);
 
             string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 }

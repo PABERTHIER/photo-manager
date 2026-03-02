@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="FFMpegCore" />
-    <PackageReference Include="log4net" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
   </ItemGroup>
 
   <!-- Reference the custom MSBuild task -->

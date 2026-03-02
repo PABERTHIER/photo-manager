@@ -46,11 +46,11 @@ public class AssetRepositoryDeleteFolderTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {

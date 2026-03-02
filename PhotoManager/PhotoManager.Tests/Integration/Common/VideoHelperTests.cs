@@ -23,22 +23,22 @@ public class VideoHelperTests
         string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
         string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<VideoHelperTests> logger = new();
 
         try
         {
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+                logger);
 
             string[] messages =
             [
                 $"First frame extracted successfully for: {Path.Combine(_dataDirectory!, fileName)}",
                 $"First frame saved at: {firstFrameVideoPath}"
             ];
-            Type typeOfService = typeof(VideoHelper);
 
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(VideoHelperTests));
 
             Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.False);
             Assert.That(firstFrameVideoPath, Is.EqualTo(expectedFirstFrameVideoPath));
@@ -49,7 +49,7 @@ public class VideoHelperTests
         {
             File.Delete(expectedFirstFrameVideoPath);
             Directory.Delete(destinationPath);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -62,7 +62,7 @@ public class VideoHelperTests
 
         string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<VideoHelperTests> logger = new();
 
         try
         {
@@ -77,15 +77,14 @@ public class VideoHelperTests
             Assert.That(File.Exists(videoPath), Is.True);
 
             string? firstFrameVideoPath =
-                VideoHelper.GetFirstFramePath(_dataDirectory!, videoFileName, destinationPath);
+                VideoHelper.GetFirstFramePath(_dataDirectory!, videoFileName, destinationPath, logger);
 
             Exception exception =
                 new(
                     $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, videoFileName)}, Message: Output file already exists and overwrite is disabled");
             Exception[] expectedExceptions = [exception];
-            Type typeOfService = typeof(VideoHelper);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));
 
             Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
@@ -93,7 +92,7 @@ public class VideoHelperTests
         finally
         {
             Directory.Delete(destinationPath, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -103,22 +102,22 @@ public class VideoHelperTests
         const string fileName = FileNames.HOMER_1_S_MP4; // Video that has less than 1 second
         string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<VideoHelperTests> logger = new();
 
         try
         {
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+                logger);
 
             Exception exception =
                 new(
                     $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: FFmpeg failed to generate the first frame file due to its format or content.");
             Exception[] expectedExceptions = [exception];
-            Type typeOfService = typeof(VideoHelper);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));
 
             Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
@@ -126,7 +125,7 @@ public class VideoHelperTests
         finally
         {
             Directory.Delete(destinationPath);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -136,22 +135,22 @@ public class VideoHelperTests
         const string fileName = FileNames.NON_EXISTENT_VIDEO_MP4;
         string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<VideoHelperTests> logger = new();
 
         try
         {
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+                logger);
 
             Exception exception =
                 new(
                     $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: Input file not found");
             Exception[] expectedExceptions = [exception];
-            Type typeOfService = typeof(VideoHelper);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));
 
             Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
@@ -159,7 +158,7 @@ public class VideoHelperTests
         finally
         {
             Directory.Delete(destinationPath);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 }

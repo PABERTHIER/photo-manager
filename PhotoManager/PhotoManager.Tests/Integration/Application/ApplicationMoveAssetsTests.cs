@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Microsoft.Extensions.Logging;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
 using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
@@ -29,7 +30,8 @@ public class ApplicationMoveAssetsTests
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
-        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos,
+        ILogger<MoveAssetsService>? moveAssetsServiceLogger = null)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -48,18 +50,20 @@ public class ApplicationMoveAssetsTests
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
+            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
+        _moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+            moveAssetsServiceLogger ?? new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(_assetRepository, fileOperationsService, assetsComparator, _moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
@@ -661,9 +665,9 @@ public class ApplicationMoveAssetsTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
         string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
         string destinationDirectory = Path.Combine(assetsDirectory, Directories.NO_MOVE_DIRECTORY);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
 
-        ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false, logger);
 
         try
         {
@@ -740,9 +744,7 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{newSourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
 
             assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.That(assetsInSource, Is.Not.Empty);
@@ -780,7 +782,7 @@ public class ApplicationMoveAssetsTests
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(assetsDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -1101,9 +1103,9 @@ public class ApplicationMoveAssetsTests
         bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MoveAssetsService> logger = new();
 
-        ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
+        ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false, logger);
 
         try
         {
@@ -1141,15 +1143,13 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            Type typeOfService = typeof(MoveAssetsService);
-
-            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 

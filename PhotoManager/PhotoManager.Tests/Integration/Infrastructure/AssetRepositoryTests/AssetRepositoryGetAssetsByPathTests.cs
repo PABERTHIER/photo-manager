@@ -48,11 +48,11 @@ public class AssetRepositoryGetAssetsByPathTests
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        _imageMetadataService = new(fileOperationsService);
+        _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            _imageMetadataService, userConfigurationService);
+            _imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
@@ -241,7 +241,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService);
+            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService,
+                new TestLogger<AssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -473,13 +474,14 @@ public class AssetRepositoryGetAssetsByPathTests
             pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
             UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
-            ImageProcessingService imageProcessingService = new();
+            ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
             FileOperationsService fileOperationsService = new(userConfigurationService);
-            ImageMetadataService imageMetadataService = new(fileOperationsService);
+            ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
             PhotoManager.Infrastructure.Database.Database database = new(
                 new ObjectListStorage(), new BlobStorage(), new BackupStorage());
             TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-                imageProcessingService, imageMetadataService, userConfigurationService);
+                imageProcessingService, imageMetadataService, userConfigurationService,
+                new TestLogger<AssetRepository>());
 
             List<Asset> cataloguedAssets2 = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets2, Has.Count.EqualTo(1));
@@ -783,13 +785,13 @@ public class AssetRepositoryGetAssetsByPathTests
             x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        TestLogger<AssetRepository> logger = new();
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService);
+            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService, logger);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
             testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -854,16 +856,15 @@ public class AssetRepositoryGetAssetsByPathTests
 
                 Exception exception = new("Exception of type 'System.Exception' was thrown.");
                 Exception[] expectedExceptions = [exception];
-                Type typeOfService = typeof(AssetRepository);
 
-                loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+                logger.AssertLogExceptions(expectedExceptions, typeof(AssetRepository));
             }
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 

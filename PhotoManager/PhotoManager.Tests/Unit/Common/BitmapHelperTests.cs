@@ -273,7 +273,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -294,7 +295,8 @@ public class BitmapHelperTests
         const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer!, rotation));
+            Assert.Throws<ArgumentNullException>(() =>
+                BitmapHelper.LoadBitmapHeicOriginalImage(buffer!, rotation, new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -307,7 +309,8 @@ public class BitmapHelperTests
         const Rotation rotation = Rotation.Rotate90;
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
+            Assert.Throws<ArgumentException>(() =>
+                BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation, new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
@@ -319,7 +322,8 @@ public class BitmapHelperTests
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
@@ -337,7 +341,8 @@ public class BitmapHelperTests
         const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
+            Assert.Throws<ArgumentException>(() =>
+                BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation, new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -368,7 +373,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -392,7 +398,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -416,7 +423,8 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -436,7 +444,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate90, -100, -100);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate90, -100, -100,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
@@ -453,7 +462,8 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 1000000, 1000000);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 1000000, 1000000,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
@@ -470,7 +480,8 @@ public class BitmapHelperTests
         const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
+            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100,
+                new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -483,7 +494,8 @@ public class BitmapHelperTests
         const Rotation rotation = Rotation.Rotate90;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
-            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100,
+                new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
@@ -495,7 +507,8 @@ public class BitmapHelperTests
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100,
+            new TestLogger<BitmapHelperTests>());
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
@@ -513,7 +526,8 @@ public class BitmapHelperTests
         const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
-            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+            BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100,
+                new TestLogger<BitmapHelperTests>()));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -902,7 +916,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -920,7 +935,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100,
+            new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
@@ -931,7 +947,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -982,7 +999,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -1000,7 +1018,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100,
+            new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
@@ -1011,7 +1030,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -1062,7 +1082,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -1080,7 +1101,8 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100,
+            new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 
@@ -1091,7 +1113,8 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);

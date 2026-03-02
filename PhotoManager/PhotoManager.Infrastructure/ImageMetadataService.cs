@@ -1,15 +1,18 @@
-﻿namespace PhotoManager.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
 
-public class ImageMetadataService(IFileOperationsService fileOperationsService) : IImageMetadataService
+namespace PhotoManager.Infrastructure;
+
+public class ImageMetadataService(IFileOperationsService fileOperationsService, ILogger<ImageMetadataService> logger)
+    : IImageMetadataService
 {
     public ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation)
     {
-        return ExifHelper.GetExifOrientation(buffer, defaultExifOrientation, corruptedImageOrientation);
+        return ExifHelper.GetExifOrientation(buffer, defaultExifOrientation, corruptedImageOrientation, logger);
     }
 
     public ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation)
     {
-        return ExifHelper.GetHeicExifOrientation(buffer, corruptedImageOrientation);
+        return ExifHelper.GetHeicExifOrientation(buffer, corruptedImageOrientation, logger);
     }
 
     public Rotation GetImageRotation(ushort exifOrientation)

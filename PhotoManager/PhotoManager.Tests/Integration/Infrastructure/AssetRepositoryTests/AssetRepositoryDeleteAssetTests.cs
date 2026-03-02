@@ -45,11 +45,11 @@ public class AssetRepositoryDeleteAssetTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService);
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
@@ -150,11 +150,11 @@ public class AssetRepositoryDeleteAssetTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
-            imageProcessingService, imageMetadataService, userConfigurationService);
+            imageProcessingService, imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
