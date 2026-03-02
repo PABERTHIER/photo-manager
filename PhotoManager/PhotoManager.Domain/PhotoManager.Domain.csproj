@@ -3,8 +3,8 @@
     <None Remove="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="log4net" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
   <ItemGroup>

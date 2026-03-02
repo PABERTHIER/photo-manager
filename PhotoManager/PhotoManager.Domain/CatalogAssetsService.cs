@@ -1,5 +1,4 @@
-﻿using log4net;
-using System.Reflection;
+﻿using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Domain;
 
@@ -11,7 +10,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     private readonly IAssetCreationService _assetCreationService;
     private readonly IUserConfigurationService _userConfigurationService;
     private readonly IAssetsComparator _assetsComparator;
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<CatalogAssetsService> _logger;
 
     private bool _backupHasSameContent = true;
     private string _currentFolderPath = string.Empty;
@@ -25,7 +24,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         IImageMetadataService imageMetadataService,
         IAssetCreationService assetCreationService,
         IUserConfigurationService userConfigurationService,
-        IAssetsComparator assetsComparator)
+        IAssetsComparator assetsComparator,
+        ILogger<CatalogAssetsService> logger)
     {
         _assetRepository = assetRepository;
         _fileOperationsService = fileOperationsService;
@@ -33,6 +33,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         _assetCreationService = assetCreationService;
         _userConfigurationService = userConfigurationService;
         _assetsComparator = assetsComparator;
+        _logger = logger;
 
         _assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(_ => UpdateAssets());
     }
@@ -126,7 +127,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                _logger.LogError(ex, "{ExMessage}", ex.Message);
                 callback?.Invoke(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessFailed,

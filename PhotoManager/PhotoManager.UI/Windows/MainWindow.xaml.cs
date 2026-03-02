@@ -1,4 +1,4 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels;
@@ -6,7 +6,6 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -18,15 +17,19 @@ namespace PhotoManager.UI.Windows;
 [ExcludeFromCodeCoverage]
 public partial class MainWindow
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<MainWindow> _logger;
+    private readonly ILoggerFactory _loggerFactory;
 
     private readonly IApplication _application;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private Task _backgroundWorkTask = new(() => { });
     private Task _catalogTask = new(() => { });
 
-    public MainWindow(ApplicationViewModel viewModel, IApplication application)
+    public MainWindow(ApplicationViewModel viewModel, IApplication application, ILoggerFactory loggerFactory)
     {
+        _loggerFactory = loggerFactory;
+        _logger = loggerFactory.CreateLogger<MainWindow>();
+
         try
         {
             InitializeComponent();
@@ -41,7 +44,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
             throw;
         }
 
@@ -59,7 +62,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -117,7 +120,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -130,7 +133,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -142,7 +145,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -156,7 +159,8 @@ public partial class MainWindow
             {
                 FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new(_application);
                 findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
-                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new(findDuplicatedAssetsViewModel);
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new(findDuplicatedAssetsViewModel,
+                    _loggerFactory.CreateLogger<FindDuplicatedAssetsWindow>());
 
                 findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
                 findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
@@ -172,7 +176,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -181,12 +185,13 @@ public partial class MainWindow
         try
         {
             SyncAssetsViewModel syncAssetsViewModel = new(_application);
-            SyncAssetsWindow syncAssetsWindow = new(syncAssetsViewModel);
+            SyncAssetsWindow syncAssetsWindow = new(syncAssetsViewModel,
+                _loggerFactory.CreateLogger<SyncAssetsWindow>());
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -194,12 +199,12 @@ public partial class MainWindow
     {
         try
         {
-            AboutWindow aboutWindow = new(ViewModel.AboutInformation);
+            AboutWindow aboutWindow = new(ViewModel.AboutInformation, _loggerFactory.CreateLogger<AboutWindow>());
             aboutWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -224,7 +229,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -278,7 +283,7 @@ public partial class MainWindow
         {
             if (task.IsFaulted)
             {
-                Log.Error(task.Exception, new("BackgroundWorkTask faulted during shutdown"));
+                _logger.LogError(task.Exception, "BackgroundWorkTask faulted during shutdown");
             }
         }, TaskScheduler.Default);
 
@@ -322,7 +327,7 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Log.Error(ex, new("Unexpected error in background work"));
+            _logger.LogError(ex, "Unexpected error in background work");
         }
     }
 
@@ -346,7 +351,7 @@ public partial class MainWindow
         }
         catch (OperationCanceledException ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
 
         ViewModel.CalculateGlobalAssetsCounter();
@@ -381,7 +386,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -403,7 +408,8 @@ public partial class MainWindow
                     new(
                         ViewModel,
                         assets[0].Folder,
-                        _application.GetRecentTargetPaths()));
+                        _application.GetRecentTargetPaths()),
+                    _loggerFactory.CreateLogger<FolderNavigationWindow>());
 
                 folderNavigationWindow.Closed += (_, _) =>
                 {
@@ -439,7 +445,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 }

@@ -14,7 +14,7 @@ public class ImageProcessingServiceTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _imageProcessingService = new();
+        _imageProcessingService = new(new TestLogger<ImageProcessingService>());
     }
 
     [Test]

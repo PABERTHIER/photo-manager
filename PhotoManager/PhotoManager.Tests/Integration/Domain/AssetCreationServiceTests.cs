@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
@@ -43,7 +44,7 @@ public class AssetCreationServiceTests
     }
 
     private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash,
-        bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+        bool usingMD5Hash, bool usingPHash, bool analyseVideos, ILogger<AssetCreationService>? logger = null)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -57,14 +58,15 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
         _userConfigurationService = new(configurationRootMock.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            logger ?? new TestLogger<AssetCreationService>());
     }
 
     [Test]
@@ -1948,8 +1950,8 @@ public class AssetCreationServiceTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsEmpty_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureAssetCreationService(200, 150, false, false, false, false);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<AssetCreationService> logger = new();
+        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
 
         try
         {
@@ -1979,14 +1981,13 @@ public class AssetCreationServiceTests
             FileNotFoundException fileNotFoundException =
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -1994,8 +1995,8 @@ public class AssetCreationServiceTests
     public void
         CreateAsset_PictureAndBasicHashTypeAndDirectoryNamePointingToAFile_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureAssetCreationService(200, 150, false, false, false, false);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<AssetCreationService> logger = new();
+        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
 
         try
         {
@@ -2024,14 +2025,13 @@ public class AssetCreationServiceTests
             FileNotFoundException fileNotFoundException =
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2069,8 +2069,8 @@ public class AssetCreationServiceTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFileNameDoesNotExist_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureAssetCreationService(200, 150, false, false, false, false);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<AssetCreationService> logger = new();
+        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
 
         try
         {
@@ -2097,22 +2097,21 @@ public class AssetCreationServiceTests
 
             FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsADirectory_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureAssetCreationService(200, 150, false, false, false, false);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<AssetCreationService> logger = new();
+        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
 
         try
         {
@@ -2139,14 +2138,13 @@ public class AssetCreationServiceTests
 
             FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -2271,14 +2269,15 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
         _userConfigurationService = new(configurationRootMock.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 

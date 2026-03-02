@@ -1,7 +1,8 @@
-﻿using log4net;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PhotoManager.UI.ViewModels;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -14,17 +15,19 @@ namespace PhotoManager.UI.Controls;
 [ExcludeFromCodeCoverage]
 public partial class ViewerUserControl
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<ViewerUserControl> _logger;
 
     public ViewerUserControl()
     {
+        _logger = App.ServiceProvider?.GetService<ILogger<ViewerUserControl>>()
+                  ?? NullLogger<ViewerUserControl>.Instance;
         try
         {
             InitializeComponent();
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -41,7 +44,7 @@ public partial class ViewerUserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -54,7 +57,7 @@ public partial class ViewerUserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -69,7 +72,7 @@ public partial class ViewerUserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

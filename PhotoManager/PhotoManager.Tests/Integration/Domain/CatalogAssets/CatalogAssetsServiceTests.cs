@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Microsoft.Extensions.Logging;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
@@ -333,7 +334,8 @@ public class CatalogAssetsServiceTests
     }
 
     private void ConfigureCatalogAssetService(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
-        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos,
+        ILogger<CatalogAssetsService>? logger = null)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -347,17 +349,19 @@ public class CatalogAssetsServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
         _userConfigurationService = new(configurationRootMock.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator);
+            assetCreationService, _userConfigurationService, assetsComparator,
+            logger ?? new TestLogger<CatalogAssetsService>());
     }
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
@@ -9181,8 +9185,8 @@ public class CatalogAssetsServiceTests
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<CatalogAssetsService> logger = new();
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos, logger);
 
         try
         {
@@ -9261,9 +9265,8 @@ public class CatalogAssetsServiceTests
             UnauthorizedAccessException unauthorizedAccessException =
                 new($"Access to the path '{assetsDirectory}' is denied.");
             Exception[] expectedExceptions = [unauthorizedAccessException];
-            Type typeOfService = typeof(CatalogAssetsService);
 
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(CatalogAssetsService));
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
@@ -9276,7 +9279,7 @@ public class CatalogAssetsServiceTests
             Directory.Delete(_databaseDirectory!, true);
             DirectoryHelper.AllowAccess(assetsDirectory);
             Directory.Delete(assetsDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
     // ERROR SECTION (End) -------------------------------------------------------------------------------------

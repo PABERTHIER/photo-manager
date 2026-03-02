@@ -45,11 +45,11 @@ public class DuplicatedSetViewModelTests
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService);
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
 

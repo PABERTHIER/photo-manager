@@ -47,11 +47,11 @@ public class AssetRepositoryGetAssetsCounterTests
         PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
             new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService);
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {

@@ -1,10 +1,9 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
@@ -23,7 +22,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 public class MainWindowLoadedAndClosingTests
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private static readonly ILogger Log = new TestLogger<MainWindowLoadedAndClosingTests>();
 
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -230,18 +229,20 @@ public class MainWindowLoadedAndClosingTests
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
+            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
@@ -261,7 +262,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 1, assetsDirectory, 200, 150, true, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -390,9 +391,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
@@ -401,7 +400,7 @@ public class MainWindowLoadedAndClosingTests
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -411,7 +410,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -512,9 +511,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
@@ -523,7 +520,7 @@ public class MainWindowLoadedAndClosingTests
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -533,7 +530,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -645,9 +642,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
@@ -656,7 +651,7 @@ public class MainWindowLoadedAndClosingTests
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Directory.Delete(_databaseDirectory!, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -666,7 +661,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -759,9 +754,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
@@ -771,7 +764,7 @@ public class MainWindowLoadedAndClosingTests
             GC.WaitForPendingFinalizers();
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -781,7 +774,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -860,15 +853,13 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -878,7 +869,7 @@ public class MainWindowLoadedAndClosingTests
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        LoggingAssertsService loggingAssertsService = new();
+        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -956,15 +947,13 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            Type typeOfService = typeof(MainWindowLoadedAndClosingTests);
-
-            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
-            loggingAssertsService.LoggingAssertTearDown();
+            logger.LoggingAssertTearDown();
         }
     }
 
@@ -1240,7 +1229,7 @@ public class MainWindowLoadedAndClosingTests
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Log.Error(ex, new("Unexpected error in background work"));
+            Log.LogError(ex, "Unexpected error in background work");
         }
     }
 
@@ -1257,7 +1246,7 @@ public class MainWindowLoadedAndClosingTests
         }
         catch (OperationCanceledException ex)
         {
-            Log.Error(ex);
+            Log.LogError(ex, ex.Message);
         }
 
         _applicationViewModel!.CalculateGlobalAssetsCounter();
@@ -1274,7 +1263,7 @@ public class MainWindowLoadedAndClosingTests
         {
             if (task.IsFaulted)
             {
-                Log.Error(task.Exception, new("BackgroundWorkTask faulted during shutdown"));
+                Log.LogError(task.Exception, "BackgroundWorkTask faulted during shutdown");
             }
         }, TaskScheduler.Default);
 

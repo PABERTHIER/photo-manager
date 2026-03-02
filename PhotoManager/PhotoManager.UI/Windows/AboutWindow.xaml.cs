@@ -1,7 +1,6 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.Domain;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 
 namespace PhotoManager.UI.Windows;
@@ -12,9 +11,7 @@ namespace PhotoManager.UI.Windows;
 [ExcludeFromCodeCoverage]
 public partial class AboutWindow
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
-    public AboutWindow(AboutInformation aboutInformation)
+    public AboutWindow(AboutInformation aboutInformation, ILogger<AboutWindow> logger)
     {
         try
         {
@@ -25,7 +22,7 @@ public partial class AboutWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

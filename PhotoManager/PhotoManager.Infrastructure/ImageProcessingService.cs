@@ -1,6 +1,8 @@
-﻿namespace PhotoManager.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
 
-public class ImageProcessingService : IImageProcessingService
+namespace PhotoManager.Infrastructure;
+
+public class ImageProcessingService(ILogger<ImageProcessingService> logger) : IImageProcessingService
 {
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
@@ -29,13 +31,13 @@ public class ImageProcessingService : IImageProcessingService
     // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
     public BitmapImage LoadBitmapHeicOriginalImage(byte[] imageBytes, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapHeicOriginalImage(imageBytes, rotation);
+        return BitmapHelper.LoadBitmapHeicOriginalImage(imageBytes, rotation, logger);
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
     public BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        return BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+        return BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height, logger);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
@@ -61,11 +63,11 @@ public class ImageProcessingService : IImageProcessingService
 
     public bool IsValidGdiPlusImage(byte[] imageData)
     {
-        return ExifHelper.IsValidGdiPlusImage(imageData);
+        return ExifHelper.IsValidGdiPlusImage(imageData, logger);
     }
 
     public bool IsValidHeic(byte[] imageData)
     {
-        return ExifHelper.IsValidHeic(imageData);
+        return ExifHelper.IsValidHeic(imageData, logger);
     }
 }

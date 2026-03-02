@@ -49,11 +49,11 @@ public class AssetRepositorySaveCatalogTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        _imageProcessingService = new();
+        _imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        _imageMetadataService = new(fileOperationsService);
+        _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, _imageProcessingService,
-            _imageMetadataService, _userConfigurationService);
+            _imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
@@ -307,7 +307,8 @@ public class AssetRepositorySaveCatalogTests
 
             // New AssetRepository to test Initialize method with content in DB
             AssetRepository assetRepository = new(_database!, _pathProviderServiceMock!.Object,
-                _imageProcessingService!, _imageMetadataService!, _userConfigurationService);
+                _imageProcessingService!, _imageMetadataService!, _userConfigurationService,
+                new TestLogger<AssetRepository>());
 
             Assert.That(assetRepository.HasChanges(), Is.False);
 

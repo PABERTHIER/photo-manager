@@ -1,7 +1,6 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.UI.ViewModels;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,9 +12,7 @@ namespace PhotoManager.UI.Windows;
 [ExcludeFromCodeCoverage]
 public partial class FolderNavigationWindow
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
-    public FolderNavigationWindow(FolderNavigationViewModel viewModel)
+    public FolderNavigationWindow(FolderNavigationViewModel viewModel, ILogger<FolderNavigationWindow> logger)
     {
         try
         {
@@ -28,7 +25,7 @@ public partial class FolderNavigationWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

@@ -183,21 +183,22 @@ public class ApplicationGetAssetsByPathTests
         _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService);
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator);
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService =
-            new(_testableAssetRepository, fileOperationsService, assetCreationService);
+            new(_testableAssetRepository, fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
@@ -830,20 +831,24 @@ public class ApplicationGetAssetsByPathTests
             x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService);
+            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
             imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
             imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService);
+            assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
@@ -1289,20 +1294,22 @@ public class ApplicationGetAssetsByPathTests
             x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService);
+            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService);
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
-            imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService);
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =

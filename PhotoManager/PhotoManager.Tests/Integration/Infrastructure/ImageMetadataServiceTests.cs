@@ -29,7 +29,7 @@ public class ImageMetadataServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         _fileOperationService = new(_userConfigurationService);
-        _imageMetadataService = new(_fileOperationService);
+        _imageMetadataService = new(_fileOperationService, new TestLogger<ImageMetadataService>());
     }
 
     [Test]

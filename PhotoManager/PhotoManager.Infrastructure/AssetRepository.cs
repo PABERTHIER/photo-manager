@@ -1,8 +1,7 @@
-using log4net;
+using Microsoft.Extensions.Logging;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reflection;
 
 namespace PhotoManager.Infrastructure;
 
@@ -10,7 +9,7 @@ public class AssetRepository : IAssetRepository
 {
     private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
 
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<AssetRepository> _logger;
 
     private readonly string _dataDirectory;
     private readonly IDatabase _database;
@@ -35,12 +34,14 @@ public class AssetRepository : IAssetRepository
         IPathProviderService pathProviderService,
         IImageProcessingService imageProcessingService,
         IImageMetadataService imageMetadataService,
-        IUserConfigurationService userConfigurationService)
+        IUserConfigurationService userConfigurationService,
+        ILogger<AssetRepository> logger)
     {
         _database = database;
         _imageProcessingService = imageProcessingService;
         _imageMetadataService = imageMetadataService;
         _userConfigurationService = userConfigurationService;
+        _logger = logger;
         _assets = [];
         _folders = [];
         _syncAssetsConfiguration = new();
@@ -95,7 +96,7 @@ public class AssetRepository : IAssetRepository
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
 
         return [.. assetsList];
@@ -110,8 +111,9 @@ public class AssetRepository : IAssetRepository
 
             if (string.IsNullOrWhiteSpace(asset.Folder.Path))
             {
-                Log.Error(
-                    $"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
+                _logger.LogError(
+                    "The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}",
+                    asset.FileName);
                 return;
             }
 

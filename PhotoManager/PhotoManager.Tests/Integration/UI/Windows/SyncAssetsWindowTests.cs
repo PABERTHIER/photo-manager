@@ -47,18 +47,20 @@ public class SyncAssetsWindowTests
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        ImageProcessingService imageProcessingService = new();
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(userConfigurationService);
-        ImageMetadataService imageMetadataService = new(_fileOperationsService);
+        ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService);
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
         AssetCreationService assetCreationService = new(assetRepository, _fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService);
+            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+            new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(assetRepository, _fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator);
-        _moveAssetsService = new(assetRepository, _fileOperationsService, assetCreationService);
+            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
+        _moveAssetsService = new(assetRepository, _fileOperationsService, assetCreationService,
+            new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService =
             new(assetRepository, _fileOperationsService, assetsComparator, _moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =

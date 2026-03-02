@@ -1,19 +1,16 @@
 using ImageMagick;
-using log4net;
-using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Common;
 
 public static class ExifHelper
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
     // 1: Normal (0 deg rotation)
     // 3: Upside-down (180 deg rotation)
     // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
     // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
     public static ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation,
-        ushort corruptedImageOrientation)
+        ushort corruptedImageOrientation, ILogger logger)
     {
         try
         {
@@ -34,15 +31,15 @@ public static class ExifHelper
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            if (e is NotSupportedException && e.InnerException?.HResult == -2003292351)
+            if (ex is NotSupportedException && ex.InnerException?.HResult == -2003292351)
             {
-                Log.Error("The image is corrupted");
+                logger.LogError("The image is corrupted");
             }
             else
             {
-                Log.Error(e);
+                logger.LogError(ex, "{ExMessage}", ex.Message);
             }
         }
 
@@ -53,7 +50,8 @@ public static class ExifHelper
     // 3: Upside-down (180 deg rotation)
     // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
     // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
-    public static ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation)
+    public static ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation,
+        ILogger logger)
     {
         try
         {
@@ -71,7 +69,7 @@ public static class ExifHelper
         }
         catch (MagickException)
         {
-            Log.Error("The image is not valid or in an unsupported format");
+            logger.LogError("The image is not valid or in an unsupported format");
         }
 
         return corruptedImageOrientation;
@@ -103,7 +101,7 @@ public static class ExifHelper
         return rotation;
     }
 
-    public static bool IsValidGdiPlusImage(byte[] imageData)
+    public static bool IsValidGdiPlusImage(byte[] imageData, ILogger logger)
     {
         try
         {
@@ -114,14 +112,14 @@ public static class ExifHelper
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error(e);
+            logger.LogError(ex, "{ExMessage}", ex.Message);
             return false;
         }
     }
 
-    public static bool IsValidHeic(byte[] imageData)
+    public static bool IsValidHeic(byte[] imageData, ILogger logger)
     {
         try
         {
@@ -137,7 +135,7 @@ public static class ExifHelper
         }
         catch (MagickException)
         {
-            Log.Error("The image is not valid or in an unsupported format");
+            logger.LogError("The image is not valid or in an unsupported format");
             return false;
         }
     }

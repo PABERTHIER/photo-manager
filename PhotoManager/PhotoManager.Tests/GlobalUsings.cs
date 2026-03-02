@@ -1,4 +1,5 @@
 ﻿global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.Logging.Testing;
 global using Moq;
 global using NUnit.Framework;
 // Projects

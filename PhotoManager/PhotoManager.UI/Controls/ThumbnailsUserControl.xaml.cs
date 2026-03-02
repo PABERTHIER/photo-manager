@@ -1,9 +1,10 @@
-﻿using log4net;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -15,17 +16,19 @@ namespace PhotoManager.UI.Controls;
 [ExcludeFromCodeCoverage]
 public partial class ThumbnailsUserControl
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<ThumbnailsUserControl> _logger;
 
     public ThumbnailsUserControl()
     {
+        _logger = App.ServiceProvider?.GetService<ILogger<ThumbnailsUserControl>>()
+                  ?? NullLogger<ThumbnailsUserControl>.Instance;
         try
         {
             InitializeComponent();
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -55,7 +58,7 @@ public partial class ThumbnailsUserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -72,7 +75,7 @@ public partial class ThumbnailsUserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 

@@ -1,16 +1,14 @@
-﻿using log4net;
-using System.Reflection;
+﻿using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Domain;
 
 public class MoveAssetsService(
     IAssetRepository assetRepository,
     IFileOperationsService fileOperationsService,
-    IAssetCreationService assetCreationService)
+    IAssetCreationService assetCreationService,
+    ILogger<MoveAssetsService> logger)
     : IMoveAssetsService
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles)
     {
         if (destinationFolder == null)
@@ -84,7 +82,8 @@ public class MoveAssetsService(
     {
         if (string.IsNullOrWhiteSpace(destinationFilePath))
         {
-            Log.Error($"Cannot copy '{sourceFilePath}' because the destination path is null or empty.");
+            logger.LogError("Cannot copy '{sourceFilePath}' because the destination path is null or empty.",
+                sourceFilePath);
             return false;
         }
 
@@ -129,8 +128,10 @@ public class MoveAssetsService(
         {
             if (fileOperationsService.FileExists(destinationFilePath))
             {
-                Log.Error(
-                    $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.");
+                logger.LogError(
+                    "Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.",
+                    sourceFilePath,
+                    destinationFilePath);
                 return fileOperationsService.FileExists(sourceFilePath);
             }
 
@@ -168,8 +169,11 @@ public class MoveAssetsService(
         }
         catch (Exception ex)
         {
-            Log.Error(
-                $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {ex.Message}");
+            logger.LogError(
+                "Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {ex.Message}",
+                sourceFilePath,
+                destinationFilePath,
+                ex.Message);
             return false;
         }
     }

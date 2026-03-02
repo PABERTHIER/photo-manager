@@ -1,10 +1,9 @@
-﻿using log4net;
+using Microsoft.Extensions.Logging;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,10 +15,13 @@ namespace PhotoManager.UI.Windows;
 [ExcludeFromCodeCoverage]
 public partial class FindDuplicatedAssetsWindow
 {
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private readonly ILogger<FindDuplicatedAssetsWindow> _logger;
 
-    public FindDuplicatedAssetsWindow(FindDuplicatedAssetsViewModel viewModel)
+    public FindDuplicatedAssetsWindow(FindDuplicatedAssetsViewModel viewModel,
+        ILogger<FindDuplicatedAssetsWindow> logger)
     {
+        _logger = logger;
+
         try
         {
             InitializeComponent();
@@ -30,7 +32,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -51,7 +53,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -68,7 +70,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -85,7 +87,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -97,7 +99,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
@@ -107,7 +109,7 @@ public partial class FindDuplicatedAssetsWindow
         {
             if (ViewModel.CurrentDuplicatedAsset == null)
             {
-                Log.Error("No duplicated asset selected");
+                _logger.LogError("No duplicated asset selected");
                 return;
             }
 
@@ -119,7 +121,7 @@ public partial class FindDuplicatedAssetsWindow
         }
         catch (Exception ex)
         {
-            Log.Error(ex);
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
         }
     }
 
