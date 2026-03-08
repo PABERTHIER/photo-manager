@@ -204,11 +204,9 @@ public static class BitmapHelper
                     image.Freeze();
                 }
             }
-            catch (MagickException ex)
+            catch (MagickException)
             {
-                logger.LogError(ex, "Failed to load HEIC image from path: {imagePath}. Message: {ex.Message}",
-                    imagePath,
-                    ex.Message);
+                logger.LogError("Failed to load HEIC image from path: {imagePath}.", imagePath);
             }
         }
 

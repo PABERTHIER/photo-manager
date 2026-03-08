@@ -22,6 +22,7 @@ public class TestLogger<T> : ILogger<T>
 
         for (int i = 0; i < records.Count; i++)
         {
+            Assert.That(records[i].Level, Is.EqualTo(LogLevel.Error));
             string message = records[i].Exception?.Message ?? records[i].Message;
             AssertMessage(expectedExceptions[i].Message, message);
             Assert.That(records[i].Category, Is.EqualTo(typeOfService.ToString()));
@@ -36,6 +37,7 @@ public class TestLogger<T> : ILogger<T>
 
         for (int i = 0; i < records.Count; i++)
         {
+            Assert.That(records[i].Level, Is.EqualTo(LogLevel.Information));
             AssertMessage(expectedMessages[i], records[i].Message);
             Assert.That(records[i].Category, Is.EqualTo(typeOfService.ToString()));
         }

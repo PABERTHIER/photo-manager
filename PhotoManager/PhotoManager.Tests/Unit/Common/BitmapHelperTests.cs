@@ -822,6 +822,42 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
+    public void LoadBitmapHeicImageFromPathViewerUserControl_CorruptedHeicFile_ReturnsDefaultBitmapImage()
+    {
+        string validFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string tempDirectory = Path.Combine(_dataDirectory!, "Temp");
+        Directory.CreateDirectory(tempDirectory);
+
+        try
+        {
+            const string invalidHeicFileName = "Invalid_Corrupted.heic";
+            string filePath = Path.Combine(tempDirectory, invalidHeicFileName);
+            const Rotation rotation = Rotation.Rotate90;
+
+            ImageHelper.CreateInvalidImage(validFilePath, filePath);
+
+            BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.StreamSource, Is.Null);
+                Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+                Assert.That(image.DecodePixelWidth, Is.Zero);
+                Assert.That(image.DecodePixelHeight, Is.Zero);
+
+                string expectedErrorMessage = $"Failed to load HEIC image from path: {filePath}.";
+                _testLogger.AssertLogExceptions([new Exception(expectedErrorMessage)], typeof(BitmapHelperTests));
+            }
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, true);
+        }
+    }
+
+    [Test]
+    [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
