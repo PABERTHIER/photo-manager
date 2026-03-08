@@ -43,7 +43,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -56,7 +56,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        _findDuplicatedAssetsService = new(_assetRepository!, fileOperationsService, userConfigurationService);
+        _findDuplicatedAssetsService = new(_assetRepository!, fileOperationsService, userConfigurationService,
+            new TestLogger<FindDuplicatedAssetsService>());
 
         _asset1 = new()
         {

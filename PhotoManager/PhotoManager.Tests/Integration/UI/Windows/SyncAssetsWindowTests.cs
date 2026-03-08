@@ -52,7 +52,8 @@ public class SyncAssetsWindowTests
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(assetRepository, _fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -61,10 +62,11 @@ public class SyncAssetsWindowTests
             assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
         _moveAssetsService = new(assetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(assetRepository, _fileOperationsService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(assetRepository, _fileOperationsService, userConfigurationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, _fileOperationsService, assetsComparator,
+            _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, _fileOperationsService,
+            userConfigurationService,
+                new TestLogger<FindDuplicatedAssetsService>());
         PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
             _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _fileOperationsService,
             imageProcessingService);

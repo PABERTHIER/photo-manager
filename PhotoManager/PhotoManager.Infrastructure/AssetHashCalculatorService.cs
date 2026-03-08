@@ -1,13 +1,17 @@
-﻿namespace PhotoManager.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
 
-public class AssetHashCalculatorService(IUserConfigurationService userConfigurationService)
+namespace PhotoManager.Infrastructure;
+
+public class AssetHashCalculatorService(
+    IUserConfigurationService userConfigurationService,
+    ILogger<AssetHashCalculatorService> logger)
     : IAssetHashCalculatorService
 {
     public string CalculateHash(byte[] imageBytes, string filePath)
     {
         if (userConfigurationService.HashSettings.UsingPHash)
         {
-            return HashingHelper.CalculatePHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
+            return HashingHelper.CalculatePHash(filePath, logger) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
         if (userConfigurationService.HashSettings.UsingDHash)

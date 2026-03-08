@@ -6,7 +6,7 @@ namespace PhotoManager.Common;
 public static class BitmapHelper
 {
     // From CatalogAssetsService for CreateAsset() to get the originalImage
-    public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
+    public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
     {
         try
         {
@@ -25,14 +25,18 @@ public static class BitmapHelper
 
             return image;
         }
-        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
-            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+            NotSupportedException exception =
+                new("No imaging component suitable to complete this operation was found.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
-    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
+    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
+        ILogger logger)
     {
         try
         {
@@ -53,9 +57,12 @@ public static class BitmapHelper
 
             return image;
         }
-        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
-            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+            NotSupportedException exception =
+                new("No imaging component suitable to complete this operation was found.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
     }
 
@@ -171,28 +178,37 @@ public static class BitmapHelper
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public static BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation)
+    public static BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation, ILogger logger)
     {
         BitmapImage image = new();
 
         if (File.Exists(imagePath))
         {
-            using (MagickImage magickImage = new(imagePath))
+            try
             {
-                // Apply Rotation because MagickImage does not rotate the image in-place
-                MagickImageApplyRotation(magickImage, rotation, false);
+                using (MagickImage magickImage = new(imagePath))
+                {
+                    // Apply Rotation because MagickImage does not rotate the image in-place
+                    MagickImageApplyRotation(magickImage, rotation, false);
 
-                // Convert the MagickImage to a byte array (supported format: JPG)
-                byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);
+                    // Convert the MagickImage to a byte array (supported format: JPG)
+                    byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);
 
-                // Create a BitmapImage from the byte array and set the rotation
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
-                image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-                image.StreamSource = new MemoryStream(imageData);
-                image.Rotation = rotation;
-                image.EndInit();
-                image.Freeze();
+                    // Create a BitmapImage from the byte array and set the rotation
+                    image.BeginInit();
+                    image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                    image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                    image.StreamSource = new MemoryStream(imageData);
+                    image.Rotation = rotation;
+                    image.EndInit();
+                    image.Freeze();
+                }
+            }
+            catch (MagickException ex)
+            {
+                logger.LogError(ex, "Failed to load HEIC image from path: {imagePath}. Message: {ex.Message}",
+                    imagePath,
+                    ex.Message);
             }
         }
 
@@ -200,7 +216,7 @@ public static class BitmapHelper
     }
 
     // From AssetRepository
-    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
+    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height, ILogger logger)
     {
         try
         {
@@ -220,8 +236,9 @@ public static class BitmapHelper
 
             return thumbnailImage;
         }
-        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
+            logger.LogError(ex, "No imaging component suitable to complete this operation was found.");
             throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
         }
     }

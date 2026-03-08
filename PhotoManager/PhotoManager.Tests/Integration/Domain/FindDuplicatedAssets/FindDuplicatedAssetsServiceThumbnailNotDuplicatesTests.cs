@@ -85,7 +85,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -324,8 +324,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
@@ -398,8 +398,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
@@ -465,8 +465,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
@@ -516,8 +516,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
@@ -567,8 +567,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
@@ -681,8 +681,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!,
                 $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");

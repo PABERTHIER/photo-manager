@@ -188,7 +188,8 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -197,10 +198,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(assetRepository, fileOperationsService, userConfigurationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+            moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+            userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
             moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
             imageProcessingService);

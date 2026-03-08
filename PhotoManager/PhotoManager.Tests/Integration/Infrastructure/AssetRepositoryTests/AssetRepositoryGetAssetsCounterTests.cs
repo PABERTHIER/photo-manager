@@ -38,7 +38,7 @@ public class AssetRepositoryGetAssetsCounterTests
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
