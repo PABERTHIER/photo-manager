@@ -745,7 +745,7 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{newSourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
 
             assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.That(assetsInSource, Is.Not.Empty);
@@ -1144,7 +1144,7 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {

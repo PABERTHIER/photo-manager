@@ -667,7 +667,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
 
             assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.That(assetsInSource, Is.Not.Empty);
@@ -1035,7 +1035,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -1975,7 +1975,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2015,7 +2015,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{_dataDirectory}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2077,7 +2077,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2241,7 +2241,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2290,7 +2290,7 @@ public class MoveAssetsServiceTests
             Assert.That(hasBeenCopied, Is.False);
 
             string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2341,7 +2341,7 @@ public class MoveAssetsServiceTests
             [
                 $"Cannot copy '(null)' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {
@@ -2366,7 +2366,7 @@ public class MoveAssetsServiceTests
             Assert.That(hasBeenCopied, Is.False);
 
             string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {

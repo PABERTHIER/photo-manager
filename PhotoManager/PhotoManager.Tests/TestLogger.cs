@@ -29,7 +29,19 @@ public class TestLogger<T> : ILogger<T>
         }
     }
 
+    public void AssertLogErrors(string[] expectedMessages, Type typeOfService)
+    {
+        AssertLog(expectedMessages, typeOfService, LogLevel.Error);
+    }
+
     public void AssertLogInfos(string[] expectedMessages, Type typeOfService)
+    {
+        AssertLog(expectedMessages, typeOfService, LogLevel.Information);
+    }
+
+    public void LoggingAssertTearDown() => _fakeLogger.Collector.Clear();
+
+    private void AssertLog(string[] expectedMessages, Type typeOfService, LogLevel logLevel)
     {
         IReadOnlyList<FakeLogRecord> records = _fakeLogger.Collector.GetSnapshot();
 
@@ -37,13 +49,11 @@ public class TestLogger<T> : ILogger<T>
 
         for (int i = 0; i < records.Count; i++)
         {
-            Assert.That(records[i].Level, Is.EqualTo(LogLevel.Information));
+            Assert.That(records[i].Level, Is.EqualTo(logLevel));
             AssertMessage(expectedMessages[i], records[i].Message);
             Assert.That(records[i].Category, Is.EqualTo(typeOfService.ToString()));
         }
     }
-
-    public void LoggingAssertTearDown() => _fakeLogger.Collector.Clear();
 
     private static void AssertMessage(string expectedMessage, string? message)
     {

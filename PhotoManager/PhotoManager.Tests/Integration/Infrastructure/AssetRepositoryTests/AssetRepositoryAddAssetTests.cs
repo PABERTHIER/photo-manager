@@ -448,7 +448,7 @@ public class AssetRepositoryAddAssetTests
                 $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1!.FileName}"
             ];
 
-            logger.AssertLogInfos(messages, typeof(AssetRepository));
+            logger.AssertLogErrors(messages, typeof(AssetRepository));
         }
         finally
         {
