@@ -46,7 +46,8 @@ public class AssetRepositoryGetAssetsByPathTests
         _pathProviderServiceMock = new();
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService);
@@ -476,9 +477,10 @@ public class AssetRepositoryGetAssetsByPathTests
             UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
             ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
             FileOperationsService fileOperationsService = new(userConfigurationService);
-            ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-            PhotoManager.Infrastructure.Database.Database database = new(
-                new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+            ImageMetadataService imageMetadataService = new(fileOperationsService,
+                new TestLogger<ImageMetadataService>());
+            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
+                new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
             TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
                 imageProcessingService, imageMetadataService, userConfigurationService,
                 new TestLogger<AssetRepository>());

@@ -10,6 +10,7 @@ public class DatabaseDeleteBlobFileTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +26,14 @@ public class DatabaseDeleteBlobFileTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger.LoggingAssertTearDown();
     }
 
     [Test]
@@ -56,6 +64,8 @@ public class DatabaseDeleteBlobFileTests
             _database!.DeleteBlobFile(blobName);
 
             Assert.That(File.Exists(blobFilePath), Is.False);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -85,11 +95,68 @@ public class DatabaseDeleteBlobFileTests
             _database!.DeleteBlobFile(blobName);
 
             Assert.That(File.Exists(blobFilePath), Is.False);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
             Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
+        }
+    }
+
+    [Test]
+    public void DeleteBlobFile_FileIsLocked_LogsItAndThrowsIOException()
+    {
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string blobsDirectory = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+        string blobFilePath = Path.Combine(blobsDirectory, blobName);
+
+        string logMessage = $"Error while trying to delete blob {blobName}.";
+        string exceptionMessage =
+            $"The process cannot access the file '{blobFilePath}' because it is being used by another process.";
+
+        try
+        {
+            Directory.CreateDirectory(blobsDirectory);
+            File.WriteAllText(blobFilePath, "test content");
+
+            // Open a file stream to lock the file
+            FileStream fileStream = new(blobFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
+            try
+            {
+                IOException? exception = Assert.Throws<IOException>(() => _database!.DeleteBlobFile(blobName));
+                Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+                _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+            }
+            finally
+            {
+                fileStream.Dispose();
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+            }
+
+            string backupsPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS);
+
+            if (Directory.Exists(backupsPath))
+            {
+                Directory.Delete(backupsPath, true);
+            }
         }
     }
 }

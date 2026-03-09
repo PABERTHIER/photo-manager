@@ -9,6 +9,7 @@ public class DatabaseWriteObjectListTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
 
     private string? _csvEscapedTextWithSemicolon;
     private string? _csvUnescapedTextWithSemicolon;
@@ -55,7 +56,14 @@ public class DatabaseWriteObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger.LoggingAssertTearDown();
     }
 
     [Test]
@@ -75,6 +83,8 @@ public class DatabaseWriteObjectListTests
             WriteObjectList(directoryPath, Constants.SEMICOLON_SEPARATOR, tableName, escapeText);
 
             Asserts(filePath, csv);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -100,6 +110,8 @@ public class DatabaseWriteObjectListTests
             WriteObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, tableName, escapeText);
 
             Asserts(filePath, csv);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -109,7 +121,7 @@ public class DatabaseWriteObjectListTests
     }
 
     [Test]
-    public void WriteObjectList_AllColumnsAndPipeSeparatorWithoutDataTableProperties_ThrowsException()
+    public void WriteObjectList_AllColumnsAndPipeSeparatorWithoutDataTableProperties_LogsItAndThrowsException()
     {
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
@@ -177,6 +189,9 @@ public class DatabaseWriteObjectListTests
                 Is.EqualTo("Properties must be defined for the columns in the table NoTableName."));
 
             Assert.That(File.Exists(filePath), Is.False);
+
+            Exception[] expectedExceptions = [exception!];
+            _testLogger.AssertLogExceptions(expectedExceptions, typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -273,6 +288,8 @@ public class DatabaseWriteObjectListTests
             _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc);
 
             Asserts(filePath, csv);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -375,6 +392,8 @@ public class DatabaseWriteObjectListTests
 
             string fileContent = File.ReadAllText(filePath);
             Assert.That(fileContent, Is.Not.EqualTo(csv));
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -412,6 +431,8 @@ public class DatabaseWriteObjectListTests
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'list')"));
             Assert.That(File.Exists(filePath), Is.False);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -495,6 +516,8 @@ public class DatabaseWriteObjectListTests
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
             Assert.That(File.Exists(filePath), Is.False);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -579,11 +602,99 @@ public class DatabaseWriteObjectListTests
             Assert.That(exception1?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
             Assert.That(exception2?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
             Assert.That(File.Exists(filePath), Is.False);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
             Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
+        }
+    }
+
+    [Test]
+    public void WriteObjectList_ExceptionIsThrown_LogsItAndThrowsException()
+    {
+        const string tableName = "assets";
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string filePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
+
+        List<Asset> assets =
+        [
+            new()
+            {
+                FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
+                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+                FileName = "20200720175810_3.jpg",
+                ImageRotation = Rotation.Rotate0,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1920, Height = 1080 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                FileProperties = new() { Size = 363888 },
+                ThumbnailCreationDateTime = new(2023, 8, 19, 11, 26, 09),
+                Hash =
+                    "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = false, Message = null },
+                    Rotated = new() { IsTrue = false, Message = null }
+                }
+            }
+        ];
+
+        string logMessage =
+            $"Error while trying to write data table {tableName}. DataDirectory: {directoryPath}, Separator: {_userConfigurationService!.StorageSettings.Separator}, LastWriteFilePath: {filePath}";
+        const string exceptionMessage = "Disk write error";
+        IOException expectedException = new(exceptionMessage);
+
+        try
+        {
+            Mock<IObjectListStorage> objectListStorageMock = new();
+
+            objectListStorageMock.Setup(x => x.Initialize(It.IsAny<DataTableProperties>(), It.IsAny<char>()));
+            objectListStorageMock.Setup(x => x.WriteObjectList(
+                It.IsAny<string>(),
+                It.IsAny<List<Asset>>(),
+                It.IsAny<Func<Asset, int, object>>(),
+                It.IsAny<Diagnostics>())).Throws(expectedException);
+
+            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
+                new BlobStorage(), new BackupStorage(), _testLogger);
+
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
+            database.SetDataTableProperties(new()
+            {
+                TableName = tableName,
+                ColumnProperties = AssetConfigs.ConfigureDataTable()
+            });
+
+            IOException? exception = Assert.Throws<IOException>(() =>
+                database.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+        }
+        finally
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+            }
+
+            string backupsPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS);
+
+            if (Directory.Exists(backupsPath))
+            {
+                Directory.Delete(backupsPath, true);
+            }
         }
     }
 

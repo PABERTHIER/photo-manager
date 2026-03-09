@@ -64,7 +64,7 @@ public class CatalogAssetsServiceTests
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
         _blobStorage = new();
-        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage());
+        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage(), new TestLogger<Database>());
     }
 
     [SetUp]

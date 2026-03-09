@@ -1,6 +1,12 @@
-﻿namespace PhotoManager.Infrastructure.Database;
+﻿using Microsoft.Extensions.Logging;
 
-public class Database(IObjectListStorage objectListStorage, IBlobStorage blobStorage, IBackupStorage backupStorage)
+namespace PhotoManager.Infrastructure.Database;
+
+public class Database(
+    IObjectListStorage objectListStorage,
+    IBlobStorage blobStorage,
+    IBackupStorage backupStorage,
+    ILogger<Database> logger)
     : IDatabase
 {
     private const string DATA_FILE_FORMAT = "{0}.db";
@@ -62,12 +68,14 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
         }
         catch (Exception ex)
         {
-            throw new ArgumentException($"Error while trying to read data table {tableName}.\n" +
-                                        $"DataDirectory: {DataDirectory}\n" +
-                                        $"Separator: {Separator}\n" +
-                                        $"LastReadFilePath: {Diagnostics.LastReadFilePath}\n" +
-                                        $"LastReadFileRaw: {Diagnostics.LastReadFileRaw}",
+            ArgumentException exception = new($"Error while trying to read data table {tableName}.\n" +
+                                              $"DataDirectory: {DataDirectory}\n" +
+                                              $"Separator: {Separator}\n" +
+                                              $"LastReadFilePath: {Diagnostics.LastReadFilePath}\n" +
+                                              $"LastReadFileRaw: {Diagnostics.LastReadFileRaw}",
                 ex);
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
     }
 
@@ -80,28 +88,55 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
             throw new ArgumentNullException(nameof(tableName));
         }
 
-        string dataFilePath = ResolveTableFilePath(tableName);
-        Diagnostics = new() { LastWriteFilePath = dataFilePath };
-        DataTableProperties? properties = GetDataTableProperties(tableName);
-        objectListStorage.Initialize(properties, Separator);
-        objectListStorage.WriteObjectList(dataFilePath, list, mapCsvFieldIndexToCsvField, Diagnostics);
+        try
+        {
+            string dataFilePath = ResolveTableFilePath(tableName);
+            Diagnostics = new() { LastWriteFilePath = dataFilePath };
+            DataTableProperties? properties = GetDataTableProperties(tableName);
+            objectListStorage.Initialize(properties, Separator);
+            objectListStorage.WriteObjectList(dataFilePath, list, mapCsvFieldIndexToCsvField, Diagnostics);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Error while trying to write data table {TableName}. DataDirectory: {DataDirectory}, Separator: {Separator}, LastWriteFilePath: {LastWriteFilePath}",
+                tableName, DataDirectory, Separator, Diagnostics.LastWriteFilePath);
+            throw;
+        }
     }
 
-    public Dictionary<string, byte[]>?
-        ReadBlob(string blobName) // Key is imageName (string), value is the binary file -> image data (byte[])
+    // Key is imageName (string), value is the binary file -> image data (byte[])
+    public Dictionary<string, byte[]>? ReadBlob(string blobName)
     {
-        string blobFilePath = ResolveBlobFilePath(blobName);
-        Diagnostics = new() { LastReadFilePath = blobFilePath };
-        return blobStorage.ReadFromBinaryFile(blobFilePath);
+        try
+        {
+            string blobFilePath = ResolveBlobFilePath(blobName);
+            Diagnostics = new() { LastReadFilePath = blobFilePath };
+            return blobStorage.ReadFromBinaryFile(blobFilePath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while trying to read blob {BlobName}. LastReadFilePath: {LastReadFilePath}",
+                blobName, Diagnostics.LastReadFilePath);
+            throw;
+        }
     }
 
-    public void
-        WriteBlob(Dictionary<string, byte[]> blob,
-            string blobName) // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
+    // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
+    public void WriteBlob(Dictionary<string, byte[]> blob, string blobName)
     {
-        string blobFilePath = ResolveBlobFilePath(blobName);
-        Diagnostics = new() { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
-        blobStorage.WriteToBinaryFile(blob, blobFilePath);
+        try
+        {
+            string blobFilePath = ResolveBlobFilePath(blobName);
+            Diagnostics = new() { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
+            blobStorage.WriteToBinaryFile(blob, blobFilePath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while trying to write blob {BlobName}. LastWriteFilePath: {LastWriteFilePath}",
+                blobName, Diagnostics.LastWriteFilePath);
+            throw;
+        }
     }
 
     public bool IsBlobFileExists(string blobName) // Folder.Id + ".bin"
@@ -112,23 +147,41 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
 
     public void DeleteBlobFile(string blobName) // Folder.Id + ".bin"
     {
-        string blobFilePath = ResolveBlobFilePath(blobName);
-        File.Delete(blobFilePath);
+        try
+        {
+            string blobFilePath = ResolveBlobFilePath(blobName);
+            File.Delete(blobFilePath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while trying to delete blob {BlobName}.", blobName);
+            throw;
+        }
     }
 
     public bool WriteBackup(DateTime backupDate)
     {
-        string backupFilePath = ResolveBackupFilePath(backupDate);
-
-        if (BackupExists(backupDate))
+        try
         {
-            File.Delete(backupFilePath);
+            string backupFilePath = ResolveBackupFilePath(backupDate);
+
+            if (BackupExists(backupDate))
+            {
+                File.Delete(backupFilePath);
+            }
+
+            Diagnostics = new() { LastWriteFilePath = backupFilePath };
+            backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
+
+            return true;
         }
-
-        Diagnostics = new() { LastWriteFilePath = backupFilePath };
-        backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
-
-        return true;
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Error while trying to write backup for date {BackupDate:yyyyMMdd}. LastWriteFilePath: {LastWriteFilePath}",
+                backupDate, Diagnostics.LastWriteFilePath);
+            throw;
+        }
     }
 
     public bool BackupExists(DateTime backupDate)
@@ -139,17 +192,26 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
 
     public void DeleteOldBackups(ushort backupsToKeep)
     {
-        string[] filesPaths = backupStorage.GetBackupFilesPaths(BackupsDirectory);
-        filesPaths = [.. filesPaths.OrderBy(f => f)];
-        List<string> deletedBackupFilePaths = [];
-
-        for (int i = 0; i < filesPaths.Length - backupsToKeep; i++)
+        try
         {
-            backupStorage.DeleteBackupFile(filesPaths[i]);
-            deletedBackupFilePaths.Add(filesPaths[i]);
-        }
+            string[] filesPaths = backupStorage.GetBackupFilesPaths(BackupsDirectory);
+            filesPaths = [.. filesPaths.OrderBy(f => f)];
+            List<string> deletedBackupFilePaths = [];
 
-        Diagnostics = new() { LastDeletedBackupFilePaths = [.. deletedBackupFilePaths] };
+            for (int i = 0; i < filesPaths.Length - backupsToKeep; i++)
+            {
+                backupStorage.DeleteBackupFile(filesPaths[i]);
+                deletedBackupFilePaths.Add(filesPaths[i]);
+            }
+
+            Diagnostics = new() { LastDeletedBackupFilePaths = [.. deletedBackupFilePaths] };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while trying to delete old backups. Backups to keep: {BackupsToKeep}",
+                backupsToKeep);
+            throw;
+        }
     }
 
     private void InitializeDirectory()

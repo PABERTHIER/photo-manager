@@ -10,6 +10,7 @@ public class DatabaseSetDataTablePropertiesTests
     private PhotoManager.Infrastructure.Database.Database? _database;
     private TestableDatabase? _testableDatabase;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,8 +26,15 @@ public class DatabaseSetDataTablePropertiesTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _testableDatabase = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+        _testableDatabase = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger.LoggingAssertTearDown();
     }
 
     [Test]
@@ -64,6 +72,8 @@ public class DatabaseSetDataTablePropertiesTests
                 dataTablePropertiesDictionary[
                     _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].ColumnProperties,
                 Is.EqualTo(properties.ColumnProperties).AsCollection);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -105,6 +115,8 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.That(
                 dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName]
                     .ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -151,6 +163,8 @@ public class DatabaseSetDataTablePropertiesTests
                         _userConfigurationService!.StorageSettings.TablesSettings
                             .SyncAssetsDirectoriesDefinitionsTableName]
                     .ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -194,6 +208,8 @@ public class DatabaseSetDataTablePropertiesTests
                 dataTablePropertiesDictionary[
                         _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName]
                     .ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
+
+            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -210,6 +226,8 @@ public class DatabaseSetDataTablePropertiesTests
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(dataTableProperties!));
         Assert.That(exception?.ParamName, Is.EqualTo("dataTableProperties"));
+
+        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 
     [Test]
@@ -224,6 +242,8 @@ public class DatabaseSetDataTablePropertiesTests
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.That(exception?.Message, Is.EqualTo("Column properties must not be empty."));
+
+        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 
     [Test]
@@ -238,6 +258,8 @@ public class DatabaseSetDataTablePropertiesTests
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.That(exception?.Message, Is.EqualTo("Column properties must not be empty."));
+
+        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 
     [Test]
@@ -261,6 +283,8 @@ public class DatabaseSetDataTablePropertiesTests
         Assert.That(exception?.Message,
             Is.EqualTo("All column properties should have a ColumnName (Parameter 'ColumnName')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(ColumnProperties.ColumnName)));
+
+        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 
     [Test]
@@ -280,5 +304,7 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.That(exception?.Message, Is.EqualTo("Duplicated column properties. (Parameter 'Column1')"));
         Assert.That(exception?.ParamName, Is.EqualTo("Column1"));
+
+        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 }
