@@ -21,6 +21,7 @@ public class AssetRepositoryGetAssetsByPathTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private ImageMetadataService? _imageMetadataService;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -43,6 +44,7 @@ public class AssetRepositoryGetAssetsByPathTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new();
         _pathProviderServiceMock = new();
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
@@ -50,10 +52,11 @@ public class AssetRepositoryGetAssetsByPathTests
             new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            _imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            _imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -134,6 +137,12 @@ public class AssetRepositoryGetAssetsByPathTests
                 Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -221,6 +230,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -242,8 +253,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService,
-                new TestLogger<AssetRepository>());
+            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -288,6 +298,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -365,6 +377,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -422,6 +436,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -476,14 +492,14 @@ public class AssetRepositoryGetAssetsByPathTests
 
             UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
             ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-            FileOperationsService fileOperationsService = new(userConfigurationService);
+            FileOperationsService fileOperationsService = new(userConfigurationService,
+                new TestLogger<FileOperationsService>());
             ImageMetadataService imageMetadataService = new(fileOperationsService,
                 new TestLogger<ImageMetadataService>());
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
                 new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
             TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-                imageProcessingService, imageMetadataService, userConfigurationService,
-                new TestLogger<AssetRepository>());
+                imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
             List<Asset> cataloguedAssets2 = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets2, Has.Count.EqualTo(1));
@@ -501,6 +517,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -510,7 +528,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_AssetFolderIsDefault_ReturnsEmptyArray()
+    public void GetAssetsByPath_AssetFolderIsDefault_LogsItAndReturnsEmptyArray()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -539,6 +557,10 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            string logMessage =
+                $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1.FileName}";
+            _testLogger!.AssertLogErrors([logMessage], typeof(AssetRepository));
         }
         finally
         {
@@ -593,6 +615,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogErrors([], typeof(AssetRepository));
         }
         finally
         {
@@ -630,6 +654,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -682,6 +708,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -714,6 +742,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -768,6 +798,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -777,7 +809,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialDataAndLogsIt()
+    public void GetAssetsByPath_ExceptionIsThrown_ReturnsAssetsWithPartialDataAndLogsIt()
     {
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
@@ -787,9 +819,8 @@ public class AssetRepositoryGetAssetsByPathTests
             x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        TestLogger<AssetRepository> logger = new();
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService, logger);
+            imageProcessingServiceMock.Object, _imageMetadataService!, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -857,16 +888,13 @@ public class AssetRepositoryGetAssetsByPathTests
                 Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
                 Exception exception = new("Exception of type 'System.Exception' was thrown.");
-                Exception[] expectedExceptions = [exception];
-
-                logger.AssertLogExceptions(expectedExceptions, typeof(AssetRepository));
+                _testLogger!.AssertLogExceptions([exception], typeof(AssetRepository));
             }
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
-            logger.LoggingAssertTearDown();
         }
     }
 
@@ -958,6 +986,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

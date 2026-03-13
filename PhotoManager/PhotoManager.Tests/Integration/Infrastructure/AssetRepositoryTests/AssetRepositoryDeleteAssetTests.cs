@@ -20,6 +20,7 @@ public class AssetRepositoryDeleteAssetTests
 
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -43,14 +44,16 @@ public class AssetRepositoryDeleteAssetTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -77,6 +80,12 @@ public class AssetRepositoryDeleteAssetTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -134,6 +143,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -152,10 +163,11 @@ public class AssetRepositoryDeleteAssetTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
-            imageProcessingService, imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -184,6 +196,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -242,6 +256,8 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -295,6 +311,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -354,6 +372,8 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -363,7 +383,7 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_FileNameIsNull_ThrowsArgumentNullExceptionAndAssetsUpdatedIsNotUpdated()
+    public void DeleteAsset_FileNameIsNull_LogsItAndThrowsArgumentNullExceptionAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -371,6 +391,8 @@ public class AssetRepositoryDeleteAssetTests
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
             string? assetFileName = null;
 
@@ -382,37 +404,43 @@ public class AssetRepositoryDeleteAssetTests
 
             _testableAssetRepository!.AddAsset(_asset1!, assetData);
 
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
-            Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+                List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
+                Assert.That(assets, Has.Count.EqualTo(1));
+                Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
+                Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+                Assert.That(thumbnails, Has.Count.EqualTo(1));
+                Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
+                Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
+                Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
+                Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _testableAssetRepository!.DeleteAsset(folderPath1, assetFileName!));
+                ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                    _testableAssetRepository!.DeleteAsset(folderPath1, assetFileName!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
+                Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+                Assert.That(thumbnails, Has.Count.EqualTo(1));
+                Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
+                Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
+                Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
+                Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
-            assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Is.Not.Empty);
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+                assets = _testableAssetRepository!.GetCataloguedAssets();
+                Assert.That(assets, Is.Not.Empty);
+                Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+                Exception expectedException = new(exceptionMessage);
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
         }
         finally
         {
@@ -442,6 +470,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -516,6 +546,8 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

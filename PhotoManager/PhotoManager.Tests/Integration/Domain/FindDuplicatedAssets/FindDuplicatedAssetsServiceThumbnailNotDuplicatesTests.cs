@@ -91,10 +91,11 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [SetUp]
     public void SetUp()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        _fileOperationsService = new(userConfigurationService);
+        _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());

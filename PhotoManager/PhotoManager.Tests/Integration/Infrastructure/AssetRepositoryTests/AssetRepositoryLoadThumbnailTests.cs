@@ -22,6 +22,7 @@ public class AssetRepositoryLoadThumbnailTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -45,14 +46,16 @@ public class AssetRepositoryLoadThumbnailTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         _userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -79,6 +82,12 @@ public class AssetRepositoryLoadThumbnailTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -152,6 +161,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -228,6 +239,8 @@ public class AssetRepositoryLoadThumbnailTests
                     Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -245,10 +258,11 @@ public class AssetRepositoryLoadThumbnailTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
-            imageProcessingService, imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -305,6 +319,8 @@ public class AssetRepositoryLoadThumbnailTests
                     Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -368,6 +384,8 @@ public class AssetRepositoryLoadThumbnailTests
                         Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
                 Assert.That(assetsUpdatedEvents, Is.Empty);
+
+                _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
             }
         }
         finally
@@ -442,6 +460,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -495,6 +515,8 @@ public class AssetRepositoryLoadThumbnailTests
                     Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -504,7 +526,7 @@ public class AssetRepositoryLoadThumbnailTests
     }
 
     [Test]
-    public void LoadThumbnail_DirectoryNameIsNull_ThrowsArgumentNullException()
+    public void LoadThumbnail_DirectoryNameIsNull_LogsItAndThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -512,6 +534,8 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string? directoryName = null;
             Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
@@ -519,22 +543,28 @@ public class AssetRepositoryLoadThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            using (Assert.EnterMultipleScope())
             {
-                _testableAssetRepository!.LoadThumbnail(
-                    directoryName!,
-                    _asset1!.FileName,
-                    _asset1.Pixel.Thumbnail.Width,
-                    _asset1.Pixel.Thumbnail.Height);
-            });
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
+                ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                {
+                    _testableAssetRepository!.LoadThumbnail(
+                        directoryName!,
+                        _asset1!.FileName,
+                        _asset1.Pixel.Thumbnail.Width,
+                        _asset1.Pixel.Thumbnail.Height);
+                });
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+                Exception expectedException = new(exceptionMessage);
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
         }
         finally
         {
@@ -544,7 +574,7 @@ public class AssetRepositoryLoadThumbnailTests
     }
 
     [Test]
-    public void LoadThumbnail_FileNameIsNull_ThrowsArgumentNullException()
+    public void LoadThumbnail_FileNameIsNull_LogsItAndThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -552,6 +582,8 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             _asset1 = _asset1!.WithFolder(addedFolder);
@@ -563,13 +595,19 @@ public class AssetRepositoryLoadThumbnailTests
 
             string? fileName = null;
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _testableAssetRepository!.LoadThumbnail(_dataDirectory!, fileName!, 0, 0));
+            using (Assert.EnterMultipleScope())
+            {
+                ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                    _testableAssetRepository!.LoadThumbnail(_dataDirectory!, fileName!, 0, 0));
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
+                Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+                Exception expectedException = new(exceptionMessage);
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
         }
         finally
         {
@@ -668,6 +706,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

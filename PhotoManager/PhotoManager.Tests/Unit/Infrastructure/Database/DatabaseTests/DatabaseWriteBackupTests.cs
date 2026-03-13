@@ -9,7 +9,7 @@ public class DatabaseWriteBackupTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,14 +25,14 @@ public class DatabaseWriteBackupTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class DatabaseWriteBackupTests
             Assert.That(backupCreated, Is.True);
             Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -90,7 +90,7 @@ public class DatabaseWriteBackupTests
             Assert.That(backupCreated2, Is.True);
             Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -120,7 +120,7 @@ public class DatabaseWriteBackupTests
             backupStorageMock.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns([]);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                backupStorageMock.Object, _testLogger);
+                backupStorageMock.Object, _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -131,7 +131,7 @@ public class DatabaseWriteBackupTests
             IOException? exception = Assert.Throws<IOException>(() => database.WriteBackup(backupDate));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

@@ -10,7 +10,7 @@ public class DatabaseReadBlobTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -26,14 +26,14 @@ public class DatabaseReadBlobTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class DatabaseReadBlobTests
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -117,7 +117,7 @@ public class DatabaseReadBlobTests
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -147,7 +147,7 @@ public class DatabaseReadBlobTests
             Assert.That(blob, Is.Null);
             Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -174,7 +174,7 @@ public class DatabaseReadBlobTests
             blobStorageMock.Setup(x => x.ReadFromBinaryFile(It.IsAny<string>())).Throws(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-                blobStorageMock.Object, new BackupStorage(), _testLogger);
+                blobStorageMock.Object, new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -185,7 +185,7 @@ public class DatabaseReadBlobTests
             IOException? exception = Assert.Throws<IOException>(() => database.ReadBlob(blobName));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

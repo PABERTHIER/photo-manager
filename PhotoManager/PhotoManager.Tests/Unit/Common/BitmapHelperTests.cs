@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Unit.Common;
 public class BitmapHelperTests
 {
     private string? _dataDirectory;
-    private TestLogger<BitmapHelperTests> _testLogger = new();
+    private TestLogger<BitmapHelperTests>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -20,13 +20,13 @@ public class BitmapHelperTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<BitmapHelperTests>();
+        _testLogger = new();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -54,7 +54,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -66,11 +66,11 @@ public class BitmapHelperTests
 
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() =>
-                BitmapHelper.LoadBitmapOriginalImage(buffer!, rotation, _testLogger));
+                BitmapHelper.LoadBitmapOriginalImage(buffer!, rotation, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -82,12 +82,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger));
+                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -101,12 +101,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger));
+                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -121,11 +121,11 @@ public class BitmapHelperTests
 
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() =>
-                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger));
+                BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -137,7 +137,7 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate0;
 
-        BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -153,7 +153,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero); // We should have the height value
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -185,7 +185,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -193,7 +193,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
         Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -204,11 +204,11 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
 
         OverflowException? exception = Assert.Throws<OverflowException>(() =>
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000, _testLogger));
+            BitmapHelper.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -219,11 +219,11 @@ public class BitmapHelperTests
         const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-            BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100, _testLogger));
+            BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -235,12 +235,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -254,12 +254,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -274,11 +274,11 @@ public class BitmapHelperTests
 
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -292,7 +292,7 @@ public class BitmapHelperTests
         const int width = 100;
         const int height = 100;
 
-        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -305,7 +305,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -338,7 +338,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -354,7 +354,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -370,7 +370,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -389,7 +389,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -406,7 +406,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -448,7 +448,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -475,7 +475,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -502,7 +502,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -521,7 +521,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -541,7 +541,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -557,7 +557,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -573,7 +573,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -592,7 +592,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -609,7 +609,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -636,7 +636,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -654,7 +654,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -672,7 +672,7 @@ public class BitmapHelperTests
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -687,7 +687,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -714,7 +714,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -729,7 +729,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -744,7 +744,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -760,7 +760,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -775,7 +775,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -785,7 +785,7 @@ public class BitmapHelperTests
         string? filePath = null;
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath!, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath!, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -796,7 +796,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -806,7 +806,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -817,7 +817,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.Zero);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -836,7 +836,7 @@ public class BitmapHelperTests
 
             ImageHelper.CreateInvalidImage(validFilePath, filePath);
 
-            BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger);
+            BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger!);
 
             using (Assert.EnterMultipleScope())
             {
@@ -847,7 +847,7 @@ public class BitmapHelperTests
                 Assert.That(image.DecodePixelHeight, Is.Zero);
 
                 string expectedErrorMessage = $"Failed to load HEIC image from path: {filePath}.";
-                _testLogger.AssertLogExceptions([new Exception(expectedErrorMessage)], typeof(BitmapHelperTests));
+                _testLogger!.AssertLogExceptions([new Exception(expectedErrorMessage)], typeof(BitmapHelperTests));
             }
         }
         finally
@@ -865,11 +865,11 @@ public class BitmapHelperTests
 
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() =>
-                BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger));
+                BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -894,7 +894,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -906,7 +906,7 @@ public class BitmapHelperTests
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -918,11 +918,11 @@ public class BitmapHelperTests
 
         OverflowException? exception =
             Assert.Throws<OverflowException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, 1000000, 1000000, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, 1000000, 1000000, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -933,11 +933,11 @@ public class BitmapHelperTests
 
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer!, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer!, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -948,12 +948,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -966,12 +966,12 @@ public class BitmapHelperTests
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
-                BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100, _testLogger));
+                BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100, _testLogger!));
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
             typeof(BitmapHelperTests));
     }
@@ -986,7 +986,7 @@ public class BitmapHelperTests
         const int width = 100;
         const int height = 100;
 
-        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, _testLogger);
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -999,7 +999,7 @@ public class BitmapHelperTests
             Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1027,7 +1027,7 @@ public class BitmapHelperTests
         AssertBrightnessValues(bitmap, 1, 1);
         AssertBrightnessValues(bitmap, 2, 5);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1039,7 +1039,7 @@ public class BitmapHelperTests
 
         Assert.That(bitmap, Is.Null);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1049,7 +1049,7 @@ public class BitmapHelperTests
 
         Assert.That(bitmap, Is.Null);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1061,7 +1061,7 @@ public class BitmapHelperTests
 
         Assert.That(bitmap, Is.Null);
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1093,7 +1093,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1126,7 +1126,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1139,7 +1139,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1152,7 +1152,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1184,7 +1184,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1217,7 +1217,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1230,7 +1230,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1243,7 +1243,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1275,7 +1275,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1308,7 +1308,7 @@ public class BitmapHelperTests
             Directory.Delete(destinationNewFileDirectory, true);
         }
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1321,7 +1321,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
@@ -1334,7 +1334,7 @@ public class BitmapHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
 
-        _testLogger.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     private static void AssertBrightnessValues(Bitmap bitmap, int x, int y)

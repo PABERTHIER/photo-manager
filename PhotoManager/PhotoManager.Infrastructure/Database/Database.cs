@@ -34,15 +34,19 @@ public class Database(
     {
         ArgumentNullException.ThrowIfNull(dataTableProperties);
 
-        if (dataTableProperties.ColumnProperties == null || dataTableProperties.ColumnProperties.Length == 0)
+        if (dataTableProperties.ColumnProperties.Length == 0)
         {
-            throw new ArgumentException("Column properties must not be empty.");
+            ArgumentException exception = new("Column properties must not be empty.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
 
         if (dataTableProperties.ColumnProperties.Any(c => string.IsNullOrWhiteSpace(c.ColumnName)))
         {
-            throw new ArgumentNullException(nameof(ColumnProperties.ColumnName),
+            ArgumentNullException exception = new(nameof(ColumnProperties.ColumnName),
                 "All column properties should have a ColumnName");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
 
         IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName)
@@ -50,7 +54,9 @@ public class Database(
 
         if (group != null)
         {
-            throw new ArgumentException("Duplicated column properties.", group.Key);
+            ArgumentException exception = new("Duplicated column properties.", group.Key);
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
 
         DataTablePropertiesDictionary[dataTableProperties.TableName] = dataTableProperties;

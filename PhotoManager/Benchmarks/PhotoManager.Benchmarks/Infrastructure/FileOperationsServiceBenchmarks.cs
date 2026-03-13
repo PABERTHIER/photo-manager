@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Benchmarks.Infrastructure;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+
+namespace PhotoManager.Benchmarks.Infrastructure;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -81,7 +83,7 @@ public class FileOperationsServiceBenchmarks
 
         IConfigurationRoot mockConfig = new ConfigurationBuilder().AddInMemoryCollection(configDict).Build();
         UserConfigurationService userConfigService = new(mockConfig);
-        _fileOperationsService = new(userConfigService);
+        _fileOperationsService = new(userConfigService, NullLogger<FileOperationsService>.Instance);
     }
 
     [GlobalCleanup]

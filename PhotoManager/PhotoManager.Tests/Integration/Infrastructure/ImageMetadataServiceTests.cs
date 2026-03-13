@@ -17,6 +17,7 @@ public class ImageMetadataServiceTests
     private ImageMetadataService? _imageMetadataService;
     private FileOperationsService? _fileOperationService;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<ImageMetadataService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -28,8 +29,20 @@ public class ImageMetadataServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
         _userConfigurationService = new(configurationRootMock.Object);
-        _fileOperationService = new(_userConfigurationService);
-        _imageMetadataService = new(_fileOperationService, new TestLogger<ImageMetadataService>());
+        _fileOperationService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+        _imageMetadataService = new(_fileOperationService!, _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -57,6 +70,8 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(expectedOrientation));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -72,6 +87,9 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")],
+            typeof(ImageMetadataService));
     }
 
     [Test]
@@ -85,6 +103,10 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+
+        _testLogger!.AssertLogExceptions(
+            [new Exception("No imaging component suitable to complete this operation was found.")],
+            typeof(ImageMetadataService));
     }
 
     [Test]
@@ -98,6 +120,9 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+
+        _testLogger!.AssertLogExceptions([new Exception("Value cannot be null. (Parameter 'buffer')")],
+            typeof(ImageMetadataService));
     }
 
     [Test]
@@ -111,6 +136,10 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+
+        _testLogger!.AssertLogExceptions(
+            [new Exception("No imaging component suitable to complete this operation was found.")],
+            typeof(ImageMetadataService));
     }
 
     [Test]
@@ -130,6 +159,8 @@ public class ImageMetadataServiceTests
 
             Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
         }
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -147,6 +178,8 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(expectedOrientation));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -158,6 +191,9 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageMetadataService));
     }
 
     [Test]
@@ -172,6 +208,8 @@ public class ImageMetadataServiceTests
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -186,6 +224,8 @@ public class ImageMetadataServiceTests
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -341,6 +381,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset5.FileProperties.Size, Is.EqualTo(FileSize.NON_EXISTENT_IMAGE_JPG));
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -352,6 +394,8 @@ public class ImageMetadataServiceTests
     public void UpdateAssetsFileProperties_AssetsIsEmpty_DoesNothing()
     {
         _imageMetadataService!.UpdateAssetsFileProperties([]);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -363,6 +407,8 @@ public class ImageMetadataServiceTests
             Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetsFileProperties(assets!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -523,6 +569,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -665,6 +713,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -721,6 +771,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -772,6 +824,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -833,6 +887,8 @@ public class ImageMetadataServiceTests
             Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -849,5 +905,7 @@ public class ImageMetadataServiceTests
             Assert.Throws<NullReferenceException>(() => _imageMetadataService!.UpdateAssetFileProperties(asset!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 }

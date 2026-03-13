@@ -210,7 +210,8 @@ public class ApplicationGetDuplicatedAssetsTests
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
@@ -618,7 +619,8 @@ public class ApplicationGetDuplicatedAssetsTests
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());

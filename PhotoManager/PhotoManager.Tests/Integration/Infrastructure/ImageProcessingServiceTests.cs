@@ -9,12 +9,25 @@ public class ImageProcessingServiceTests
     private string? _dataDirectory;
 
     private ImageProcessingService? _imageProcessingService;
+    private TestLogger<ImageProcessingService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _imageProcessingService = new(new TestLogger<ImageProcessingService>());
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+        _imageProcessingService = new(_testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -39,6 +52,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -68,6 +83,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -84,6 +101,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.GetJpegBitmapImage(image));
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -95,6 +114,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.GetJpegBitmapImage(invalidImage!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -119,6 +140,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -148,6 +171,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -164,6 +189,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetPngBitmapImage(image));
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -175,6 +202,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<ArgumentNullException>(() => _imageProcessingService!.GetPngBitmapImage(invalidImage!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -199,6 +228,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -228,6 +259,8 @@ public class ImageProcessingServiceTests
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
         }
         finally
         {
@@ -244,6 +277,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetGifBitmapImage(image));
 
         Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -255,6 +290,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<ArgumentNullException>(() => _imageProcessingService!.GetGifBitmapImage(invalidImage!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -271,6 +308,8 @@ public class ImageProcessingServiceTests
         bool result = _imageProcessingService!.IsValidGdiPlusImage(validImageData);
 
         Assert.That(result, Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -281,6 +320,10 @@ public class ImageProcessingServiceTests
         bool result = _imageProcessingService!.IsValidGdiPlusImage(emptyHeicData);
 
         Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions(
+            [new Exception("No imaging component suitable to complete this operation was found.")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -292,6 +335,8 @@ public class ImageProcessingServiceTests
         bool result = _imageProcessingService!.IsValidHeic(validHeicData);
 
         Assert.That(result, Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -302,6 +347,9 @@ public class ImageProcessingServiceTests
         bool result = _imageProcessingService!.IsValidHeic(invalidHeicData);
 
         Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -313,6 +361,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<ArgumentException>(() => _imageProcessingService!.IsValidHeic(emptyHeicData));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     private static bool IsValidImage(string filePath)

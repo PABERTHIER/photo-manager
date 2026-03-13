@@ -9,7 +9,7 @@ public class DatabaseDeleteOldBackupsTests
 
     private UserConfigurationService? _userConfigurationService;
     private Mock<IBackupStorage>? _backupStorageMock;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,14 +25,14 @@ public class DatabaseDeleteOldBackupsTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _backupStorageMock = new();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object, _testLogger);
+                _backupStorageMock.Object, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -81,7 +81,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[0], Is.EqualTo(path4));
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[1], Is.EqualTo(path3));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -108,7 +108,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object, _testLogger);
+                _backupStorageMock.Object, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -121,7 +121,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Is.Empty);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -131,7 +131,7 @@ public class DatabaseDeleteOldBackupsTests
     }
 
     [Test]
-    public void DeleteOldBackups_ExceptionThrown_LogsItAndThrowsException()
+    public void DeleteOldBackups_ExceptionIsThrown_LogsItAndThrowsException()
     {
         const ushort backupsToKeep = 1;
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
@@ -152,7 +152,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock.Setup(x => x.DeleteBackupFile(It.IsAny<string>())).Throws(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-                new BlobStorage(), _backupStorageMock.Object, _testLogger);
+                new BlobStorage(), _backupStorageMock.Object, _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -163,7 +163,7 @@ public class DatabaseDeleteOldBackupsTests
             IOException? exception = Assert.Throws<IOException>(() => database.DeleteOldBackups(backupsToKeep));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

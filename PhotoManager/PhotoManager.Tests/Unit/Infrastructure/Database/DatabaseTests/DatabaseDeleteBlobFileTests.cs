@@ -10,7 +10,7 @@ public class DatabaseDeleteBlobFileTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -26,14 +26,14 @@ public class DatabaseDeleteBlobFileTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class DatabaseDeleteBlobFileTests
 
             Assert.That(File.Exists(blobFilePath), Is.False);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -96,7 +96,7 @@ public class DatabaseDeleteBlobFileTests
 
             Assert.That(File.Exists(blobFilePath), Is.False);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -124,24 +124,18 @@ public class DatabaseDeleteBlobFileTests
             File.WriteAllText(blobFilePath, "test content");
 
             // Open a file stream to lock the file
-            FileStream fileStream = new(blobFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
-
-            _database!.Initialize(
-                directoryPath,
-                _userConfigurationService!.StorageSettings.Separator,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-
-            try
+            using (new FileStream(blobFilePath, FileMode.Open, FileAccess.Read, FileShare.None))
             {
+                _database!.Initialize(
+                    directoryPath,
+                    _userConfigurationService!.StorageSettings.Separator,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
                 IOException? exception = Assert.Throws<IOException>(() => _database!.DeleteBlobFile(blobName));
                 Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-                _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
-            }
-            finally
-            {
-                fileStream.Dispose();
+                _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
             }
         }
         finally

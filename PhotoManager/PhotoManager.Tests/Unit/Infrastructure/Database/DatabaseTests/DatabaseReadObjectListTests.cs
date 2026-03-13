@@ -9,7 +9,7 @@ public class DatabaseReadObjectListTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     private string? _csvEscapedTextWithSemicolon;
     private string? _csvUnescapedTextWithSemicolon;
@@ -59,14 +59,14 @@ public class DatabaseReadObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class DatabaseReadObjectListTests
 
             Asserts(assets, filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -116,7 +116,7 @@ public class DatabaseReadObjectListTests
 
             Asserts(assets, filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -156,7 +156,8 @@ public class DatabaseReadObjectListTests
                 Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogExceptions([expectedException], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -189,7 +190,7 @@ public class DatabaseReadObjectListTests
 
             Asserts(assets, filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -243,7 +244,7 @@ public class DatabaseReadObjectListTests
 
             Asserts(assets, filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -297,7 +298,7 @@ public class DatabaseReadObjectListTests
 
             Asserts(assets, filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -325,7 +326,7 @@ public class DatabaseReadObjectListTests
 
             Assert.That(assets, Is.Empty);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -353,7 +354,7 @@ public class DatabaseReadObjectListTests
 
             Assert.That(assets, Is.Empty);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -390,7 +391,8 @@ public class DatabaseReadObjectListTests
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogExceptions([expectedException], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -436,7 +438,8 @@ public class DatabaseReadObjectListTests
                 Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogExceptions([expectedException], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -467,7 +470,7 @@ public class DatabaseReadObjectListTests
                 .Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(),
                     It.IsAny<Diagnostics>())).Throws(new Exception());
             PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
-                new BlobStorage(), new BackupStorage(), _testLogger);
+                new BlobStorage(), new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -487,7 +490,8 @@ public class DatabaseReadObjectListTests
                 Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogExceptions([expectedException], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

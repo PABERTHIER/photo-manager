@@ -46,9 +46,10 @@ public class SyncAssetsWindowTests
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        _fileOperationsService = new(userConfigurationService);
+        _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());

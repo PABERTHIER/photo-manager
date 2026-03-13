@@ -11,12 +11,25 @@ public class ImageProcessingServiceTests
     private string? _dataDirectory;
 
     private ImageProcessingService? _imageProcessingService;
+    private TestLogger<ImageProcessingService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _imageProcessingService = new(new TestLogger<ImageProcessingService>());
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+        _imageProcessingService = new(_testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -55,6 +68,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(rotation));
         Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
         Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -68,6 +83,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -81,6 +98,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -95,6 +114,8 @@ public class ImageProcessingServiceTests
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
+
+        _testLogger!.AssertLogExceptions([exception!], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -109,6 +130,8 @@ public class ImageProcessingServiceTests
 
         Assert.That(exception?.Message,
             Is.EqualTo("No imaging component suitable to complete this operation was found."));
+
+        _testLogger!.AssertLogExceptions([exception!], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -123,6 +146,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -145,6 +170,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(height));
         Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
         Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -180,6 +207,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -194,6 +223,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -207,6 +238,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapThumbnailImage(buffer!, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -214,13 +247,16 @@ public class ImageProcessingServiceTests
     public void LoadBitmapThumbnailImageAssetRepository_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
+        const string expectedExceptionMessage = "No imaging component suitable to complete this operation was found.";
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
                 _imageProcessingService!.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -228,13 +264,16 @@ public class ImageProcessingServiceTests
     public void LoadBitmapThumbnailImageAssetRepository_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
+        const string expectedExceptionMessage = "No imaging component suitable to complete this operation was found.";
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
                 _imageProcessingService!.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(ImageProcessingService));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -256,6 +295,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(height));
         Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
         Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -282,6 +323,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedPixelHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -296,6 +339,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapOriginalImage(buffer!, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -304,13 +349,16 @@ public class ImageProcessingServiceTests
     {
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
+        const string expectedExceptionMessage = "No imaging component suitable to complete this operation was found.";
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
                 _imageProcessingService!.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -319,13 +367,16 @@ public class ImageProcessingServiceTests
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
+        const string expectedExceptionMessage = "No imaging component suitable to complete this operation was found.";
 
         NotSupportedException? exception =
             Assert.Throws<NotSupportedException>(() =>
                 _imageProcessingService!.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -340,6 +391,8 @@ public class ImageProcessingServiceTests
             Assert.Throws<ArgumentException>(() => _imageProcessingService!.LoadBitmapOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -363,6 +416,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -388,6 +443,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -404,6 +461,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -420,6 +479,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -434,6 +495,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapImageFromPath(filePath, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -456,6 +519,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -486,6 +551,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedPixelHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -500,6 +567,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapHeicOriginalImage(buffer!, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -514,6 +583,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapHeicOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -530,6 +601,9 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -545,6 +619,8 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapHeicOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -584,6 +660,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -608,6 +686,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -632,6 +712,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -649,6 +731,9 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -666,6 +751,9 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -679,6 +767,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -692,6 +782,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -708,6 +800,9 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([new Exception("The image is not valid or in an unsupported format")],
+            typeof(ImageProcessingService));
     }
 
     [Test]
@@ -722,6 +817,8 @@ public class ImageProcessingServiceTests
             _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -747,6 +844,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -773,6 +872,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -789,6 +890,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -805,6 +908,8 @@ public class ImageProcessingServiceTests
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -819,5 +924,7 @@ public class ImageProcessingServiceTests
                 _imageProcessingService!.LoadBitmapHeicImageFromPath(filePath, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 }

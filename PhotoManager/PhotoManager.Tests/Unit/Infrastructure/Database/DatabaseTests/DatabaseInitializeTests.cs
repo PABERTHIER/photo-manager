@@ -9,7 +9,7 @@ public class DatabaseInitializeTests
 
     private TestableDatabase? _testableDatabase;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,14 +25,14 @@ public class DatabaseInitializeTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _testableDatabase = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class DatabaseInitializeTests
             Assert.That(Directory.Exists(blobsDirectory), Is.True);
             Assert.That(Directory.Exists(backupsDirectory), Is.True);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -109,6 +109,6 @@ public class DatabaseInitializeTests
         Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
         Assert.That(dataTablePropertiesDictionary, Is.Empty);
 
-        _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+        _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
     }
 }

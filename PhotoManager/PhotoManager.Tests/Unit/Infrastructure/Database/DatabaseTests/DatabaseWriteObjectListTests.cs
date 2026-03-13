@@ -9,7 +9,7 @@ public class DatabaseWriteObjectListTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     private string? _csvEscapedTextWithSemicolon;
     private string? _csvUnescapedTextWithSemicolon;
@@ -56,14 +56,14 @@ public class DatabaseWriteObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class DatabaseWriteObjectListTests
 
             Asserts(filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -111,7 +111,7 @@ public class DatabaseWriteObjectListTests
 
             Asserts(filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -191,7 +191,7 @@ public class DatabaseWriteObjectListTests
             Assert.That(File.Exists(filePath), Is.False);
 
             Exception[] expectedExceptions = [exception!];
-            _testLogger.AssertLogExceptions(expectedExceptions, typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -289,7 +289,7 @@ public class DatabaseWriteObjectListTests
 
             Asserts(filePath, csv);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -393,7 +393,7 @@ public class DatabaseWriteObjectListTests
             string fileContent = File.ReadAllText(filePath);
             Assert.That(fileContent, Is.Not.EqualTo(csv));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -432,7 +432,7 @@ public class DatabaseWriteObjectListTests
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'list')"));
             Assert.That(File.Exists(filePath), Is.False);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -517,7 +517,7 @@ public class DatabaseWriteObjectListTests
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
             Assert.That(File.Exists(filePath), Is.False);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -603,7 +603,7 @@ public class DatabaseWriteObjectListTests
             Assert.That(exception2?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
             Assert.That(File.Exists(filePath), Is.False);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -662,7 +662,7 @@ public class DatabaseWriteObjectListTests
                 It.IsAny<Diagnostics>())).Throws(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
-                new BlobStorage(), new BackupStorage(), _testLogger);
+                new BlobStorage(), new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -680,7 +680,7 @@ public class DatabaseWriteObjectListTests
                 database.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            _testLogger.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

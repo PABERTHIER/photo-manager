@@ -13,7 +13,7 @@ public class HashingHelperTests
 {
     private string? _dataDirectory;
 
-    private TestLogger<HashingHelperTests> _testLogger = new();
+    private TestLogger<HashingHelperTests>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -24,13 +24,13 @@ public class HashingHelperTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<HashingHelperTests>();
+        _testLogger = new();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _testLogger.LoggingAssertTearDown();
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class HashingHelperTests
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class HashingHelperTests
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class HashingHelperTests
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -97,13 +97,13 @@ public class HashingHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger);
+        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger!);
 
         Assert.That(string.IsNullOrWhiteSpace(phash), Is.False);
         Assert.That(phash?.Length, Is.EqualTo(PHashes.LENGTH));
         Assert.That(phash?.ToLower(), Is.EqualTo(expectedHash));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -111,11 +111,11 @@ public class HashingHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
-        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger);
+        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger!);
 
         Assert.That(phash, Is.Null);
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new MagickBlobErrorException($"MagickImage is unable to open image {filePath}.")],
             typeof(HashingHelperTests));
     }
@@ -123,11 +123,11 @@ public class HashingHelperTests
     [Test]
     public void CalculatePHash_ImagePathIsInvalid_ReturnsNull()
     {
-        string? phash = HashingHelper.CalculatePHash(_dataDirectory!, _testLogger);
+        string? phash = HashingHelper.CalculatePHash(_dataDirectory!, _testLogger!);
 
         Assert.That(phash, Is.Null);
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
             [new MagickBlobErrorException($"MagickImage is unable to open image {_dataDirectory}.")],
             typeof(HashingHelperTests));
     }
@@ -137,11 +137,11 @@ public class HashingHelperTests
     {
         const string filePath = "";
 
-        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger);
+        string? phash = HashingHelper.CalculatePHash(filePath, _testLogger!);
 
         Assert.That(phash, Is.Null);
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
         [
             new ArgumentException("Value cannot be null or empty. (Parameter 'fileName')")
         ], typeof(HashingHelperTests));
@@ -152,11 +152,11 @@ public class HashingHelperTests
     {
         string? filePath = null;
 
-        string? phash = HashingHelper.CalculatePHash(filePath!, _testLogger);
+        string? phash = HashingHelper.CalculatePHash(filePath!, _testLogger!);
 
         Assert.That(phash, Is.Null);
 
-        _testLogger.AssertLogExceptions(
+        _testLogger!.AssertLogExceptions(
         [
             new ArgumentException("Value cannot be null or empty. (Parameter 'fileName')")
         ], typeof(HashingHelperTests));
@@ -180,7 +180,7 @@ public class HashingHelperTests
         Assert.That(dHash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(dHash, Is.EqualTo(expectedHash));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -196,7 +196,7 @@ public class HashingHelperTests
         Assert.That(dHash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(dHash, Is.EqualTo(expectedHash));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -208,7 +208,7 @@ public class HashingHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class HashingHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -232,7 +232,7 @@ public class HashingHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -255,7 +255,7 @@ public class HashingHelperTests
         Assert.That(md5Hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(md5Hash, Is.EqualTo(expectedHash));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -269,7 +269,7 @@ public class HashingHelperTests
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(MD5Hashes.EMPTY_IMAGE));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -282,7 +282,7 @@ public class HashingHelperTests
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -292,11 +292,11 @@ public class HashingHelperTests
     [TestCase(MD5Hashes.IMAGE_1_JPG)] // MD5Hash
     public void CalculateHammingDistance_SameHashes_ReturnsZero(string hash)
     {
-        int distance = HashingHelper.CalculateHammingDistance(hash, hash, _testLogger);
+        int distance = HashingHelper.CalculateHammingDistance(hash, hash, _testLogger!);
 
         Assert.That(distance, Is.Zero);
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -307,12 +307,12 @@ public class HashingHelperTests
     public void CalculateHammingDistance_DifferentHashes_ReturnsCorrectDistance(string hash1, string hash2,
         int expectedDistance)
     {
-        int distance = HashingHelper.CalculateHammingDistance(hash1, hash2, _testLogger);
+        int distance = HashingHelper.CalculateHammingDistance(hash1, hash2, _testLogger!);
 
         Assert.That(distance, Is.GreaterThanOrEqualTo(0));
         Assert.That(distance, Is.EqualTo(expectedDistance));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 
     [Test]
@@ -325,11 +325,11 @@ public class HashingHelperTests
         Exception[] expectedExceptions = [expectedException];
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger));
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 
-        _testLogger.AssertLogExceptions(expectedExceptions, typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions(expectedExceptions, typeof(HashingHelperTests));
     }
 
     [Test]
@@ -339,10 +339,10 @@ public class HashingHelperTests
     public void CalculateHammingDistance_HashesAreNull_ThrowsNullReferenceException(string? hash1, string? hash2)
     {
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
-            HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger));
+            HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-        _testLogger.AssertLogExceptions([], typeof(HashingHelperTests));
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
 }

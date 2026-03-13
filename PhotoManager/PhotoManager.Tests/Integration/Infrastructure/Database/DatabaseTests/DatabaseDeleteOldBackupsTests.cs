@@ -9,7 +9,7 @@ public class DatabaseDeleteOldBackupsTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private TestLogger<PhotoManager.Infrastructure.Database.Database> _testLogger = new();
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +25,7 @@ public class DatabaseDeleteOldBackupsTests
     [SetUp]
     public void SetUp()
     {
-        _testLogger = new TestLogger<PhotoManager.Infrastructure.Database.Database>();
+        _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
     }
 
@@ -74,7 +74,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths![0], Is.EqualTo(path4));
             Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths[1], Is.EqualTo(path3));
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -118,7 +118,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
             Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths!, Is.Empty);
 
-            _testLogger.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
