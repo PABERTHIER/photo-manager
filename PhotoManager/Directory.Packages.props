@@ -10,7 +10,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="FFMpegCore" Version="5.4.0" />
-    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.10.3" />
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.10.4" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.3" />
