@@ -38,7 +38,7 @@ public class AssetCreationServiceTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }

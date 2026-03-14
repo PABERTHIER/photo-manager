@@ -738,7 +738,7 @@ public class StringAssetComparerTests
         Asset? asset2 = null;
 
         ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2!));
+            Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'asset2')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(asset2)));

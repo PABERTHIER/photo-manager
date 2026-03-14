@@ -6,11 +6,13 @@ namespace PhotoManager.Infrastructure;
 
 public class UserConfigurationService : IUserConfigurationService
 {
+#pragma warning disable IDE0370
     public AssetSettings AssetSettings { get; private set; } = null!;
     public HashSettings HashSettings { get; private set; } = null!;
     public PathSettings PathSettings { get; private set; } = null!;
     public ProjectSettings ProjectSettings { get; private set; } = null!;
     public StorageSettings StorageSettings { get; private set; } = null!;
+#pragma warning restore IDE0370
 
     private readonly IConfigurationRoot _configuration;
 

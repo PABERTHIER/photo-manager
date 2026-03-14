@@ -12,7 +12,7 @@ public class VisibilityConverterTests
         VisibilityConverter visibilityConverter = new();
         object? parameter = null;
 
-        Visibility result = (Visibility)visibilityConverter.Convert(new NamedObject(), typeof(Visibility), parameter!,
+        Visibility result = (Visibility)visibilityConverter.Convert(new NamedObject(), typeof(Visibility), parameter,
             CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(Visibility.Hidden));
     }
@@ -25,7 +25,7 @@ public class VisibilityConverterTests
         object? parameter = null;
 
         object? result =
-            visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
+            visibilityConverter.Convert(value, typeof(Visibility), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
@@ -36,7 +36,7 @@ public class VisibilityConverterTests
         VisibilityConverter visibilityConverter = new();
         object? parameter = null;
 
-        Visibility result = (Visibility)visibilityConverter.Convert("A string", typeof(Visibility), parameter!,
+        Visibility result = (Visibility)visibilityConverter.Convert("A string", typeof(Visibility), parameter,
             CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
@@ -47,7 +47,7 @@ public class VisibilityConverterTests
         VisibilityConverter visibilityConverter = new();
         object? parameter = null;
 
-        Visibility result = (Visibility)visibilityConverter.Convert(null, typeof(Visibility), parameter!,
+        Visibility result = (Visibility)visibilityConverter.Convert(null, typeof(Visibility), parameter,
             CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
@@ -59,7 +59,7 @@ public class VisibilityConverterTests
         object? parameter = null;
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
-            visibilityConverter.ConvertBack(Visibility.Visible, typeof(Visibility), parameter!,
+            visibilityConverter.ConvertBack(Visibility.Visible, typeof(Visibility), parameter,
                 CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
