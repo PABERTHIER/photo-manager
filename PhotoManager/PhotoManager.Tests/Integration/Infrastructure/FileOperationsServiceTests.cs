@@ -220,17 +220,17 @@ public class FileOperationsServiceTests
     }
 
     [Test]
-    [TestCase("toto", null!, "path2")]
-    [TestCase(null!, FileNames.IMAGE_1_JPG, "path1")]
-    public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName,
+    [TestCase("toto", null, "path2")]
+    [TestCase(null, FileNames.IMAGE_1_JPG, "path1")]
+    public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string? path, string? fileName,
         string exceptionParameter)
     {
-        Folder folder = new() { Id = Guid.NewGuid(), Path = path };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = path! };
         Asset asset = new()
         {
             FolderId = folder.Id,
             Folder = folder,
-            FileName = fileName,
+            FileName = fileName!,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },

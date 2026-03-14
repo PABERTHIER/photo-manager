@@ -7,8 +7,8 @@ public class TernaryConverterTests
 {
     [Test]
     [TestCase(true, "Message", "Message")]
-    [TestCase(false, null!, null!)]
-    public void Convert_AssetCorrupted_ReturnsValue(bool assertion, string message, string expected)
+    [TestCase(false, null, null)]
+    public void Convert_AssetCorrupted_ReturnsValue(bool assertion, string? message, string? expected)
     {
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
@@ -24,7 +24,7 @@ public class TernaryConverterTests
             },
             Metadata = new()
             {
-                Corrupted = new() { IsTrue = assertion, Message = message },
+                Corrupted = new() { IsTrue = assertion, Message = message! },
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
@@ -40,8 +40,8 @@ public class TernaryConverterTests
 
     [Test]
     [TestCase(true, "Message", "Message")]
-    [TestCase(false, null!, null!)]
-    public void Convert_AssetRotated_ReturnsValue(bool assertion, string message, string expected)
+    [TestCase(false, null, null)]
+    public void Convert_AssetRotated_ReturnsValue(bool assertion, string? message, string? expected)
     {
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
@@ -58,7 +58,7 @@ public class TernaryConverterTests
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = assertion, Message = message }
+                Rotated = new() { IsTrue = assertion, Message = message! }
             }
         };
 

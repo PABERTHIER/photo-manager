@@ -228,16 +228,16 @@ public class SyncAssetsConfigurationTests
     }
 
     [Test]
-    [TestCase(null!, "")]
-    [TestCase(null!, null!)]
+    [TestCase(null, "")]
+    [TestCase(null, null)]
     public void
         Validate_DefinitionsAreInvalidSourceAndDestinationAreNull_ThrowsArgumentNullExceptionAndDoesNotRemoveDefinitions(
-            string sourceDirectory, string destinationDirectory)
+            string? sourceDirectory, string? destinationDirectory)
     {
         _syncAssetsConfiguration!.Definitions.Add(new()
         {
-            SourceDirectory = sourceDirectory,
-            DestinationDirectory = destinationDirectory
+            SourceDirectory = sourceDirectory!,
+            DestinationDirectory = destinationDirectory!
         });
 
         ArgumentNullException? exception =
@@ -419,16 +419,16 @@ public class SyncAssetsConfigurationTests
     }
 
     [Test]
-    [TestCase("", null!)]
-    [TestCase(null!, "")]
-    [TestCase(null!, null!)]
-    public void Normalize_PathsAreInvalid_ThrowsArgumentNullExceptionAndDoesNotRemoveDefinitions(string sourceDirectory,
-        string destinationDirectory)
+    [TestCase("", null)]
+    [TestCase(null, "")]
+    [TestCase(null, null)]
+    public void Normalize_PathsAreInvalid_ThrowsArgumentNullExceptionAndDoesNotRemoveDefinitions(
+        string? sourceDirectory, string? destinationDirectory)
     {
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
         {
-            SourceDirectory = sourceDirectory,
-            DestinationDirectory = destinationDirectory
+            SourceDirectory = sourceDirectory!,
+            DestinationDirectory = destinationDirectory!
         };
 
         _syncAssetsConfiguration!.Definitions.Add(syncAssetsDirectoriesDefinition);

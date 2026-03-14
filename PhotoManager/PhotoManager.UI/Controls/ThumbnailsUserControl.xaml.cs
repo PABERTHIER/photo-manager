@@ -52,7 +52,9 @@ public partial class ThumbnailsUserControl
                 if (ThumbnailsListView.Items.Count > 0 && ThumbnailsListView.Items[0] != null)
                 {
                     ViewModel.ViewerPosition = 0;
+#pragma warning disable IDE0370
                     ThumbnailsListView.ScrollIntoView(ThumbnailsListView.Items[0]!);
+#pragma warning restore IDE0370
                 }
             }
         }

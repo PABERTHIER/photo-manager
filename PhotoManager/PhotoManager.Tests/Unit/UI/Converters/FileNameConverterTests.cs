@@ -34,7 +34,7 @@ public class FileNameConverterTests
 
         object? parameter = null;
 
-        string? result = (string?)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!,
+        string? result = (string?)fileNameConverter.Convert(asset.FileName, typeof(string), parameter,
             CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -46,7 +46,7 @@ public class FileNameConverterTests
         string? fileName = null;
         object? parameter = null;
 
-        object? result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileNameConverter.Convert(fileName, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.Null);
     }
@@ -58,7 +58,7 @@ public class FileNameConverterTests
         const int input = 123;
         object? parameter = null;
 
-        object? result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileNameConverter.Convert(input, typeof(int), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(input));
     }
@@ -70,7 +70,7 @@ public class FileNameConverterTests
         Type? targetType = null;
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
-            fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
+            fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType, CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }

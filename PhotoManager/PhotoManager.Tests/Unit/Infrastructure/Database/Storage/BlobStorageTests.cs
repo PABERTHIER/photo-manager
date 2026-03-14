@@ -20,7 +20,7 @@ public class BlobStorageTests
         _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(_configurationRootMock!.Object);
+        _userConfigurationService = new(_configurationRootMock.Object);
     }
 
     [SetUp]
