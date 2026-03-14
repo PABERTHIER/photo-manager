@@ -40,7 +40,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -65,7 +65,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -90,7 +90,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -115,7 +115,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -140,7 +140,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -165,7 +165,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset6 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = Path.Combine(_dataDirectory!, Directories.FOLDER_1) },
+            Folder = new() { Id = folderId, Path = Path.Combine(_dataDirectory, Directories.FOLDER_1) },
             FileName = FileNames.IMAGE_6_JPG,
             Pixel = new()
             {

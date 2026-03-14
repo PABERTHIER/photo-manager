@@ -1216,11 +1216,11 @@ public class FolderNavigationWindowTests
     }
 
     [Test]
-    [TestCase(null!)]
+    [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("     ")]
-    public void FolderTreeViewFolderSelected_SourceFolderPathHasWrongValue_SetsTargetPath(string sourceFolderPath)
+    public void FolderTreeViewFolderSelected_SourceFolderPathHasWrongValue_SetsTargetPath(string? sourceFolderPath)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -1228,7 +1228,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = new() { Id = Guid.NewGuid(), Path = sourceFolderPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = sourceFolderPath! };
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;

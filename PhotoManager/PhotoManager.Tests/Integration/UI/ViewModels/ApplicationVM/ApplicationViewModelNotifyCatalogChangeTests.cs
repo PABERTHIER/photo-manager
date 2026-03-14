@@ -67,7 +67,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
         _blobStorage = new();
         _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage(), new TestLogger<Database>());

@@ -25,7 +25,7 @@ public class PixelSizeConverterTests
         object? parameter = null;
 
         string? result =
-            (string?)pixelSizeConverter.Convert(asset, typeof(Asset), parameter!, CultureInfo.InvariantCulture);
+            (string?)pixelSizeConverter.Convert(asset, typeof(Asset), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
     }
@@ -37,7 +37,7 @@ public class PixelSizeConverterTests
         object? input = null;
         object? parameter = null;
 
-        object? result = pixelSizeConverter.Convert(input!, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(""));
     }
@@ -49,7 +49,7 @@ public class PixelSizeConverterTests
         const string input = "Not an Asset object";
         object? parameter = null;
 
-        object? result = pixelSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(""));
     }
@@ -61,7 +61,7 @@ public class PixelSizeConverterTests
         object? parameter = null;
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
-            pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!,
+            pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter,
                 CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));

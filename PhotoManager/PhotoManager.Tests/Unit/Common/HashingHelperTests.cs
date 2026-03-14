@@ -215,7 +215,7 @@ public class HashingHelperTests
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory!));
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory));
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
 
@@ -228,7 +228,7 @@ public class HashingHelperTests
         string? filePath = null;
 
         ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
+            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
 

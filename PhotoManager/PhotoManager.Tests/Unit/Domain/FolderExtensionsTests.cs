@@ -73,10 +73,10 @@ public class FolderExtensionsTests
         Assert.That(folder2.Path, Is.EqualTo(folder1.Path));
     }
 
-    [TestCase(null!, "D:\\Workspace\\PhotoManager\\Tutu")]
-    public void IsSameDirectory_FirstDirectoryIsNull_ThrowsNullReferenceException(string path1, string path2)
+    [TestCase(null, "D:\\Workspace\\PhotoManager\\Tutu")]
+    public void IsSameDirectory_FirstDirectoryIsNull_ThrowsNullReferenceException(string? path1, string path2)
     {
-        Folder folder1 = new() { Id = Guid.NewGuid(), Path = path1 };
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = path1! };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = path2 };
 
         NullReferenceException? exception =
@@ -91,11 +91,11 @@ public class FolderExtensionsTests
         Assert.That(folder2.Path, Is.Not.EqualTo(folder1.Path));
     }
 
-    [TestCase("D:\\Workspace\\PhotoManager\\Toto", null!)]
-    public void IsSameDirectory_SecondDirectoryIsNull_ThrowsNullReferenceException(string path1, string path2)
+    [TestCase("D:\\Workspace\\PhotoManager\\Toto", null)]
+    public void IsSameDirectory_SecondDirectoryIsNull_ThrowsNullReferenceException(string path1, string? path2)
     {
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = path1 };
-        Folder folder2 = new() { Id = Guid.NewGuid(), Path = path2 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = path2! };
 
         bool isSameDirectory = folder1.IsSameDirectory(folder2);
 

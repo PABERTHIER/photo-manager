@@ -25,7 +25,7 @@ public class FileSizeConverterTests
         object? parameter = null;
 
         string? result =
-            (string?)fileSizeConverter.Convert(size, typeof(long), parameter!, CultureInfo.InvariantCulture);
+            (string?)fileSizeConverter.Convert(size, typeof(long), parameter, CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -36,7 +36,7 @@ public class FileSizeConverterTests
         string? input = null;
         object? parameter = null;
 
-        object? result = fileSizeConverter.Convert(input!, typeof(long), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileSizeConverter.Convert(input, typeof(long), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo("0 bytes"));
     }
@@ -48,7 +48,7 @@ public class FileSizeConverterTests
         const string input = "12345";
         object? parameter = null;
 
-        object? result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo("12.1 KB"));
     }
@@ -62,7 +62,7 @@ public class FileSizeConverterTests
 
         FormatException? exception = Assert.Throws<FormatException>(() =>
         {
-            fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
+            fileSizeConverter.Convert(input, typeof(long), parameter, CultureInfo.InvariantCulture);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("The input string 'abc' was not in a correct format."));
@@ -77,7 +77,7 @@ public class FileSizeConverterTests
 
         InvalidCastException? exception = Assert.Throws<InvalidCastException>(() =>
         {
-            fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
+            fileSizeConverter.Convert(input, typeof(long), parameter, CultureInfo.InvariantCulture);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Specified cast is not valid."));
@@ -92,7 +92,7 @@ public class FileSizeConverterTests
 
         OverflowException? exception = Assert.Throws<OverflowException>(() =>
         {
-            fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
+            fileSizeConverter.Convert(input, typeof(long), parameter, CultureInfo.InvariantCulture);
         });
 
         Assert.That(exception?.Message, Is.EqualTo("Value was either too large or too small for an Int64."));
@@ -105,7 +105,7 @@ public class FileSizeConverterTests
         object? parameter = null;
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
-            fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter!, CultureInfo.InvariantCulture));
+            fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter, CultureInfo.InvariantCulture));
 
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
