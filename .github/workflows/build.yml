@@ -21,11 +21,11 @@ jobs:
     steps:
       # Step 1: Checkout the code
       - name: ⤵️ Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Step 2: Setup .NET SDK
       - name: 🛠️ Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -49,7 +49,7 @@ jobs:
 
       # Step 3: Cache NuGet packages for faster builds
       - name: 💾 Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
@@ -82,21 +82,21 @@ jobs:
 
       # Step 10: Upload Coverage XML as Artifact
       - name: 📂 Upload Coverage XML as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report
           path: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
 
       # Step 11: Upload test results as an artifact
       - name: 📂 Upload Test Results as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: ${{ env.PROJECT_TESTRESULTS_PATH }}/test-results.trx
 
       # Step 12: Upload coverage report to Codecov
       - name: ☁️ Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
           name: codecov-windows-latest
