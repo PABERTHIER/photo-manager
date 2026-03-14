@@ -307,13 +307,15 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -325,7 +327,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         SyncAssetsService syncAssetsService =
             new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_assetRepository, fileOperationsService, _userConfigurationService);
+            new(_assetRepository, fileOperationsService, _userConfigurationService,
+                new TestLogger<FindDuplicatedAssetsService>());
         _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }

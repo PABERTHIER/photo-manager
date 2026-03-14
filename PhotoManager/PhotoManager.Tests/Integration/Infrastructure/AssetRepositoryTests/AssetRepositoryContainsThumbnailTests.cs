@@ -20,6 +20,7 @@ public class AssetRepositoryContainsThumbnailTests
 
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -43,13 +44,16 @@ public class AssetRepositoryContainsThumbnailTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -76,6 +80,12 @@ public class AssetRepositoryContainsThumbnailTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -106,6 +116,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -155,6 +167,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -195,6 +209,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -234,6 +250,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(isContainingThumbnail, Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -251,10 +269,11 @@ public class AssetRepositoryContainsThumbnailTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
-            imageProcessingService, imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -284,6 +303,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(isContainingThumbnail, Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -323,6 +344,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(isContainingThumbnail, Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -377,6 +400,8 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(isContainingThumbnail, Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -413,6 +438,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -449,6 +476,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -486,6 +515,8 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

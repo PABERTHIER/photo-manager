@@ -44,26 +44,26 @@ public class ApplicationSyncAssetsAsyncTests
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        _fileOperationsService = new(_userConfigurationService);
+        _fileOperationsService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_assetRepository, _fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(_assetRepository, _fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator,
-            new TestLogger<CatalogAssetsService>());
+            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
         _moveAssetsService = new(_assetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(_assetRepository, _fileOperationsService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_assetRepository, _fileOperationsService, _userConfigurationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, _fileOperationsService, assetsComparator,
+            _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, _fileOperationsService,
+            _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, _fileOperationsService, imageProcessingService);
     }

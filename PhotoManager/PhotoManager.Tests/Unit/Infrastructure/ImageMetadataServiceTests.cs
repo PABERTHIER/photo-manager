@@ -10,6 +10,7 @@ public class ImageMetadataServiceTests
     private ImageMetadataService? _imageMetadataService;
     private FileOperationsService? _fileOperationService;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<ImageMetadataService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -21,8 +22,20 @@ public class ImageMetadataServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
         _userConfigurationService = new(configurationRootMock.Object);
-        _fileOperationService = new(_userConfigurationService);
-        _imageMetadataService = new(_fileOperationService, new TestLogger<ImageMetadataService>());
+        _fileOperationService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+        _imageMetadataService = new(_fileOperationService!, _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -46,6 +59,8 @@ public class ImageMetadataServiceTests
         Rotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(expectedRotation));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -56,6 +71,8 @@ public class ImageMetadataServiceTests
         Rotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -68,5 +85,7 @@ public class ImageMetadataServiceTests
                 _imageMetadataService!.GetImageRotation((ushort)exifOrientation!));
 
         Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
 }

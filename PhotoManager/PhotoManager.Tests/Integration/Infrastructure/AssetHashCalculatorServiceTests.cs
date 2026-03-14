@@ -1,4 +1,5 @@
-﻿using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
+﻿using ImageMagick;
+using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
@@ -11,11 +12,24 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 public class AssetHashCalculatorServiceTests
 {
     private string? _dataDirectory;
+    private TestLogger<AssetHashCalculatorService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -34,7 +48,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -44,13 +58,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_DefaultHashAndEmptyImageBytes_ReturnsDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string? filePath = null;
@@ -61,13 +77,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_DefaultHashAndNullImageBytes_ReturnsDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -78,6 +96,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -93,7 +113,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -103,6 +123,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -118,7 +140,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -129,6 +151,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -144,7 +168,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -154,6 +178,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -172,7 +198,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -182,6 +208,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(PHashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -197,7 +225,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -207,6 +235,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(PHashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -222,7 +252,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -232,13 +262,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(PHashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_PHashAndImageDoesNotExist_ReturnsTheDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
@@ -248,13 +280,17 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
+
+        _testLogger!.AssertLogExceptions(
+            [new MagickBlobErrorException($"MagickImage is unable to open image {filePath}.")],
+            typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_PHashAndImagePathIsInvalid_ReturnsHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string directoryPath = _dataDirectory!;
 
@@ -266,13 +302,17 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.IMAGE_1_JPG));
+
+        _testLogger!.AssertLogExceptions(
+            [new MagickBlobErrorException($"MagickImage is unable to open image {directoryPath}.")],
+            typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_PHashAndEmptyImageBytesAndImagePathIsInvalid_ReturnsTheDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
 
@@ -281,13 +321,17 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
+
+        _testLogger!.AssertLogExceptions(
+            [new MagickBlobErrorException($"MagickImage is unable to open image {_dataDirectory}.")],
+            typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_PHashAndImagePathIsNull_ReturnsTheDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string? filePath = null;
@@ -297,6 +341,10 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
+
+        _testLogger!.AssertLogExceptions(
+            [new ArgumentException("Value cannot be null or empty. (Parameter 'fileName')")],
+            typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -312,7 +360,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -322,6 +370,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -331,7 +381,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -341,6 +391,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -355,7 +407,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -365,6 +417,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -374,7 +428,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -384,6 +438,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -398,7 +454,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -408,6 +464,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -417,7 +475,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -427,13 +485,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_DHashAndImageDoesNotExist_ThrowsArgumentException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
@@ -442,13 +502,15 @@ public class AssetHashCalculatorServiceTests
             Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_DHashAndImagePathIsInvalid_ThrowsArgumentException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
 
@@ -456,13 +518,15 @@ public class AssetHashCalculatorServiceTests
             assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateHash_DHashAndImagePathIsNull_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -472,6 +536,8 @@ public class AssetHashCalculatorServiceTests
                 assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -490,7 +556,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -500,13 +566,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateMD5Hash_MD5HashAndEmptyImageBytes_ReturnsSameMD5Hash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[] imageBytes = [];
         string? filePath = null;
@@ -517,13 +585,15 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
     public void CalculateMD5Hash_MD5HashAndNullImageBytes_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -533,6 +603,8 @@ public class AssetHashCalculatorServiceTests
                 assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -548,7 +620,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -558,6 +630,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -573,7 +647,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -583,6 +657,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -598,7 +674,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -608,6 +684,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -623,7 +701,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, true, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -633,6 +711,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(PHashes.LENGTH));
         Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
@@ -646,7 +726,7 @@ public class AssetHashCalculatorServiceTests
         string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, true);
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -656,6 +736,8 @@ public class AssetHashCalculatorServiceTests
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
         Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     private static UserConfigurationService GetUserConfigurationService(bool usingPHash, bool usingDHash,

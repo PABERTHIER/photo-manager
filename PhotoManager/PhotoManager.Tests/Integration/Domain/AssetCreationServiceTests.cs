@@ -40,7 +40,7 @@ public class AssetCreationServiceTests
         _pathProviderServiceMock = new();
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
     }
 
     private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash,
@@ -59,11 +59,13 @@ public class AssetCreationServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             logger ?? new TestLogger<AssetCreationService>());
@@ -2270,11 +2272,13 @@ public class AssetCreationServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());

@@ -20,6 +20,7 @@ public class AssetRepositoryConcurrentAccessTests
 
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -45,13 +46,16 @@ public class AssetRepositoryConcurrentAccessTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -132,6 +136,12 @@ public class AssetRepositoryConcurrentAccessTests
                 Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -369,6 +379,8 @@ public class AssetRepositoryConcurrentAccessTests
                 Assert.That(assetsUpdatedEvents[5], Is.EqualTo(Reactive.Unit.Default));
                 Assert.That(assetsUpdatedEvents[6], Is.EqualTo(Reactive.Unit.Default));
             }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

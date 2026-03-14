@@ -1,4 +1,5 @@
 ﻿using ImageMagick;
+using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
@@ -26,7 +27,7 @@ public static class HashingHelper
     }
 
     // Performances are decreased by 6 times with CalculatePHash
-    public static string? CalculatePHash(string filePath)
+    public static string? CalculatePHash(string filePath, ILogger logger)
     {
         try
         {
@@ -44,9 +45,15 @@ public static class HashingHelper
 
             return phash;
         }
-        catch
+        catch (Exception ex) when (ex is MagickBlobErrorException or MagickMissingDelegateErrorException)
         {
-            // TODO: Log the error once the log system has been reworked
+            logger.LogError("MagickImage is unable to open image {filePath}.", filePath);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to calculate PHash for: {filePath}. Message: {ex.Message}", filePath,
+                ex.Message);
             return null;
         }
     }
@@ -87,12 +94,14 @@ public static class HashingHelper
     }
 
     // The best use is for PHash method, the most accurate
-    public static int CalculateHammingDistance(string hash1, string hash2)
+    public static int CalculateHammingDistance(string hash1, string hash2, ILogger logger)
     {
-        if (hash1 == null || hash2 == null || hash1.Length != hash2.Length)
+        if (hash1.Length != hash2.Length)
         {
-            // TODO: Check for ArgumentException. - .net 8) to not throw
-            throw new ArgumentException("Invalid arguments for hamming distance calculation.");
+            ArgumentException exception = new(
+                $"Invalid arguments for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
 
         int distance = 0;

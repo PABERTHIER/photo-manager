@@ -9,6 +9,7 @@ public class DatabaseDeleteOldBackupsTests
 
     private UserConfigurationService? _userConfigurationService;
     private Mock<IBackupStorage>? _backupStorageMock;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -24,7 +25,14 @@ public class DatabaseDeleteOldBackupsTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new();
         _backupStorageMock = new();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -53,7 +61,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object);
+                _backupStorageMock.Object, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -72,6 +80,8 @@ public class DatabaseDeleteOldBackupsTests
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Has.Length.EqualTo(2));
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[0], Is.EqualTo(path4));
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[1], Is.EqualTo(path3));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -98,7 +108,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object);
+                _backupStorageMock.Object, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -110,11 +120,64 @@ public class DatabaseDeleteOldBackupsTests
 
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
             Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
+        }
+    }
+
+    [Test]
+    public void DeleteOldBackups_ExceptionIsThrown_LogsItAndThrowsException()
+    {
+        const ushort backupsToKeep = 1;
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string[] filesPaths =
+        [
+            Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS, "20230404.zip"),
+            Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS, "20230304.zip")
+        ];
+
+        string logMessage = $"Error while trying to delete old backups. Backups to keep: {backupsToKeep}";
+        string exceptionMessage =
+            $"The process cannot access the file '{filesPaths[1]}' because it is being used by another process.";
+        IOException expectedException = new(exceptionMessage);
+
+        try
+        {
+            _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPaths);
+            _backupStorageMock.Setup(x => x.DeleteBackupFile(It.IsAny<string>())).Throws(expectedException);
+
+            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
+                new BlobStorage(), _backupStorageMock.Object, _testLogger!);
+
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
+            IOException? exception = Assert.Throws<IOException>(() => database.DeleteOldBackups(backupsToKeep));
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+        }
+        finally
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+            }
+
+            string backupsPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS);
+
+            if (Directory.Exists(backupsPath))
+            {
+                Directory.Delete(backupsPath, true);
+            }
         }
     }
 }

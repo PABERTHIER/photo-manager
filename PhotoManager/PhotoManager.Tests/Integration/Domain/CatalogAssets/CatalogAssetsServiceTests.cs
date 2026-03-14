@@ -64,7 +64,7 @@ public class CatalogAssetsServiceTests
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
         _blobStorage = new();
-        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage());
+        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage(), new TestLogger<Database>());
     }
 
     [SetUp]
@@ -350,11 +350,13 @@ public class CatalogAssetsServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());

@@ -12,6 +12,7 @@ public class AssetRepositoryAddFolderTests
     private readonly Guid _defaultGuid = Guid.Empty;
 
     private AssetRepository? _assetRepository;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -33,14 +34,23 @@ public class AssetRepositoryAddFolderTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage());
+        _testLogger = new();
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
+            new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -89,6 +99,8 @@ public class AssetRepositoryAddFolderTests
             Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -142,6 +154,8 @@ public class AssetRepositoryAddFolderTests
             Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -206,6 +220,8 @@ public class AssetRepositoryAddFolderTests
             Assert.That(folder2!.Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

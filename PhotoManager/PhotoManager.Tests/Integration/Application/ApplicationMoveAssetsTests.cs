@@ -49,13 +49,15 @@ public class ApplicationMoveAssetsTests
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -64,10 +66,10 @@ public class ApplicationMoveAssetsTests
             assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
         _moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
             moveAssetsServiceLogger ?? new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(_assetRepository, fileOperationsService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_assetRepository, fileOperationsService, _userConfigurationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+            _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+            _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }
@@ -744,7 +746,7 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{newSourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
 
             assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.That(assetsInSource, Is.Not.Empty);
@@ -1143,7 +1145,7 @@ public class ApplicationMoveAssetsTests
             [
                 $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
             ];
-            logger.AssertLogInfos(messages, typeof(MoveAssetsService));
+            logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }
         finally
         {

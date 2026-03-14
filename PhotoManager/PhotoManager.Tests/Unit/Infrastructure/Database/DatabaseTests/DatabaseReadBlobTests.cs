@@ -10,6 +10,7 @@ public class DatabaseReadBlobTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +26,14 @@ public class DatabaseReadBlobTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -63,6 +71,8 @@ public class DatabaseReadBlobTests
             Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -106,6 +116,8 @@ public class DatabaseReadBlobTests
             Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -134,11 +146,60 @@ public class DatabaseReadBlobTests
 
             Assert.That(blob, Is.Null);
             Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
             Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
+        }
+    }
+
+    [Test]
+    public void ReadBlob_ExceptionIsThrown_LogsItAndThrowsException()
+    {
+        string blobName = Guid.NewGuid() + ".bin";
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+
+        string logMessage = $"Error while trying to read blob {blobName}. LastReadFilePath: {blobFilePath}";
+        const string exceptionMessage = "Blob read error";
+        IOException expectedException = new(exceptionMessage);
+
+        try
+        {
+            Mock<IBlobStorage> blobStorageMock = new();
+            blobStorageMock.Setup(x => x.ReadFromBinaryFile(It.IsAny<string>())).Throws(expectedException);
+
+            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
+                blobStorageMock.Object, new BackupStorage(), _testLogger!);
+
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
+            IOException? exception = Assert.Throws<IOException>(() => database.ReadBlob(blobName));
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+        }
+        finally
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+            }
+
+            string backupsPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS);
+
+            if (Directory.Exists(backupsPath))
+            {
+                Directory.Delete(backupsPath, true);
+            }
         }
     }
 }

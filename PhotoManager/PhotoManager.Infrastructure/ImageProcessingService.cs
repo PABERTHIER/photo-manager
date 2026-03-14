@@ -7,19 +7,19 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        return BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height);
+        return BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, logger);
     }
 
     // From AssetRepository
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
     {
-        return BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height);
+        return BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, logger);
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage
     public BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapOriginalImage(buffer, rotation);
+        return BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, logger);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
@@ -43,7 +43,7 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
     public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapHeicImageFromPath(imagePath, rotation);
+        return BitmapHelper.LoadBitmapHeicImageFromPath(imagePath, rotation, logger);
     }
 
     public byte[] GetJpegBitmapImage(BitmapImage thumbnailImage)

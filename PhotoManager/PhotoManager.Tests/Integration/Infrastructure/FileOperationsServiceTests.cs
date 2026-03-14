@@ -14,6 +14,7 @@ public class FileOperationsServiceTests
 
     private FileOperationsService? _fileOperationsService;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<FileOperationsService>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +26,19 @@ public class FileOperationsServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
         _userConfigurationService = new(configurationRootMock.Object);
-        _fileOperationsService = new(_userConfigurationService);
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _testLogger = new();
+        _fileOperationsService = new(_userConfigurationService!, _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -43,6 +56,8 @@ public class FileOperationsServiceTests
         Assert.That(subDirectories[0].Name, Is.EqualTo(Directories.TEST_HIDDEN_SUB_FOLDER));
         Assert.That(subDirectories[1].Name, Is.EqualTo(Directories.TEST_SUB_FOLDER_1));
         Assert.That(subDirectories[2].Name, Is.EqualTo(Directories.TEST_SUB_FOLDER_2));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -54,6 +69,8 @@ public class FileOperationsServiceTests
             Assert.Throws<DirectoryNotFoundException>(() => _fileOperationsService!.GetSubDirectories(directoryPath));
 
         Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{directoryPath}'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -73,6 +90,8 @@ public class FileOperationsServiceTests
         Assert.That(recursiveSubDirectories[2].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2));
         Assert.That(recursiveSubDirectories[3].FullName,
             Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2 + "\\" + Directories.TEST_SUB_FOLDER_3));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -85,6 +104,8 @@ public class FileOperationsServiceTests
                 _fileOperationsService!.GetRecursiveSubDirectories(directoryPath));
 
         Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{directoryPath}'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -97,6 +118,8 @@ public class FileOperationsServiceTests
         Assert.That(Directory.Exists(testDirectory), Is.True);
 
         Directory.Delete(testDirectory);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -114,6 +137,8 @@ public class FileOperationsServiceTests
         _fileOperationsService!.DeleteFile(_dataDirectory!, newFileName);
 
         Assert.That(File.Exists(destinationFilePath), Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -125,6 +150,46 @@ public class FileOperationsServiceTests
         Assert.That(File.Exists(testFilePath), Is.False);
 
         Assert.DoesNotThrow(() => _fileOperationsService!.DeleteFile(_dataDirectory!, testFileName));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+    }
+
+    [Test]
+    public void DeleteFile_FileIsLocked_LogsItAndDoesNotThrowAndNoActionTaken()
+    {
+        const string testFileName = FileNames.IMAGE_TO_DELETE_JPG;
+        string tempDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+
+        try
+        {
+            Directory.CreateDirectory(tempDirectory);
+            string testFilePath = Path.Combine(tempDirectory, testFileName);
+            File.Copy(sourceFilePath, testFilePath);
+
+            Assert.That(File.Exists(testFilePath), Is.True);
+
+            // Open a file stream to lock the file
+            using (new FileStream(testFilePath, FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                _fileOperationsService!.DeleteFile(tempDirectory, testFileName);
+
+                Assert.That(File.Exists(testFilePath), Is.True);
+
+                _testLogger!.AssertLogErrors(
+                    [
+                        $"Failed to delete file '{testFilePath}'. The process cannot access the file '{testFilePath}' because it is being used by another process."
+                    ],
+                    typeof(FileOperationsService));
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(tempDirectory))
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+        }
     }
 
     [Test]
@@ -135,6 +200,8 @@ public class FileOperationsServiceTests
         Assert.That(fileNames, Has.Length.GreaterThanOrEqualTo(2));
         Assert.That(fileNames, Does.Contain(FileNames.IMAGE_2_JPG));
         Assert.That(fileNames, Does.Contain(FileNames.IMAGE_1_JPG));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -146,6 +213,8 @@ public class FileOperationsServiceTests
 
         Assert.That(actualBytes, Is.Not.Null);
         Assert.That(actualBytes, Is.Not.Empty);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -157,6 +226,8 @@ public class FileOperationsServiceTests
             Assert.Throws<FileNotFoundException>(() => _fileOperationsService!.GetFileBytes(nonExistentFilePath));
 
         Assert.That(exception?.Message, Is.EqualTo($"Could not find file '{nonExistentFilePath}'."));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -165,6 +236,8 @@ public class FileOperationsServiceTests
         UnauthorizedAccessException? exception =
             Assert.Throws<UnauthorizedAccessException>(() => _fileOperationsService!.GetFileBytes(_dataDirectory!));
         Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -187,6 +260,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FileExists(folder, asset);
 
         Assert.That(exists, Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -217,6 +292,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FileExists(folder, asset);
 
         Assert.That(exists, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -243,6 +320,8 @@ public class FileOperationsServiceTests
             Assert.Throws<ArgumentNullException>(() => _fileOperationsService!.FileExists(folder, asset));
 
         Assert.That(exception?.Message, Is.EqualTo($"Value cannot be null. (Parameter '{exceptionParameter}')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -253,6 +332,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FileExists(fullPath);
 
         Assert.That(exists, Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -263,6 +344,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FileExists(fullPath);
 
         Assert.That(exists, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -273,6 +356,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FileExists(fullPath!);
 
         Assert.That(exists, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -281,6 +366,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FolderExists(_dataDirectory!);
 
         Assert.That(exists, Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -289,6 +376,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FolderExists("toto");
 
         Assert.That(exists, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -299,6 +388,8 @@ public class FileOperationsServiceTests
         bool exists = _fileOperationsService!.FolderExists(fullPath!);
 
         Assert.That(exists, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -306,6 +397,8 @@ public class FileOperationsServiceTests
     {
         int totalFilesCount = _fileOperationsService!.GetTotalFilesCount();
         Assert.That(totalFilesCount, Is.EqualTo(67));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
 
     [Test]
@@ -322,10 +415,13 @@ public class FileOperationsServiceTests
             configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
             UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
-            FileOperationsService fileOperationsService = new(userConfigurationService);
+            TestLogger<FileOperationsService> logger = new();
+            FileOperationsService fileOperationsService = new(userConfigurationService, logger);
 
             int totalFilesCount = fileOperationsService.GetTotalFilesCount();
             Assert.That(totalFilesCount, Is.Zero);
+
+            logger.AssertLogExceptions([], typeof(FileOperationsService));
         }
         finally
         {
