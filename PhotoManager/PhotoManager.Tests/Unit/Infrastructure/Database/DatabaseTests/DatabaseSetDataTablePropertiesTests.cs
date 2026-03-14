@@ -241,10 +241,10 @@ public class DatabaseSetDataTablePropertiesTests
     }
 
     [Test]
-    [TestCase(null!)]
+    [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
-    public void SetDataTableProperties_WithInvalidColumnName_ThrowsArgumentNullException(string columnName)
+    public void SetDataTableProperties_WithInvalidColumnName_ThrowsArgumentNullException(string? columnName)
     {
         DataTableProperties properties = new()
         {
@@ -252,7 +252,7 @@ public class DatabaseSetDataTablePropertiesTests
             ColumnProperties =
             [
                 new() { ColumnName = "Column1" },
-                new() { ColumnName = columnName }
+                new() { ColumnName = columnName! }
             ]
         };
 

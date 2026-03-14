@@ -18,7 +18,10 @@ public static class InfrastructureServiceCollectionExtensions
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
         }
 
+        // Known issue, see: https://github.com/dotnet/roslyn/issues/82691
+#pragma warning disable IDE0051
         private void AddDatabase()
+#pragma warning restore IDE0051
         {
             services.AddSingleton<IObjectListStorage, ObjectListStorage>();
             services.AddSingleton<IBlobStorage, BlobStorage>();
