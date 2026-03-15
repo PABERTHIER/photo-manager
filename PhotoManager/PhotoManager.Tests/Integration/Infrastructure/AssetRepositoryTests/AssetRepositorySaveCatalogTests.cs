@@ -629,12 +629,57 @@ public class AssetRepositorySaveCatalogTests
                 // Delete the database directory to cause an exception when saving
                 Directory.Delete(_databaseDirectory!, true);
 
-                DirectoryNotFoundException exception = Assert.Throws<DirectoryNotFoundException>(() =>
-                    _assetRepository.SaveCatalog(addedFolder))!;
+                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
+                    _assetRepository.SaveCatalog(addedFolder));
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
 
-                Assert.That(exception.Message, Is.EqualTo(expectedException.Message));
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(_databaseDirectory!))
+            {
+                Directory.Delete(_databaseDirectory!, true);
+            }
+
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void SaveCatalog_FolderIsNullAndDatabaseThrowsException_LogsItAndThrowsException()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string backupFilePath = Path.Combine(_databasePath!, Directories.TABLES, Tables.ASSETS_DB);
+            DirectoryNotFoundException expectedException =
+                new($"Could not find a part of the path '{backupFilePath}'.");
+
+            string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            Folder addedFolder = _assetRepository!.AddFolder(folderPath);
+
+            _asset1 = _asset1!.WithFolder(addedFolder);
+            _assetRepository!.AddAsset(_asset1!, []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_assetRepository.HasChanges(), Is.True);
+
+                // Delete the database directory to cause an exception when saving
+                Directory.Delete(_databaseDirectory!, true);
+
+                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
+                    _assetRepository.SaveCatalog(null));
+
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
                 _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }

@@ -53,11 +53,11 @@ public class AssetRepositoryConstructorTests
 
             using (Assert.EnterMultipleScope())
             {
-                ArgumentException exception = Assert.Throws<ArgumentException>(() =>
+                ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
                     new AssetRepository(database, _pathProviderServiceMock!.Object, imageProcessingService,
-                        imageMetadataService, userConfigurationService, testLogger))!;
+                        imageMetadataService, userConfigurationService, testLogger));
 
-                Assert.That(exception.Message, Does.Contain("Error while trying to read data table"));
+                Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));
 
                 Exception expectedException = new(exception.Message);
                 testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
