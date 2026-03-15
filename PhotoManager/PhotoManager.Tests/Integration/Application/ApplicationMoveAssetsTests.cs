@@ -1143,7 +1143,7 @@ public class ApplicationMoveAssetsTests
 
             string[] messages =
             [
-                $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
+                $"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the source and destination are the same."
             ];
             logger.AssertLogErrors(messages, typeof(MoveAssetsService));
         }

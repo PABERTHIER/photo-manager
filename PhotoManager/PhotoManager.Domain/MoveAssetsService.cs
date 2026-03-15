@@ -101,7 +101,7 @@ public class MoveAssetsService(
             throw new ArgumentNullException(nameof(assets), "assets cannot be null or empty.");
         }
 
-        foreach (Asset? asset in assets)
+        foreach (Asset asset in assets)
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (asset == null)
