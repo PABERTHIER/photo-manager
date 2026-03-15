@@ -862,7 +862,9 @@ public class MoveAssetsServiceTests
             Assert.That(recentTargetPaths, Is.Empty);
 
             _testLogger!.AssertLogErrors(
-                [$"Cannot validate asset 'Image 1.jpg' because the file does not exist at '{newSourceFilePath2}'."],
+                [
+                    $"Cannot validate asset '{asset2.FileName}' because the file does not exist at '{newSourceFilePath2}'."
+                ],
                 typeof(MoveAssetsService));
         }
         finally
@@ -1016,7 +1018,6 @@ public class MoveAssetsServiceTests
     public void MoveAssets_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
-
 
         try
         {
@@ -1492,7 +1493,7 @@ public class MoveAssetsServiceTests
             Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
             Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate asset 'NonExistentFile.jpg' because the folder is null."],
+            _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
                 typeof(MoveAssetsService));
         }
         finally
@@ -1599,7 +1600,7 @@ public class MoveAssetsServiceTests
 
             _testLogger!.AssertLogErrors(
             [
-                $"Cannot validate asset '{FileNames.NON_EXISTENT_FILE_JPG}' because the file does not exist at '{sourceFilePath}'."
+                $"Cannot validate asset '{asset.FileName}' because the file does not exist at '{sourceFilePath}'."
             ], typeof(MoveAssetsService));
         }
         finally
@@ -1930,7 +1931,7 @@ public class MoveAssetsServiceTests
             Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
             Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate asset 'NonExistentFile.jpg' because the folder is null."],
+            _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
                 typeof(MoveAssetsService));
         }
         finally
@@ -1976,7 +1977,7 @@ public class MoveAssetsServiceTests
 
             _testLogger!.AssertLogErrors(
             [
-                $"Cannot validate asset '{FileNames.NON_EXISTENT_FILE_JPG}' because the file does not exist at '{asset.FullPath}'."
+                $"Cannot validate asset '{asset.FileName}' because the file does not exist at '{asset.FullPath}'."
             ], typeof(MoveAssetsService));
         }
         finally
