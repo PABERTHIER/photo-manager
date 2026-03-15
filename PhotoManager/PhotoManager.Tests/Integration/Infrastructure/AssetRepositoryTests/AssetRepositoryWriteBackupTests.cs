@@ -181,11 +181,11 @@ public class AssetRepositoryWriteBackupTests
 
             Directory.Delete(_databaseDirectory!, true);
 
-            DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
-                _assetRepository!.WriteBackup());
-
             using (Assert.EnterMultipleScope())
             {
+                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
+                    _assetRepository!.WriteBackup());
+
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));

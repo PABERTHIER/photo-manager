@@ -59,7 +59,7 @@ public class AssetRepositoryConstructorTests
 
                 Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));
 
-                Exception expectedException = new(exception.Message);
+                Exception expectedException = new(exception?.Message);
                 testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }
