@@ -1,10 +1,13 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+using Microsoft.Extensions.Logging;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 public class TestableDatabase(
     IObjectListStorage objectListStorage,
     IBlobStorage blobStorage,
-    IBackupStorage backupStorage)
-    : PhotoManager.Infrastructure.Database.Database(objectListStorage, blobStorage, backupStorage)
+    IBackupStorage backupStorage,
+    ILogger<PhotoManager.Infrastructure.Database.Database> logger)
+    : PhotoManager.Infrastructure.Database.Database(objectListStorage, blobStorage, backupStorage, logger)
 {
     public string GetTablesDirectory() => TablesDirectory;
     public string GetBlobsDirectory() => BlobsDirectory;

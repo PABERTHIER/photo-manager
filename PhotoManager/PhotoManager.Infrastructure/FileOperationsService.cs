@@ -1,8 +1,12 @@
-﻿using System.Collections.Concurrent;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace PhotoManager.Infrastructure;
 
-public class FileOperationsService(IUserConfigurationService userConfigurationService) : IFileOperationsService
+public class FileOperationsService(
+    IUserConfigurationService userConfigurationService,
+    ILogger<FileOperationsService> logger)
+    : IFileOperationsService
 {
     public DirectoryInfo[] GetSubDirectories(string directoryPath)
     {
@@ -25,7 +29,14 @@ public class FileOperationsService(IUserConfigurationService userConfigurationSe
 
         if (File.Exists(fullPath))
         {
-            File.Delete(fullPath);
+            try
+            {
+                File.Delete(fullPath);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to delete file '{FilePath}'. {Message}", fullPath, ex.Message);
+            }
         }
     }
 

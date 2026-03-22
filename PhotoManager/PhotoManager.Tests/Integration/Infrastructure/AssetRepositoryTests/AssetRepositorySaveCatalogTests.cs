@@ -24,6 +24,7 @@ public class AssetRepositorySaveCatalogTests
     private UserConfigurationService? _userConfigurationService;
     private ImageProcessingService? _imageProcessingService;
     private ImageMetadataService? _imageMetadataService;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -47,13 +48,16 @@ public class AssetRepositorySaveCatalogTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         _userConfigurationService = new(_configurationRootMock!.Object);
         _imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_database, _pathProviderServiceMock!.Object, _imageProcessingService,
-            _imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            _imageMetadataService, _userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -80,6 +84,12 @@ public class AssetRepositorySaveCatalogTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -219,6 +229,8 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -307,8 +319,7 @@ public class AssetRepositorySaveCatalogTests
 
             // New AssetRepository to test Initialize method with content in DB
             AssetRepository assetRepository = new(_database!, _pathProviderServiceMock!.Object,
-                _imageProcessingService!, _imageMetadataService!, _userConfigurationService,
-                new TestLogger<AssetRepository>());
+                _imageProcessingService!, _imageMetadataService!, _userConfigurationService, _testLogger!);
 
             Assert.That(assetRepository.HasChanges(), Is.False);
 
@@ -385,6 +396,8 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -460,6 +473,8 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -521,6 +536,8 @@ public class AssetRepositorySaveCatalogTests
                     Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -577,10 +594,102 @@ public class AssetRepositorySaveCatalogTests
                     Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void SaveCatalog_DatabaseThrowsException_LogsItAndThrowsException()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string backupFilePath = Path.Combine(_databasePath!, Directories.TABLES, Tables.ASSETS_DB);
+            DirectoryNotFoundException expectedException =
+                new($"Could not find a part of the path '{backupFilePath}'.");
+
+            string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            Folder addedFolder = _assetRepository!.AddFolder(folderPath);
+
+            _asset1 = _asset1!.WithFolder(addedFolder);
+            _assetRepository!.AddAsset(_asset1!, []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_assetRepository.HasChanges(), Is.True);
+
+                // Delete the database directory to cause an exception when saving
+                Directory.Delete(_databaseDirectory!, true);
+
+                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
+                    _assetRepository.SaveCatalog(addedFolder));
+
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(_databaseDirectory!))
+            {
+                Directory.Delete(_databaseDirectory!, true);
+            }
+
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void SaveCatalog_FolderIsNullAndDatabaseThrowsException_LogsItAndThrowsException()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string backupFilePath = Path.Combine(_databasePath!, Directories.TABLES, Tables.ASSETS_DB);
+            DirectoryNotFoundException expectedException =
+                new($"Could not find a part of the path '{backupFilePath}'.");
+
+            string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            Folder addedFolder = _assetRepository!.AddFolder(folderPath);
+
+            _asset1 = _asset1!.WithFolder(addedFolder);
+            _assetRepository!.AddAsset(_asset1!, []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_assetRepository.HasChanges(), Is.True);
+
+                // Delete the database directory to cause an exception when saving
+                Directory.Delete(_databaseDirectory!, true);
+
+                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
+                    _assetRepository.SaveCatalog(null));
+
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(_databaseDirectory!))
+            {
+                Directory.Delete(_databaseDirectory!, true);
+            }
+
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -718,6 +827,8 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

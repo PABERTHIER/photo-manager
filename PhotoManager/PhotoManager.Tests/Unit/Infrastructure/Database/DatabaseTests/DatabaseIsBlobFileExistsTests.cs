@@ -10,6 +10,7 @@ public class DatabaseIsBlobFileExistsTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +26,14 @@ public class DatabaseIsBlobFileExistsTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -52,6 +60,8 @@ public class DatabaseIsBlobFileExistsTests
             bool isBlobFileExists = _database!.IsBlobFileExists(blobName);
 
             Assert.That(isBlobFileExists, Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -77,6 +87,8 @@ public class DatabaseIsBlobFileExistsTests
             bool isBlobFileExists = _database!.IsBlobFileExists(blobName);
 
             Assert.That(isBlobFileExists, Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {

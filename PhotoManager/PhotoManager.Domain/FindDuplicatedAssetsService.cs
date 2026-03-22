@@ -1,9 +1,12 @@
-﻿namespace PhotoManager.Domain;
+﻿using Microsoft.Extensions.Logging;
+
+namespace PhotoManager.Domain;
 
 public class FindDuplicatedAssetsService(
     IAssetRepository assetRepository,
     IFileOperationsService fileOperationsService,
-    IUserConfigurationService userConfigurationService)
+    IUserConfigurationService userConfigurationService,
+    ILogger<FindDuplicatedAssetsService> logger)
     : IFindDuplicatedAssetsService
 {
     /// <summary>
@@ -64,7 +67,7 @@ public class FindDuplicatedAssetsService(
             foreach ((string hash2, List<Asset> assetsAdded) in assetDictionary)
             {
                 // Calculate the Hamming distance between the Hash values
-                int hammingDistance = HashingHelper.CalculateHammingDistance(hash1, hash2);
+                int hammingDistance = HashingHelper.CalculateHammingDistance(hash1, hash2, logger);
 
                 // If the Hamming distance is below the threshold, add the asset to the duplicates list
                 if (hammingDistance <= threshold)

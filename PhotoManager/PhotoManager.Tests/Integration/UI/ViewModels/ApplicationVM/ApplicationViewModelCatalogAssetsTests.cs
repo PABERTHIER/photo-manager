@@ -68,7 +68,7 @@ public class ApplicationViewModelCatalogAssetsTests
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
         _blobStorage = new();
-        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage());
+        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage(), new TestLogger<Database>());
     }
 
     [SetUp]
@@ -353,11 +353,13 @@ public class ApplicationViewModelCatalogAssetsTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -365,13 +367,12 @@ public class ApplicationViewModelCatalogAssetsTests
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
             imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
             catalogAssetsServiceLogger ?? new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService =
-            new(_testableAssetRepository, fileOperationsService, assetCreationService,
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
                 new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(_testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_testableAssetRepository, fileOperationsService, _userConfigurationService);
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
+            moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
+            _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService,
             fileOperationsService, imageProcessingService);

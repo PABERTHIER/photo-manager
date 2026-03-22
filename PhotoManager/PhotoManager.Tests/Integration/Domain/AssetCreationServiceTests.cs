@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
@@ -27,6 +26,7 @@ public class AssetCreationServiceTests
     private Database? _database;
     private UserConfigurationService? _userConfigurationService;
     private TestableAssetRepository? _testableAssetRepository;
+    private TestLogger<AssetCreationService>? _logger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
 
@@ -40,11 +40,23 @@ public class AssetCreationServiceTests
         _pathProviderServiceMock = new();
         _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        _logger = new();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _logger!.LoggingAssertTearDown();
     }
 
     private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash,
-        bool usingMD5Hash, bool usingPHash, bool analyseVideos, ILogger<AssetCreationService>? logger = null)
+        bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -59,14 +71,16 @@ public class AssetCreationServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            logger ?? new TestLogger<AssetCreationService>());
+            _logger!);
     }
 
     [Test]
@@ -306,6 +320,8 @@ public class AssetCreationServiceTests
 
                 AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
             }
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -550,6 +566,8 @@ public class AssetCreationServiceTests
 
                 AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
             }
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -794,6 +812,8 @@ public class AssetCreationServiceTests
 
                 AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
             }
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1038,6 +1058,8 @@ public class AssetCreationServiceTests
 
                 AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
             }
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1108,6 +1130,8 @@ public class AssetCreationServiceTests
 
                 AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
             }
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1196,6 +1220,8 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1290,6 +1316,8 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1379,6 +1407,8 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1517,6 +1547,8 @@ public class AssetCreationServiceTests
             Assert.That(thumbnails[newSameAssetFolder.Path].ContainsKey(newSameAsset.FileName), Is.True);
             Assert.That(thumbnails[newSameAssetFolder.Path][newSameAsset.FileName], Is.Not.Null);
             Assert.That(thumbnails[newSameAssetFolder.Path][newSameAsset.FileName], Has.Length.EqualTo(imageByteSize));
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1600,6 +1632,8 @@ public class AssetCreationServiceTests
             Assert.That(newSameAsset, Is.Null);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1646,6 +1680,8 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
 
             Assert.That(thumbnails, Is.Empty);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1752,6 +1788,8 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSizeExpected);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -1761,7 +1799,7 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    public void CreateAsset_PictureAndBasicHashTypeAndFolderNotAdded_ThrowsNullReferenceExceptionAndAssetIsNotCreated()
+    public void CreateAsset_PictureAndBasicHashTypeAndFolderNotAdded_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
@@ -1778,15 +1816,17 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            NullReferenceException? exception =
-                Assert.Throws<NullReferenceException>(() =>
-                    _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            NullReferenceException nullReferenceException =
+                new("Object reference not set to an instance of an object.");
+            _logger!.AssertLogExceptions([nullReferenceException], typeof(AssetCreationService));
         }
         finally
         {
@@ -1799,7 +1839,7 @@ public class AssetCreationServiceTests
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 100, 100000)] // Height > Width
     [TestCase(FileNames.HOMER_GIF, 100, 100000)] // Width == Height
     public void
-        CreateAsset_PictureAndBasicHashTypeAndThumbnailSettingsTooBig_ThrowsOverflowExceptionAndAssetIsNotCreated(
+        CreateAsset_PictureAndBasicHashTypeAndThumbnailSettingsTooBig_LogsItAndReturnsNullAndAssetIsNotCreated(
             string assetName, int thumbnailMaxWidth, int thumbnailMaxHeight)
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
@@ -1817,14 +1857,16 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            OverflowException? exception =
-                Assert.Throws<OverflowException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            OverflowException overflowException = new("The image data generated an overflow during processing.");
+            _logger!.AssertLogExceptions([overflowException], typeof(AssetCreationService));
         }
         finally
         {
@@ -1834,7 +1876,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_HeicPictureAndBasicHashTypeAndThumbnailSettingsTooBig_ThrowsInvalidOperationExceptionAndAssetIsNotCreated()
+        CreateAsset_HeicPictureAndBasicHashTypeAndThumbnailSettingsTooBig_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         const string assetName = FileNames.IMAGE_11_HEIC;
         const int thumbnailMaxWidth = 150;
@@ -1855,16 +1897,17 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            InvalidOperationException? exception =
-                Assert.Throws<InvalidOperationException>(() =>
-                    _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(exception?.Message,
-                Is.EqualTo("Operation is not valid due to the current state of the object."));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            InvalidOperationException invalidOperationException =
+                new("Operation is not valid due to the current state of the object.");
+            _logger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
         }
         finally
         {
@@ -1874,7 +1917,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_HeicPictureAndBasicHashTypeAndNegativeThumbnailSettings_ThrowsInvalidOperationExceptionAndAssetIsNotCreated()
+        CreateAsset_HeicPictureAndBasicHashTypeAndNegativeThumbnailSettings_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         const string assetName = FileNames.IMAGE_11_HEIC;
         const int thumbnailMaxWidth = -100;
@@ -1895,16 +1938,17 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            InvalidOperationException? exception =
-                Assert.Throws<InvalidOperationException>(() =>
-                    _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(exception?.Message,
-                Is.EqualTo("Operation is not valid due to the current state of the object."));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            InvalidOperationException invalidOperationException =
+                new("Operation is not valid due to the current state of the object.");
+            _logger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
         }
         finally
         {
@@ -1914,7 +1958,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsNull_ThrowsArgumentNullExceptionAndAssetIsNotCreated()
+        CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsNull_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
@@ -1922,6 +1966,7 @@ public class AssetCreationServiceTests
         {
             const string assetName = FileNames.IMAGE_1_JPG;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+            string? directoryName = null;
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.That(File.Exists(imagePath), Is.True);
@@ -1932,14 +1977,16 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(null!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName);
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            ArgumentNullException argumentNullException = new(nameof(directoryName));
+            _logger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
         }
         finally
         {
@@ -1948,10 +1995,9 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsEmpty_LogsErrorAndReturnsNullAndAssetIsNotCreated()
+    public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsEmpty_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
-        TestLogger<AssetCreationService> logger = new();
-        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -1982,21 +2028,19 @@ public class AssetCreationServiceTests
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
 
-            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            logger.LoggingAssertTearDown();
         }
     }
 
     [Test]
     public void
-        CreateAsset_PictureAndBasicHashTypeAndDirectoryNamePointingToAFile_LogsErrorAndReturnsNullAndAssetIsNotCreated()
+        CreateAsset_PictureAndBasicHashTypeAndDirectoryNamePointingToAFile_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
-        TestLogger<AssetCreationService> logger = new();
-        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -2026,23 +2070,22 @@ public class AssetCreationServiceTests
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
 
-            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            logger.LoggingAssertTearDown();
         }
     }
 
     [Test]
-    public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsNull_ThrowsArgumentNullExceptionAndAssetIsNotCreated()
+    public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsNull_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
-            string assetName = null!;
+            string? fileName = null;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
@@ -2051,14 +2094,16 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!);
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path2')"));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            ArgumentNullException argumentNullException = new(nameof(fileName));
+            _logger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
         }
         finally
         {
@@ -2067,10 +2112,9 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    public void CreateAsset_PictureAndBasicHashTypeAndFileNameDoesNotExist_LogsErrorAndReturnsNullAndAssetIsNotCreated()
+    public void CreateAsset_PictureAndBasicHashTypeAndFileNameDoesNotExist_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
-        TestLogger<AssetCreationService> logger = new();
-        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -2098,20 +2142,18 @@ public class AssetCreationServiceTests
             FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
 
-            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            logger.LoggingAssertTearDown();
         }
     }
 
     [Test]
-    public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsADirectory_LogsErrorAndReturnsNullAndAssetIsNotCreated()
+    public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsADirectory_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
-        TestLogger<AssetCreationService> logger = new();
-        ConfigureAssetCreationService(200, 150, false, false, false, false, logger);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -2139,19 +2181,18 @@ public class AssetCreationServiceTests
             FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
 
-            logger.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            logger.LoggingAssertTearDown();
         }
     }
 
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
         Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
-    public void CreateAsset_VideoAndBasicHashType_ReturnsAsset(
+    public void CreateAsset_VideoAndBasicHashType_LogsItAndReturnsAsset(
         string fileName,
         string firstFrameFileName,
         long fileSize,
@@ -2227,6 +2268,12 @@ public class AssetCreationServiceTests
                 rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            _logger!.AssertLogInfos(
+            [
+                $"First frame extracted successfully for: {videoPath}",
+                $"First frame saved at: {imagePath}"
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2240,7 +2287,7 @@ public class AssetCreationServiceTests
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
         Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-    public void CreateAsset_VideoAndBasicHashTypeAndCreateFirstFrameInSameLocationAsVideo_ReturnsAsset(
+    public void CreateAsset_VideoAndBasicHashTypeAndCreateFirstFrameInSameLocationAsVideo_LogsItAndReturnsAsset(
         string fileName,
         string firstFrameFileName,
         long fileSize,
@@ -2270,14 +2317,16 @@ public class AssetCreationServiceTests
 
         _userConfigurationService = new(configurationRootMock.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            _logger!);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -2337,6 +2386,12 @@ public class AssetCreationServiceTests
             //     rotatedMessage);
 
             // AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            _logger!.AssertLogInfos(
+            [
+                $"First frame extracted successfully for: {newVideoPath}",
+                $"First frame saved at: {imagePath}"
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2346,8 +2401,9 @@ public class AssetCreationServiceTests
     }
 
     [TestCase(FileNames.HOMER_1_S_MP4, FileNames.HOMER_1_S_JPG)]
-    public void CreateAsset_VideoTooShortAndBasicHashType_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(
-        string fileName, string firstFrameFileName)
+    public void
+        CreateAsset_VideoTooShortAndBasicHashType_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(
+            string fileName, string firstFrameFileName)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2379,6 +2435,13 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
 
             Assert.That(thumbnails, Is.Empty);
+
+            Exception[] expectedExceptions =
+            [
+                new($"Failed to extract the first frame for: {videoPath}, " +
+                    "Message: FFmpeg failed to generate the first frame file due to its format or content.")
+            ];
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
@@ -2390,7 +2453,7 @@ public class AssetCreationServiceTests
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
         Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
-    public void CreateAsset_VideoAndBasicHashTypeAndAddSameVideoTwice_ReturnsAsset(
+    public void CreateAsset_VideoAndBasicHashTypeAndAddSameVideoTwice_LogsItAndReturnsAsset(
         string fileName,
         string firstFrameFileName,
         long fileSize,
@@ -2467,6 +2530,14 @@ public class AssetCreationServiceTests
 
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
 
+            _logger!.AssertLogInfos(
+            [
+                $"First frame extracted successfully for: {videoPath}",
+                $"First frame saved at: {imagePath}"
+            ], typeof(AssetCreationService));
+
+            _logger!.LoggingAssertTearDown();
+
             Asset? asset3 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset3, Is.Null);
@@ -2488,6 +2559,12 @@ public class AssetCreationServiceTests
             Assert.That(asset2!.FileName, Is.EqualTo(firstFrameFileName));
 
             AssertCataloguedAssetAndThumbnailValidity(asset2, folder, thumbnails, imageByteSize);
+
+            _logger!.AssertLogExceptions(
+            [
+                new Exception($"Failed to extract the first frame for: {videoPath}, " +
+                              "Message: Output file already exists and overwrite is disabled")
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2498,7 +2575,7 @@ public class AssetCreationServiceTests
 
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG)]
     public void
-        CreateAsset_VideoAndBasicHashTypeButAnotherImageAlreadyExistsInTheOutputDirectory_DoesNotCreateFirstFrame(
+        CreateAsset_VideoAndBasicHashTypeButAnotherImageAlreadyExistsInTheOutputDirectory_LogsItAndDoesNotCreateFirstFrame(
             string fileName, string firstFrameFileName)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
@@ -2597,6 +2674,13 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, expectedImageByteSize);
+
+            Exception[] expectedExceptions =
+            [
+                new($"Failed to extract the first frame for: {videoPath}, " +
+                    "Message: Output file already exists and overwrite is disabled")
+            ];
+            _logger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
         }
         finally
         {
@@ -2640,6 +2724,8 @@ public class AssetCreationServiceTests
 
             string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
             Assert.That(File.Exists(imagePath), Is.False);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -2711,6 +2797,8 @@ public class AssetCreationServiceTests
 
             string imagePath = Path.Combine(firstFrameVideosPath, fileName);
             Assert.That(File.Exists(imagePath), Is.False);
+
+            _logger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
         {
@@ -2726,7 +2814,7 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, true)]
     public void
-        CreateAsset_PictureAndIsVideoIsTrueAndAnalyseVideosIsTrue_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(
+        CreateAsset_PictureAndIsVideoIsTrueAndAnalyseVideosIsTrue_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(
             string fileName, bool analyseVideos)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
@@ -2757,6 +2845,12 @@ public class AssetCreationServiceTests
 
             string imagePath = Path.Combine(firstFrameVideosPath, fileName);
             Assert.That(File.Exists(imagePath), Is.False);
+
+            _logger!.AssertLogExceptions(
+            [
+                new Exception($"Failed to extract the first frame for: {filePath}, " +
+                              "Message: FFmpeg failed to generate the first frame file due to its format or content.")
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2771,7 +2865,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsNull_ThrowsArgumentNullExceptionAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsNull_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2779,6 +2873,7 @@ public class AssetCreationServiceTests
         {
             const string assetName = FileNames.HOMER_MP4;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+            string? directoryName = null;
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.That(File.Exists(imagePath), Is.True);
@@ -2789,10 +2884,9 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(null!, assetName, true));
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName, true);
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
@@ -2802,6 +2896,9 @@ public class AssetCreationServiceTests
             string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
             string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
             Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
+
+            ArgumentNullException argumentNullException = new(nameof(directoryName));
+            _logger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
         }
         finally
         {
@@ -2811,7 +2908,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsEmpty_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsEmpty_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2820,6 +2917,7 @@ public class AssetCreationServiceTests
             const string assetName = FileNames.HOMER_MP4;
             string directoryName =
                 Path.Combine(_dataDirectory!, Directories.TEST_FOLDER, Directories.TEST_HIDDEN_SUB_FOLDER);
+            string videoPath = Path.Combine(directoryName, assetName);
 
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
@@ -2845,6 +2943,11 @@ public class AssetCreationServiceTests
 
             string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
             Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
+
+            _logger!.AssertLogExceptions(
+            [
+                new Exception($"Failed to extract the first frame for: {videoPath}, Message: Input file not found")
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2855,7 +2958,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndDirectoryNamePointingToAFile_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndDirectoryNamePointingToAFile_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2863,6 +2966,7 @@ public class AssetCreationServiceTests
         {
             const string assetName = FileNames.HOMER_MP4;
             string directoryName = Path.Combine(_dataDirectory!, assetName);
+            string videoPath = Path.Combine(directoryName, assetName);
 
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
@@ -2888,6 +2992,11 @@ public class AssetCreationServiceTests
 
             string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
             Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
+
+            _logger!.AssertLogExceptions(
+            [
+                new Exception($"Failed to extract the first frame for: {videoPath}, Message: Input file not found")
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2898,13 +3007,13 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndFileNameIsNull_ThrowsArgumentNullExceptionAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndFileNameIsNull_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
-            string assetName = null!;
+            string? fileName = null;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
@@ -2913,15 +3022,17 @@ public class AssetCreationServiceTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _assetCreationService!.CreateAsset(_dataDirectory!, assetName, true));
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!, true);
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path2')"));
+            Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
             Assert.That(thumbnails, Is.Empty);
+
+            ArgumentNullException argumentNullException = new(nameof(fileName));
+            _logger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
         }
         finally
         {
@@ -2931,13 +3042,14 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndFileNameDoesNotExist_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndFileNameDoesNotExist_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
             const string assetName = FileNames.NON_EXISTENT_VIDEO_MP4;
+            string videoPath = Path.Combine(_dataDirectory!, assetName);
 
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
@@ -2957,6 +3069,11 @@ public class AssetCreationServiceTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            _logger!.AssertLogExceptions(
+            [
+                new Exception($"Failed to extract the first frame for: {videoPath}, Message: Input file not found")
+            ], typeof(AssetCreationService));
         }
         finally
         {
@@ -2967,7 +3084,7 @@ public class AssetCreationServiceTests
 
     [Test]
     public void
-        CreateAsset_VideoAndBasicHashTypeAndFileNameIsADirectory_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
+        CreateAsset_VideoAndBasicHashTypeAndFileNameIsADirectory_LogsItAndReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2993,6 +3110,13 @@ public class AssetCreationServiceTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
+
+            // videoPath = Path.Combine(_dataDirectory!, _dataDirectory!) = _dataDirectory! (absolute path overrides)
+            _logger!.AssertLogExceptions(
+            [
+                new Exception(
+                    $"Failed to extract the first frame for: {_dataDirectory!}, Message: Input file not found")
+            ], typeof(AssetCreationService));
         }
         finally
         {

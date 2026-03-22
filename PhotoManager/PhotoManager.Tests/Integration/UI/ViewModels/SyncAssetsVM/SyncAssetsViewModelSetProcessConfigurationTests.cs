@@ -46,13 +46,15 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(userConfigurationService);
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(_database, pathProviderServiceMock.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
+            new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
             imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
@@ -61,10 +63,10 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(assetRepository, fileOperationsService, userConfigurationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+            moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+            userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
             moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
             imageProcessingService);

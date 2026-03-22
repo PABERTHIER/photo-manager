@@ -105,36 +105,46 @@ public class AssetRepository : IAssetRepository
     // TODO: Return created Asset
     public void AddAsset(Asset asset, byte[] thumbnailData)
     {
-        lock (_syncLock)
+        try
         {
-            Folder? folder = GetFolderById(asset.FolderId);
-
-            if (string.IsNullOrWhiteSpace(asset.Folder.Path))
+            lock (_syncLock)
             {
-                _logger.LogError(
-                    "The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}",
-                    asset.FileName);
-                return;
-            }
+                Folder? folder = GetFolderById(asset.FolderId);
 
-            if (folder == null)
-            {
-                AddFolder(asset.Folder.Path);
-            }
+                if (string.IsNullOrWhiteSpace(asset.Folder.Path))
+                {
+                    _logger.LogError(
+                        "The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}",
+                        asset.FileName);
+                    return;
+                }
 
-            if (!Thumbnails.ContainsKey(asset.Folder.Path))
-            {
-                Thumbnails[asset.Folder.Path] = GetThumbnails(asset.Folder, out _);
-                RemoveOldThumbnailsDictionaryEntries(asset.Folder);
-            }
+                if (folder == null)
+                {
+                    AddFolder(asset.Folder.Path);
+                }
 
-            if (Thumbnails.TryGetValue(asset.Folder.Path, out Dictionary<string, byte[]>? folderThumbnails))
-            {
-                folderThumbnails[asset.FileName] = thumbnailData;
-                _assets.Add(asset);
-                _hasChanges = true;
-                _assetsUpdatedSubject.OnNext(Unit.Default);
+                if (!Thumbnails.ContainsKey(asset.Folder.Path))
+                {
+                    Thumbnails[asset.Folder.Path] = GetThumbnails(asset.Folder, out _);
+                    RemoveOldThumbnailsDictionaryEntries(asset.Folder);
+                }
+
+                if (Thumbnails.TryGetValue(asset.Folder.Path, out Dictionary<string, byte[]>? folderThumbnails))
+                {
+                    folderThumbnails[asset.FileName] = thumbnailData;
+                    _assets.Add(asset);
+                    _hasChanges = true;
+                    _assetsUpdatedSubject.OnNext(Unit.Default);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            _logger.LogError(ex, "Error adding asset: {asset.FileName}, FolderId: {FolderId}",
+                asset?.FileName, asset?.FolderId);
+            throw;
         }
     }
 
@@ -216,22 +226,30 @@ public class AssetRepository : IAssetRepository
 
     public void SaveCatalog(Folder? folder)
     {
-        lock (_syncLock)
+        try
         {
-            if (_hasChanges)
+            lock (_syncLock)
             {
-                WriteAssets();
-                WriteFolders();
-                WriteSyncAssetsDirectoriesDefinitions();
-                WriteRecentTargetPaths();
+                if (_hasChanges)
+                {
+                    WriteAssets();
+                    WriteFolders();
+                    WriteSyncAssetsDirectoriesDefinitions();
+                    WriteRecentTargetPaths();
 
-                _hasChanges = false;
-            }
+                    _hasChanges = false;
+                }
 
-            if (folder != null && Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail))
-            {
-                SaveThumbnails(thumbnail, folder.ThumbnailsFilename);
+                if (folder != null && Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail))
+                {
+                    SaveThumbnails(thumbnail, folder.ThumbnailsFilename);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving catalog for folder: {FolderPath}", folder?.Path);
+            throw;
         }
     }
 
@@ -245,12 +263,20 @@ public class AssetRepository : IAssetRepository
 
     public void WriteBackup()
     {
-        lock (_syncLock)
+        try
         {
-            if (_database.WriteBackup(DateTime.Now.Date))
+            lock (_syncLock)
             {
-                _database.DeleteOldBackups(_userConfigurationService.StorageSettings.BackupsToKeep);
+                if (_database.WriteBackup(DateTime.Now.Date))
+                {
+                    _database.DeleteOldBackups(_userConfigurationService.StorageSettings.BackupsToKeep);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error writing backup");
+            throw;
         }
     }
 
@@ -299,56 +325,73 @@ public class AssetRepository : IAssetRepository
 
     public Asset? DeleteAsset(string directory, string fileName)
     {
-        lock (_syncLock)
+        try
         {
-            Folder? folder = GetFolderByPath(directory);
-
-            if (folder == null)
+            lock (_syncLock)
             {
-                return null;
+                Folder? folder = GetFolderByPath(directory);
+
+                if (folder == null)
+                {
+                    return null;
+                }
+
+                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
+
+                if (!Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnails))
+                {
+                    thumbnails = GetThumbnails(folder, out _);
+                    Thumbnails[folder.Path] = thumbnails;
+                    RemoveOldThumbnailsDictionaryEntries(folder);
+                }
+
+                thumbnails.Remove(fileName);
+
+                if (thumbnails.Count == 0)
+                {
+                    Thumbnails.Remove(folder.Path);
+                    _database.DeleteBlobFile(folder.ThumbnailsFilename);
+                }
+
+                if (assetToDelete != null)
+                {
+                    _assets.Remove(assetToDelete);
+                    _hasChanges = true;
+                    _assetsUpdatedSubject.OnNext(Unit.Default);
+                }
+
+                return assetToDelete;
             }
-
-            Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
-
-            if (!Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnails))
-            {
-                thumbnails = GetThumbnails(folder, out _);
-                Thumbnails[folder.Path] = thumbnails;
-                RemoveOldThumbnailsDictionaryEntries(folder);
-            }
-
-            thumbnails.Remove(fileName);
-
-            if (thumbnails.Count == 0)
-            {
-                Thumbnails.Remove(folder.Path);
-                _database.DeleteBlobFile(folder.ThumbnailsFilename);
-            }
-
-            if (assetToDelete != null)
-            {
-                _assets.Remove(assetToDelete);
-                _hasChanges = true;
-                _assetsUpdatedSubject.OnNext(Unit.Default);
-            }
-
-            return assetToDelete;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting asset: {Directory}, {FileName}", directory, fileName);
+            throw;
         }
     }
 
     public void DeleteFolder(Folder folder)
     {
-        lock (_syncLock)
+        try
         {
-            Thumbnails.Remove(folder.Path);
-
-            if (IsBlobFileExists(folder.ThumbnailsFilename))
+            lock (_syncLock)
             {
-                _database.DeleteBlobFile(folder.ThumbnailsFilename);
-            }
+                Thumbnails.Remove(folder.Path);
 
-            _folders.Remove(folder);
-            _hasChanges = true;
+                if (IsBlobFileExists(folder.ThumbnailsFilename))
+                {
+                    _database.DeleteBlobFile(folder.ThumbnailsFilename);
+                }
+
+                _folders.Remove(folder);
+                _hasChanges = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            _logger.LogError(ex, "Error deleting folder: {FolderPath}", folder?.Path);
+            throw;
         }
     }
 
@@ -390,26 +433,34 @@ public class AssetRepository : IAssetRepository
     {
         BitmapImage? result = null;
 
-        lock (_syncLock)
+        try
         {
-            if (!Thumbnails.ContainsKey(directoryName))
+            lock (_syncLock)
             {
-                Folder? folder = GetFolderByPath(directoryName);
-                Thumbnails[directoryName] = GetThumbnails(folder, out _);
-                RemoveOldThumbnailsDictionaryEntries(folder);
-            }
+                if (!Thumbnails.ContainsKey(directoryName))
+                {
+                    Folder? folder = GetFolderByPath(directoryName);
+                    Thumbnails[directoryName] = GetThumbnails(folder, out _);
+                    RemoveOldThumbnailsDictionaryEntries(folder);
+                }
 
-            if (Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail)
-                && thumbnail.TryGetValue(fileName, out byte[]? buffer))
-            {
-                result = _imageProcessingService.LoadBitmapThumbnailImage(buffer, width, height);
+                if (Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail)
+                    && thumbnail.TryGetValue(fileName, out byte[]? buffer))
+                {
+                    result = _imageProcessingService.LoadBitmapThumbnailImage(buffer, width, height);
+                }
+                else
+                {
+                    _ = DeleteAsset(directoryName, fileName);
+                    Folder? folder = GetFolderByPath(directoryName);
+                    SaveCatalog(folder);
+                }
             }
-            else
-            {
-                _ = DeleteAsset(directoryName, fileName);
-                Folder? folder = GetFolderByPath(directoryName);
-                SaveCatalog(folder);
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading thumbnail: {DirectoryName}, {FileName}", directoryName, fileName);
+            throw;
         }
 
         return result;
@@ -537,19 +588,27 @@ public class AssetRepository : IAssetRepository
 
     private void ReadCatalog()
     {
-        _assets = ReadAssets();
-        _folders = ReadFolders();
-        _syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
-        _recentTargetPaths = ReadRecentTargetPaths();
-
-        for (int i = 0; i < _assets.Count; i++)
+        try
         {
-            // If the folder is not found, that means the DB has been modified manually
-            // TODO: Improve the mapping for perf
-            _assets[i].Folder = GetFolderById(_assets[i].FolderId)!;
+            _assets = ReadAssets();
+            _folders = ReadFolders();
+            _syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
+            _recentTargetPaths = ReadRecentTargetPaths();
 
-            // Not saved in DB because it is computed each time to detect file update
-            _imageMetadataService.UpdateAssetFileProperties(_assets[i]);
+            for (int i = 0; i < _assets.Count; i++)
+            {
+                // If the folder is not found, that means the DB has been modified manually
+                // TODO: Improve the mapping for perf
+                _assets[i].Folder = GetFolderById(_assets[i].FolderId)!;
+
+                // Not saved in DB because it is computed each time to detect file update
+                _imageMetadataService.UpdateAssetFileProperties(_assets[i]);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error reading catalog");
+            throw;
         }
     }
 

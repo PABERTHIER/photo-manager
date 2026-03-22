@@ -14,39 +14,50 @@ public class AssetCreationService(
 {
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
     {
-        if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
+        try
         {
-            // Create an asset from the video file
-            VideoHelper.GetFirstFramePath(directoryName, fileName,
-                userConfigurationService.PathSettings.FirstFrameVideosPath, logger);
-            // The video file is not in the same path as the asset created
-            // The asset is null because the target is not the video but the asset created previously
+            ArgumentNullException.ThrowIfNull(directoryName);
+            ArgumentNullException.ThrowIfNull(fileName);
+
+            if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
+            {
+                // Create an asset from the video file
+                VideoHelper.GetFirstFramePath(directoryName, fileName,
+                    userConfigurationService.PathSettings.FirstFrameVideosPath, logger);
+                // The video file is not in the same path as the asset created
+                // The asset is null because the target is not the video but the asset created previously
+                return null;
+            }
+
+            string imagePath = Path.Combine(directoryName, fileName);
+
+            if (!File.Exists(imagePath))
+            {
+                FileNotFoundException exception = new($"The file {imagePath} does not exist.");
+                logger.LogError(exception, "{ExMessage}", exception.Message);
+                return null;
+            }
+
+            if (assetRepository.IsAssetCatalogued(directoryName, fileName))
+            {
+                return null;
+            }
+
+            byte[] imageBytes = fileOperationsService.GetFileBytes(imagePath);
+
+            return Path.GetExtension(fileName).ToLower() switch
+            {
+                ".png" => CreateAssetFromPng(imagePath, directoryName, imageBytes),
+                ".gif" => CreateAssetFromGif(imagePath, directoryName, imageBytes),
+                ".heic" => CreateAssetFromHeic(imagePath, directoryName, imageBytes),
+                _ => CreateAssetFromOtherFormat(imagePath, directoryName, imageBytes)
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{ExMessage}", ex.Message);
             return null;
         }
-
-        string imagePath = Path.Combine(directoryName, fileName);
-
-        if (!File.Exists(imagePath))
-        {
-            FileNotFoundException exception = new($"The file {imagePath} does not exist.");
-            logger.LogError(exception, "{ExMessage}", exception.Message);
-            return null;
-        }
-
-        if (assetRepository.IsAssetCatalogued(directoryName, fileName))
-        {
-            return null;
-        }
-
-        byte[] imageBytes = fileOperationsService.GetFileBytes(imagePath);
-
-        return Path.GetExtension(fileName).ToLower() switch
-        {
-            ".png" => CreateAssetFromPng(imagePath, directoryName, imageBytes),
-            ".gif" => CreateAssetFromGif(imagePath, directoryName, imageBytes),
-            ".heic" => CreateAssetFromHeic(imagePath, directoryName, imageBytes),
-            _ => CreateAssetFromOtherFormat(imagePath, directoryName, imageBytes)
-        };
     }
 
     private Asset? CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)

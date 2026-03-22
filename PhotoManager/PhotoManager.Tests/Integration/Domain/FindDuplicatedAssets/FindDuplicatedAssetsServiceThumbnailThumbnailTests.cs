@@ -76,10 +76,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     [SetUp]
     public void SetUp()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        _fileOperationsService = new(userConfigurationService);
+        _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
@@ -264,8 +265,8 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -325,8 +326,8 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -392,8 +393,8 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
@@ -514,8 +515,8 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
             UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService =
-                new(_assetRepository!, _fileOperationsService!, userConfigurationService);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository!, _fileOperationsService!,
+                userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
             string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
             string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");

@@ -21,6 +21,7 @@ public class AssetRepositoryDeleteFolderTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<AssetRepository>? _testLogger;
 
     private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -44,13 +45,16 @@ public class AssetRepositoryDeleteFolderTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
+            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         _userConfigurationService = new(_configurationRootMock!.Object);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        FileOperationsService fileOperationsService = new(_userConfigurationService,
+            new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -79,29 +83,10 @@ public class AssetRepositoryDeleteFolderTests
         };
     }
 
-    [Test]
-    public void DeleteFolder_FolderIsNull_ThrowsNullReferenceException()
+    [TearDown]
+    public void TearDown()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        try
-        {
-            Folder? folder = null;
-
-            NullReferenceException? exception =
-                Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
-
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
-
-            Assert.That(assetsUpdatedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            assetsUpdatedSubscription.Dispose();
-        }
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -166,6 +151,8 @@ public class AssetRepositoryDeleteFolderTests
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
                     folder.ThumbnailsFilename)), Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -223,6 +210,8 @@ public class AssetRepositoryDeleteFolderTests
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
                     folder.ThumbnailsFilename)), Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -286,6 +275,8 @@ public class AssetRepositoryDeleteFolderTests
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
                     folder.ThumbnailsFilename)), Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -345,6 +336,8 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -391,11 +384,45 @@ public class AssetRepositoryDeleteFolderTests
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
                     folder.ThumbnailsFilename)), Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void DeleteFolder_FolderIsNull_LogsItAndThrowsNullReferenceException()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            const string exceptionMessage = "Object reference not set to an instance of an object.";
+            Folder? folder = null;
+
+            using (Assert.EnterMultipleScope())
+            {
+                NullReferenceException? exception =
+                    Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
+
+                Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+
+                Exception expectedException = new(exceptionMessage);
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -467,6 +494,8 @@ public class AssetRepositoryDeleteFolderTests
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
                     folder.ThumbnailsFilename)), Is.False);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {

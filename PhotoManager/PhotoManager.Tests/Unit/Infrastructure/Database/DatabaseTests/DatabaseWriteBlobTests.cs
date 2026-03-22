@@ -10,6 +10,7 @@ public class DatabaseWriteBlobTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,7 +26,14 @@ public class DatabaseWriteBlobTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -65,6 +73,8 @@ public class DatabaseWriteBlobTests
             Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -110,6 +120,8 @@ public class DatabaseWriteBlobTests
             Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -119,7 +131,7 @@ public class DatabaseWriteBlobTests
     }
 
     [Test]
-    public void WriteBlob_BlobToWriteIsNullAndPipeSeparator_ThrowsNullReferenceException()
+    public void WriteBlob_BlobToWriteIsNullAndPipeSeparator_LogsItAndThrowsNullReferenceException()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
@@ -142,6 +154,9 @@ public class DatabaseWriteBlobTests
             Assert.That(File.Exists(blobFilePath), Is.True);
             Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(blobFilePath));
             Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(blobToWrite));
+
+            Exception[] expectedExceptions = [exception!];
+            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -177,11 +192,62 @@ public class DatabaseWriteBlobTests
             Assert.That(blob, Is.Not.Null);
             Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
             Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
             Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
+        }
+    }
+
+    [Test]
+    public void WriteBlob_ExceptionIsThrown_LogsItAndThrowsException()
+    {
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string blobFilePath = Path.Combine(directoryPath,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
+        Dictionary<string, byte[]> blob = new() { { FileNames.IMAGE1_JPG, [1, 2, 3] } };
+
+        string logMessage = $"Error while trying to write blob {blobName}. LastWriteFilePath: {blobFilePath}";
+        const string exceptionMessage = "Blob write error";
+        IOException expectedException = new(exceptionMessage);
+
+        try
+        {
+            Mock<IBlobStorage> blobStorageMock = new();
+            blobStorageMock.Setup(x => x.WriteToBinaryFile(It.IsAny<Dictionary<string, byte[]>>(), It.IsAny<string>()))
+                .Throws(expectedException);
+
+            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
+                blobStorageMock.Object, new BackupStorage(), _testLogger!);
+
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+
+            IOException? exception = Assert.Throws<IOException>(() => database.WriteBlob(blob, blobName));
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogErrors([logMessage], typeof(PhotoManager.Infrastructure.Database.Database));
+        }
+        finally
+        {
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath, true);
+            }
+
+            string backupsPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS);
+
+            if (Directory.Exists(backupsPath))
+            {
+                Directory.Delete(backupsPath, true);
+            }
         }
     }
 }

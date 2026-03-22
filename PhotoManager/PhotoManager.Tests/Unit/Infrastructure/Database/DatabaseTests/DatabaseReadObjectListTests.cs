@@ -9,6 +9,7 @@ public class DatabaseReadObjectListTests
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
+    private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     private string? _csvEscapedTextWithSemicolon;
     private string? _csvUnescapedTextWithSemicolon;
@@ -58,7 +59,14 @@ public class DatabaseReadObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testLogger = new();
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), _testLogger);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -79,6 +87,8 @@ public class DatabaseReadObjectListTests
                 escapeText);
 
             Asserts(assets, filePath, csv);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -105,6 +115,8 @@ public class DatabaseReadObjectListTests
                 filePath, csv, tableName, escapeText);
 
             Asserts(assets, filePath, csv);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -114,7 +126,8 @@ public class DatabaseReadObjectListTests
     }
 
     [Test]
-    public void ReadObjectList_AllColumnsAndPipeSeparatorEscapedTextWithoutDataTableProperties_ThrowsArgumentException()
+    public void
+        ReadObjectList_AllColumnsAndPipeSeparatorEscapedTextWithoutDataTableProperties_LogsItAndThrowsArgumentException()
     {
         string csv = _csvEscapedTextWithPipe!;
 
@@ -127,6 +140,7 @@ public class DatabaseReadObjectListTests
                                   $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
                                   $"LastReadFilePath: {filePath}\n" +
                                   $"LastReadFileRaw: {csv}";
+        ArgumentException expectedException = new(exceptionMessage);
 
         try
         {
@@ -141,6 +155,9 @@ public class DatabaseReadObjectListTests
             ArgumentException? exception =
                 Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -172,6 +189,8 @@ public class DatabaseReadObjectListTests
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -224,6 +243,8 @@ public class DatabaseReadObjectListTests
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -276,6 +297,8 @@ public class DatabaseReadObjectListTests
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -302,6 +325,8 @@ public class DatabaseReadObjectListTests
                 filePath, csv!, tableName, escapeText);
 
             Assert.That(assets, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -328,6 +353,8 @@ public class DatabaseReadObjectListTests
                 filePath, csv, tableName, escapeText);
 
             Assert.That(assets, Is.Empty);
+
+            _testLogger!.AssertLogExceptions([], typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -339,7 +366,7 @@ public class DatabaseReadObjectListTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void ReadObjectList_CsvIsIncorrectPipeSeparator_ThrowsArgumentException(bool escapeText)
+    public void ReadObjectList_CsvIsIncorrectPipeSeparator_LogsItAndThrowsArgumentException(bool escapeText)
     {
         string csv = _csvInvalid!;
 
@@ -352,6 +379,7 @@ public class DatabaseReadObjectListTests
                                   $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
                                   $"LastReadFilePath: {filePath}\n" +
                                   $"LastReadFileRaw: {csv}";
+        ArgumentException expectedException = new(exceptionMessage);
 
         try
         {
@@ -362,6 +390,9 @@ public class DatabaseReadObjectListTests
             });
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -371,7 +402,7 @@ public class DatabaseReadObjectListTests
     }
 
     [Test]
-    public void ReadObjectList_FuncIsNull_ThrowsArgumentException()
+    public void ReadObjectList_FuncIsNull_LogsItAndThrowsArgumentException()
     {
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
@@ -379,11 +410,13 @@ public class DatabaseReadObjectListTests
         string filePath = Path.Combine(directoryPath,
             _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         Func<string[], Asset>? nullFunc = null;
+
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
                                   $"DataDirectory: {directoryPath}\n" +
                                   $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
                                   $"LastReadFilePath: {filePath}\n" +
                                   $"LastReadFileRaw: {csv}";
+        ArgumentException expectedException = new(exceptionMessage);
 
         try
         {
@@ -404,6 +437,9 @@ public class DatabaseReadObjectListTests
             ArgumentException? exception =
                 Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
@@ -413,7 +449,7 @@ public class DatabaseReadObjectListTests
     }
 
     [Test]
-    public void ReadObjectList_ErrorInObjectListStorage_ThrowsArgumentException()
+    public void ReadObjectList_ErrorInObjectListStorage_LogsItAndThrowsArgumentException()
     {
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
@@ -425,6 +461,7 @@ public class DatabaseReadObjectListTests
                                   $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
                                   $"LastReadFilePath: {filePath}\n" +
                                   $"LastReadFileRaw: {null}";
+        ArgumentException expectedException = new(exceptionMessage);
 
         try
         {
@@ -433,7 +470,7 @@ public class DatabaseReadObjectListTests
                 .Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(),
                     It.IsAny<Diagnostics>())).Throws(new Exception());
             PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
-                new BlobStorage(), new BackupStorage());
+                new BlobStorage(), new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,
@@ -452,6 +489,9 @@ public class DatabaseReadObjectListTests
             ArgumentException? exception =
                 Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+
+            _testLogger!.AssertLogExceptions([expectedException],
+                typeof(PhotoManager.Infrastructure.Database.Database));
         }
         finally
         {
