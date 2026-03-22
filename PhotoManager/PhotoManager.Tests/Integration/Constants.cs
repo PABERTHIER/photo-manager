@@ -82,6 +82,13 @@ public static class Constants
         public const string FOLDERS_DB = "folders.db";
         public const string RECENT_TARGET_PATHS_DB = "recenttargetpaths.db";
         public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB = "syncassetsdirectoriesdefinitions.db";
+        public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_EMPTY_DB = "syncassetsdirectoriesdefinitions_empty.db";
+    }
+
+    public static class Blobs
+    {
+        public const string BLOB_18033543 = "18033543-defb-4d37-837b-d8063eda3a25.bin";
+        public const string BLOB_F1F00403 = "f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin";
     }
 
     public static class FileNames

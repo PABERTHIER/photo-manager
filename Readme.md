@@ -104,7 +104,7 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Paths` part is about settings of paths:** :open_file_folder:
 
 - `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
-- `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database will be stored (The backup must be upper than the location to prevent bugs like "Process is already used" **WIP**).
+- `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database and backup will be stored.
 - `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
 - `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 
