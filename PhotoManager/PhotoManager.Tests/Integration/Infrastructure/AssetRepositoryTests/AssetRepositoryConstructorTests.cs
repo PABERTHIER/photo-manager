@@ -8,8 +8,8 @@ public class AssetRepositoryConstructorTests
     private string? _databaseDirectory;
     private string? _databasePath;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IPathProviderService? _pathProviderServiceMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -18,11 +18,11 @@ public class AssetRepositoryConstructorTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class AssetRepositoryConstructorTests
         {
             // Create the database directory structure
             Directory.CreateDirectory(_databaseDirectory!);
-            string tablesDirectory = Path.Combine(_databasePath!, _configurationRootMock!.Object
+            string tablesDirectory = Path.Combine(_databasePath!, _configurationRootMock!
                 .GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME)!);
             Directory.CreateDirectory(tablesDirectory);
 
@@ -44,7 +44,7 @@ public class AssetRepositoryConstructorTests
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
                 new BlobStorage(), new BackupStorage(),
                 new TestLogger<PhotoManager.Infrastructure.Database.Database>());
-            UserConfigurationService userConfigurationService = new(_configurationRootMock.Object);
+            UserConfigurationService userConfigurationService = new(_configurationRootMock!);
             ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
             FileOperationsService fileOperationsService = new(userConfigurationService,
                 new TestLogger<FileOperationsService>());
@@ -54,7 +54,7 @@ public class AssetRepositoryConstructorTests
             using (Assert.EnterMultipleScope())
             {
                 ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
-                    new AssetRepository(database, _pathProviderServiceMock!.Object, imageProcessingService,
+                    new AssetRepository(database, _pathProviderServiceMock!, imageProcessingService,
                         imageMetadataService, userConfigurationService, testLogger));
 
                 Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));

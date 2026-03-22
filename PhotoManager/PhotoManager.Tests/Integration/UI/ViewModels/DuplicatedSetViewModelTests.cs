@@ -36,13 +36,13 @@ public class DuplicatedSetViewModelTests
     [SetUp]
     public void SetUp()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<Database>());
@@ -50,7 +50,7 @@ public class DuplicatedSetViewModelTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;

@@ -4,21 +4,20 @@ namespace PhotoManager.Tests;
 
 public static class ConfigurationMockExtensions
 {
-    extension(Mock<IConfigurationRoot> configurationRootMock)
+    extension(IConfigurationRoot configurationRoot)
     {
-        public Mock<IConfigurationRoot> MockGetValue(string key,
-            string value)
+        public IConfigurationRoot MockGetValue(string key, string value)
         {
-            Mock<IConfigurationSection> configurationSectionMock = new();
-            configurationSectionMock.SetupGet(s => s.Value).Returns(value);
-            configurationRootMock.Setup(c => c.GetSection(key)).Returns(configurationSectionMock.Object);
+            IConfigurationSection configurationSection = Substitute.For<IConfigurationSection>();
+            configurationSection.Value.Returns(value);
+            configurationRoot.GetSection(key).Returns(configurationSection);
 
-            return configurationRootMock;
+            return configurationRoot;
         }
 
         public void GetDefaultMockConfig()
         {
-            configurationRootMock
+            configurationRoot
                 .MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "false")
                 .MockGetValue(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE, "The asset is corrupted")
                 .MockGetValue(UserConfigurationKeys.ASSET_ROTATED_MESSAGE, "The asset has been rotated")

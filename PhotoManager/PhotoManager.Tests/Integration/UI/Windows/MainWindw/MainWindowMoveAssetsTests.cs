@@ -122,7 +122,7 @@ public class MainWindowMoveAssetsTests
         bool usingPHash,
         bool analyseVideos)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
@@ -133,10 +133,10 @@ public class MainWindowMoveAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<Database>());
@@ -144,7 +144,7 @@ public class MainWindowMoveAssetsTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -164,7 +164,7 @@ public class MainWindowMoveAssetsTests
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
 
-        _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
+        _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel.CurrentFolderPath };
     }
 
     [Test]

@@ -16,10 +16,10 @@ public class DatabaseWriteBackupTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [SetUp]
@@ -114,13 +114,13 @@ public class DatabaseWriteBackupTests
 
         try
         {
-            Mock<IBackupStorage> backupStorageMock = new();
-            backupStorageMock.Setup(x => x.WriteFolderToZipFile(It.IsAny<string>(), It.IsAny<string>()))
-                .Throws(expectedException);
-            backupStorageMock.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns([]);
+            IBackupStorage backupStorageMock = Substitute.For<IBackupStorage>();
+            backupStorageMock.When(x => x.WriteFolderToZipFile(Arg.Any<string>(), Arg.Any<string>()))
+                .Throw(expectedException);
+            backupStorageMock.GetBackupFilesPaths(Arg.Any<string>()).Returns([]);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                backupStorageMock.Object, _testLogger!);
+                backupStorageMock, _testLogger!);
 
             database.Initialize(
                 directoryPath,

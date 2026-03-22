@@ -82,36 +82,36 @@ public class ApplicationGetAssetsByPathTests
             }
         ];
 
-        Mock<IAssetRepository> assetRepositoryMock = new();
-        assetRepositoryMock.Setup(x => x.FolderExists(directory)).Returns(true);
-        assetRepositoryMock.Setup(x => x.GetAssetsByPath(directory)).Returns(expectedResult);
+        IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
+        assetRepositoryMock.FolderExists(directory).Returns(true);
+        assetRepositoryMock.GetAssetsByPath(directory).Returns(expectedResult);
 
-        Mock<ISyncAssetsService> syncAssetsServiceMock = new();
-        Mock<ICatalogAssetsService> catalogAssetsServiceMock = new();
-        Mock<IMoveAssetsService> moveAssetsServiceMock = new();
-        Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
-        Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IFileOperationsService> fileOperationsServiceMock = new();
-        Mock<IImageProcessingService> imageProcessingServiceMock = new();
+        ISyncAssetsService syncAssetsServiceMock = Substitute.For<ISyncAssetsService>();
+        ICatalogAssetsService catalogAssetsServiceMock = Substitute.For<ICatalogAssetsService>();
+        IMoveAssetsService moveAssetsServiceMock = Substitute.For<IMoveAssetsService>();
+        IFindDuplicatedAssetsService findDuplicatedAssetsServiceMock = Substitute.For<IFindDuplicatedAssetsService>();
+        IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
+        IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
+        IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
 
         PhotoManager.Application.Application application = new(
-            assetRepositoryMock.Object,
-            syncAssetsServiceMock.Object,
-            catalogAssetsServiceMock.Object,
-            moveAssetsServiceMock.Object,
-            findDuplicatedAssetsServiceMock.Object,
-            userConfigurationServiceMock.Object,
-            fileOperationsServiceMock.Object,
-            imageProcessingServiceMock.Object);
+            assetRepositoryMock,
+            syncAssetsServiceMock,
+            catalogAssetsServiceMock,
+            moveAssetsServiceMock,
+            findDuplicatedAssetsServiceMock,
+            userConfigurationServiceMock,
+            fileOperationsServiceMock,
+            imageProcessingServiceMock);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
         Assert.That(assets, Has.Length.EqualTo(2));
         Assert.That(assets, Is.EquivalentTo(expectedResult));
 
-        assetRepositoryMock.Verify(x => x.FolderExists(directory), Times.Once);
-        assetRepositoryMock.Verify(x => x.AddFolder(directory), Times.Never);
-        assetRepositoryMock.Verify(x => x.GetAssetsByPath(directory), Times.Once);
+        assetRepositoryMock.Received(1).FolderExists(directory);
+        assetRepositoryMock.DidNotReceive().AddFolder(directory);
+        assetRepositoryMock.Received(1).GetAssetsByPath(directory);
     }
 
     [Test]
@@ -178,36 +178,36 @@ public class ApplicationGetAssetsByPathTests
             }
         ];
 
-        Mock<IAssetRepository> assetRepositoryMock = new();
-        assetRepositoryMock.Setup(x => x.FolderExists(directory)).Returns(false);
-        assetRepositoryMock.Setup(x => x.GetAssetsByPath(directory)).Returns(expectedResult);
+        IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
+        assetRepositoryMock.FolderExists(directory).Returns(false);
+        assetRepositoryMock.GetAssetsByPath(directory).Returns(expectedResult);
 
-        Mock<ISyncAssetsService> syncAssetsServiceMock = new();
-        Mock<ICatalogAssetsService> catalogAssetsServiceMock = new();
-        Mock<IMoveAssetsService> moveAssetsServiceMock = new();
-        Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
-        Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IFileOperationsService> fileOperationsServiceMock = new();
-        Mock<IImageProcessingService> imageProcessingServiceMock = new();
+        ISyncAssetsService syncAssetsServiceMock = Substitute.For<ISyncAssetsService>();
+        ICatalogAssetsService catalogAssetsServiceMock = Substitute.For<ICatalogAssetsService>();
+        IMoveAssetsService moveAssetsServiceMock = Substitute.For<IMoveAssetsService>();
+        IFindDuplicatedAssetsService findDuplicatedAssetsServiceMock = Substitute.For<IFindDuplicatedAssetsService>();
+        IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
+        IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
+        IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
 
         PhotoManager.Application.Application application = new(
-            assetRepositoryMock.Object,
-            syncAssetsServiceMock.Object,
-            catalogAssetsServiceMock.Object,
-            moveAssetsServiceMock.Object,
-            findDuplicatedAssetsServiceMock.Object,
-            userConfigurationServiceMock.Object,
-            fileOperationsServiceMock.Object,
-            imageProcessingServiceMock.Object);
+            assetRepositoryMock,
+            syncAssetsServiceMock,
+            catalogAssetsServiceMock,
+            moveAssetsServiceMock,
+            findDuplicatedAssetsServiceMock,
+            userConfigurationServiceMock,
+            fileOperationsServiceMock,
+            imageProcessingServiceMock);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
         Assert.That(assets, Has.Length.EqualTo(2));
         Assert.That(assets, Is.EquivalentTo(expectedResult));
 
-        assetRepositoryMock.Verify(x => x.FolderExists(directory), Times.Once);
-        assetRepositoryMock.Verify(x => x.AddFolder(directory), Times.Once);
-        assetRepositoryMock.Verify(x => x.GetAssetsByPath(directory), Times.Once);
+        assetRepositoryMock.Received(1).FolderExists(directory);
+        assetRepositoryMock.Received(1).AddFolder(directory);
+        assetRepositoryMock.Received(1).GetAssetsByPath(directory);
     }
 
     [Test]
@@ -222,34 +222,34 @@ public class ApplicationGetAssetsByPathTests
     {
         Asset[] expectedResult = [];
 
-        Mock<IAssetRepository> assetRepositoryMock = new();
-        assetRepositoryMock.Setup(x => x.FolderExists(directory!)).Returns(folderExists);
-        assetRepositoryMock.Setup(x => x.GetAssetsByPath(directory!)).Returns(expectedResult);
+        IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
+        assetRepositoryMock.FolderExists(directory!).Returns(folderExists);
+        assetRepositoryMock.GetAssetsByPath(directory!).Returns(expectedResult);
 
-        Mock<ISyncAssetsService> syncAssetsServiceMock = new();
-        Mock<ICatalogAssetsService> catalogAssetsServiceMock = new();
-        Mock<IMoveAssetsService> moveAssetsServiceMock = new();
-        Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
-        Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IFileOperationsService> fileOperationsServiceMock = new();
-        Mock<IImageProcessingService> imageProcessingServiceMock = new();
+        ISyncAssetsService syncAssetsServiceMock = Substitute.For<ISyncAssetsService>();
+        ICatalogAssetsService catalogAssetsServiceMock = Substitute.For<ICatalogAssetsService>();
+        IMoveAssetsService moveAssetsServiceMock = Substitute.For<IMoveAssetsService>();
+        IFindDuplicatedAssetsService findDuplicatedAssetsServiceMock = Substitute.For<IFindDuplicatedAssetsService>();
+        IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
+        IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
+        IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
 
         PhotoManager.Application.Application application = new(
-            assetRepositoryMock.Object,
-            syncAssetsServiceMock.Object,
-            catalogAssetsServiceMock.Object,
-            moveAssetsServiceMock.Object,
-            findDuplicatedAssetsServiceMock.Object,
-            userConfigurationServiceMock.Object,
-            fileOperationsServiceMock.Object,
-            imageProcessingServiceMock.Object);
+            assetRepositoryMock,
+            syncAssetsServiceMock,
+            catalogAssetsServiceMock,
+            moveAssetsServiceMock,
+            findDuplicatedAssetsServiceMock,
+            userConfigurationServiceMock,
+            fileOperationsServiceMock,
+            imageProcessingServiceMock);
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => application.GetAssetsByPath(directory!));
 
         Assert.That(exception?.Message, Is.EqualTo("Directory cannot be null or empty."));
 
-        assetRepositoryMock.Verify(x => x.FolderExists(directory!), Times.Never);
-        assetRepositoryMock.Verify(x => x.AddFolder(directory!), Times.Never);
-        assetRepositoryMock.Verify(x => x.GetAssetsByPath(directory!), Times.Never);
+        assetRepositoryMock.DidNotReceive().FolderExists(directory!);
+        assetRepositoryMock.DidNotReceive().AddFolder(directory!);
+        assetRepositoryMock.DidNotReceive().GetAssetsByPath(directory!);
     }
 }

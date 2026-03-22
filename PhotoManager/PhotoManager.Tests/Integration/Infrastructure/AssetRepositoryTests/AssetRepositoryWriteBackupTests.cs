@@ -13,8 +13,8 @@ public class AssetRepositoryWriteBackupTests
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IPathProviderService? _pathProviderServiceMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -23,11 +23,11 @@ public class AssetRepositoryWriteBackupTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
     [SetUp]
@@ -36,12 +36,12 @@ public class AssetRepositoryWriteBackupTests
         _testLogger = new();
         PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
             new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
+        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
     }
 
@@ -87,19 +87,19 @@ public class AssetRepositoryWriteBackupTests
     [Test]
     public void WriteBackup_BackupWrittenAndLessBackupsToKeep_WritesBackupAndDeletesOldBackups()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP,
             "0"); // 0 backups, so that, the new created is directly deleted
 
         PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
             new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
+        AssetRepository assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];

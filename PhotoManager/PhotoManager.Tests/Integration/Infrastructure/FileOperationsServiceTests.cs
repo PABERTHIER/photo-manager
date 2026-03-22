@@ -21,11 +21,11 @@ public class FileOperationsServiceTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [SetUp]
@@ -410,11 +410,11 @@ public class FileOperationsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            Mock<IConfigurationRoot> configurationRootMock = new();
+            IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
             configurationRootMock.GetDefaultMockConfig();
             configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-            UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+            UserConfigurationService userConfigurationService = new(configurationRootMock);
             TestLogger<FileOperationsService> logger = new();
             FileOperationsService fileOperationsService = new(userConfigurationService, logger);
 

@@ -23,10 +23,10 @@ public class DatabaseReadObjectListTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
 
         _csvEscapedTextWithSemicolon =
             "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
@@ -465,11 +465,11 @@ public class DatabaseReadObjectListTests
 
         try
         {
-            Mock<IObjectListStorage> objectListStorageMock = new();
+            IObjectListStorage objectListStorageMock = Substitute.For<IObjectListStorage>();
             objectListStorageMock
-                .Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(),
-                    It.IsAny<Diagnostics>())).Throws(new Exception());
-            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
+                .ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], Asset>>(),
+                    Arg.Any<Diagnostics>()).Throws(new Exception());
+            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock,
                 new BlobStorage(), new BackupStorage(), _testLogger!);
 
             database.Initialize(

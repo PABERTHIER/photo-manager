@@ -17,10 +17,10 @@ public class DatabaseWriteBlobTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [SetUp]
@@ -217,12 +217,12 @@ public class DatabaseWriteBlobTests
 
         try
         {
-            Mock<IBlobStorage> blobStorageMock = new();
-            blobStorageMock.Setup(x => x.WriteToBinaryFile(It.IsAny<Dictionary<string, byte[]>>(), It.IsAny<string>()))
-                .Throws(expectedException);
+            IBlobStorage blobStorageMock = Substitute.For<IBlobStorage>();
+            blobStorageMock.When(x => x.WriteToBinaryFile(Arg.Any<Dictionary<string, byte[]>>(), Arg.Any<string>()))
+                .Throw(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-                blobStorageMock.Object, new BackupStorage(), _testLogger!);
+                blobStorageMock, new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,
