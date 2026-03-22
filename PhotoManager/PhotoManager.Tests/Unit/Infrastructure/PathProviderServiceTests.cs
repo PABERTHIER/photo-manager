@@ -20,12 +20,12 @@ public class PathProviderServiceTests
     public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion,
         string storageVersionPath)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
         configurationRootMock.MockGetValue(UserConfigurationKeys.STORAGE_VERSION, storageVersion);
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
         PathProviderService pathProviderService = new(userConfigurationService);
 
         string expected = Path.Combine(userConfigurationService.PathSettings.BackupPath, storageVersionPath);

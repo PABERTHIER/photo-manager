@@ -22,8 +22,8 @@ public class AssetRepositoryAddAssetTests
     private PhotoManager.Infrastructure.Database.Database? _database;
     private TestLogger<AssetRepository>? _testLogger;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IPathProviderService? _pathProviderServiceMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -35,11 +35,11 @@ public class AssetRepositoryAddAssetTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
     [SetUp]
@@ -48,12 +48,12 @@ public class AssetRepositoryAddAssetTests
         _testLogger = new();
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<PhotoManager.Infrastructure.Database.Database>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+        _testableAssetRepository = new(_database, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
@@ -336,16 +336,16 @@ public class AssetRepositoryAddAssetTests
     [Test]
     public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
+        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!,
             imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
@@ -435,12 +435,12 @@ public class AssetRepositoryAddAssetTests
     [Test]
     public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdatedAndLogsIt()
     {
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
+        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!,
             imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];

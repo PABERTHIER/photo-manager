@@ -22,10 +22,10 @@ public class DatabaseWriteObjectListTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
 
         _csvEscapedTextWithSemicolon =
             "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
@@ -652,16 +652,15 @@ public class DatabaseWriteObjectListTests
 
         try
         {
-            Mock<IObjectListStorage> objectListStorageMock = new();
+            IObjectListStorage objectListStorageMock = Substitute.For<IObjectListStorage>();
 
-            objectListStorageMock.Setup(x => x.Initialize(It.IsAny<DataTableProperties>(), It.IsAny<char>()));
-            objectListStorageMock.Setup(x => x.WriteObjectList(
-                It.IsAny<string>(),
-                It.IsAny<List<Asset>>(),
-                It.IsAny<Func<Asset, int, object>>(),
-                It.IsAny<Diagnostics>())).Throws(expectedException);
+            objectListStorageMock.When(x => x.WriteObjectList(
+                Arg.Any<string>(),
+                Arg.Any<List<Asset>>(),
+                Arg.Any<Func<Asset, int, object>>(),
+                Arg.Any<Diagnostics>())).Throw(expectedException);
 
-            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object,
+            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock,
                 new BlobStorage(), new BackupStorage(), _testLogger!);
 
             database.Initialize(

@@ -21,8 +21,8 @@ public class AssetRepositoryGetAssetsCounterTests
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IPathProviderService? _pathProviderServiceMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -35,11 +35,11 @@ public class AssetRepositoryGetAssetsCounterTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
     [SetUp]
@@ -48,12 +48,12 @@ public class AssetRepositoryGetAssetsCounterTests
         _testLogger = new();
         PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
             new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
+        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()

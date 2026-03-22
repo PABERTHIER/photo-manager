@@ -10,17 +10,17 @@ public class BlobStorageTests
 
     private BlobStorage? _blobStorage;
     private UserConfigurationService? _userConfigurationService;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(_configurationRootMock.Object);
+        _userConfigurationService = new(_configurationRootMock);
     }
 
     [SetUp]

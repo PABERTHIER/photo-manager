@@ -166,7 +166,7 @@ public class ApplicationViewModelGoToNextAssetTests
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
@@ -177,10 +177,10 @@ public class ApplicationViewModelGoToNextAssetTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<Database>());
@@ -188,7 +188,7 @@ public class ApplicationViewModelGoToNextAssetTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());

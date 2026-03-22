@@ -743,13 +743,13 @@ public class AssetHashCalculatorServiceTests
     private static UserConfigurationService GetUserConfigurationService(bool usingPHash, bool usingDHash,
         bool usingMd5Hash)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock
             .MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString())
             .MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString())
             .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMd5Hash.ToString());
 
-        return new(configurationRootMock.Object);
+        return new(configurationRootMock);
     }
 }

@@ -23,7 +23,7 @@ public class ApplicationGetAssetsByPathTests
     private UserConfigurationService? _userConfigurationService;
     private Database? _database;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
+    private IPathProviderService? _pathProviderServiceMock;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -166,7 +166,7 @@ public class ApplicationGetAssetsByPathTests
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
@@ -177,17 +177,17 @@ public class ApplicationGetAssetsByPathTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+        _testableAssetRepository = new(_database, _pathProviderServiceMock, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -819,18 +819,18 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailsAndFolderExistButLoadBitmapThumbnailImageReturnsNull_ReturnsEmptyArray()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         BitmapImage? bitmapImage = null;
-        Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
-        Mock<IImageProcessingService> imageProcessingServiceMock = new();
-        imageProcessingServiceMock.Setup(x =>
-            x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
+        IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(bitmapImage!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<Database>());
@@ -838,8 +838,8 @@ public class ApplicationGetAssetsByPathTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService,
+        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock,
+            imageProcessingServiceMock, imageMetadataService, userConfigurationService,
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -900,8 +900,8 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Is.Empty);
 
-            imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
-                It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1286,17 +1286,17 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ExceptionIsThrown_ReturnsAssetsWithPartialData()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+        IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
-        Mock<IImageProcessingService> imageProcessingServiceMock = new();
-        imageProcessingServiceMock.Setup(x =>
-            x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
+        IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+            .Throws(new Exception());
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
             new TestLogger<Database>());
@@ -1304,8 +1304,8 @@ public class ApplicationGetAssetsByPathTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
-            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService,
+        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock,
+            imageProcessingServiceMock, imageMetadataService, userConfigurationService,
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -1382,8 +1382,8 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
 
-            imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
-                It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

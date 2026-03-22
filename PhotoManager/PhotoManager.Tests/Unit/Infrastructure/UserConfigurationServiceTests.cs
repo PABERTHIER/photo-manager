@@ -13,10 +13,10 @@ public class UserConfigurationServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [Test]
@@ -274,11 +274,11 @@ public class UserConfigurationServiceTests
     [Test]
     public void Separator_NullValue_ReturnsDefaultSeparatorValue()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.SEPARATOR, null!);
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         Assert.That(userConfigurationService.StorageSettings.Separator, Is.EqualTo('|'));
     }

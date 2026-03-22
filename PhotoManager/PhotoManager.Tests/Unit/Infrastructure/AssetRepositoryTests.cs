@@ -22,9 +22,9 @@ public class AssetRepositoryTests
     private UserConfigurationService? _userConfigurationService;
     private TestLogger<AssetRepository>? _testLogger;
 
-    private Mock<IDatabase>? _databaseMock;
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private IDatabase? _databaseMock;
+    private IPathProviderService? _pathProviderServiceMock;
+    private IConfigurationRoot? _configurationRootMock;
 
     private Asset? _asset1;
 
@@ -35,37 +35,34 @@ public class AssetRepositoryTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new();
+        _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        _userConfigurationService = new(_configurationRootMock!.Object);
-        _databaseMock = new();
+        _userConfigurationService = new(_configurationRootMock!);
+        _databaseMock = Substitute.For<IDatabase>();
 
-        _databaseMock.Setup(d => d.Initialize(
-            It.IsAny<string>(), It.IsAny<char>(), It.IsAny<string>(), It.IsAny<string>()));
-        _databaseMock.Setup(d => d.SetDataTableProperties(It.IsAny<DataTableProperties>()));
-        _databaseMock.Setup(d => d.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Folder>>())).Returns([]);
-        _databaseMock.Setup(d => d.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>())).Returns([]);
-        _databaseMock.Setup(d => d.ReadObjectList(
-            It.IsAny<string>(), It.IsAny<Func<string[], SyncAssetsDirectoriesDefinition>>())).Returns([]);
-        _databaseMock.Setup(d => d.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], string>>())).Returns([]);
-        _databaseMock.Setup(d => d.ReadBlob(It.IsAny<string>())).Returns((Dictionary<string, byte[]>?)null);
-        _databaseMock.Setup(d => d.BackupExists(It.IsAny<DateTime>())).Returns(false);
+        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], Folder>>()).Returns([]);
+        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], Asset>>()).Returns([]);
+        _databaseMock.ReadObjectList(
+            Arg.Any<string>(), Arg.Any<Func<string[], SyncAssetsDirectoriesDefinition>>()).Returns([]);
+        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], string>>()).Returns([]);
+        _databaseMock.ReadBlob(Arg.Any<string>()).Returns((Dictionary<string, byte[]>?)null);
+        _databaseMock.BackupExists(Arg.Any<DateTime>()).Returns(false);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
 
-        _testableAssetRepository = new(_databaseMock.Object, _pathProviderServiceMock!.Object, imageProcessingService,
+        _testableAssetRepository = new(_databaseMock, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, _testLogger);
 
         _asset1 = new()
@@ -116,7 +113,7 @@ public class AssetRepositoryTests
             byte[] assetData = [1, 2, 3];
 
             IOException expectedException = new("Database read error");
-            _databaseMock!.Setup(d => d.ReadBlob(It.IsAny<string>())).Throws(expectedException);
+            _databaseMock!.ReadBlob(Arg.Any<string>()).Throws(expectedException);
 
             using (Assert.EnterMultipleScope())
             {
@@ -150,8 +147,8 @@ public class AssetRepositoryTests
             _asset1 = _asset1!.WithFolder(folder);
 
             IOException expectedException = new("Failed to write to database");
-            _databaseMock!.Setup(d => d.WriteObjectList(It.IsAny<List<Asset>>(), It.IsAny<string>(),
-                It.IsAny<Func<Asset, int, object>>())).Throws(expectedException);
+            _databaseMock!.When(d => d.WriteObjectList(Arg.Any<List<Asset>>(), Arg.Any<string>(),
+                Arg.Any<Func<Asset, int, object>>())).Throw(expectedException);
 
             // Add an asset first to ensure hasChanges is true
             _testableAssetRepository!.AddAsset(_asset1!, []);
@@ -187,7 +184,7 @@ public class AssetRepositoryTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             IOException expectedException = new("Failed to access blob storage");
-            _databaseMock!.Setup(d => d.IsBlobFileExists(It.IsAny<string>())).Throws(expectedException);
+            _databaseMock!.IsBlobFileExists(Arg.Any<string>()).Throws(expectedException);
 
             using (Assert.EnterMultipleScope())
             {

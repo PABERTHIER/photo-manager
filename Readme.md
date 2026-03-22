@@ -180,7 +180,7 @@ Improvements **WIP**.
 - [.NET 10.0][dotnet]
 - [Windows Presentation Foundation][wpf]
 - [NUnit][nunit]
-- [Moq framework for .NET (v4.18.4)][moq]
+- [NSubstitute][nsubstitute]
 - [MagickImage][magickimage]
 - [Microsoft Extensions Logging][microsoft-extensions-logging]
 - [coverlet][coverlet]
@@ -236,7 +236,7 @@ I've made a specific repo for the two customs dll, injected in the project: [pho
 [dotnet]: https://dotnet.microsoft.com/
 [wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
 [nunit]: https://nunit.org/
-[moq]: https://github.com/moq/moq4
+[nsubstitute]: https://github.com/nsubstitute/NSubstitute
 [magickimage]: https://github.com/dlemstra/Magick.NET
 [microsoft-extensions-logging]: https://www.nuget.org/packages/Microsoft.Extensions.Logging/
 [coverlet]: https://github.com/coverlet-coverage/coverlet

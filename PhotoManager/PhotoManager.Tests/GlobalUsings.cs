@@ -1,6 +1,7 @@
 ﻿global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Logging.Testing;
-global using Moq;
+global using NSubstitute;
+global using NSubstitute.ExceptionExtensions;
 global using NUnit.Framework;
 // Projects
 global using PhotoManager.Common;

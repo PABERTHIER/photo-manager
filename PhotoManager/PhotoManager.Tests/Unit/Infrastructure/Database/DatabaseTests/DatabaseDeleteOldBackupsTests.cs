@@ -8,7 +8,7 @@ public class DatabaseDeleteOldBackupsTests
     private string? _dataDirectory;
 
     private UserConfigurationService? _userConfigurationService;
-    private Mock<IBackupStorage>? _backupStorageMock;
+    private IBackupStorage? _backupStorageMock;
     private TestLogger<PhotoManager.Infrastructure.Database.Database>? _testLogger;
 
     [OneTimeSetUp]
@@ -16,17 +16,17 @@ public class DatabaseDeleteOldBackupsTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        _backupStorageMock = new();
+        _backupStorageMock = Substitute.For<IBackupStorage>();
     }
 
     [TearDown]
@@ -58,10 +58,10 @@ public class DatabaseDeleteOldBackupsTests
 
         try
         {
-            _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
+            _backupStorageMock!.GetBackupFilesPaths(Arg.Any<string>()).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object, _testLogger!);
+                _backupStorageMock, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -69,12 +69,12 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             database.DeleteOldBackups(backupsToKeep);
 
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Exactly(2));
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path1), Times.Never);
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path2), Times.Never);
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path5), Times.Never);
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path3), Times.Once);
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path4), Times.Once);
+            _backupStorageMock.Received(2).DeleteBackupFile(Arg.Any<string>());
+            _backupStorageMock.DidNotReceive().DeleteBackupFile(path1);
+            _backupStorageMock.DidNotReceive().DeleteBackupFile(path2);
+            _backupStorageMock.DidNotReceive().DeleteBackupFile(path5);
+            _backupStorageMock.Received(1).DeleteBackupFile(path3);
+            _backupStorageMock.Received(1).DeleteBackupFile(path4);
 
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Has.Length.EqualTo(2));
@@ -105,10 +105,10 @@ public class DatabaseDeleteOldBackupsTests
 
         try
         {
-            _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
+            _backupStorageMock!.GetBackupFilesPaths(Arg.Any<string>()).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-                _backupStorageMock.Object, _testLogger!);
+                _backupStorageMock, _testLogger!);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -116,7 +116,7 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             database.DeleteOldBackups(backupsToKeep);
 
-            _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Never);
+            _backupStorageMock.DidNotReceive().DeleteBackupFile(Arg.Any<string>());
 
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Is.Empty);
@@ -148,11 +148,11 @@ public class DatabaseDeleteOldBackupsTests
 
         try
         {
-            _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPaths);
-            _backupStorageMock.Setup(x => x.DeleteBackupFile(It.IsAny<string>())).Throws(expectedException);
+            _backupStorageMock!.GetBackupFilesPaths(Arg.Any<string>()).Returns(filesPaths);
+            _backupStorageMock.When(x => x.DeleteBackupFile(Arg.Any<string>())).Throw(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-                new BlobStorage(), _backupStorageMock.Object, _testLogger!);
+                new BlobStorage(), _backupStorageMock, _testLogger!);
 
             database.Initialize(
                 directoryPath,

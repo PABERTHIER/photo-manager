@@ -28,7 +28,7 @@ public class AssetCreationServiceTests
     private TestableAssetRepository? _testableAssetRepository;
     private TestLogger<AssetCreationService>? _logger;
 
-    private Mock<IPathProviderService>? _pathProviderServiceMock;
+    private IPathProviderService? _pathProviderServiceMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -37,8 +37,8 @@ public class AssetCreationServiceTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _pathProviderServiceMock = new();
-        _pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
+        _pathProviderServiceMock = Substitute.For<IPathProviderService>();
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
     }
@@ -58,7 +58,7 @@ public class AssetCreationServiceTests
     private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash,
         bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY,
             _dataDirectory!); // Only needed for videos
@@ -69,12 +69,12 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
+        _testableAssetRepository = new(_database!, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -2303,7 +2303,7 @@ public class AssetCreationServiceTests
         string? rotatedMessage,
         int imageByteSize)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY,
             _dataDirectory!); // Only needed for videos
@@ -2315,12 +2315,12 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "true");
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
+        _testableAssetRepository = new(_database!, _pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());

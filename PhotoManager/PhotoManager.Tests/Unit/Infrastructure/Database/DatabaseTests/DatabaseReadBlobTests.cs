@@ -17,10 +17,10 @@ public class DatabaseReadBlobTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock);
     }
 
     [SetUp]
@@ -170,11 +170,11 @@ public class DatabaseReadBlobTests
 
         try
         {
-            Mock<IBlobStorage> blobStorageMock = new();
-            blobStorageMock.Setup(x => x.ReadFromBinaryFile(It.IsAny<string>())).Throws(expectedException);
+            IBlobStorage blobStorageMock = Substitute.For<IBlobStorage>();
+            blobStorageMock.ReadFromBinaryFile(Arg.Any<string>()).Throws(expectedException);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-                blobStorageMock.Object, new BackupStorage(), _testLogger!);
+                blobStorageMock, new BackupStorage(), _testLogger!);
 
             database.Initialize(
                 directoryPath,

@@ -8,10 +8,10 @@ public class ConfigurationMockExtensionsTests
     [Test]
     public void ConfigurationMockTest()
     {
-        Mock<IConfigurationRoot> configurationRootMock = new();
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        IConfigurationRoot configuration = configurationRootMock.Object;
+        IConfigurationRoot configuration = configurationRootMock;
 
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS), Is.False);
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE),
