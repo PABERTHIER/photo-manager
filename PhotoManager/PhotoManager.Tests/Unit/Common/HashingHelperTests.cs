@@ -200,6 +200,20 @@ public class HashingHelperTests
     }
 
     [Test]
+    public void CalculateDHash_HeicImageDoesNotExist_ReturnsDefaultDHash()
+    {
+        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
+
+        string dHash = HashingHelper.CalculateDHash(filePath);
+
+        Assert.That(string.IsNullOrWhiteSpace(dHash), Is.False);
+        Assert.That(dHash, Has.Length.EqualTo(DHashes.LENGTH));
+        Assert.That(dHash, Is.EqualTo(DHashes.EMPTY_IMAGE));
+
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+    }
+
+    [Test]
     public void CalculateDHash_ImageDoesNotExist_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);

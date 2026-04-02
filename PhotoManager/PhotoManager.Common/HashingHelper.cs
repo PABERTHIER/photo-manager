@@ -41,10 +41,7 @@ public static class HashingHelper
                 // Convert the image to grayscale
                 image.Grayscale(PixelIntensityMethod.Average);
 
-                // Calculate the PHash of the image
-                string? phash = image.PerceptualHash()?.ToString();
-
-                return phash;
+                return image.PerceptualHash()!.ToString(); // We want to log the reason if PerceptualHash returns null
             }
         }
         catch (Exception ex) when (ex is MagickBlobErrorException or MagickMissingDelegateErrorException)
