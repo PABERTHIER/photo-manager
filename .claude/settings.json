@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet format *)",
+      "Bash(dotnet restore *)",
+      "Bash(dotnet run --project *Benchmarks*)",
+      "Read",
+      "Edit",
+      "Write",
+      "Grep",
+      "Glob"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(del /s /q *)",
+      "Bash(format *)",
+      "Bash(git push *)",
+      "Bash(git reset --hard *)",
+      "Bash(git reset *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git checkout *)",
+      "Bash(git stash *)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git branch -D *)",
+      "Bash(git tag *)",
+      "Bash(git am *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git revert *)"
+    ]
+  }
+}
