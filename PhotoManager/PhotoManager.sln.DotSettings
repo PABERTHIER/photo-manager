@@ -73,6 +73,8 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=recenttargetpaths/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=syncassetsdirectoriesdefinitions/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ftyp/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=ffplay/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=ffprobe/@EntryIndexedValue">True</s:Boolean>
 
 	<!-- Code cleanup on save -->
 	<s:Boolean x:Key="/Default/Environment/EditorOptions/CodeCleanupOnSave/@EntryValue">True</s:Boolean>

@@ -14,21 +14,24 @@ public static class ImageHelper
     //.webp - WebP image
     public static bool IsImageFile(string fileName)
     {
-        return fileName.ToLowerInvariant() switch
+        ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
+
+        if (extension.IsEmpty)
         {
-            { } s when s.EndsWith(".bmp") => true,
-            { } s when s.EndsWith(".dng") => true,
-            { } s when s.EndsWith(".gif") => true,
-            { } s when s.EndsWith(".heic") => true,
-            { } s when s.EndsWith(".ico") => true,
-            { } s when s.EndsWith(".jfif") => true,
-            { } s when s.EndsWith(".jpeg") => true,
-            { } s when s.EndsWith(".jpg") => true,
-            { } s when s.EndsWith(".png") => true,
-            { } s when s.EndsWith(".tiff") => true,
-            { } s when s.EndsWith(".tif") => true,
-            { } s when s.EndsWith(".webp") => true,
-            _ => false
-        };
+            return false;
+        }
+
+        return extension.Equals(".bmp", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".dng", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".gif", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".heic", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".ico", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".jfif", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".png", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".tiff", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".tif", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".webp", StringComparison.OrdinalIgnoreCase);
     }
 }
