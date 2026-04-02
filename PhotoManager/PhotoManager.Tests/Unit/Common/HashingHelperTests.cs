@@ -259,7 +259,7 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameMD5Hash()
+    public void CalculateMD5Hash_EmptyImageBytes_ReturnsDefaultMd5Hash()
     {
         byte[] imageBytes = [];
 
@@ -273,14 +273,15 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_NullImageBytes_ThrowsArgumentNullException()
+    public void CalculateMD5Hash_NullImageBytes_ReturnsDefaultMd5Hash()
     {
         byte[]? imageBytes = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
+        string hash = HashingHelper.CalculateMD5Hash(imageBytes!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(MD5Hashes.EMPTY_IMAGE));
 
         _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
@@ -325,7 +326,8 @@ public class HashingHelperTests
         Exception[] expectedExceptions = [expectedException];
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
+            Assert.Throws<ArgumentException>(() =>
+                HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 
