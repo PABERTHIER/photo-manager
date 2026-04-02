@@ -322,7 +322,7 @@ public class HashingHelperTests
     public void CalculateHammingDistance_IncorrectHashes_LogsItAndThrowsArgumentException(string? hash1, string? hash2)
     {
         Exception expectedException = new(
-            $"Invalid arguments for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
+            $"Input arguments must all have the same length for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
         Exception[] expectedExceptions = [expectedException];
 
         ArgumentException? exception =

@@ -1,5 +1,6 @@
 ﻿using ImageMagick;
 using Microsoft.Extensions.Logging;
+using System.Numerics.Tensors;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
@@ -112,21 +113,11 @@ public static class HashingHelper
         if (hash1.Length != hash2.Length)
         {
             ArgumentException exception = new(
-                $"Invalid arguments for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
+                $"Input arguments must all have the same length for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
             logger.LogError(exception, "{ExMessage}", exception.Message);
             throw exception;
         }
 
-        int distance = 0;
-
-        for (int i = 0; i < hash1.Length; i++)
-        {
-            if (hash1[i] != hash2[i])
-            {
-                distance++;
-            }
-        }
-
-        return distance;
+        return TensorPrimitives.HammingDistance(hash1.AsSpan(), hash2.AsSpan());
     }
 }
