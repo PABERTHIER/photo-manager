@@ -4,41 +4,48 @@ public class Folder
 {
     public required Guid Id { get; init; }
     public required string Path { get; init; }
-    public string ThumbnailsFilename => Id + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
+    // TODO: BlobFileName instead -> rename all methods like this
+    public string ThumbnailsFilename => field ??= $"{Id}.bin";
 
     public string Name
     {
         get
         {
-            string[] pathParts = !string.IsNullOrWhiteSpace(Path)
-                ? Path.Split(['\\'], StringSplitOptions.RemoveEmptyEntries)
-                : [];
-            string result = pathParts.Length > 0 ? pathParts[^1] : string.Empty;
+            if (string.IsNullOrWhiteSpace(Path))
+            {
+                return string.Empty;
+            }
 
-            return result;
-        }
-    }
+            ReadOnlySpan<char> pathAsSpan = Path.AsSpan().TrimEnd('\\');
+            int lastSeparator = pathAsSpan.LastIndexOf('\\');
 
-    private Folder? Parent
-    {
-        get
-        {
-            string? parentPath = GetParentPath(Path);
-            return parentPath != null ? new() { Id = Guid.NewGuid(), Path = parentPath } : null;
+            return lastSeparator >= 0 ? pathAsSpan[(lastSeparator + 1)..].ToString() : pathAsSpan.ToString();
         }
     }
 
     public bool IsParentOf(Folder folder)
     {
-        return !string.IsNullOrWhiteSpace(Path)
-               && !string.IsNullOrWhiteSpace(folder.Parent?.Path)
-               && string.Compare(Path, folder.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
+        if (string.IsNullOrWhiteSpace(Path))
+        {
+            return false;
+        }
+
+        string? parentPath = GetParentPath(folder.Path);
+
+        return !string.IsNullOrWhiteSpace(parentPath)
+               && string.Compare(Path, parentPath, StringComparison.OrdinalIgnoreCase) == 0;
     }
 
     private static string? GetParentPath(string? path)
     {
-        string[]? directoriesPath = path?.Split(System.IO.Path.DirectorySeparatorChar);
-        directoriesPath = directoriesPath?.SkipLast(1).ToArray();
-        return directoriesPath?.Length > 0 ? System.IO.Path.Combine(directoriesPath) : null;
+        if (path == null)
+        {
+            return null;
+        }
+
+        ReadOnlySpan<char> pathAsSpan = path.AsSpan().TrimEnd(System.IO.Path.DirectorySeparatorChar);
+        int lastSeparator = pathAsSpan.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+
+        return lastSeparator >= 0 ? pathAsSpan[..lastSeparator].ToString() : null;
     }
 }

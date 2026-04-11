@@ -1,8 +1,8 @@
 ﻿namespace PhotoManager.Domain;
 
-public class AboutInformation
+public readonly struct AboutInformation
 {
-    public required string Product { get; set; }
-    public string? Author { get; set; }
-    public required string Version { get; set; }
+    public required string Product { get; init; }
+    public string? Author { get; init; }
+    public required string Version { get; init; }
 }
