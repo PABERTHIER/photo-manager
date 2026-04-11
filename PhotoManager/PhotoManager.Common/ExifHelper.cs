@@ -33,7 +33,8 @@ public static class ExifHelper
         }
         catch (Exception ex)
         {
-            if (ex is NotSupportedException && ex.InnerException?.HResult == -2003292351)
+            // All WPF/WIC NotSupportedExceptions always include a COMException as InnerException
+            if (ex is NotSupportedException && ex.InnerException!.HResult == -2003292351)
             {
                 logger.LogError("The image is corrupted");
             }
