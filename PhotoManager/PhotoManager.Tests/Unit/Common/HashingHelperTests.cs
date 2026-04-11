@@ -200,6 +200,20 @@ public class HashingHelperTests
     }
 
     [Test]
+    public void CalculateDHash_HeicImageDoesNotExist_ReturnsDefaultDHash()
+    {
+        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
+
+        string dHash = HashingHelper.CalculateDHash(filePath);
+
+        Assert.That(string.IsNullOrWhiteSpace(dHash), Is.False);
+        Assert.That(dHash, Has.Length.EqualTo(DHashes.LENGTH));
+        Assert.That(dHash, Is.EqualTo(DHashes.EMPTY_IMAGE));
+
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+    }
+
+    [Test]
     public void CalculateDHash_ImageDoesNotExist_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
@@ -259,7 +273,7 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameMD5Hash()
+    public void CalculateMD5Hash_EmptyImageBytes_ReturnsDefaultMd5Hash()
     {
         byte[] imageBytes = [];
 
@@ -273,14 +287,15 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_NullImageBytes_ThrowsArgumentNullException()
+    public void CalculateMD5Hash_NullImageBytes_ReturnsDefaultMd5Hash()
     {
         byte[]? imageBytes = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
+        string hash = HashingHelper.CalculateMD5Hash(imageBytes!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(MD5Hashes.EMPTY_IMAGE));
 
         _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
     }
@@ -321,11 +336,12 @@ public class HashingHelperTests
     public void CalculateHammingDistance_IncorrectHashes_LogsItAndThrowsArgumentException(string? hash1, string? hash2)
     {
         Exception expectedException = new(
-            $"Invalid arguments for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
+            $"Input arguments must all have the same length for hamming distance calculation. hash1: {hash1}, hash2: {hash2}");
         Exception[] expectedExceptions = [expectedException];
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
+            Assert.Throws<ArgumentException>(() =>
+                HashingHelper.CalculateHammingDistance(hash1!, hash2!, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 

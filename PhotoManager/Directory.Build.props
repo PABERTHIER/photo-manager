@@ -16,6 +16,8 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);AD0001</NoWarn>
+    <!-- Temporary: suppress NuGet audit for vulnerability warnings -->
+    <!-- <NuGetAudit>false</NuGetAudit> -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

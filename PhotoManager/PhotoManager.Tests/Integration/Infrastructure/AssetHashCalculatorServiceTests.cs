@@ -571,7 +571,7 @@ public class AssetHashCalculatorServiceTests
     }
 
     [Test]
-    public void CalculateMD5Hash_MD5HashAndEmptyImageBytes_ReturnsSameMD5Hash()
+    public void CalculateMD5Hash_MD5HashAndEmptyImageBytes_ReturnsDefaultMd5Hash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
@@ -590,19 +590,20 @@ public class AssetHashCalculatorServiceTests
     }
 
     [Test]
-    public void CalculateMD5Hash_MD5HashAndNullImageBytes_ThrowsArgumentNullException()
+    public void CalculateMD5Hash_MD5HashAndNullImageBytes_ReturnsDefaultMd5Hash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
 
         byte[]? imageBytes = null;
         string? filePath = null;
+        const string expectedHash = MD5Hashes.EMPTY_IMAGE;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
-                assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
 
         _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }

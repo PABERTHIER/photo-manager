@@ -22,25 +22,28 @@ public static class VideoHelper
     //.wmv - Windows Media Video
     public static bool IsVideoFile(string fileName)
     {
-        return fileName.ToLowerInvariant() switch
+        ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
+
+        if (extension.IsEmpty)
         {
-            { } s when s.EndsWith(".3g2") => true,
-            { } s when s.EndsWith(".3gp") => true,
-            { } s when s.EndsWith(".asf") => true,
-            { } s when s.EndsWith(".av1") => true,
-            { } s when s.EndsWith(".avi") => true,
-            { } s when s.EndsWith(".flv") => true,
-            { } s when s.EndsWith(".m4v") => true,
-            { } s when s.EndsWith(".mkv") => true,
-            { } s when s.EndsWith(".mov") => true,
-            { } s when s.EndsWith(".mp4") => true,
-            { } s when s.EndsWith(".mpeg") => true,
-            { } s when s.EndsWith(".mpg") => true,
-            { } s when s.EndsWith(".ogv") => true,
-            { } s when s.EndsWith(".webm") => true,
-            { } s when s.EndsWith(".wmv") => true,
-            _ => false
-        };
+            return false;
+        }
+
+        return extension.Equals(".3g2", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".3gp", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".asf", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".av1", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".avi", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".flv", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".m4v", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".mkv", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".mov", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".mpeg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".mpg", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".ogv", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".webm", StringComparison.OrdinalIgnoreCase)
+               || extension.Equals(".wmv", StringComparison.OrdinalIgnoreCase);
     }
 
     public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath,
@@ -79,6 +82,7 @@ public static class VideoHelper
 
             logger.LogInformation("First frame extracted successfully for: {videoPath}", videoPath);
             logger.LogInformation("First frame saved at: {firstFrameVideoPath}", firstFrameVideoPath);
+
             return firstFrameVideoPath;
         }
         catch (Exception ex)

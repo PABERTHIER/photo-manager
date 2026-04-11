@@ -226,6 +226,8 @@ public static class Constants
         public const string IMAGE_11_HEIC = "00000000000000";
         public const string IMAGE_11_90_DEG_HEIC = "347636785c99d1";
 
+        public const string EMPTY_IMAGE = "00000000000000";
+
         public const int LENGTH = 14; // The DHash is a 14-hex digits
     }
 

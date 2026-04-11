@@ -3,6 +3,7 @@
     <PackageReference Include="FFMpegCore" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="System.Numerics.Tensors" />
   </ItemGroup>
 
   <!-- Reference the custom MSBuild task -->

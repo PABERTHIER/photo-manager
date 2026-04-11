@@ -156,7 +156,7 @@ UI → Application → Domain ← Infrastructure
 - **Max line length**: 120
 - **End of line**: CRLF
 - Treat warnings as errors is enabled in builds
-- Run `dotnet format` before committing to verify code style
+- Run `dotnet format` to apply right file encoding, and code style
 - Global usings are defined in each project's `GlobalUsings.cs`
 
 ## Testing Conventions
