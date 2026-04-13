@@ -248,7 +248,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>()).Returns(bitmapImage!);
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(bitmapImage!);
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock,
@@ -333,7 +334,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            _database!.WriteBlob(blobToWrite, _asset3!.Folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, _asset3!.Folder.BlobFileName);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -684,7 +685,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            _database!.WriteBlob(blobToWrite, folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, folder.BlobFileName);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -814,7 +815,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>()).Throws(new Exception());
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+            .Throws(new Exception());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestableAssetRepository testableAssetRepository = new(_database!, pathProviderServiceMock,

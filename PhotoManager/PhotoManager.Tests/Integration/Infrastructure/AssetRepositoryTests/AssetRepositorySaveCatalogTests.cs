@@ -114,7 +114,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)),
@@ -175,11 +175,11 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.True);
+                    _asset1.Folder.BlobFileName)), Is.True);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    addedFolder2.ThumbnailsFilename)), Is.False);
+                    addedFolder2.BlobFileName)), Is.False);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -263,7 +263,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)),
@@ -330,11 +330,11 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.True);
+                    _asset1.Folder.BlobFileName)), Is.True);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    addedFolder2.ThumbnailsFilename)), Is.False);
+                    addedFolder2.BlobFileName)), Is.False);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -426,7 +426,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)),
@@ -454,7 +454,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
@@ -716,7 +716,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)),
@@ -777,11 +777,11 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.True);
+                    _asset1.Folder.BlobFileName)), Is.True);
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    addedFolder2.ThumbnailsFilename)), Is.False);
+                    addedFolder2.BlobFileName)), Is.False);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,

@@ -61,9 +61,9 @@ public class AssetRepositoryIsBlobFileExistsTests
         try
         {
             Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-            _database!.WriteBlob([], folder.ThumbnailsFilename);
+            _database!.WriteBlob([], folder.BlobFileName);
 
-            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.ThumbnailsFilename);
+            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.BlobFileName);
 
             Assert.That(isBlobFileExists, Is.True);
 
@@ -88,7 +88,7 @@ public class AssetRepositoryIsBlobFileExistsTests
         {
             Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
-            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.ThumbnailsFilename);
+            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.BlobFileName);
 
             Assert.That(isBlobFileExists, Is.False);
 

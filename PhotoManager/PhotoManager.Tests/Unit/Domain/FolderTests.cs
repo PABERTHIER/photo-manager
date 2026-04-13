@@ -46,17 +46,17 @@ public class FolderTests
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder", false)]
     [TestCase("TestFolder\\TestSubFolder1\\TestSubFolder2", "TestFolder", false)]
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder\\TestSubFolder2", false)]
-    public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2,
+    public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath, string childFolderSubPath,
         bool expected)
     {
-        Folder parentFolder1 = new()
+        Folder parentFolder = new()
         {
             Id = Guid.NewGuid(),
-            Path = Path.Combine(_dataDirectory!, parentFolderSubPath1)
+            Path = Path.Combine(_dataDirectory!, parentFolderSubPath)
         };
-        Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, childFolderSubPath2) };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, childFolderSubPath) };
 
-        bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
+        bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
 
         Assert.That(isFolderParentOfChild, Is.EqualTo(expected));
     }
@@ -77,13 +77,13 @@ public class FolderTests
     [TestCase("TestFolder", "", false)]
     [TestCase(" ", "TestFolder", false)]
     [TestCase("TestFolder", " ", false)]
-    public void IsParentOf_PathIsInvalid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2,
+    public void IsParentOf_PathIsInvalid_ReturnsExpected(string parentFolderSubPath, string childFolderSubPath,
         bool expected)
     {
-        Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderSubPath1 };
-        Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = childFolderSubPath2 };
+        Folder parentFolder = new() { Id = Guid.NewGuid(), Path = parentFolderSubPath };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = childFolderSubPath };
 
-        bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
+        bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
 
         Assert.That(isFolderParentOfChild, Is.EqualTo(expected));
     }

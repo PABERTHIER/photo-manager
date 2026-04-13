@@ -228,7 +228,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, deletedFileNames, token);
 
-        bool isBlobFileExists = folder != null && _assetRepository.IsBlobFileExists(folder.ThumbnailsFilename);
+        bool isBlobFileExists = folder != null && _assetRepository.IsBlobFileExists(folder.BlobFileName);
 
         if (_assetRepository.HasChanges() || !isBlobFileExists)
         {

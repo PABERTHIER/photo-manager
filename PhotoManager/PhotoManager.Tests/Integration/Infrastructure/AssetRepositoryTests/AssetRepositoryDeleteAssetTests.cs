@@ -294,7 +294,7 @@ public class AssetRepositoryDeleteAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, _asset1!.Folder.BlobFileName);
 
             Asset? assetDeleted = _testableAssetRepository!.DeleteAsset(folderPath, _asset1!.FileName);
 

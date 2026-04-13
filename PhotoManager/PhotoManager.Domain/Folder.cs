@@ -4,8 +4,7 @@ public class Folder
 {
     public required Guid Id { get; init; }
     public required string Path { get; init; }
-    // TODO: BlobFileName instead -> rename all methods like this
-    public string ThumbnailsFilename => field ??= $"{Id}.bin";
+    public string BlobFileName => field ??= $"{Id}.bin";
 
     public string Name
     {

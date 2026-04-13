@@ -298,7 +298,7 @@ public class AssetRepositoryAddAssetTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            _database!.WriteBlob(blobToWrite, folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, folder.BlobFileName);
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);

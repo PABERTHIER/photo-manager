@@ -240,9 +240,9 @@ public class AssetRepository : IAssetRepository
                     _hasChanges = false;
                 }
 
-                if (folder != null && Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail))
+                if (folder != null && Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnails))
                 {
-                    SaveThumbnails(thumbnail, folder.ThumbnailsFilename);
+                    SaveThumbnails(thumbnails, folder.BlobFileName);
                 }
             }
         }
@@ -350,7 +350,7 @@ public class AssetRepository : IAssetRepository
                 if (thumbnails.Count == 0)
                 {
                     Thumbnails.Remove(folder.Path);
-                    _database.DeleteBlobFile(folder.ThumbnailsFilename);
+                    _database.DeleteBlobFile(folder.BlobFileName);
                 }
 
                 if (assetToDelete != null)
@@ -378,9 +378,9 @@ public class AssetRepository : IAssetRepository
             {
                 Thumbnails.Remove(folder.Path);
 
-                if (IsBlobFileExists(folder.ThumbnailsFilename))
+                if (IsBlobFileExists(folder.BlobFileName))
                 {
-                    _database.DeleteBlobFile(folder.ThumbnailsFilename);
+                    _database.DeleteBlobFile(folder.BlobFileName);
                 }
 
                 _folders.Remove(folder);
@@ -682,7 +682,7 @@ public class AssetRepository : IAssetRepository
         }
 
         // ReadBlob returns a dict with the key as the image name and the value the byte[] (image data)
-        thumbnails = _database.ReadBlob(folder.ThumbnailsFilename);
+        thumbnails = _database.ReadBlob(folder.BlobFileName);
 
         if (thumbnails == null)
         {
@@ -715,9 +715,9 @@ public class AssetRepository : IAssetRepository
     }
 
     // One Blob per folder
-    private void SaveThumbnails(Dictionary<string, byte[]> thumbnails, string thumbnailsFileName)
+    private void SaveThumbnails(Dictionary<string, byte[]> thumbnails, string blobFileName)
     {
-        _database.WriteBlob(thumbnails, thumbnailsFileName);
+        _database.WriteBlob(thumbnails, blobFileName);
     }
 
     private Folder? GetFolderById(Guid folderId)

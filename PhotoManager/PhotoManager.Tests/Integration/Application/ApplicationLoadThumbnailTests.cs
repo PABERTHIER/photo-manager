@@ -227,7 +227,7 @@ public class ApplicationLoadThumbnailTests
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetCreationService,
-            new TestLogger<MoveAssetsService>());
+                new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
@@ -312,7 +312,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.True);
+                    _asset1.Folder.BlobFileName)), Is.True);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -388,7 +388,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1Temp.Folder.ThumbnailsFilename)), Is.True);
+                    _asset1Temp.Folder.BlobFileName)), Is.True);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -506,7 +506,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -566,7 +566,7 @@ public class ApplicationLoadThumbnailTests
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
-            _database!.WriteBlob(blobToWrite, addedFolder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, addedFolder.BlobFileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -591,7 +591,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    addedFolder.ThumbnailsFilename)), Is.True);
+                    addedFolder.BlobFileName)), Is.True);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -680,7 +680,7 @@ public class ApplicationLoadThumbnailTests
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
-            database.WriteBlob(blobToWrite, addedFolder.ThumbnailsFilename);
+            database.WriteBlob(blobToWrite, addedFolder.BlobFileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -699,7 +699,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     userConfigurationService.StorageSettings.FoldersNameSettings.Blobs,
-                    addedFolder.ThumbnailsFilename)), Is.True);
+                    addedFolder.BlobFileName)), Is.True);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
@@ -743,7 +743,7 @@ public class ApplicationLoadThumbnailTests
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
-            _database!.WriteBlob([], addedFolder.ThumbnailsFilename);
+            _database!.WriteBlob([], addedFolder.BlobFileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -764,7 +764,7 @@ public class ApplicationLoadThumbnailTests
                 Assert.That(
                     File.Exists(Path.Combine(_databasePath!,
                         _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                        addedFolder.ThumbnailsFilename)), Is.False);
+                        addedFolder.BlobFileName)), Is.False);
 
                 Assert.That(
                     File.Exists(Path.Combine(_databasePath!,
@@ -1123,7 +1123,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    _asset1.Folder.ThumbnailsFilename)), Is.False);
+                    _asset1.Folder.BlobFileName)), Is.False);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,

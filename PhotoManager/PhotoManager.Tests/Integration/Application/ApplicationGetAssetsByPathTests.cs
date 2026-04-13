@@ -941,7 +941,7 @@ public class ApplicationGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, _asset1!.Folder.BlobFileName);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1214,7 +1214,7 @@ public class ApplicationGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            _database!.WriteBlob(blobToWrite, folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, folder.BlobFileName);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);

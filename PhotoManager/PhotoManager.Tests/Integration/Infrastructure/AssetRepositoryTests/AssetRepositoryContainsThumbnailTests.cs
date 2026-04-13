@@ -382,7 +382,7 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
-            _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, _asset1!.Folder.BlobFileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
