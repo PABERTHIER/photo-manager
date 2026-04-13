@@ -2457,4 +2457,38 @@ public class MoveAssetsServiceTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
+
+    [Test]
+    public void CopyAsset_SourceFileNoLongerExistsAfterCopy_ReturnsFalse()
+    {
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        TestLogger<MoveAssetsService> testLogger = new();
+
+        try
+        {
+            Directory.CreateDirectory(destinationDirectory);
+
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
+
+            IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
+            fileOperationsServiceMock.FileExists(sourceFilePath).Returns(false);
+
+            MoveAssetsService moveAssetsService = new(_assetRepository!, fileOperationsServiceMock,
+                _assetCreationService!, testLogger);
+
+            bool hasBeenCopied = moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath);
+
+            Assert.That(hasBeenCopied, Is.False);
+            Assert.That(File.Exists(sourceFilePath), Is.True);
+            Assert.That(File.Exists(destinationFilePath), Is.True);
+
+            testLogger.AssertLogErrors([], typeof(MoveAssetsService));
+        }
+        finally
+        {
+            Directory.Delete(destinationDirectory, true);
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
 }
