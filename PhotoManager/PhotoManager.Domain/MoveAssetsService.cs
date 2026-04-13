@@ -154,7 +154,7 @@ public class MoveAssetsService(
                 return fileOperationsService.FileExists(sourceFilePath);
             }
 
-            string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
+            string destinationFolderPath = Path.GetDirectoryName(destinationFilePath)!;
 
             if (!Directory.Exists(destinationFolderPath))
             {
