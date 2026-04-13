@@ -424,6 +424,7 @@ public partial class MainWindow
                         {
                             ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
                             ViewModel.IsRefreshingFolders = true;
+                            FolderTreeView.SelectedPath = folderNavigationWindow.ViewModel.SelectedFolder.Path;
                             FolderTreeView.Initialize();
                             ViewModel.IsRefreshingFolders = false;
 
