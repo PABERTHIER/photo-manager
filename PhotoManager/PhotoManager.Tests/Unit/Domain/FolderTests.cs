@@ -14,6 +14,32 @@ public class FolderTests
     }
 
     [Test]
+    [TestCase("")]
+    [TestCase(" ")]
+    [TestCase(null)]
+    public void Name_PathIsNullOrWhiteSpace_ReturnsEmpty(string? path)
+    {
+        Folder folder = new() { Id = Guid.NewGuid(), Path = path! };
+
+        string name = folder.Name;
+
+        Assert.That(name, Is.EqualTo(string.Empty));
+    }
+
+    [Test]
+    [TestCase("FolderName", "FolderName")]
+    [TestCase("C:\\TestFolder\\SubFolder", "SubFolder")]
+    [TestCase("C:\\TestFolder\\SubFolder\\", "SubFolder")]
+    public void Name_PathIsValid_ReturnsExpected(string path, string expected)
+    {
+        Folder folder = new() { Id = Guid.NewGuid(), Path = path };
+
+        string name = folder.Name;
+
+        Assert.That(name, Is.EqualTo(expected));
+    }
+
+    [Test]
     [TestCase("TestFolder", "TestFolder", false)] // WhenParentAndChildPathsAreTheSame
     [TestCase("TestFolder", "TestFolder\\TestSubFolder1", true)] // ChildIsImmediateChild
     [TestCase("TestFolder", "TestFolder\\TestSubFolder1\\TestSubFolder2", false)] // WhenChildIsNotImmediateChild
@@ -33,6 +59,17 @@ public class FolderTests
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
         Assert.That(isFolderParentOfChild, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void IsParentOf_PathMatchesCaseInsensitively_ReturnsTrue()
+    {
+        Folder parentFolder = new() { Id = Guid.NewGuid(), Path = "C:\\TestFolder" };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = "C:\\TESTFOLDER\\SubFolder" };
+
+        bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
+
+        Assert.That(isFolderParentOfChild, Is.True);
     }
 
     [Test]
