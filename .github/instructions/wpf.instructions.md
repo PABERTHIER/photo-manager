@@ -5,6 +5,7 @@ applyTo: "**/PhotoManager.UI/**/*.cs,**/PhotoManager.UI/**/*.xaml"
 # WPF Code Standards for PhotoManager
 
 ## Project Structure
+
 ```
 PhotoManager.UI/
 ├── Windows/       — Main window + dialog windows ({Feature}Window)
@@ -17,6 +18,7 @@ PhotoManager.UI/
 ## MVVM Patterns
 
 ### ViewModel Base Classes
+
 - All ViewModels inherit from `BaseViewModel` (implements `INotifyPropertyChanged`)
 - Multi-step process ViewModels inherit from `BaseProcessViewModel<TC, TR>`
 - Call `NotifyPropertyChanged(nameof(Property))` inside property setters
@@ -34,6 +36,7 @@ public string Title
 ```
 
 ### Computed Visibility Properties
+
 Use computed properties returning `Visibility` directly — do not rely on converters for simple show/hide:
 
 ```csharp
@@ -41,21 +44,23 @@ public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibilit
 ```
 
 ### Collections
+
 - Use `ObservableCollection<T>` for dynamic UI lists
 - Use `SortableObservableCollection<T>` (project type) when sorting is needed — it raises `Reset` notification
 
 ## Naming Conventions
 
-| Element | Pattern | Example |
-|---------|---------|---------|
-| Window | `{Feature}Window` | `FindDuplicatedAssetsWindow` |
-| UserControl | `{Feature}UserControl` | `ThumbnailsUserControl` |
-| ViewModel | `{Feature}ViewModel` | `ApplicationViewModel` |
-| Converter | `{Feature}Converter` | `FileSizeConverter` |
-| Event delegate | `{Action}EventHandler` | `FolderAddedEventHandler` |
-| Event args | `{Action}EventArgs` | `FolderAddedEventArgs` |
+| Element        | Pattern                | Example                      |
+| -------------- | ---------------------- | ---------------------------- |
+| Window         | `{Feature}Window`      | `FindDuplicatedAssetsWindow` |
+| UserControl    | `{Feature}UserControl` | `ThumbnailsUserControl`      |
+| ViewModel      | `{Feature}ViewModel`   | `ApplicationViewModel`       |
+| Converter      | `{Feature}Converter`   | `FileSizeConverter`          |
+| Event delegate | `{Action}EventHandler` | `FolderAddedEventHandler`    |
+| Event args     | `{Action}EventArgs`    | `FolderAddedEventArgs`       |
 
 ## Value Converters
+
 - Implement `IValueConverter` or `IMultiValueConverter`
 - `ConvertBack` must `throw new NotImplementedException()` for read-only converters
 - Register converters as `StaticResource` in the relevant `Resources` section
@@ -70,6 +75,7 @@ public class FileSizeConverter : IValueConverter
 ```
 
 ## Custom Events
+
 Define event delegates and args in `Models/`:
 
 ```csharp
@@ -82,6 +88,7 @@ public class FolderAddedEventArgs : EventArgs
 ```
 
 ## Dependency Injection
+
 - `MainWindow` and `ApplicationViewModel` are registered as **singletons** in `UiServiceCollectionExtensions`
 - XAML-instantiated controls (UserControls) resolve services from the static `App.ServiceProvider`:
 
@@ -99,6 +106,7 @@ window.ShowDialog();
 ```
 
 ## Async & Thread Safety
+
 - Use `Dispatcher.InvokeAsync()` to marshal domain callbacks back to the UI thread
 - Always use `.ConfigureAwait(true)` in WPF async methods to preserve the UI synchronization context
 
@@ -113,6 +121,7 @@ await _catalogTask.ConfigureAwait(true);
 ## WPF Types Used Across All Layers
 
 The following WPF types from `System.Windows.Media.Imaging` are used throughout **all layers** (not just UI):
+
 - `BitmapImage` — used as image data carrier in `Asset.ImageData`, service interfaces, and repository
 - `Rotation` — WPF enum used for image rotation in `Asset.ImageRotation`, service signatures, and DB mapping
 

@@ -20,6 +20,7 @@ Follow this workflow in order:
    - Name them clearly: `Optimized_ApproachName`, `Optimized_Stackalloc`, etc.
 
 4. **Run the benchmark**:
+
    ```
    dotnet run --project PhotoManager/Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj -c Release -- --filter "*BenchmarkClassName"
    ```

@@ -7,6 +7,7 @@ This file provides shared guidance for AI coding agents (Claude Code, GitHub Cop
 # UNIVERSAL RULES - Apply to Every Request
 
 ## Code Formatting (NON-NEGOTIABLE)
+
 - **Max line length: 120 characters** (from `.editorconfig`)
 - All code MUST follow `PhotoManager/.editorconfig` rules
 - Indent: 4 spaces, End of line: CRLF, Charset: utf-8
@@ -29,12 +30,14 @@ When optimizing performance:
 Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCalculateHashBenchmarks.cs`
 
 ## Zero Warnings Policy (NON-NEGOTIABLE)
+
 - **This project contains 0 warnings - keep it that way**
 - NEVER introduce compiler warnings when adding/updating code
 - Treat warnings as errors is enabled in builds
 - Run `dotnet build` to verify no warnings before completing a task
 
 ## Test Execution Strategy
+
 - **NEVER run all tests** with `dotnet test PhotoManager/PhotoManager.slnx` without filter
 - Run ONLY relevant tests based on what changed:
   - Single test: `dotnet test --filter "FullyQualifiedName~TestClassName"`
@@ -43,10 +46,12 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
 - Always explain which tests are being run and why
 
 ## TODO Comments (NON-NEGOTIABLE)
+
 - **Never remove a `// TODO` comment** unless the issue it describes has been fully fixed in the same change
 - If you touch a file containing TODO comments, leave them untouched unless you are explicitly fixing them
 
 ## Before Reporting Completion
+
 1. Verify no compiler warnings (run `dotnet build` and check output)
 2. Verify no line exceeds 120 characters (use `dotnet format` to check)
 3. Run only relevant tests for changes made
@@ -62,51 +67,61 @@ PhotoManager is a WPF desktop application for managing photo/video collections, 
 ## Build and Test Commands
 
 **Build:**
+
 ```bash
 dotnet build PhotoManager/PhotoManager.slnx
 ```
 
 **Build Release:**
+
 ```bash
 dotnet build --configuration Release PhotoManager/PhotoManager.slnx
 ```
 
 **Restore dependencies:**
+
 ```bash
 dotnet restore PhotoManager/PhotoManager.slnx
 ```
 
 **Run tests:**
+
 ```bash
 dotnet test PhotoManager/PhotoManager.slnx
 ```
 
 **Run tests with coverage (local):**
+
 ```bash
 PhotoManager/test-with-coverage.bat
 ```
 
 **Format/Verify code style:**
+
 ```bash
 dotnet format PhotoManager/PhotoManager.slnx --severity warn --verify-no-changes
 ```
 
 **Run single test:**
+
 ```bash
 dotnet test --filter "FullyQualifiedName~TestClassName" PhotoManager/PhotoManager.slnx
 ```
 
 **Run the UI application:**
+
 ```bash
 dotnet run --project PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 ```
 
 **Run benchmarks:**
+
 ```bash
 dotnet run --project PhotoManager/Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj -c Release
 ```
 
 **Run specific benchmark:**
+
 ```bash
 dotnet run --project PhotoManager/Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj -c Release -- --filter "BenchmarkClassName"
 ```
@@ -127,6 +142,7 @@ PhotoManager.slnx
 ```
 
 ### Dependency Flow
+
 UI → Application → Domain ← Infrastructure
 
 ### Key Architectural Patterns
@@ -162,6 +178,7 @@ UI → Application → Domain ← Infrastructure
 ## Testing Conventions
 
 ### Test Structure (Follow this pattern exactly)
+
 ```csharp
 [TestFixture]
 public class ClassNameTests
@@ -200,11 +217,13 @@ public class ClassNameTests
 ```
 
 ### Naming Conventions
+
 - Test files: `{ClassName}Tests.cs`
 - Test class: `{ClassName}Tests`
 - Test methods: `{MethodName}_{Scenario}_{ExpectedResult}`
 
 ### Required Test Helpers (Don't duplicate - USE THESE)
+
 - `TestLogger<T>` - For all logging verification in tests
   - `_testLogger.AssertLogInfos(messages, typeof(Service))` - Verify info logs
   - `_testLogger.AssertLogErrors(messages, typeof(Service))` - Verify error logs
@@ -216,6 +235,7 @@ public class ClassNameTests
   - `CreateInvalidImage(validPath, invalidPath)`
 
 ### Resource Cleanup Pattern
+
 ```csharp
 string testDirectory = Path.Combine(_dataDirectory!, Directories.TEST_DIR);
 try
@@ -230,12 +250,22 @@ finally
 ```
 
 ### Key Points
+
 - ALWAYS use `TestLogger<T>` for each test class to verify log output
 - ALWAYS verify logs in assertions: `_testLogger.AssertLogExceptions([], typeof(Type))`
 - ALWAYS cleanup in `finally` blocks or `TearDown`
 - Use existing test helpers - don't recreate functionality
 - Test data files in `PhotoManager/PhotoManager.Tests/TestFiles/`
 - Constants for test data in `PhotoManager.Tests.Unit.Constants` namespace
+
+### Visibility and Testability (NON-NEGOTIABLE)
+
+- **Never use `InternalsVisibleTo`** to expose internal members for testing
+- If a method cannot be tested through the public API, it is a design smell — refactor instead:
+  - Test the behavior through a higher-level public method that exercises it
+  - Extract the logic into a new class with a public interface
+  - Reconsider whether the method belongs in its current layer
+- Granting internal visibility to the test project couples tests to implementation details and undermines maintainability
 
 ## External Dependencies
 
@@ -250,6 +280,7 @@ finally
 ## Working with the Database
 
 The custom database stores:
+
 - Tables as `.db` files in `{BackupPath}/{StorageVersion}/{TablesFolderName}/`
 - Blobs in `{BackupPath}/{StorageVersion}/{BlobsFolderName}/`
 - Backups in `{BackupPath}/{StorageVersion}_Backups/`
@@ -259,3 +290,29 @@ To add a new table, create a `DataTableProperties` in `TablesConfig/` and regist
 ## HEIC/HEVC Support
 
 The application requires HEIF Image Extensions and HEVC Video Extensions to be installed. In CI (`build.yml`), these are installed via `winget` and `Add-AppxPackage`.
+
+## Git Policy — AI Agents Must Never Commit or Push
+
+**AI agents (Claude Code, GitHub Copilot, and any other tool) are strictly forbidden from running any destructive or history-altering git commands without explicit user instruction.**
+
+### Permanently forbidden without explicit user request
+
+- `git commit` — never commit on behalf of the user
+- `git push` — never push to any remote
+- `git reset` — never alter HEAD or the index
+- `git rebase` — never rebase branches
+- `git merge` — never merge branches
+- `git cherry-pick` — never cherry-pick commits
+- `git revert` — never create revert commits
+- `git stash` — never stash changes
+- `git tag` — never create or delete tags
+- `git branch -D` — never delete branches
+- `git am` — never apply patches
+
+### Allowed read-only git operations
+
+- `git status`, `git diff`, `git log`, `git show` — inspection only
+
+### Rule
+
+If the user says "commit the changes" or "push", **ask for confirmation first** and show exactly what will be committed/pushed before running the command. Never commit speculatively at the end of a task.

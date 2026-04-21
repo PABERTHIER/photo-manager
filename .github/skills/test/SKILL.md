@@ -42,6 +42,7 @@ Follow this workflow in order:
        }
    }
    ```
+
    For static methods, use `TestLogger<ClassNameTests>` instead.
 
 3. **Check `GlobalUsings.cs`** before adding any `using` directives.
