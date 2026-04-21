@@ -37,11 +37,13 @@ PhotoManager.UI/
 ## MVVM Patterns
 
 ### ViewModel Base Classes
+
 - `BaseViewModel` — implements `INotifyPropertyChanged`; call `NotifyPropertyChanged(nameof(Prop))`
 - `BaseProcessViewModel<TC, TR>` — for multi-step process workflows (Describe → Configure → Run → Results)
 - All ViewModels inherit one of the above; no external MVVM framework is used
 
 ### Property Pattern (C# 11 `field` keyword)
+
 ```csharp
 public SortCriteria SortCriteria
 {
@@ -55,11 +57,13 @@ public SortCriteria SortCriteria
 ```
 
 ### Visibility — Prefer Computed Properties over Converters
+
 ```csharp
 public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
 ```
 
 ### Collections
+
 - `ObservableCollection<T>` — dynamic UI lists
 - `SortableObservableCollection<T>` (project type in `ViewModels/`) — raises `Reset` on Sort()
 
@@ -88,6 +92,7 @@ public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibilit
 - Background work launched in `Window_Loaded` via `StartBackgroundWorkAsync()`
 - Always use `Dispatcher.InvokeAsync()` to marshal domain callbacks back to the UI thread
 - Always use `.ConfigureAwait(true)` in WPF async methods (preserves WPF synchronization context)
+
 ```csharp
 _catalogTask = ViewModel.CatalogAssets(
     e => Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e)),
@@ -101,13 +106,13 @@ await _catalogTask.ConfigureAwait(true);
 
 All 5 converters live in `Converters/` and follow this pattern:
 
-| Converter | Input → Output |
-|-----------|---------------|
-| `FileNameConverter` | `string` → escapes `_` for XAML label display |
-| `FileSizeConverter` | `long` (bytes) → formatted `KB`/`MB`/`GB` string |
-| `PixelSizeConverter` | `Asset` → `"W×H pixels"` string |
-| `TernaryConverter` | `(bool, object)` multi-binding → conditional value |
-| `VisibilityConverter` | type name → `Visibility.Visible` or `.Hidden` |
+| Converter             | Input → Output                                     |
+| --------------------- | -------------------------------------------------- |
+| `FileNameConverter`   | `string` → escapes `_` for XAML label display      |
+| `FileSizeConverter`   | `long` (bytes) → formatted `KB`/`MB`/`GB` string   |
+| `PixelSizeConverter`  | `Asset` → `"W×H pixels"` string                    |
+| `TernaryConverter`    | `(bool, object)` multi-binding → conditional value |
+| `VisibilityConverter` | type name → `Visibility.Visible` or `.Hidden`      |
 
 - `ConvertBack` always `throw new NotImplementedException()` for read-only converters
 - Register as `StaticResource` in the XAML that uses them
@@ -148,70 +153,78 @@ Pattern: `{Action}EventHandler` delegate + `{Action}EventArgs` class.
 This is **by design**. Do NOT replace these with custom abstractions unless performing an explicit architectural refactor.
 
 ### BitmapImage
+
 Primary image carrier throughout the system:
 
-| Location | Usage |
-|----------|-------|
-| `Common/BitmapHelper.cs` | Created by all `Load*` methods (10 methods); set `.Rotation`, `.CacheOption`, `.CreateOptions`, `.StreamSource` |
-| `Common/BitmapHelper.cs` | Parameter in `GetJpegBitmapImage()`, `GetPngBitmapImage()`, `GetGifBitmapImage()`, `GetBitmapImage()` |
-| `Application/IApplication.cs` | Return type of `LoadBitmapImageFromPath()`, `LoadBitmapHeicImageFromPath()` |
-| `Application/Application.cs` | Return type (delegates to service) |
-| `UI/ViewModels/ApplicationViewModel.cs` | Calls the two IApplication methods above |
-| `UI/Controls/ViewerUserControl.xaml.cs` | Bound to `Image.Source` for display |
+| Location                                | Usage                                                                                                           |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `Common/BitmapHelper.cs`                | Created by all `Load*` methods (10 methods); set `.Rotation`, `.CacheOption`, `.CreateOptions`, `.StreamSource` |
+| `Common/BitmapHelper.cs`                | Parameter in `GetJpegBitmapImage()`, `GetPngBitmapImage()`, `GetGifBitmapImage()`, `GetBitmapImage()`           |
+| `Application/IApplication.cs`           | Return type of `LoadBitmapImageFromPath()`, `LoadBitmapHeicImageFromPath()`                                     |
+| `Application/Application.cs`            | Return type (delegates to service)                                                                              |
+| `UI/ViewModels/ApplicationViewModel.cs` | Calls the two IApplication methods above                                                                        |
+| `UI/Controls/ViewerUserControl.xaml.cs` | Bound to `Image.Source` for display                                                                             |
 
 ### Rotation (`System.Windows.Media.Imaging.Rotation`)
+
 WPF enum with values `Rotate0`, `Rotate90`, `Rotate180`, `Rotate270`:
 
-| Location | Usage |
-|----------|-------|
-| `Common/BitmapHelper.cs` | Parameter in all 6 `Load*` methods; assigned to `BitmapImage.Rotation`; switch in `MagickImageApplyRotation()` |
-| `Common/ExifHelper.cs` | Return type of `GetImageRotation()` — reads EXIF data and maps to `Rotation.*` |
-| `Application/IApplication.cs` | Parameter in `LoadBitmapImageFromPath()`, `LoadBitmapHeicImageFromPath()` |
-| `Application/Application.cs` | Parameter (passed through to service) |
+| Location                      | Usage                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `Common/BitmapHelper.cs`      | Parameter in all 6 `Load*` methods; assigned to `BitmapImage.Rotation`; switch in `MagickImageApplyRotation()` |
+| `Common/ExifHelper.cs`        | Return type of `GetImageRotation()` — reads EXIF data and maps to `Rotation.*`                                 |
+| `Application/IApplication.cs` | Parameter in `LoadBitmapImageFromPath()`, `LoadBitmapHeicImageFromPath()`                                      |
+| `Application/Application.cs`  | Parameter (passed through to service)                                                                          |
 
 ### BitmapFrame
-| Location | Usage |
-|----------|-------|
-| `Common/ExifHelper.cs` | `BitmapFrame.Create(stream)` to access `BitmapMetadata` for EXIF orientation |
-| `Common/BitmapHelper.cs` | `BitmapFrame.Create(image)` before encoding |
+
+| Location                 | Usage                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `Common/ExifHelper.cs`   | `BitmapFrame.Create(stream)` to access `BitmapMetadata` for EXIF orientation |
+| `Common/BitmapHelper.cs` | `BitmapFrame.Create(image)` before encoding                                  |
 
 ### BitmapMetadata
-| Location | Usage |
-|----------|-------|
+
+| Location               | Usage                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
 | `Common/ExifHelper.cs` | Cast from `BitmapFrame.Metadata`; `GetQuery("/app1/ifd/exif:{uint=274}")` for EXIF orientation tag |
 
 ### BitmapEncoder (+ JpegBitmapEncoder, PngBitmapEncoder, GifBitmapEncoder)
-| Location | Usage |
-|----------|-------|
+
+| Location                 | Usage                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------ |
 | `Common/BitmapHelper.cs` | Base type parameter in `GetBitmapImage()`; instantiated in format-specific overloads |
 
 ### BitmapCacheOption & BitmapCreateOptions
-| Location | Usage |
-|----------|-------|
+
+| Location                 | Usage                                                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
 | `Common/BitmapHelper.cs` | `BitmapCacheOption.OnLoad` and `BitmapCreateOptions.IgnoreColorProfile` set on every `BitmapImage` |
 
 ### System.Windows.Visibility
-| Location | Usage |
-|----------|-------|
-| `UI/ViewModels/ApplicationViewModel.cs` | `ThumbnailsVisible`, `ViewerVisible` computed properties |
-| `UI/ViewModels/DuplicatedAssetViewModel.cs` | `Visible` property for XAML binding |
-| `UI/Converters/VisibilityConverter.cs` | Returns `Visibility.Hidden` / `Visibility.Visible` |
+
+| Location                                    | Usage                                                    |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `UI/ViewModels/ApplicationViewModel.cs`     | `ThumbnailsVisible`, `ViewerVisible` computed properties |
+| `UI/ViewModels/DuplicatedAssetViewModel.cs` | `Visible` property for XAML binding                      |
+| `UI/Converters/VisibilityConverter.cs`      | Returns `Visibility.Hidden` / `Visibility.Visible`       |
 
 ### System.Windows.FrameworkElement
-| Location | Usage |
-|----------|-------|
+
+| Location                                        | Usage                                                                     |
+| ----------------------------------------------- | ------------------------------------------------------------------------- |
 | `UI/Windows/FindDuplicatedAssetsWindow.xaml.cs` | `(FrameworkElement)e.Source` cast to read `DataContext` in mouse handlers |
 
 ---
 
 ## Naming Conventions
 
-| Element | Pattern | Example |
-|---------|---------|---------|
-| Window | `{Feature}Window` | `FindDuplicatedAssetsWindow` |
-| UserControl | `{Feature}UserControl` | `ThumbnailsUserControl` |
-| ViewModel | `{Feature}ViewModel` | `ApplicationViewModel` |
-| Process ViewModel | `{Feature}ProcessViewModel` | `SyncAssetsViewModel` |
-| Converter | `{Feature}Converter` | `FileSizeConverter` |
-| Event delegate | `{Action}EventHandler` | `FolderAddedEventHandler` |
-| Event args | `{Action}EventArgs` | `FolderAddedEventArgs` |
+| Element           | Pattern                     | Example                      |
+| ----------------- | --------------------------- | ---------------------------- |
+| Window            | `{Feature}Window`           | `FindDuplicatedAssetsWindow` |
+| UserControl       | `{Feature}UserControl`      | `ThumbnailsUserControl`      |
+| ViewModel         | `{Feature}ViewModel`        | `ApplicationViewModel`       |
+| Process ViewModel | `{Feature}ProcessViewModel` | `SyncAssetsViewModel`        |
+| Converter         | `{Feature}Converter`        | `FileSizeConverter`          |
+| Event delegate    | `{Action}EventHandler`      | `FolderAddedEventHandler`    |
+| Event args        | `{Action}EventArgs`         | `FolderAddedEventArgs`       |
