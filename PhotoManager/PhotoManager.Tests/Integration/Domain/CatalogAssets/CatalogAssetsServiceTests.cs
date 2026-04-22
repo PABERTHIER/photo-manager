@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -28,6 +27,8 @@ public class CatalogAssetsServiceTests
     private TestableAssetRepository? _testableAssetRepository;
 
     private IPathProviderService? _pathProviderServiceMock;
+
+    private TestLogger<CatalogAssetsService>? _testLogger;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -70,6 +71,8 @@ public class CatalogAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new();
+
         _asset1 = new()
         {
             FolderId = Guid.Empty, // Initialised later
@@ -333,9 +336,14 @@ public class CatalogAssetsServiceTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testLogger!.LoggingAssertTearDown();
+    }
+
     private void ConfigureCatalogAssetService(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
-        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos,
-        ILogger<CatalogAssetsService>? logger = null)
+        int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -363,7 +371,7 @@ public class CatalogAssetsServiceTests
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
             assetCreationService, _userConfigurationService, assetsComparator,
-            logger ?? new TestLogger<CatalogAssetsService>());
+            _testLogger!);
     }
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
@@ -514,6 +522,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -719,6 +729,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -905,6 +917,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -1055,6 +1069,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -1217,6 +1233,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -1227,137 +1245,6 @@ public class CatalogAssetsServiceTests
             {
                 File.Delete(imagePath1ToCopyTemp);
             }
-        }
-    }
-
-    [Test]
-    [TestCase(false)]
-    [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(
-        bool analyseVideos)
-    {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
-
-        try
-        {
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
-
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
-
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
-
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogChangeCallback? catalogChangeCallback = null;
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChangeCallback!);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
-
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
-
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(catalogChangeCallback, Is.Null);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1460,6 +1347,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -1744,6 +1633,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -2067,6 +1958,8 @@ public class CatalogAssetsServiceTests
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -2350,6 +2243,8 @@ public class CatalogAssetsServiceTests
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -2620,6 +2515,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -2903,6 +2800,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -3194,6 +3093,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -3477,6 +3378,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -3800,6 +3703,8 @@ public class CatalogAssetsServiceTests
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -4087,6 +3992,8 @@ public class CatalogAssetsServiceTests
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -4493,6 +4400,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -4763,6 +4672,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -5051,6 +4962,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -5340,6 +5253,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -5689,6 +5604,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -6175,6 +6092,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -6778,6 +6697,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -7360,6 +7281,8 @@ public class CatalogAssetsServiceTests
                     CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
             }
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -7950,6 +7873,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8050,6 +7975,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8138,6 +8065,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8227,6 +8156,79 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_RootCatalogFolderPathIsEmpty_DoesNothing()
+    {
+        const string assetsDirectory = "";
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        try
+        {
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.That(folder, Is.Null);
+
+            string blobsPath = Path.Combine(_databasePath!,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.That(thumbnails, Is.Empty);
+
+            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.That(folder, Is.Not.Null);
+
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+
+            assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
+                blobsPath, tablesPath, false, false, folder!);
+
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
+
+            Assert.That(catalogChanges, Has.Count.EqualTo(4));
+
+            int increment = 0;
+
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
+                CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8325,6 +8327,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8574,6 +8578,8 @@ public class CatalogAssetsServiceTests
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -8849,6 +8855,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -9136,6 +9144,8 @@ public class CatalogAssetsServiceTests
 
             Assert.That(File.Exists(oldBackupFilePath), Is.True);
             Assert.That(File.Exists(backupFilePath), Is.True);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
@@ -9187,8 +9197,7 @@ public class CatalogAssetsServiceTests
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
-        TestLogger<CatalogAssetsService> logger = new();
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos, logger);
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -9268,7 +9277,7 @@ public class CatalogAssetsServiceTests
                 new($"Access to the path '{assetsDirectory}' is denied.");
             Exception[] expectedExceptions = [unauthorizedAccessException];
 
-            logger.AssertLogExceptions(expectedExceptions, typeof(CatalogAssetsService));
+            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(CatalogAssetsService));
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
@@ -9281,9 +9290,9 @@ public class CatalogAssetsServiceTests
             Directory.Delete(_databaseDirectory!, true);
             DirectoryHelper.AllowAccess(assetsDirectory);
             Directory.Delete(assetsDirectory, true);
-            logger.LoggingAssertTearDown();
         }
     }
+
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
 
     [Test]
@@ -9434,6 +9443,8 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            _testLogger!.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
         {
