@@ -124,12 +124,19 @@ public class SyncAssetsService(
         DirectoryInfo[] destinationSubDirectories =
             fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
 
+        if (destinationSubDirectories.Length == 0)
+        {
+            return newFileNames;
+        }
+
+        HashSet<string> allDestinationFileNames = [];
+
         for (int i = 0; i < destinationSubDirectories.Length; i++)
         {
             string[] destinationFileNames = fileOperationsService.GetFileNames(destinationSubDirectories[i].FullName);
-            newFileNames = assetsComparator.GetNewFileNamesToSync(newFileNames, destinationFileNames);
+            allDestinationFileNames.UnionWith(destinationFileNames);
         }
 
-        return newFileNames;
+        return [.. newFileNames.Except(allDestinationFileNames)];
     }
 }
