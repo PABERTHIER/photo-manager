@@ -1,10 +1,29 @@
-﻿namespace PhotoManager.Domain;
+﻿using System.Runtime.InteropServices;
+
+namespace PhotoManager.Domain;
 
 public class AssetsComparator : IAssetsComparator
 {
     public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
-        return GetNewFileNamesList(fileNames, [.. cataloguedAssets.Select(ca => ca.FileName)]);
+        HashSet<string> cataloguedSet = new(cataloguedAssets.Count);
+
+        foreach (Asset cataloguedAsset in CollectionsMarshal.AsSpan(cataloguedAssets))
+        {
+            cataloguedSet.Add(cataloguedAsset.FileName);
+        }
+
+        List<string> result = new(fileNames.Length);
+
+        foreach (string fileName in fileNames)
+        {
+            if (!cataloguedSet.Contains(fileName) && IsValidAsset(fileName))
+            {
+                result.Add(fileName);
+            }
+        }
+
+        return [.. result];
     }
 
     public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
@@ -24,7 +43,18 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
-        return [.. cataloguedAssets.Select(ca => ca.FileName).Except(fileNames)];
+        HashSet<string> fileNameSet = [.. fileNames];
+        List<string> result = new(cataloguedAssets.Count);
+
+        foreach (Asset cataloguedAsset in CollectionsMarshal.AsSpan(cataloguedAssets))
+        {
+            if (!fileNameSet.Contains(cataloguedAsset.FileName))
+            {
+                result.Add(cataloguedAsset.FileName);
+            }
+        }
+
+        return [.. result];
     }
 
     public string[] GetDeletedFileNamesToSync(string[] fileNames, string[] destinationFileNames)
@@ -50,8 +80,8 @@ public class AssetsComparator : IAssetsComparator
 
     private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)
     {
-        List<string> imageNames = [];
-        List<string> videoNames = [];
+        List<string> imageNames = new(fileNames.Length);
+        List<string> videoNames = new(fileNames.Length / 4);
 
         foreach (string fileName in fileNames)
         {
