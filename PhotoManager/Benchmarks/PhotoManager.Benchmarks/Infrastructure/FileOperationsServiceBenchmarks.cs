@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-
-namespace PhotoManager.Benchmarks.Infrastructure;
+﻿namespace PhotoManager.Benchmarks.Infrastructure;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

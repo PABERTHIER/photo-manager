@@ -1,5 +1,3 @@
-using PhotoManager.Domain;
-
 namespace PhotoManager.Benchmarks.Domain;
 
 [MemoryDiagnoser]
