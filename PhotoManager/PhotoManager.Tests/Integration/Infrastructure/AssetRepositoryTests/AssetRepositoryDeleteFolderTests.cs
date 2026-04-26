@@ -134,7 +134,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.True);
+                    folder.BlobFileName)), Is.True);
 
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
@@ -150,7 +150,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -194,7 +194,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
@@ -209,7 +209,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -259,7 +259,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.True);
+                    folder.BlobFileName)), Is.True);
 
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
@@ -274,7 +274,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -315,19 +315,19 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(thumbnails, Is.Empty);
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
-            _database!.WriteBlob([], _asset1!.Folder.ThumbnailsFilename);
+            _database!.WriteBlob([], _asset1!.Folder.BlobFileName);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.True);
+                    folder.BlobFileName)), Is.True);
 
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
 
@@ -369,7 +369,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testableAssetRepository!.DeleteFolder(folder);
 
@@ -383,7 +383,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -472,7 +472,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.True);
+                    folder.BlobFileName)), Is.True);
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -493,7 +493,7 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(
                 File.Exists(Path.Combine(_databasePath!,
                     _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.ThumbnailsFilename)), Is.False);
+                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }

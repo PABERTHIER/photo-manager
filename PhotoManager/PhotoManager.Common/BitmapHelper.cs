@@ -5,7 +5,7 @@ namespace PhotoManager.Common;
 
 public static class BitmapHelper
 {
-    // From CatalogAssetsService for CreateAsset() to get the originalImage
+    // From AssetCreationService for CreateAsset() to get the originalImage
     public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
     {
         try
@@ -34,7 +34,7 @@ public static class BitmapHelper
         }
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
+    // From AssetCreationService for CreateAsset() to get the thumbnailImage
     public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
         ILogger logger)
     {
@@ -66,7 +66,7 @@ public static class BitmapHelper
         }
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
+    // From AssetCreationService for CreateAsset() to get the originalImage for HEIC
     public static BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
     {
         BitmapImage image = new();
@@ -110,7 +110,7 @@ public static class BitmapHelper
         return image;
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
+    // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
     public static BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
         ILogger logger)
     {
@@ -196,7 +196,8 @@ public static class BitmapHelper
 
                     // Create a BitmapImage from the byte array and set the rotation
                     image.BeginInit();
-                    image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                    // To keep the imageData after dispose of the using block
+                    image.CacheOption = BitmapCacheOption.OnLoad;
                     image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                     image.StreamSource = new MemoryStream(imageData);
                     image.Rotation = rotation;
@@ -280,6 +281,93 @@ public static class BitmapHelper
     public static byte[] GetGifBitmapImage(BitmapImage image)
     {
         return GetBitmapImage(image, new GifBitmapEncoder());
+    }
+
+    public static (int width, int height) GetImageDimensions(byte[] buffer, Rotation rotation, ILogger logger)
+    {
+        (int rawWidth, int rawHeight) = TryReadDimensionsFromHeader(buffer);
+
+        if (rawWidth <= 0 || rawHeight <= 0)
+        {
+            BitmapImage image = LoadBitmapOriginalImage(buffer, Rotation.Rotate0, logger);
+            rawWidth = image.PixelWidth;
+            rawHeight = image.PixelHeight;
+        }
+
+        return rotation is Rotation.Rotate90 or Rotation.Rotate270 ? (rawHeight, rawWidth) : (rawWidth, rawHeight);
+    }
+
+    private static (int width, int height) TryReadDimensionsFromHeader(ReadOnlySpan<byte> buffer)
+    {
+        if (buffer.Length < 4)
+        {
+            return (-1, -1);
+        }
+
+        // JPEG: starts with FF D8
+        if (buffer[0] == 0xFF && buffer[1] == 0xD8)
+        {
+            return ReadJpegDimensions(buffer);
+        }
+
+        // PNG: 89 50 4E 47 signature. IHDR at offset 8: length(4) + "IHDR"(4) + width(4 BE) + height(4 BE)
+        if (buffer.Length >= 24 && buffer[0] == 0x89 && buffer[1] == 0x50 && buffer[2] == 0x4E && buffer[3] == 0x47)
+        {
+            int width = (buffer[16] << 24) | (buffer[17] << 16) | (buffer[18] << 8) | buffer[19];
+            int height = (buffer[20] << 24) | (buffer[21] << 16) | (buffer[22] << 8) | buffer[23];
+            return (width, height);
+        }
+
+        // GIF: "GIF8" prefix (GIF87a or GIF89a). Width and height are LE 16-bit at offsets 6 and 8.
+        if (buffer.Length >= 10 && buffer[0] == 0x47 && buffer[1] == 0x49 && buffer[2] == 0x46 && buffer[3] == 0x38)
+        {
+            int width = buffer[6] | (buffer[7] << 8);
+            int height = buffer[8] | (buffer[9] << 8);
+            return (width, height);
+        }
+
+        return (-1, -1);
+    }
+
+    private static (int width, int height) ReadJpegDimensions(ReadOnlySpan<byte> buffer)
+    {
+        int offset = 2; // skip SOI marker (FF D8)
+
+        while (offset < buffer.Length - 3)
+        {
+            if (buffer[offset] != 0xFF)
+            {
+                break;
+            }
+
+            byte marker = buffer[offset + 1];
+            offset += 2;
+
+            // SOF markers encode image dimensions (exclude DHT=C4, DAC=CC, RST=D0-D7, SOI=D8, EOI=D9, SOS=DA)
+            if (marker is >= 0xC0 and <= 0xCF and not 0xC4 and not 0xC8 and not 0xCC)
+            {
+                // SOF layout: 2-byte segment length, 1-byte precision, 2-byte height, 2-byte width
+                if (offset + 6 < buffer.Length)
+                {
+                    int height = (buffer[offset + 3] << 8) | buffer[offset + 4];
+                    int width = (buffer[offset + 5] << 8) | buffer[offset + 6];
+                    return (width, height);
+                }
+
+                break;
+            }
+
+            int segmentLength = (buffer[offset] << 8) | buffer[offset + 1];
+
+            if (segmentLength < 2)
+            {
+                break;
+            }
+
+            offset += segmentLength;
+        }
+
+        return (-1, -1);
     }
 
     private static byte[] GetBitmapImage(BitmapImage image, BitmapEncoder encoder)

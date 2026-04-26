@@ -10587,6 +10587,110 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
+    public async Task NotifyCatalogChange_RootCatalogFolderPathIsEmpty_DoesNothing()
+    {
+        const string assetsDirectory = "";
+
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.That(folder, Is.Null);
+
+            string blobsPath = Path.Combine(_databasePath!,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.That(thumbnails, Is.Empty);
+
+            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+
+            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.That(folder, Is.Not.Null);
+
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+
+            assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
+                blobsPath, tablesPath, false, false, folder!);
+
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
+
+            Assert.That(catalogChanges, Has.Count.EqualTo(4));
+
+            int increment = 0;
+
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
+                [],
+                null,
+                folder!,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
+                [],
+                null,
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
     [TestCase(0, true)]
     [TestCase(0, false)]
     [TestCase(2, true)]
@@ -11948,6 +12052,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             logger.LoggingAssertTearDown();
         }
     }
+
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
 
     private

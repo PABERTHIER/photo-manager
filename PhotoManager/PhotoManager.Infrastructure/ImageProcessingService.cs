@@ -4,7 +4,7 @@ namespace PhotoManager.Infrastructure;
 
 public class ImageProcessingService(ILogger<ImageProcessingService> logger) : IImageProcessingService
 {
-    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
+    // From AssetCreationService for CreateAsset() to get the thumbnailImage
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
         return BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, logger);
@@ -16,25 +16,19 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
         return BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, logger);
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the originalImage
-    public BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
-    {
-        return BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, logger);
-    }
-
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation)
     {
         return BitmapHelper.LoadBitmapImageFromPath(imagePath, rotation);
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
+    // From AssetCreationService for CreateAsset() to get the originalImage for HEIC
     public BitmapImage LoadBitmapHeicOriginalImage(byte[] imageBytes, Rotation rotation)
     {
         return BitmapHelper.LoadBitmapHeicOriginalImage(imageBytes, rotation, logger);
     }
 
-    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
+    // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
     public BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
         return BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height, logger);
@@ -59,6 +53,11 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
     public byte[] GetGifBitmapImage(BitmapImage thumbnailImage)
     {
         return BitmapHelper.GetGifBitmapImage(thumbnailImage);
+    }
+
+    public (int width, int height) GetImageDimensions(byte[] buffer, Rotation rotation)
+    {
+        return BitmapHelper.GetImageDimensions(buffer, rotation, logger);
     }
 
     public bool IsValidGdiPlusImage(byte[] imageData)

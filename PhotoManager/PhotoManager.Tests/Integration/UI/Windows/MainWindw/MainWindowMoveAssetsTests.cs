@@ -36,6 +36,7 @@ public class MainWindowMoveAssetsTests
     private Folder? _sourceFolder;
     private Folder? _selectedFolder;
     private bool _hasConfirmed;
+    private string? _folderTreeViewSelectedPath;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -110,6 +111,7 @@ public class MainWindowMoveAssetsTests
         _sourceFolder = null;
         _mainFolderNavigationViewModel = null;
         _folderNavigationViewModel = null;
+        _folderTreeViewSelectedPath = null;
     }
 
     private void ConfigureApplicationViewModel(
@@ -329,7 +331,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -566,7 +569,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 false,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -809,7 +813,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 true,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1058,7 +1063,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 false,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1322,7 +1328,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1558,7 +1565,8 @@ public class MainWindowMoveAssetsTests
                 _selectedFolder,
                 false,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _selectedFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1785,7 +1793,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2006,7 +2015,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2197,7 +2207,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2378,7 +2389,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 true,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2527,7 +2539,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2664,7 +2677,8 @@ public class MainWindowMoveAssetsTests
                 null,
                 false,
                 false,
-                _sourceFolder!);
+                _sourceFolder!,
+                _sourceFolder!.Path);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2948,7 +2962,7 @@ public class MainWindowMoveAssetsTests
         Assert.That(folderNavigationViewModelInstance.TargetPath, Is.EqualTo(expectedTargetPath));
     }
 
-    private static void CheckMainFolderNavigationViewModel(
+    private void CheckMainFolderNavigationViewModel(
         FolderNavigationViewModel folderNavigationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
@@ -2962,7 +2976,8 @@ public class MainWindowMoveAssetsTests
         Folder? expectedMoveAssetsLastSelectedFolder,
         bool expectedCanGoToPreviousAsset,
         bool expectedCanGoToNextAsset,
-        Folder expectedSourceFolder)
+        Folder expectedSourceFolder,
+        string expectedFolderTreeViewSelectedPath)
     {
         // From ApplicationViewModel
         CheckAfterChanges(
@@ -3000,6 +3015,7 @@ public class MainWindowMoveAssetsTests
         Assert.That(folderNavigationViewModelInstance.HasConfirmed, Is.False);
         Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Is.Empty);
         Assert.That(folderNavigationViewModelInstance.TargetPath, Is.Null);
+        Assert.That(_folderTreeViewSelectedPath, Is.EqualTo(expectedFolderTreeViewSelectedPath));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset)
@@ -3102,6 +3118,7 @@ public class MainWindowMoveAssetsTests
     private void MainWindowsInit()
     {
         _mainFolderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
+        _folderTreeViewSelectedPath = _sourceFolder!.Path;
 
         CancellationTokenSource cancellationTokenSource = new();
 
@@ -3155,6 +3172,7 @@ public class MainWindowMoveAssetsTests
                         _applicationViewModel!.MoveAssetsLastSelectedFolder =
                             _folderNavigationViewModel!.SelectedFolder;
                         _applicationViewModel!.IsRefreshingFolders = true;
+                        _folderTreeViewSelectedPath = _folderNavigationViewModel!.SelectedFolder.Path;
                         _applicationViewModel!.IsRefreshingFolders = false;
 
                         if (!preserveOriginalFiles)

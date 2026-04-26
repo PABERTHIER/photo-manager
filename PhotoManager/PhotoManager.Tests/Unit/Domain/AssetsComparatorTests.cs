@@ -412,7 +412,7 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetNewFileNames_FileNamesIsNull_ThrowsArgumentNullException()
+    public void GetNewFileNames_FileNamesIsNull_ThrowsNullReferenceException()
     {
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
@@ -479,11 +479,11 @@ public class AssetsComparatorTests
             }
         ];
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() =>
                 _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -499,16 +499,16 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetNewFileNames_CataloguedAssetsIsNull_ThrowsArgumentNullException()
+    public void GetNewFileNames_CataloguedAssetsIsNull_ThrowsNullReferenceException()
     {
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() =>
                 _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -1015,7 +1015,7 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetDeletedFileNames_FileNamesIsNull_ThrowsArgumentNullException()
+    public void GetDeletedFileNames_FileNamesIsNull_ThrowsNullReferenceException()
     {
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
@@ -1082,10 +1082,10 @@ public class AssetsComparatorTests
             }
         ];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -1100,15 +1100,15 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetDeletedFileNames_CataloguedAssetsIsNull_ThrowsArgumentNullException()
+    public void GetDeletedFileNames_CataloguedAssetsIsNull_ThrowsNullReferenceException()
     {
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]

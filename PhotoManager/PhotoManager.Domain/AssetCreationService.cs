@@ -45,13 +45,24 @@ public class AssetCreationService(
 
             byte[] imageBytes = fileOperationsService.GetFileBytes(imagePath);
 
-            return Path.GetExtension(fileName).ToLower() switch
+            ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
+
+            if (extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
             {
-                ".png" => CreateAssetFromPng(imagePath, directoryName, imageBytes),
-                ".gif" => CreateAssetFromGif(imagePath, directoryName, imageBytes),
-                ".heic" => CreateAssetFromHeic(imagePath, directoryName, imageBytes),
-                _ => CreateAssetFromOtherFormat(imagePath, directoryName, imageBytes)
-            };
+                return CreateAssetFromPng(imagePath, directoryName, imageBytes);
+            }
+
+            if (extension.Equals(".gif", StringComparison.OrdinalIgnoreCase))
+            {
+                return CreateAssetFromGif(imagePath, directoryName, imageBytes);
+            }
+
+            if (extension.Equals(".heic", StringComparison.OrdinalIgnoreCase))
+            {
+                return CreateAssetFromHeic(imagePath, directoryName, imageBytes);
+            }
+
+            return CreateAssetFromOtherFormat(imagePath, directoryName, imageBytes);
         }
         catch (Exception ex)
         {
@@ -70,8 +81,8 @@ public class AssetCreationService(
         // GetExifOrientation is not handled by Png
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
         (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
-        BitmapImage originalImage = imageProcessingService.LoadBitmapOriginalImage(imageBytes, rotation);
-        (int originalDecodeWidth, int originalDecodeHeight) = GetOriginalDecodeLengths(originalImage);
+        (int originalDecodeWidth, int originalDecodeHeight) =
+            imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
         BitmapImage thumbnailImage =
@@ -103,8 +114,8 @@ public class AssetCreationService(
         // GetExifOrientation is not handled by GIF
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
         (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
-        BitmapImage originalImage = imageProcessingService.LoadBitmapOriginalImage(imageBytes, rotation);
-        (int originalDecodeWidth, int originalDecodeHeight) = GetOriginalDecodeLengths(originalImage);
+        (int originalDecodeWidth, int originalDecodeHeight) =
+            imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
         BitmapImage thumbnailImage =
@@ -171,8 +182,8 @@ public class AssetCreationService(
             userConfigurationService.AssetSettings.DefaultExifOrientation,
             userConfigurationService.AssetSettings.CorruptedImageOrientation);
         (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
-        BitmapImage originalImage = imageProcessingService.LoadBitmapOriginalImage(imageBytes, rotation);
-        (int originalDecodeWidth, int originalDecodeHeight) = GetOriginalDecodeLengths(originalImage);
+        (int originalDecodeWidth, int originalDecodeHeight) =
+            imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
         BitmapImage thumbnailImage =

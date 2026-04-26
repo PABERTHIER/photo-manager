@@ -24,7 +24,6 @@ public class MoveAssetsService(
         // If the folder is null, it means it is not present in the catalog
         Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path);
 
-        // TODO: IF THE DESTINATION FOLDER IS NEW, THE FOLDER NAVIGATION CONTROL SHOULD DISPLAY IT WHEN THE USER GOES BACK TO THE MAIN WINDOW.
         bool isDestinationFolderInCatalog = folder != null;
 
         if (isDestinationFolderInCatalog)
@@ -155,7 +154,7 @@ public class MoveAssetsService(
                 return fileOperationsService.FileExists(sourceFilePath);
             }
 
-            string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
+            string destinationFolderPath = Path.GetDirectoryName(destinationFilePath)!;
 
             if (!Directory.Exists(destinationFolderPath))
             {
