@@ -13,8 +13,7 @@ public class LongAssetComparer(bool ascending, Func<Asset, long> longSelector) :
 
         if (result == 0)
         {
-            StringAssetComparer comparer = new(ascending, asset => asset.FileName);
-            return comparer.Compare(asset1, asset2);
+            result = string.CompareOrdinal(asset1.FileName, asset2.FileName);
         }
 
         return ascending ? result : -result;

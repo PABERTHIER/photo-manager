@@ -4,8 +4,20 @@ public class DateTimeAssetComparer(bool ascending, Func<Asset, DateTime> dateTim
 {
     public int Compare(Asset? asset1, Asset? asset2)
     {
-        LongAssetComparer comparer = new(ascending, asset => dateTimeSelector(asset).Ticks / TimeSpan.TicksPerSecond);
+        if (asset1 == null || asset2 == null)
+        {
+            throw new ArgumentNullException(asset1 == null ? nameof(asset1) : nameof(asset2));
+        }
 
-        return comparer.Compare(asset1, asset2);
+        long ticks1 = dateTimeSelector(asset1).Ticks / TimeSpan.TicksPerSecond;
+        long ticks2 = dateTimeSelector(asset2).Ticks / TimeSpan.TicksPerSecond;
+        int result = ticks1.CompareTo(ticks2);
+
+        if (result == 0)
+        {
+            result = string.CompareOrdinal(asset1.FileName, asset2.FileName);
+        }
+
+        return ascending ? result : -result;
     }
 }
