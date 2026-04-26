@@ -28,12 +28,28 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
     {
-        return GetNewFileNamesList(sourceFileNames, destinationFileNames);
+        return [.. sourceFileNames.Except(destinationFileNames).Where(IsValidAsset)];
     }
 
     public (string[], string[]) GetImageAndVideoNames(string[] fileNames)
     {
-        return GetImageAndVideoNamesList(fileNames);
+        List<string> imageNames = new(fileNames.Length);
+        List<string> videoNames = new(fileNames.Length / 4);
+
+        foreach (string fileName in fileNames)
+        {
+            if (ImageHelper.IsImageFile(fileName))
+            {
+                imageNames.Add(fileName);
+            }
+
+            else if (VideoHelper.IsVideoFile(fileName))
+            {
+                videoNames.Add(fileName);
+            }
+        }
+
+        return ([.. imageNames], [.. videoNames]);
     }
 
     public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
@@ -62,11 +78,6 @@ public class AssetsComparator : IAssetsComparator
         return [.. destinationFileNames.Except(fileNames)];
     }
 
-    private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
-    {
-        return [.. fileNames.Except(destinationFileNames).Where(IsValidAsset)];
-    }
-
     private static bool IsValidAsset(string assetFileName)
     {
         return ImageHelper.IsImageFile(assetFileName) || VideoHelper.IsVideoFile(assetFileName);
@@ -76,26 +87,5 @@ public class AssetsComparator : IAssetsComparator
     {
         return a => a.FileProperties.Creation > a.ThumbnailCreationDateTime
                     || a.FileProperties.Modification > a.ThumbnailCreationDateTime;
-    }
-
-    private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)
-    {
-        List<string> imageNames = new(fileNames.Length);
-        List<string> videoNames = new(fileNames.Length / 4);
-
-        foreach (string fileName in fileNames)
-        {
-            if (ImageHelper.IsImageFile(fileName))
-            {
-                imageNames.Add(fileName);
-            }
-
-            else if (VideoHelper.IsVideoFile(fileName))
-            {
-                videoNames.Add(fileName);
-            }
-        }
-
-        return ([.. imageNames], [.. videoNames]);
     }
 }
