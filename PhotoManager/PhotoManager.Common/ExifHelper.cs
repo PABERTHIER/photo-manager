@@ -16,9 +16,12 @@ public static class ExifHelper
         {
             using (MemoryStream stream = new(buffer))
             {
-                BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
+                BitmapDecoder decoder = BitmapDecoder.Create(
+                    stream,
+                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
+                    BitmapCacheOption.None);
 
-                if (bitmapFrame.Metadata is BitmapMetadata bitmapMetadata)
+                if (decoder.Frames[0].Metadata is BitmapMetadata bitmapMetadata)
                 {
                     object? orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
 
@@ -96,7 +99,7 @@ public static class ExifHelper
             6 => Rotation.Rotate90,
             7 => Rotation.Rotate270, // FlipX
             8 => Rotation.Rotate270,
-            _ => Rotation.Rotate0,
+            _ => Rotation.Rotate0
         };
 
         return rotation;
@@ -108,7 +111,10 @@ public static class ExifHelper
         {
             using (MemoryStream ms = new(imageData))
             {
-                BitmapFrame.Create(ms);
+                BitmapDecoder.Create(
+                    ms,
+                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
+                    BitmapCacheOption.None);
             }
 
             return true;

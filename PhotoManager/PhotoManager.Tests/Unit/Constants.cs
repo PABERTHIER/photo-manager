@@ -93,7 +93,7 @@ public static class Constants
         public const int IMAGE_5_JPG = 720;
         public const int IMAGE_6_JPG = 720;
         public const int IMAGE_8_JPEG = 720;
-        public const int IMAGE_9_PNG = 700;
+        public const int IMAGE_9_PNG = 720;
         public const int IMAGE_10_PORTRAIT_PNG = 1280;
         public const int IMAGE_11_HEIC = 4032;
         public const int IMAGE_11_90_DEG_HEIC = 3024;

@@ -30,7 +30,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
@@ -58,7 +58,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
@@ -74,7 +74,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
@@ -93,7 +93,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
@@ -112,7 +112,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -130,7 +130,7 @@ public class BitmapHelperTests
 
     // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_HeicImageFormat_ReturnsBitmapImageWithIncorrectData()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -157,7 +157,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     [TestCase(Rotation.Rotate0, 100, 100)]
     [TestCase(Rotation.Rotate90, 100, 100)]
     [TestCase(Rotation.Rotate180, 100, 100)]
@@ -197,7 +197,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_LargeWidthAndHeight_ThrowsOverflowException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -212,7 +212,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
@@ -227,7 +227,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
@@ -246,7 +246,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
@@ -265,7 +265,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -283,7 +283,7 @@ public class BitmapHelperTests
 
     // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_HeicImageFormat_ReturnsBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -309,7 +309,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
     [TestCase(FileNames.IMAGE_11_HEIC, Rotation.Rotate0, Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC,
         PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, Rotation.Rotate90,
@@ -342,7 +342,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
@@ -358,7 +358,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_EmptyBuffer_ThrowsArgumentException()
     {
         byte[] buffer = [];
@@ -374,7 +374,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
@@ -393,7 +393,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -410,7 +410,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     [TestCase(Rotation.Rotate0, 100, 100, Rotation.Rotate0, 75, 100)]
     [TestCase(Rotation.Rotate90, 100, 100, Rotation.Rotate90, 75, 100)]
     [TestCase(Rotation.Rotate180, 100, 100, Rotation.Rotate180, 75, 100)]
@@ -452,7 +452,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, 100, 100, Rotation.Rotate90, 100, 75)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, 100, 100, Rotation.Rotate180, 75, 100)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, 100, 100, Rotation.Rotate270, 100, 75)]
@@ -479,7 +479,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     [TestCase(-100, 100, 100, 133)]
     [TestCase(100, -100, 75, 100)]
     public void LoadBitmapHeicThumbnailImage_NegativeWidthOrHeight_ReturnsBitmapImage(int width, int height,
@@ -506,7 +506,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_NegativeWidthAndHeight_ReturnsDefaultBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -525,7 +525,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -545,7 +545,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
@@ -561,7 +561,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_EmptyBuffer_ThrowsArgumentException()
     {
         byte[] buffer = [];
@@ -577,7 +577,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
@@ -596,7 +596,7 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
@@ -1335,6 +1335,209 @@ public class BitmapHelperTests
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    [TestCase(FileNames.IMAGE_1_JPG, Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_JPG, Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_JPG, Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_JPG, Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_9_PNG, Rotation.Rotate0, PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG)]
+    [TestCase(FileNames.IMAGE_9_PNG, Rotation.Rotate90, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, Rotation.Rotate0, PixelWidthAsset.IMAGE_10_PORTRAIT_PNG,
+        PixelHeightAsset.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF, Rotation.Rotate0, PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF)]
+    public void GetImageDimensions_ValidBufferAndRotation_ReturnsDimensions(string fileName, Rotation rotation,
+        int expectedWidth, int expectedHeight)
+    {
+        string filePath = Path.Combine(_dataDirectory!, fileName);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        (int width, int height) = BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!);
+
+        Assert.That(width, Is.EqualTo(expectedWidth));
+        Assert.That(height, Is.EqualTo(expectedHeight));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    // TODO: Migrate from MagickImage to BitmapImage ?
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_HeicImageFormat_FallsBackToWpfAndReturnsDimensions()
+    {
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        byte[] buffer = File.ReadAllBytes(filePath);
+        const Rotation rotation = Rotation.Rotate0;
+
+        (int width, int height) = BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!);
+
+        Assert.That(width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_NullBuffer_ThrowsArgumentNullException()
+    {
+        byte[]? buffer = null;
+        const Rotation rotation = Rotation.Rotate90;
+
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() =>
+                BitmapHelper.GetImageDimensions(buffer!, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_EmptyBuffer_ThrowsNotSupportedException()
+    {
+        byte[] buffer = [];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_InvalidBuffer_ThrowsNotSupportedException()
+    {
+        byte[] buffer = [0x00, 0x01, 0x02, 0x03];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_JpegBufferTooShort_ThrowsNotSupportedException()
+    {
+        // JPEG signature detected, but buffer is too short for the while loop (offset=2, buffer.Length-3=1)
+        byte[] buffer = [0xFF, 0xD8, 0xFF, 0xFF];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_JpegBufferWithCorruptMarker_ThrowsNotSupportedException()
+    {
+        // JPEG signature valid, but byte at marker position is not 0xFF
+        byte[] buffer = [0xFF, 0xD8, 0x00, 0x00, 0x00, 0x00];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_JpegBufferWithTruncatedSofSegment_ThrowsNotSupportedException()
+    {
+        // SOF0 marker found (0xC0) but not enough bytes after it to read the dimensions
+        byte[] buffer = [0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x00];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_JpegBufferWithMalformedSegmentLength_ThrowsNotSupportedException()
+    {
+        // APP0 marker (0xE0) with segment length = 1, which is below the minimum of 2
+        byte[] buffer = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x01, 0x00, 0x00, 0x00];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
+    public void GetImageDimensions_JpegBufferWithNoSofMarkerFoundAfterSegmentSkip_ThrowsNotSupportedException()
+    {
+        // APP0 marker (0xE0) with valid length=8 is skipped, then the while condition becomes false (no SOF found)
+        byte[] buffer = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00];
+        const Rotation rotation = Rotation.Rotate0;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
+
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
+                BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
+
+        _testLogger!.AssertLogExceptions(
+            [new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
     }
 
     private static void AssertBrightnessValues(Bitmap bitmap, int x, int y)
