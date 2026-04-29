@@ -436,12 +436,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
             Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+            Assert.That(folder, Is.Null);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -449,7 +444,7 @@ public class MainWindowLoadedAndClosingTests
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
             const string expectedTotalFilesCountWording = "4 files found";
-            const string expectedStatusMessage = "The catalog process has ended.";
+            string expectedStatusMessage = $"Cataloging thumbnails for {assetsDirectory}";
 
             Assert.That(_catalogTask.IsCompleted, Is.True);
 
@@ -486,16 +481,12 @@ public class MainWindowLoadedAndClosingTests
                 false,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
-            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("TotalFilesCountWording"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1247,9 +1238,10 @@ public class MainWindowLoadedAndClosingTests
         {
             await _catalogTask.ConfigureAwait(false); // Unlike in WPF context, we do no need to set it to true
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
-            Log.LogError(ex, ex.Message);
+            // Expected: the user requested cancellation (window closing). The service has already
+            // saved any in-flight catalog state and emitted CatalogProcessCancelled/CatalogProcessEnded.
         }
 
         _applicationViewModel!.CalculateGlobalAssetsCounter();

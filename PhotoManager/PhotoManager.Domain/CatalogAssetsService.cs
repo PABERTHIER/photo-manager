@@ -48,7 +48,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         _cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath);
     }
 
-    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null)
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default)
     {
         await Task.Run(() =>
         {
@@ -57,13 +57,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
             try
             {
+                token.ThrowIfCancellationRequested();
+
                 HashSet<string> foldersPathToCatalog = GetFoldersPathToCatalog();
 
                 foreach (string path in foldersPathToCatalog)
                 {
-                    // TODO: Rework the whole cancellation
-                    // ThrowIfCancellationRequested should be in each if below ?
-                    // token?.ThrowIfCancellationRequested();
+                    token.ThrowIfCancellationRequested();
 
                     CatalogFolders(path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
                     callback(new()
@@ -109,13 +109,27 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
             catch (OperationCanceledException)
             {
-                // If the catalog background process is cancelled, there is a risk that it happens while saving the catalog files.
-                // This could result in the files being damaged.
-                // Therefore, the application saves the files before the task is completely shut down.
+                // When cancellation is requested (typically the user closing the window), the in-flight folder
+                // may have produced uncommitted changes in the repository. Persist them before propagating so
+                // that work already done is not lost (resilience). Backup writing is intentionally skipped:
+                // it is expensive and can be performed on the next start.
+                try
+                {
+                    Folder? currentFolder = string.IsNullOrEmpty(_currentFolderPath)
+                        ? null
+                        : _assetRepository.GetFolderByPath(_currentFolderPath);
 
-                // TODO: Test if _currentFolderPath is good & SaveCatalog performed correctly
-                Folder? currentFolder = _assetRepository.GetFolderByPath(_currentFolderPath);
-                _assetRepository.SaveCatalog(currentFolder);
+                    if (_assetRepository.HasChanges())
+                    {
+                        _assetRepository.SaveCatalog(currentFolder);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    // Saving on cancellation is best-effort: log but never mask the OperationCanceledException.
+                    _logger.LogError(exception, "Failed to save catalog while handling cancellation: {ExMessage}",
+                        exception.Message);
+                }
 
                 callback(new()
                 {
@@ -143,7 +157,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                     Message = "The catalog process has ended."
                 });
             }
-        });
+        }, token);
     }
 
     #region private
@@ -164,7 +178,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     }
 
     private void CatalogFolders(string directory, CatalogChangeCallback callback, ref int cataloguedAssetsBatchCount,
-        HashSet<string> visitedDirectories, CancellationToken? token = null)
+        HashSet<string> visitedDirectories, CancellationToken token = default)
     {
         int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
         _currentFolderPath = directory;
@@ -185,11 +199,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     private void CatalogExistingFolder(string directory, CatalogChangeCallback callback,
         ref int cataloguedAssetsBatchCount, int batchSize, HashSet<string> visitedDirectories,
-        CancellationToken? token = null)
+        CancellationToken token = default)
     {
         Folder? folder;
 
-        if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+        token.ThrowIfCancellationRequested();
+
+        if (cataloguedAssetsBatchCount >= batchSize)
         {
             return;
         }
@@ -236,7 +252,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             _assetRepository.SaveCatalog(folder);
         }
 
-        if (cataloguedAssetsBatchCount >= batchSize || (!(!token?.IsCancellationRequested ?? true)))
+        token.ThrowIfCancellationRequested();
+
+        if (cataloguedAssetsBatchCount >= batchSize)
         {
             return;
         }
@@ -245,6 +263,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         foreach (DirectoryInfo subdirectory in subdirectories)
         {
+            token.ThrowIfCancellationRequested();
+
             if (!_directories.Contains(subdirectory.FullName))
             {
                 CatalogFolders(subdirectory.FullName, callback, ref cataloguedAssetsBatchCount, visitedDirectories,
@@ -254,9 +274,11 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     }
 
     private void CatalogNonExistingFolder(string directory, CatalogChangeCallback callback,
-        ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
+        ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken token = default)
     {
-        if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+        token.ThrowIfCancellationRequested();
+
+        if (cataloguedAssetsBatchCount >= batchSize)
         {
             return;
         }
@@ -266,8 +288,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         foreach (Asset asset in _cataloguedAssetsByPath)
         {
-            // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
-            if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+            token.ThrowIfCancellationRequested();
+
+            if (cataloguedAssetsBatchCount >= batchSize)
             {
                 break;
             }
@@ -305,7 +328,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     }
 
     private void CatalogNewAssets(string directory, CatalogChangeCallback callback, ref int cataloguedAssetsBatchCount,
-        int batchSize, string[] fileNames, CancellationToken? token = null)
+        int batchSize, string[] fileNames, CancellationToken token = default)
     {
         (string[] imageNames, string[] videoNames) = _assetsComparator.GetImageAndVideoNames(fileNames);
 
@@ -323,11 +346,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     private void CatalogAssets(IEnumerable<string> fileNames, bool isAssetVideo, string directory,
         CatalogChangeCallback callback, ref int cataloguedAssetsBatchCount, int batchSize,
-        CancellationToken? token = null)
+        CancellationToken token = default)
     {
         foreach (string fileName in fileNames)
         {
-            if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+            token.ThrowIfCancellationRequested();
+
+            if (cataloguedAssetsBatchCount >= batchSize)
             {
                 break;
             }
@@ -364,12 +389,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     private void CatalogUpdatedAssets(string directory, CatalogChangeCallback callback,
         ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> updatedFileNames,
-        CancellationToken? token = null)
+        CancellationToken token = default)
     {
         foreach (string fileName in updatedFileNames)
         {
-            // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
-            if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+            token.ThrowIfCancellationRequested();
+
+            if (cataloguedAssetsBatchCount >= batchSize)
             {
                 break;
             }
@@ -407,12 +433,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     private void CatalogDeletedAssets(string directory, CatalogChangeCallback callback,
         ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> deletedFileNames,
-        CancellationToken? token = null)
+        CancellationToken token = default)
     {
         foreach (string fileName in deletedFileNames)
         {
-            // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
-            if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
+            token.ThrowIfCancellationRequested();
+
+            if (cataloguedAssetsBatchCount >= batchSize)
             {
                 break;
             }

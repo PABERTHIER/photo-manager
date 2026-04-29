@@ -28,7 +28,6 @@ Even the database is stored in your computer.**
 
 ## Upcoming :next_track_button:
 
-- 100% of code coverage.
 - Progress bar.
 - Multithread.
 - Handling corrupted images and videos.

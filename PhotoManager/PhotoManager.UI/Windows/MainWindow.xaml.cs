@@ -331,7 +331,6 @@ public partial class MainWindow
         }
     }
 
-    // TODO: Rework the cancellation from here to CatalogAssetsService
     private async Task InitializeOnceAsync(Stopwatch stopwatch)
     {
         _catalogTask = ViewModel.CatalogAssets(
@@ -349,9 +348,10 @@ public partial class MainWindow
             await _catalogTask
                 .ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
-            _logger.LogError(ex, "{ExMessage}", ex.Message);
+            // Expected: the user requested cancellation (window closing). The service has already
+            // saved any in-flight catalog state and emitted CatalogProcessCancelled/CatalogProcessEnded.
         }
 
         ViewModel.CalculateGlobalAssetsCounter();
