@@ -322,7 +322,7 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_DirectoryIsNull_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
+    public void DeleteAsset_DirectoryIsNull_LogsItAndThrowsArgumentNullExceptionAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -330,6 +330,8 @@ public class AssetRepositoryDeleteAssetTests
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
             string? folderPath2 = null;
 
@@ -356,9 +358,10 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset? assetDeleted = _testableAssetRepository!.DeleteAsset(folderPath2!, _asset1.FileName);
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _testableAssetRepository!.DeleteAsset(folderPath2!, _asset1.FileName));
 
-            Assert.That(assetDeleted, Is.Null);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
@@ -373,7 +376,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+            _testLogger!.AssertLogExceptions([new Exception(exceptionMessage)], typeof(AssetRepository));
         }
         finally
         {

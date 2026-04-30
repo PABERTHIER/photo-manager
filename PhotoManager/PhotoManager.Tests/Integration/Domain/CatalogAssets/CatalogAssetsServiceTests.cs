@@ -10330,6 +10330,7 @@ public class CatalogAssetsServiceTests
                 DisposeCheckCatalogChangesAssetAdded(
                     catalogChanges,
                     assetsDirectory,
+                    folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
                     ref increment);
@@ -10381,6 +10382,7 @@ public class CatalogAssetsServiceTests
     private static void DisposeCheckCatalogChangesAssetAdded(
         List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
+        IReadOnlyList<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
@@ -10390,7 +10392,7 @@ public class CatalogAssetsServiceTests
         DisposeAssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath,
             assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
-        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetCreated));
         Assert.That(catalogChange.Message, Is.EqualTo($"Image {expectedAsset.FullPath} added to catalog."));
         Assert.That(catalogChange.Exception, Is.Null);

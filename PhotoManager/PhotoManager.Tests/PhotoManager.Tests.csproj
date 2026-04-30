@@ -3,6 +3,13 @@
     <IsPackable>false</IsPackable>
     <Product>PhotoManager</Product>
     <FixedDate>2024-06-07T00:00:00</FixedDate>
+    <!-- Disable IDE-style code analyzers and XML doc generation for the test project.
+         In .NET 10, AnalysisLevel=latest enables significantly more IDE analyzers than .NET 8,
+         causing a ~30s overhead on every rebuild of this large test project (~200K lines).
+         Code style is still enforced via `dotnet format` in CI.
+         NUnit.Analyzers (package analyzers) are unaffected and continue to run. -->
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <TestFiles Include="TestFiles\**\*.*" />

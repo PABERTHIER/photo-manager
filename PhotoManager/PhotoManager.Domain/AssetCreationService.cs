@@ -12,7 +12,8 @@ public class AssetCreationService(
     ILogger<AssetCreationService> logger)
     : IAssetCreationService
 {
-    public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
+    public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false,
+        bool skipCatalogCheck = false)
     {
         try
         {
@@ -38,7 +39,7 @@ public class AssetCreationService(
                 return null;
             }
 
-            if (assetRepository.IsAssetCatalogued(directoryName, fileName))
+            if (!skipCatalogCheck && assetRepository.IsAssetCatalogued(directoryName, fileName))
             {
                 return null;
             }

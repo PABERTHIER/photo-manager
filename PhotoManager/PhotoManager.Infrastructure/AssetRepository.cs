@@ -19,6 +19,9 @@ public class AssetRepository : IAssetRepository
 
     private List<Asset> _assets;
     private List<Folder> _folders;
+    private readonly Dictionary<string, Folder> _foldersByPath = [];
+    private readonly Dictionary<Guid, Folder> _foldersById = [];
+    private readonly Dictionary<Guid, Dictionary<string, Asset>> _assetsByFolderId = [];
     private SyncAssetsConfiguration _syncAssetsConfiguration;
     private List<string> _recentTargetPaths;
     protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; }
@@ -134,6 +137,14 @@ public class AssetRepository : IAssetRepository
                 {
                     folderThumbnails[asset.FileName] = thumbnailData;
                     _assets.Add(asset);
+
+                    if (!_assetsByFolderId.TryGetValue(asset.FolderId, out Dictionary<string, Asset>? assetsByName))
+                    {
+                        assetsByName = [];
+                        _assetsByFolderId[asset.FolderId] = assetsByName;
+                    }
+
+                    assetsByName[asset.FileName] = asset;
                     _hasChanges = true;
                     _assetsUpdatedSubject.OnNext(Unit.Default);
                 }
@@ -164,6 +175,8 @@ public class AssetRepository : IAssetRepository
             };
 
             _folders.Add(folder);
+            _foldersByPath.TryAdd(folder.Path, folder);
+            _foldersById[folder.Id] = folder;
             _hasChanges = true;
         }
 
@@ -176,7 +189,7 @@ public class AssetRepository : IAssetRepository
 
         lock (_syncLock)
         {
-            result = _folders.Any(f => f.Path == path);
+            result = _foldersByPath.ContainsKey(path);
         }
 
         return result;
@@ -218,7 +231,7 @@ public class AssetRepository : IAssetRepository
 
         lock (_syncLock)
         {
-            result = _folders.FirstOrDefault(f => f.Path == path);
+            result = _foldersByPath.GetValueOrDefault(path);
         }
 
         return result;
@@ -301,9 +314,11 @@ public class AssetRepository : IAssetRepository
         {
             Folder? folder = GetFolderByPath(directory);
 
-            if (folder != null)
+            if (folder != null
+                && _assetsByFolderId.TryGetValue(
+                    folder.Id, out Dictionary<string, Asset>? folderAssets))
             {
-                cataloguedAssets = [.. _assets.Where(a => a.FolderId == folder.Id)];
+                cataloguedAssets = [.. folderAssets.Values];
             }
         }
 
@@ -356,6 +371,17 @@ public class AssetRepository : IAssetRepository
                 if (assetToDelete != null)
                 {
                     _assets.Remove(assetToDelete);
+
+                    if (_assetsByFolderId.TryGetValue(folder.Id, out Dictionary<string, Asset>? assetsByName))
+                    {
+                        assetsByName.Remove(fileName);
+
+                        if (assetsByName.Count == 0)
+                        {
+                            _assetsByFolderId.Remove(folder.Id);
+                        }
+                    }
+
                     _hasChanges = true;
                     _assetsUpdatedSubject.OnNext(Unit.Default);
                 }
@@ -384,6 +410,13 @@ public class AssetRepository : IAssetRepository
                 }
 
                 _folders.Remove(folder);
+
+                if (_foldersByPath.TryGetValue(folder.Path, out Folder? indexed) && indexed.Id == folder.Id)
+                {
+                    _foldersByPath.Remove(folder.Path);
+                }
+
+                _foldersById.Remove(folder.Id);
                 _hasChanges = true;
             }
         }
@@ -592,6 +625,9 @@ public class AssetRepository : IAssetRepository
         {
             _assets = ReadAssets();
             _folders = ReadFolders();
+
+            BuildIndexes();
+
             _syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
             _recentTargetPaths = ReadRecentTargetPaths();
 
@@ -609,6 +645,31 @@ public class AssetRepository : IAssetRepository
         {
             _logger.LogError(ex, "Error reading catalog");
             throw;
+        }
+    }
+
+    private void BuildIndexes()
+    {
+        _foldersByPath.Clear();
+        _foldersById.Clear();
+        _assetsByFolderId.Clear();
+
+        foreach (Folder folder in _folders)
+        {
+            _foldersByPath.TryAdd(folder.Path, folder);
+            _foldersById.TryAdd(folder.Id, folder);
+        }
+
+        foreach (Asset asset in _assets)
+        {
+            if (!_assetsByFolderId.TryGetValue(
+                    asset.FolderId, out Dictionary<string, Asset>? folderAssets))
+            {
+                folderAssets = [];
+                _assetsByFolderId[asset.FolderId] = folderAssets;
+            }
+
+            folderAssets.TryAdd(asset.FileName, asset);
         }
     }
 
@@ -726,7 +787,7 @@ public class AssetRepository : IAssetRepository
 
         lock (_syncLock)
         {
-            result = _folders.FirstOrDefault(f => f.Id == folderId);
+            result = _foldersById.GetValueOrDefault(folderId);
         }
 
         return result;
@@ -738,7 +799,9 @@ public class AssetRepository : IAssetRepository
 
         lock (_syncLock)
         {
-            result = [.. _assets.Where(a => a.FolderId == folderId)];
+            result = _assetsByFolderId.TryGetValue(folderId, out Dictionary<string, Asset>? folderAssets)
+                ? [.. folderAssets.Values]
+                : [];
         }
 
         return result;
@@ -746,11 +809,14 @@ public class AssetRepository : IAssetRepository
 
     private Asset? GetAssetByFolderIdAndFileName(Guid folderId, string fileName)
     {
-        Asset? asset;
+        Asset? asset = null;
 
         lock (_syncLock)
         {
-            asset = _assets.FirstOrDefault(a => a.FolderId == folderId && a.FileName == fileName);
+            if (_assetsByFolderId.TryGetValue(folderId, out Dictionary<string, Asset>? folderAssets))
+            {
+                asset = folderAssets.GetValueOrDefault(fileName);
+            }
         }
 
         return asset;

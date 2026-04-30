@@ -92,7 +92,8 @@ public class CatalogAssetsServiceTests
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
         IAssetCreationService assetCreationServiceMock = Substitute.For<IAssetCreationService>();
-        assetCreationServiceMock.CreateAsset(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(testAsset);
+        assetCreationServiceMock.CreateAsset(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
+            .Returns(testAsset);
 
         AssetSettings assetSettings = new(
             AnalyseVideos: false,
@@ -152,8 +153,8 @@ public class CatalogAssetsServiceTests
 
         CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
             testPath, ref increment);
-        CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, testPath, [], testAsset, testFolder,
-            ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, testPath, [testAsset], testAsset,
+            testFolder, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
