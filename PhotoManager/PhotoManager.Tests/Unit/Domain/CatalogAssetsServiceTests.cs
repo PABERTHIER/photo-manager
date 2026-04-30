@@ -152,8 +152,8 @@ public class CatalogAssetsServiceTests
 
         CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
             testPath, ref increment);
-        CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, testPath, [], testAsset, testFolder,
-            ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, testPath, [testAsset], testAsset,
+            testFolder, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 

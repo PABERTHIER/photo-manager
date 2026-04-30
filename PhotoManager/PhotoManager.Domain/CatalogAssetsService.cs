@@ -17,6 +17,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     private readonly HashSet<string> _directories = [];
     private List<Asset> _cataloguedAssetsByPath = [];
     private readonly IDisposable _assetsUpdatedSubscription;
+    private bool _suppressReactiveUpdates;
 
     public CatalogAssetsService(
         IAssetRepository assetRepository,
@@ -45,6 +46,11 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     private void UpdateAssets()
     {
+        if (_suppressReactiveUpdates)
+        {
+            return;
+        }
+
         _cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath);
     }
 
@@ -54,6 +60,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         {
             int cataloguedAssetsBatchCount = 0;
             HashSet<string> visitedDirectories = [];
+
+            _suppressReactiveUpdates = true;
 
             try
             {
@@ -151,6 +159,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
             finally
             {
+                _suppressReactiveUpdates = false;
+
                 callback(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessEnded,
@@ -182,7 +192,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     {
         int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
         _currentFolderPath = directory;
-        UpdateAssets(); // Needed when having multiple actions on the same instance
+        // Explicit refresh for the new folder (not suppressed by the reactive guard)
+        _cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath);
 
         if (_fileOperationsService.FolderExists(directory))
         {
@@ -286,7 +297,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         // If the directory has been manually deleted during the EnumerateDirectories, we want to throw an exception
         Folder folder = _assetRepository.GetFolderByPath(directory)!;
 
-        foreach (Asset asset in _cataloguedAssetsByPath)
+        List<Asset> assetsToProcess = [.. _cataloguedAssetsByPath];
+
+        foreach (Asset asset in assetsToProcess)
         {
             token.ThrowIfCancellationRequested();
 
@@ -296,13 +309,14 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
 
             _ = _assetRepository.DeleteAsset(directory, asset.FileName);
+            _cataloguedAssetsByPath.Remove(asset);
             _backupHasSameContent = false;
             cataloguedAssetsBatchCount++;
 
             callback(new()
             {
                 Asset = asset,
-                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
             });
@@ -365,7 +379,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 {
                     callback(new()
                     {
-                        CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                        CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                         Reason = CatalogChangeReason.AssetNotCreated,
                         Message = $"Image {Path.Combine(directory, fileName)} not added to catalog (corrupted)."
                     });
@@ -374,10 +388,12 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 continue;
             }
 
+            _cataloguedAssetsByPath.Add(newAsset);
+
             callback(new()
             {
                 Asset = newAsset,
-                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetCreated,
                 Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog."
             });
@@ -401,6 +417,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
 
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
+            _cataloguedAssetsByPath.RemoveAll(a => a.FileName == fileName);
             _backupHasSameContent = false;
 
             Asset? updatedAsset = _assetCreationService.CreateAsset(directory, fileName);
@@ -410,7 +427,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 callback(new()
                 {
                     Asset = deletedAsset,
-                    CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                    CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                     Reason = CatalogChangeReason.AssetDeleted,
                     Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
                 });
@@ -418,11 +435,13 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 continue;
             }
 
+            _cataloguedAssetsByPath.Add(updatedAsset);
+
             string fullPath = Path.Combine(directory, fileName);
             callback(new()
             {
                 Asset = updatedAsset,
-                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetUpdated,
                 Message = $"Image {fullPath} updated in catalog."
             });
@@ -445,11 +464,12 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
 
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
+            _cataloguedAssetsByPath.RemoveAll(a => a.FileName == fileName);
 
             callback(new()
             {
                 Asset = deletedAsset,
-                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog."
             });
