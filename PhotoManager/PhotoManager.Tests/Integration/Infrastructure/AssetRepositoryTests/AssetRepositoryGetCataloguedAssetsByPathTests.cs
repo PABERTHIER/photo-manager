@@ -166,13 +166,15 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
     }
 
     [Test]
-    public void GetCataloguedAssetsByPath_DirectoryIsNull_ReturnsEmptyList()
+    public void GetCataloguedAssetsByPath_DirectoryIsNull_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
             string? folderPath2 = null;
 
@@ -185,9 +187,10 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(folderPath2!);
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository.GetCataloguedAssetsByPath(folderPath2!));
 
-            Assert.That(cataloguedAssets, Is.Empty);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

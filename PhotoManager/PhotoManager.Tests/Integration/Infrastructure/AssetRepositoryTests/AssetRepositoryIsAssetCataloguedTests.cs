@@ -163,18 +163,21 @@ public class AssetRepositoryIsAssetCataloguedTests
     }
 
     [Test]
-    public void IsAssetCatalogued_DirectoryNameIsNull_ReturnsFalse()
+    public void IsAssetCatalogued_DirectoryNameIsNull_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string? folderPath = null;
 
-            bool isAssetCatalogued = _assetRepository!.IsAssetCatalogued(folderPath!, FileNames.NON_EXISTENT_FILE_JPG);
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                _assetRepository!.IsAssetCatalogued(folderPath!, FileNames.NON_EXISTENT_FILE_JPG));
 
-            Assert.That(isAssetCatalogued, Is.False);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

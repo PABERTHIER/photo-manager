@@ -150,20 +150,23 @@ public class AssetRepositoryGetFolderByPathTests
     }
 
     [Test]
-    public void GetFolderByPath_PathIsNull_ReturnsNull()
+    public void GetFolderByPath_PathIsNull_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
+            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+
             string? folderPath1 = null;
 
             _assetRepository!.AddFolder(Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1));
 
-            Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1!);
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository!.GetFolderByPath(folderPath1!));
 
-            Assert.That(folderByPath1, Is.Null);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

@@ -799,7 +799,9 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+            _testLogger!.AssertLogExceptions(
+                [new Exception("Value cannot be null. (Parameter 'key')")],
+                typeof(AssetRepository));
         }
         finally
         {

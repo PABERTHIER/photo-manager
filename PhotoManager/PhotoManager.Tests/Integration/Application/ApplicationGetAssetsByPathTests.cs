@@ -714,9 +714,9 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            if (folderExists)
+            if (folderExists && directory != null)
             {
-                _testableAssetRepository!.AddFolder(directory!);
+                _testableAssetRepository!.AddFolder(directory);
             }
 
             ArgumentException? exception =
