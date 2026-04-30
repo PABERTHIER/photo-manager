@@ -6,7 +6,7 @@ namespace PhotoManager.Application;
 
 public interface IApplication
 {
-    Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null);
+    Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default);
     List<List<Asset>> GetDuplicatedAssets();
     Asset[] GetAssetsByPath(string directory);
     Folder[] GetRootCatalogFolders();

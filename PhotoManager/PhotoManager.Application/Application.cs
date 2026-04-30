@@ -17,7 +17,7 @@ public class Application(
     : IApplication
 {
     // Catalog
-    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) =>
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default) =>
         await catalogAssetsService.CatalogAssetsAsync(callback, token);
 
     /// <summary>

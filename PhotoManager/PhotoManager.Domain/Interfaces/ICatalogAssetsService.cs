@@ -2,5 +2,5 @@
 
 public interface ICatalogAssetsService
 {
-    Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null);
+    Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default);
 }

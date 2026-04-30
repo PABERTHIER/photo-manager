@@ -360,7 +360,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) =>
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken token = default) =>
         await _application.CatalogAssetsAsync(callback, token);
 
     public ushort GetCatalogCooldownMinutes() => _application.GetCatalogCooldownMinutes();

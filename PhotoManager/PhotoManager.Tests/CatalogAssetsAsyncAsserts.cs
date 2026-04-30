@@ -599,6 +599,19 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
+    public static void CheckCatalogChangesCancelled(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.CatalogProcessCancelled));
+        Assert.That(catalogChange.Message, Is.EqualTo("The catalog process has been cancelled."));
+        Assert.That(catalogChange.Exception, Is.Null);
+        increment++;
+    }
+
     public static void CheckCatalogChangesEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
         ref int increment)
     {
