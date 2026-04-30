@@ -1642,6 +1642,211 @@ public class AssetCreationServiceTests
     }
 
     [Test]
+    public void
+        CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageAndSkipCatalogCheckFalse_DoesNotAddTheSecondOneAndReturnsNull()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        Asset expectedAsset = new()
+        {
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
+
+        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
+
+        try
+        {
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+
+            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            Assert.That(File.Exists(imagePath), Is.True);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.That(thumbnails, Is.Empty);
+
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+                skipCatalogCheck: false);
+
+            Assert.That(asset, Is.Not.Null);
+
+            AssertAssetPropertyValidity(
+                asset!,
+                expectedAsset.FileName,
+                imagePath,
+                _dataDirectory!,
+                folder,
+                expectedAsset.FileProperties.Size,
+                expectedAsset.Pixel.Asset.Width,
+                expectedAsset.Pixel.Asset.Height,
+                expectedAsset.Pixel.Thumbnail.Width,
+                expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileProperties.Modification,
+                expectedAsset.ImageRotation,
+                expectedAsset.Hash,
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
+
+            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+                skipCatalogCheck: false);
+
+            Assert.That(newSameAsset, Is.Null);
+
+            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void
+        CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageAndSkipCatalogCheckTrue_ReturnsAssetBothTimes()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        Asset expectedAsset = new()
+        {
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
+
+        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
+
+        try
+        {
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+
+            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            Assert.That(File.Exists(imagePath), Is.True);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Is.Empty);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.That(thumbnails, Is.Empty);
+
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+                skipCatalogCheck: true);
+
+            Assert.That(asset, Is.Not.Null);
+
+            AssertAssetPropertyValidity(
+                asset!,
+                expectedAsset.FileName,
+                imagePath,
+                _dataDirectory!,
+                folder,
+                expectedAsset.FileProperties.Size,
+                expectedAsset.Pixel.Asset.Width,
+                expectedAsset.Pixel.Asset.Height,
+                expectedAsset.Pixel.Thumbnail.Width,
+                expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileProperties.Modification,
+                expectedAsset.ImageRotation,
+                expectedAsset.Hash,
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
+
+            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+
+            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+                skipCatalogCheck: true);
+
+            Assert.That(newSameAsset, Is.Not.Null);
+
+            AssertAssetPropertyValidity(
+                newSameAsset!,
+                expectedAsset.FileName,
+                imagePath,
+                _dataDirectory!,
+                folder,
+                expectedAsset.FileProperties.Size,
+                expectedAsset.Pixel.Asset.Width,
+                expectedAsset.Pixel.Asset.Height,
+                expectedAsset.Pixel.Thumbnail.Width,
+                expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileProperties.Modification,
+                expectedAsset.ImageRotation,
+                expectedAsset.Hash,
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
+            Assert.That(assetsFromRepository[0].FileName, Is.EqualTo(expectedAsset.FileName));
+            Assert.That(assetsFromRepository[1].FileName, Is.EqualTo(expectedAsset.FileName));
+            Assert.That(assetsFromRepository[0].Hash, Is.EqualTo(expectedAsset.Hash));
+            Assert.That(assetsFromRepository[1].Hash, Is.EqualTo(expectedAsset.Hash));
+
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folder.Path], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folder.Path][expectedAsset.FileName], Is.Not.Null);
+            Assert.That(thumbnails[folder.Path][expectedAsset.FileName], Has.Length.EqualTo(imageByteSize));
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
     [TestCase(FileNames.IMAGE_1_JPG, "Invalid_Image_1.jpg")]
     [TestCase(FileNames.HOMER_GIF, "Invalid_Homer.gif")]
     [TestCase(FileNames.IMAGE_9_PNG, "Invalid_Image_9.png")]

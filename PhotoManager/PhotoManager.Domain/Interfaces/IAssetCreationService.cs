@@ -2,5 +2,5 @@
 
 public interface IAssetCreationService
 {
-    Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false);
+    Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false, bool skipCatalogCheck = false);
 }

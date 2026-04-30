@@ -212,8 +212,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         ref int cataloguedAssetsBatchCount, int batchSize, HashSet<string> visitedDirectories,
         CancellationToken token = default)
     {
-        Folder? folder;
-
         token.ThrowIfCancellationRequested();
 
         if (cataloguedAssetsBatchCount >= batchSize)
@@ -221,7 +219,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        if (!_assetRepository.FolderExists(directory))
+        Folder? folder = _assetRepository.GetFolderByPath(directory);
+
+        if (folder == null)
         {
             folder = _assetRepository.AddFolder(directory);
 
@@ -232,8 +232,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 Message = $"Folder {directory} added to catalog."
             });
         }
-
-        folder = _assetRepository.GetFolderByPath(directory);
 
         callback(new()
         {
@@ -255,8 +253,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, deletedFileNames, token);
 
-        // folder is guaranteed non-null at this point (just assigned via AddFolder or GetFolderByPath on a known-existing path)
-        bool isBlobFileExists = _assetRepository.IsBlobFileExists(folder!.BlobFileName);
+        // folder is guaranteed non-null (assigned via AddFolder or GetFolderByPath on a known-existing path)
+        bool isBlobFileExists = _assetRepository.IsBlobFileExists(folder.BlobFileName);
 
         if (_assetRepository.HasChanges() || !isBlobFileExists)
         {
@@ -371,7 +369,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 break;
             }
 
-            Asset? newAsset = _assetCreationService.CreateAsset(directory, fileName, isAssetVideo);
+            string fullPath = Path.Combine(directory, fileName);
+            Asset? newAsset = _assetCreationService.CreateAsset(directory, fileName, isAssetVideo,
+                skipCatalogCheck: true);
 
             if (newAsset == null)
             {
@@ -381,7 +381,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                     {
                         CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                         Reason = CatalogChangeReason.AssetNotCreated,
-                        Message = $"Image {Path.Combine(directory, fileName)} not added to catalog (corrupted)."
+                        Message = $"Image {fullPath} not added to catalog (corrupted)."
                     });
                 }
 
@@ -395,7 +395,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 Asset = newAsset,
                 CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetCreated,
-                Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog."
+                Message = $"Image {fullPath} added to catalog."
             });
 
             _backupHasSameContent = false;
@@ -416,11 +416,14 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 break;
             }
 
+            string fullPath = Path.Combine(directory, fileName);
+
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
             _cataloguedAssetsByPath.RemoveAll(a => a.FileName == fileName);
             _backupHasSameContent = false;
 
-            Asset? updatedAsset = _assetCreationService.CreateAsset(directory, fileName);
+            Asset? updatedAsset = _assetCreationService.CreateAsset(directory, fileName,
+                skipCatalogCheck: true);
 
             if (updatedAsset == null)
             {
@@ -429,7 +432,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                     Asset = deletedAsset,
                     CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                     Reason = CatalogChangeReason.AssetDeleted,
-                    Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
+                    Message = $"Image {fullPath} deleted from catalog (corrupted)."
                 });
 
                 continue;
@@ -437,7 +440,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
             _cataloguedAssetsByPath.Add(updatedAsset);
 
-            string fullPath = Path.Combine(directory, fileName);
             callback(new()
             {
                 Asset = updatedAsset,
@@ -463,6 +465,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 break;
             }
 
+            string fullPath = Path.Combine(directory, fileName);
+
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
             _cataloguedAssetsByPath.RemoveAll(a => a.FileName == fileName);
 
@@ -471,7 +475,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 Asset = deletedAsset,
                 CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
                 Reason = CatalogChangeReason.AssetDeleted,
-                Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog."
+                Message = $"Image {fullPath} deleted from catalog."
             });
 
             _backupHasSameContent = false;

@@ -92,7 +92,8 @@ public class CatalogAssetsServiceTests
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
         IAssetCreationService assetCreationServiceMock = Substitute.For<IAssetCreationService>();
-        assetCreationServiceMock.CreateAsset(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(testAsset);
+        assetCreationServiceMock.CreateAsset(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
+            .Returns(testAsset);
 
         AssetSettings assetSettings = new(
             AnalyseVideos: false,
