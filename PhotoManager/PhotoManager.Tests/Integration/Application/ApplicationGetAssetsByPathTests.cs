@@ -21,7 +21,6 @@ public class ApplicationGetAssetsByPathTests
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
-    private Database? _database;
 
     private IPathProviderService? _pathProviderServiceMock;
 
@@ -182,12 +181,11 @@ public class ApplicationGetAssetsByPathTests
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
         _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database, _pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -297,15 +295,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[3].FileName, Is.EqualTo(_asset4!.FileName));
             Assert.That(assets[3].Hash, Is.EqualTo(_asset4!.Hash));
             Assert.That(assets[3].ImageData, Is.Not.Null);
-
-            CheckThumbnail(assetsDirectory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width,
-                _asset1!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width,
-                _asset2!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width,
-                _asset3!.Pixel.Thumbnail.Height);
-            CheckThumbnail(assetsDirectory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width,
-                _asset4!.Pixel.Thumbnail.Height);
         }
         finally
         {
@@ -509,65 +498,6 @@ public class ApplicationGetAssetsByPathTests
             {
                 Assert.That(folderExists, Is.False);
             }
-
-            CheckThumbnail(rootDirectory, FileNames.HOMER_GIF, ThumbnailWidthAsset.HOMER_GIF,
-                ThumbnailHeightAsset.HOMER_GIF);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG,
-                ThumbnailHeightAsset.IMAGE_1_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
-                ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
-                ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
-                ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
-                ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_DUPLICATED_JPG, ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG,
-                ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_JPG, ThumbnailWidthAsset.IMAGE_2_JPG,
-                ThumbnailHeightAsset.IMAGE_2_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_3_JPG, ThumbnailWidthAsset.IMAGE_3_JPG,
-                ThumbnailHeightAsset.IMAGE_3_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_4_JPG, ThumbnailWidthAsset.IMAGE_4_JPG,
-                ThumbnailHeightAsset.IMAGE_4_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_5_JPG, ThumbnailWidthAsset.IMAGE_5_JPG,
-                ThumbnailHeightAsset.IMAGE_5_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_6_JPG, ThumbnailWidthAsset.IMAGE_6_JPG,
-                ThumbnailHeightAsset.IMAGE_6_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_7_JPG, ThumbnailWidthAsset.IMAGE_7_JPG,
-                ThumbnailHeightAsset.IMAGE_7_JPG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG,
-                ThumbnailHeightAsset.IMAGE_8_JPEG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG,
-                ThumbnailHeightAsset.IMAGE_9_PNG);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC,
-                ThumbnailHeightAsset.IMAGE_11_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
-                ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
-                ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
-                ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC);
-            CheckThumbnail(rootDirectory, FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG,
-                ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG);
-
-            CheckThumbnail(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG,
-                ThumbnailHeightAsset.IMAGE_1_JPG);
-
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width,
-                _asset1!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width,
-                _asset2!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset3!.FileName, _asset3!.Pixel.Thumbnail.Width,
-                _asset3!.Pixel.Thumbnail.Height);
-            CheckThumbnail(duplicatesNewFolder2Directory, _asset4!.FileName, _asset4!.Pixel.Thumbnail.Width,
-                _asset4!.Pixel.Thumbnail.Height);
-
-            if (analyseVideos)
-            {
-                CheckThumbnail(outputVideoFirstFrameDirectory, FileNames.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG,
-                    ThumbnailHeightAsset.HOMER_JPG);
-            }
         }
         finally
         {
@@ -656,8 +586,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[0].FileName, Is.EqualTo(asset.FileName));
             Assert.That(assets[0].Hash, Is.EqualTo(asset.Hash));
             Assert.That(assets[0].ImageData, Is.Not.Null);
-
-            CheckThumbnail(assetsDirectory, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
         }
         finally
         {
@@ -759,9 +687,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             _testableAssetRepository.AddAsset(_asset1, assetData1);
             _testableAssetRepository.AddAsset(_asset2, assetData2);
             _testableAssetRepository.AddAsset(_asset3, assetData3);
@@ -784,19 +709,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
             Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
             Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(3));
-
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
-
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
-            Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData3));
 
             Assert.That(assets, Has.Length.EqualTo(3));
 
@@ -832,13 +744,11 @@ public class ApplicationGetAssetsByPathTests
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock,
+        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
             imageProcessingServiceMock, imageMetadataService, userConfigurationService,
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
@@ -877,9 +787,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             testableAssetRepository.AddAsset(_asset1, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -893,94 +800,10 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
-
             Assert.That(assets, Is.Empty);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
                 Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
-
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            assetsUpdatedSubscription.Dispose();
-        }
-    }
-
-    [Test]
-    public void GetAssetsByPath_ThumbnailsAndFolderExistButBinExists_ReturnsAssetsArray()
-    {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        try
-        {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
-
-            string filePath1 = Path.Combine(folderPath2, _asset1!.FileName);
-            byte[] assetData1 = File.ReadAllBytes(filePath1);
-            string filePath2 = Path.Combine(folderPath2, _asset2!.FileName);
-            byte[] assetData2 = File.ReadAllBytes(filePath2);
-
-            _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
-
-            Dictionary<string, byte[]> blobToWrite = new()
-            {
-                { _asset1!.FileName, assetData1 },
-                { _asset2!.FileName, assetData2 }
-            };
-
-            _database!.WriteBlob(blobToWrite, _asset1!.Folder.BlobFileName);
-
-            List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            _testableAssetRepository.AddAsset(_asset1, assetData1);
-
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-
-            Asset[] assets = _application!.GetAssetsByPath(folderPath1);
-
-            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
-
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(2));
-            Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(2));
-
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2].ContainsKey(_asset2.FileName), Is.True);
-
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
-            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath2][_asset2.FileName], Is.EqualTo(assetData2));
-
-            Assert.That(assets, Has.Length.EqualTo(1));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1014,9 +837,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             _testableAssetRepository.AddAsset(_asset1, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -1029,14 +849,6 @@ public class ApplicationGetAssetsByPathTests
             Asset[] assets = _application!.GetAssetsByPath(folderPath1);
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
-            Assert.That(thumbnails[folderPath1], Is.Empty);
-            Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath2].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -1069,9 +881,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             _testableAssetRepository.AddAsset(_asset1!, assetData);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -1079,10 +888,6 @@ public class ApplicationGetAssetsByPathTests
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
             Assert.That(cataloguedAssets, Is.Empty);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Is.Empty);
 
             Assert.That(assets, Is.Empty);
 
@@ -1118,9 +923,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             _testableAssetRepository.AddAsset(_asset1!, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -1133,12 +935,6 @@ public class ApplicationGetAssetsByPathTests
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Is.Empty);
 
@@ -1169,70 +965,9 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
             Assert.That(cataloguedAssets, Is.Empty);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Is.Empty);
-
-            Assert.That(assets, Is.Empty);
-
-            Assert.That(assetsUpdatedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            assetsUpdatedSubscription.Dispose();
-        }
-    }
-
-    [Test]
-    public void GetAssetsByPath_ThumbnailDoesNotExistButBinExists_ReturnsEmptyArray()
-    {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        try
-        {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [];
-
-            Dictionary<string, byte[]> blobToWrite = new()
-            {
-                { _asset1!.FileName, assetData1 },
-                { _asset2!.FileName, assetData2 }
-            };
-
-            _database!.WriteBlob(blobToWrite, folder.BlobFileName);
-
-            List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            Asset[] assets = _application!.GetAssetsByPath(folderPath);
-
-            Assert.That(cataloguedAssets, Is.Empty);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Is.Empty);
 
@@ -1261,16 +996,9 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
             Assert.That(cataloguedAssets, Is.Empty);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Is.Empty);
 
             Assert.That(assets, Is.Empty);
 
@@ -1298,13 +1026,11 @@ public class ApplicationGetAssetsByPathTests
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock,
+        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
             imageProcessingServiceMock, imageMetadataService, userConfigurationService,
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
@@ -1346,9 +1072,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             testableAssetRepository.AddAsset(_asset1, assetData1);
             testableAssetRepository.AddAsset(_asset2, assetData2);
 
@@ -1366,17 +1089,6 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
-
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Has.Length.EqualTo(2));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -1425,9 +1137,6 @@ public class ApplicationGetAssetsByPathTests
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             _testableAssetRepository.AddAsset(_asset1, assetData1);
             _testableAssetRepository.AddAsset(_asset2, assetData2);
             _testableAssetRepository.AddAsset(_asset3, assetData3);
@@ -1458,19 +1167,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
             Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(3));
-
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
-
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
-            Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData3));
-
             Assert.That(assets1, Has.Length.EqualTo(3));
             Assert.That(assets2, Has.Length.EqualTo(3));
 
@@ -1491,15 +1187,5 @@ public class ApplicationGetAssetsByPathTests
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
-    }
-
-    private void CheckThumbnail(string directory, string fileName, int thumbnailWidth, int thumbnailHeight)
-    {
-        bool assetContainsThumbnail = _testableAssetRepository!.ContainsThumbnail(directory, fileName);
-        Assert.That(assetContainsThumbnail, Is.True);
-
-        BitmapImage? assetBitmapImage =
-            _testableAssetRepository.LoadThumbnail(directory, fileName, thumbnailWidth, thumbnailHeight);
-        Assert.That(assetBitmapImage, Is.Not.Null);
     }
 }

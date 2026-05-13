@@ -35,21 +35,19 @@ public class AssetRepositoryAddFolderTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(),
-            new BlobStorage(), new BackupStorage(),
-            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -76,7 +74,6 @@ public class AssetRepositoryAddFolderTests
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.True);
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2);
@@ -131,7 +128,6 @@ public class AssetRepositoryAddFolderTests
             Assert.That(addedFolder2.Path, Is.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.True);
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath1);
@@ -193,7 +189,6 @@ public class AssetRepositoryAddFolderTests
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.True);
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2);

@@ -13,7 +13,6 @@ public interface IAssetRepository
     HashSet<string> GetFoldersPath();
     Folder[] GetSubFolders(Folder parentFolder);
     Folder? GetFolderByPath(string path);
-    void SaveCatalog(Folder? folder);
     bool BackupExists();
     void WriteBackup();
     List<Asset> GetCataloguedAssets();
@@ -21,10 +20,7 @@ public interface IAssetRepository
     bool IsAssetCatalogued(string directoryName, string fileName);
     Asset? DeleteAsset(string directory, string deletedFileName);
     void DeleteFolder(Folder folder);
-    bool HasChanges();
-    bool ContainsThumbnail(string directoryName, string fileName);
     BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height);
-    bool IsBlobFileExists(string blobName);
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration);
     List<string> GetRecentTargetPaths();

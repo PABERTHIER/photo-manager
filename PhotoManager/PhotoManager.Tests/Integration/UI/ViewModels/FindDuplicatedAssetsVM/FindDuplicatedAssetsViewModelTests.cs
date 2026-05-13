@@ -23,7 +23,7 @@ public class FindDuplicatedAssetsViewModelTests
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -252,29 +252,28 @@ public class FindDuplicatedAssetsViewModelTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService, imageMetadataService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService, imageMetadataService,
             userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
         _findDuplicatedAssetsViewModel = new(_application);
@@ -309,7 +308,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -561,7 +560,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2!.WithFolder(folder!);
@@ -710,7 +709,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2!.WithFolder(folder!);
@@ -961,7 +960,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1080,7 +1079,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1194,7 +1193,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1379,7 +1378,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1495,7 +1494,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1763,10 +1762,10 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
             Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset2Temp!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -1913,10 +1912,10 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1.WithFolder(folder!);
@@ -2076,10 +2075,10 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1.WithFolder(folder!);
@@ -2227,7 +2226,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);
@@ -2347,7 +2346,7 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset2 = _asset2.WithFolder(folder!);

@@ -11,7 +11,7 @@ public class ApplicationGetSubFoldersTests
     private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -40,29 +40,28 @@ public class ApplicationGetSubFoldersTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -74,7 +73,8 @@ public class ApplicationGetSubFoldersTests
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -91,12 +91,12 @@ public class ApplicationGetSubFoldersTests
 
             await _application!.CatalogAssetsAsync(_ => { });
 
-            Folder? parentFolder1 = _assetRepository!.GetFolderByPath(parentFolderPath1);
-            Folder? parentFolder2 = _assetRepository!.GetFolderByPath(parentFolderPath2);
-            Folder? parentFolder3 = _assetRepository!.GetFolderByPath(parentFolderPath3);
-            Folder? parentFolder4 = _assetRepository!.GetFolderByPath(parentFolderPath4);
-            Folder? parentFolder5 = _assetRepository!.GetFolderByPath(parentFolderPath5);
-            Folder? parentFolder6 = _assetRepository!.GetFolderByPath(parentFolderPath6);
+            Folder? parentFolder1 = _testableAssetRepository!.GetFolderByPath(parentFolderPath1);
+            Folder? parentFolder2 = _testableAssetRepository!.GetFolderByPath(parentFolderPath2);
+            Folder? parentFolder3 = _testableAssetRepository!.GetFolderByPath(parentFolderPath3);
+            Folder? parentFolder4 = _testableAssetRepository!.GetFolderByPath(parentFolderPath4);
+            Folder? parentFolder5 = _testableAssetRepository!.GetFolderByPath(parentFolderPath5);
+            Folder? parentFolder6 = _testableAssetRepository!.GetFolderByPath(parentFolderPath6);
 
             Assert.That(parentFolder1, Is.Not.Null);
             Assert.That(parentFolder2, Is.Not.Null);
@@ -125,9 +125,9 @@ public class ApplicationGetSubFoldersTests
             Assert.That(parentFolders5, Is.Empty);
             Assert.That(parentFolders6, Is.Empty);
 
-            Folder? childFolder1 = _assetRepository!.GetFolderByPath(childFolderPath1);
-            Folder? childFolder2 = _assetRepository!.GetFolderByPath(childFolderPath2);
-            Folder? childFolder3 = _assetRepository!.GetFolderByPath(childFolderPath3);
+            Folder? childFolder1 = _testableAssetRepository!.GetFolderByPath(childFolderPath1);
+            Folder? childFolder2 = _testableAssetRepository!.GetFolderByPath(childFolderPath2);
+            Folder? childFolder3 = _testableAssetRepository!.GetFolderByPath(childFolderPath3);
 
             Assert.That(childFolder1, Is.Not.Null);
             Assert.That(childFolder2, Is.Not.Null);
@@ -156,7 +156,8 @@ public class ApplicationGetSubFoldersTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -167,12 +168,12 @@ public class ApplicationGetSubFoldersTests
             string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
             string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
 
-            Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
-            Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
+            Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
+            Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
 
-            Folder childFolder1 = _assetRepository!.AddFolder(childFolderPath1);
-            Folder childFolder2 = _assetRepository!.AddFolder(childFolderPath2);
-            Folder childFolder3 = _assetRepository!.AddFolder(childFolderPath3);
+            Folder childFolder1 = _testableAssetRepository!.AddFolder(childFolderPath1);
+            Folder childFolder2 = _testableAssetRepository!.AddFolder(childFolderPath2);
+            Folder childFolder3 = _testableAssetRepository!.AddFolder(childFolderPath3);
 
             Folder[] parentFolders1 = _application!.GetSubFolders(parentFolder1);
             Folder[] parentFolders2 = _application!.GetSubFolders(parentFolder2);
@@ -209,15 +210,16 @@ public class ApplicationGetSubFoldersTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
             string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
-            Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
+            Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
+            Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
 
             Folder[] parentFolders1 = _application!.GetSubFolders(parentFolder1);
             Folder[] parentFolders2 = _application!.GetSubFolders(parentFolder2);
@@ -240,7 +242,8 @@ public class ApplicationGetSubFoldersTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -271,7 +274,8 @@ public class ApplicationGetSubFoldersTests
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -279,7 +283,8 @@ public class ApplicationGetSubFoldersTests
 
             string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
+            // At least one folder to trigger the Where on folders
+            _testableAssetRepository!.AddFolder(parentFolderPath2);
 
             ArgumentException? exception =
                 Assert.Throws<ArgumentException>(() => _application!.GetSubFolders(parentFolder1!));

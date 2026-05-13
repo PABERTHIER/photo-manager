@@ -11,10 +11,9 @@ public class ApplicationSyncAssetsAsyncTests
     private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
     private FileOperationsService? _fileOperationsService;
     private UserConfigurationService? _userConfigurationService;
-    private Database? _database;
     private MoveAssetsService? _moveAssetsService;
 
     [OneTimeSetUp]
@@ -44,27 +43,27 @@ public class ApplicationSyncAssetsAsyncTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, _fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, _fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, _fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        _moveAssetsService = new(_assetRepository, _fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, _fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, _fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, _fileOperationsService, assetsComparator,
             _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, _fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, _fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, _fileOperationsService, imageProcessingService);
     }
 
@@ -2658,8 +2657,8 @@ public class ApplicationSyncAssetsAsyncTests
 
             syncAssetsConfiguration.Definitions.Add(definition!);
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref in Validate and Normalize methods
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _testableAssetRepository to prevent null ref in Validate and Normalize methods
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
@@ -2813,8 +2812,8 @@ public class ApplicationSyncAssetsAsyncTests
 
             SyncAssetsConfiguration? syncAssetsConfiguration = null;
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
-            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration!); // Using instead _assetRepository to prevent null ref for Validate and Normalize methods
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration!); // Using instead _testableAssetRepository to prevent null ref for Validate and Normalize methods
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository, Is.Null);
 
@@ -2905,8 +2904,8 @@ public class ApplicationSyncAssetsAsyncTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _testableAssetRepository to prevent null ref during regex verification
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
@@ -3091,8 +3090,8 @@ public class ApplicationSyncAssetsAsyncTests
                 DestinationDirectory = destinationDirectory!
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _testableAssetRepository to prevent null ref during regex verification
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,

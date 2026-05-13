@@ -10,20 +10,6 @@ public class InfrastructureServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        ServiceDescriptor? objectListStorageDescriptor =
-            services.FirstOrDefault(x => x.ServiceType == typeof(IObjectListStorage));
-        Assert.That(objectListStorageDescriptor, Is.Null);
-
-        ServiceDescriptor? blobStorageDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IBlobStorage));
-        Assert.That(blobStorageDescriptor, Is.Null);
-
-        ServiceDescriptor? backupStorageDescriptor =
-            services.FirstOrDefault(x => x.ServiceType == typeof(IBackupStorage));
-        Assert.That(backupStorageDescriptor, Is.Null);
-
-        ServiceDescriptor? databaseDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IDatabase));
-        Assert.That(databaseDescriptor, Is.Null);
-
         ServiceDescriptor? userConfigurationServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IUserConfigurationService));
         Assert.That(userConfigurationServiceDescriptor, Is.Null);
@@ -57,35 +43,6 @@ public class InfrastructureServiceCollectionExtensionsTests
         services.AddInfrastructure();
 
         Assert.That(services, Has.Count.EqualTo(11));
-
-        objectListStorageDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IObjectListStorage));
-        Assert.That(objectListStorageDescriptor, Is.Not.Null);
-        Assert.That(objectListStorageDescriptor, Is.EqualTo(services[0]));
-        Assert.That(objectListStorageDescriptor.ImplementationInstance, Is.Null);
-        Assert.That(objectListStorageDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(objectListStorageDescriptor.ImplementationType, Is.EqualTo(typeof(ObjectListStorage)));
-
-        blobStorageDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IBlobStorage));
-        Assert.That(blobStorageDescriptor, Is.Not.Null);
-        Assert.That(blobStorageDescriptor, Is.EqualTo(services[1]));
-        Assert.That(blobStorageDescriptor.ImplementationInstance, Is.Null);
-        Assert.That(blobStorageDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(blobStorageDescriptor.ImplementationType, Is.EqualTo(typeof(BlobStorage)));
-
-        backupStorageDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IBackupStorage));
-        Assert.That(backupStorageDescriptor, Is.Not.Null);
-        Assert.That(backupStorageDescriptor, Is.EqualTo(services[2]));
-        Assert.That(backupStorageDescriptor.ImplementationInstance, Is.Null);
-        Assert.That(backupStorageDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(backupStorageDescriptor.ImplementationType, Is.EqualTo(typeof(BackupStorage)));
-
-        databaseDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IDatabase));
-        Assert.That(databaseDescriptor, Is.Not.Null);
-        Assert.That(databaseDescriptor, Is.EqualTo(services[3]));
-        Assert.That(databaseDescriptor.ImplementationInstance, Is.Null);
-        Assert.That(databaseDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(databaseDescriptor.ImplementationType,
-            Is.EqualTo(typeof(PhotoManager.Infrastructure.Database.Database)));
 
         userConfigurationServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IUserConfigurationService));

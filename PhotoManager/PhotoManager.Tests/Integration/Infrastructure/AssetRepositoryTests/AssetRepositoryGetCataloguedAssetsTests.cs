@@ -45,14 +45,12 @@ public class AssetRepositoryGetCataloguedAssetsTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
@@ -110,6 +108,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -130,7 +129,6 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -196,7 +194,6 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

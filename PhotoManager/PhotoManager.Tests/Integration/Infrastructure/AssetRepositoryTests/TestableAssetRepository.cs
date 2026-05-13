@@ -1,21 +1,59 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 public class TestableAssetRepository(
-    IDatabase database,
     IPathProviderService pathProviderService,
     IImageProcessingService imageProcessingService,
     IImageMetadataService imageMetadataService,
     IUserConfigurationService userConfigurationService,
     ILogger<AssetRepository> logger)
     : AssetRepository(
-        database,
         pathProviderService,
         imageProcessingService,
         imageMetadataService,
         userConfigurationService,
         logger)
 {
-    public Dictionary<string, Dictionary<string, byte[]>> GetThumbnails() => Thumbnails;
+    public new IObservable<System.Reactive.Unit> AssetsUpdated => base.AssetsUpdated;
+
+    public new Asset[] GetAssetsByPath(string directory) => base.GetAssetsByPath(directory);
+    public new void AddAsset(Asset asset, byte[] thumbnailData) => base.AddAsset(asset, thumbnailData);
+    public new Folder AddFolder(string path) => base.AddFolder(path);
+    public new bool FolderExists(string path) => base.FolderExists(path);
+    public new Folder[] GetFolders() => base.GetFolders();
+    public new HashSet<string> GetFoldersPath() => base.GetFoldersPath();
+    public new Folder[] GetSubFolders(Folder parentFolder) => base.GetSubFolders(parentFolder);
+    public new Folder? GetFolderByPath(string path) => base.GetFolderByPath(path);
+    public new bool BackupExists() => base.BackupExists();
+    public new void WriteBackup() => base.WriteBackup();
+    public new List<Asset> GetCataloguedAssets() => base.GetCataloguedAssets();
+    public new List<Asset> GetCataloguedAssetsByPath(string directory) => base.GetCataloguedAssetsByPath(directory);
+
+    public new bool IsAssetCatalogued(string directoryName, string fileName) => base.IsAssetCatalogued(
+        directoryName, fileName);
+
+    public new Asset? DeleteAsset(string directory, string deletedFileName) => base.DeleteAsset(directory,
+        deletedFileName);
+
+    public new void DeleteFolder(Folder folder) => base.DeleteFolder(folder);
+
+    public new BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height) =>
+        base.LoadThumbnail(
+            directoryName, fileName, width, height);
+
+    public new SyncAssetsConfiguration GetSyncAssetsConfiguration() => base.GetSyncAssetsConfiguration();
+
+    public new void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration) =>
+        base.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+
+    public new List<string> GetRecentTargetPaths() => base.GetRecentTargetPaths();
+
+    public new void SaveRecentTargetPaths(List<string> recentTargetPaths) => base.SaveRecentTargetPaths(
+        recentTargetPaths);
+
+    public new void UpdateTargetPathToRecent(Folder destinationFolder) => base.UpdateTargetPathToRecent(
+        destinationFolder);
+
+    public new int GetAssetsCounter() => base.GetAssetsCounter();
 }

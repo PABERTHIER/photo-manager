@@ -12,8 +12,7 @@ public class SyncAssetsServiceTests
 
     private SyncAssetsService? _syncAssetsService;
     private UserConfigurationService? _userConfigurationService;
-    private AssetRepository? _assetRepository;
-    private Database? _database;
+    private TestableAssetRepository? _testableAssetRepository;
     private FileOperationsService? _fileOperationsService;
     private MoveAssetsService? _moveAssetsService;
 
@@ -37,22 +36,22 @@ public class SyncAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         _userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_database, _pathProviderServiceMock!, imageProcessingService,
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, _fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, _fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        _moveAssetsService = new(_assetRepository, _fileOperationsService, assetCreationService,
+        _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        _syncAssetsService = new(_assetRepository, _fileOperationsService, assetsComparator, _moveAssetsService);
+        _syncAssetsService = new(_testableAssetRepository, _fileOperationsService, assetsComparator,
+            _moveAssetsService);
     }
 
     [Test]
@@ -74,9 +73,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -163,9 +162,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -302,9 +301,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -428,9 +427,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -552,9 +551,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -725,9 +724,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = secondDestinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -925,9 +924,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -1100,9 +1099,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -1270,9 +1269,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -1449,9 +1448,9 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -1668,9 +1667,9 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -1867,9 +1866,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2050,9 +2049,9 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2248,9 +2247,9 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2419,9 +2418,9 @@ public class SyncAssetsServiceTests
                     DeleteAssetsNotInSource = true,
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2538,9 +2537,9 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
@@ -2627,9 +2626,9 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(definition!);
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.Null);
@@ -2694,7 +2693,7 @@ public class SyncAssetsServiceTests
             Assert.That(_fileOperationsService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository!.GetSyncAssetsConfiguration();
+                _testableAssetRepository!.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
@@ -2778,9 +2777,9 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration? syncAssetsConfiguration = null;
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository, Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
@@ -2814,9 +2813,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2866,9 +2865,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -2945,9 +2944,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
@@ -3048,9 +3047,9 @@ public class SyncAssetsServiceTests
                 DestinationDirectory = destinationDirectory!
             });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
+            _testableAssetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository =
-                _assetRepository.GetSyncAssetsConfiguration();
+                _testableAssetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions,
                 Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));

@@ -260,5 +260,8 @@ PhotoManager/tools
 # Benchmark results
 **/BenchmarkDotNet.Artifacts/
 
+# SQLite files
+PhotoManager/identifier.sqlite
+
 # Claude Code local settings (personal, not shared)
 .claude/settings.local.json

@@ -22,7 +22,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
 
     private Asset? _asset1;
@@ -1197,29 +1197,28 @@ public class FindDuplicatedAssetsViewModelDHashTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService, imageMetadataService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService, imageMetadataService,
             _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
         _findDuplicatedAssetsViewModel = new(_application);
@@ -1315,14 +1314,14 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Assert.That(duplicatedAssetsSets[6][0].FileName, Is.EqualTo(_asset29!.FileName));
             Assert.That(duplicatedAssetsSets[6][1].FileName, Is.EqualTo(_asset31!.FileName));
 
-            Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
-            Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
-            Folder? folder3 = _assetRepository!.GetFolderByPath(directoryNewFolder2);
-            Folder? folder4 = _assetRepository!.GetFolderByPath(directorySample1);
-            Folder? folder5 = _assetRepository!.GetFolderByPath(directoryPart);
-            Folder? folder6 = _assetRepository!.GetFolderByPath(directoryResolution);
-            Folder? folder7 = _assetRepository!.GetFolderByPath(directoryThumbnail);
-            Folder? folder8 = _assetRepository!.GetFolderByPath(directoryOutputVideoFirstFrame);
+            Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
+            Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
+            Folder? folder3 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder2);
+            Folder? folder4 = _testableAssetRepository!.GetFolderByPath(directorySample1);
+            Folder? folder5 = _testableAssetRepository!.GetFolderByPath(directoryPart);
+            Folder? folder6 = _testableAssetRepository!.GetFolderByPath(directoryResolution);
+            Folder? folder7 = _testableAssetRepository!.GetFolderByPath(directoryThumbnail);
+            Folder? folder8 = _testableAssetRepository!.GetFolderByPath(directoryOutputVideoFirstFrame);
 
             Assert.That(folder1, Is.Not.Null);
             Assert.That(folder2, Is.Not.Null);

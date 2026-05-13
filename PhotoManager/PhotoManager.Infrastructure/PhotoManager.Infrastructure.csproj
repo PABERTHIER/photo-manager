@@ -12,5 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\PhotoManager.Common\PhotoManager.Common.csproj" />
     <ProjectReference Include="..\PhotoManager.Domain\PhotoManager.Domain.csproj" />
+    <ProjectReference Include="..\PhotoManager.Persistence\PhotoManager.Persistence.csproj" />
   </ItemGroup>
 </Project>

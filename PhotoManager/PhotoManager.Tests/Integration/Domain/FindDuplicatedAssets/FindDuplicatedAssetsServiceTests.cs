@@ -18,7 +18,7 @@ public class FindDuplicatedAssetsServiceTests
     private string? _databasePath;
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private IPathProviderService? _pathProviderServiceMock;
     private IConfigurationRoot? _configurationRootMock;
@@ -46,16 +46,14 @@ public class FindDuplicatedAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        _findDuplicatedAssetsService = new(_assetRepository, fileOperationsService, userConfigurationService,
+        _findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService, userConfigurationService,
             new TestLogger<FindDuplicatedAssetsService>());
 
         _asset1 = new()
@@ -225,11 +223,11 @@ public class FindDuplicatedAssetsServiceTests
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
-            _assetRepository.AddAsset(_asset3!, assetData1);
-            _assetRepository.AddAsset(_asset4!, assetData2);
-            _assetRepository.AddAsset(_asset5!, assetData1);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+            _testableAssetRepository.AddAsset(_asset2!, assetData2);
+            _testableAssetRepository.AddAsset(_asset3!, assetData1);
+            _testableAssetRepository.AddAsset(_asset4!, assetData2);
+            _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
@@ -281,10 +279,10 @@ public class FindDuplicatedAssetsServiceTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset2!, assetData);
-            _assetRepository.AddAsset(_asset3!, assetData);
-            _assetRepository.AddAsset(_asset4!, assetData);
-            _assetRepository.AddAsset(_asset5!, assetData);
+            _testableAssetRepository!.AddAsset(_asset2!, assetData);
+            _testableAssetRepository.AddAsset(_asset3!, assetData);
+            _testableAssetRepository.AddAsset(_asset4!, assetData);
+            _testableAssetRepository.AddAsset(_asset5!, assetData);
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
@@ -332,8 +330,8 @@ public class FindDuplicatedAssetsServiceTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1!, assetData);
-            _assetRepository.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _testableAssetRepository.AddAsset(_asset3!, assetData);
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
@@ -365,11 +363,11 @@ public class FindDuplicatedAssetsServiceTests
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
-            _assetRepository.AddAsset(_asset3!, assetData1);
-            _assetRepository.AddAsset(_asset4!, assetData2);
-            _assetRepository.AddAsset(_asset5!, assetData1);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+            _testableAssetRepository.AddAsset(_asset2!, assetData2);
+            _testableAssetRepository.AddAsset(_asset3!, assetData1);
+            _testableAssetRepository.AddAsset(_asset4!, assetData2);
+            _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
@@ -411,8 +409,8 @@ public class FindDuplicatedAssetsServiceTests
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+            _testableAssetRepository.AddAsset(_asset2!, assetData2);
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 

@@ -27,7 +27,7 @@ public class MainWindowDeleteAssetsTests
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1Temp;
     private Asset? _asset2Temp;
@@ -102,6 +102,7 @@ public class MainWindowDeleteAssetsTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
         _sourceFolder = null;
         _folderNavigationViewModel = null;
     }
@@ -132,29 +133,28 @@ public class MainWindowDeleteAssetsTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
 
@@ -200,20 +200,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -226,10 +223,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -335,20 +329,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -362,10 +353,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -474,20 +462,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
@@ -498,10 +483,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset2TempFileName));
 
@@ -608,20 +590,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -634,10 +613,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
 
@@ -744,20 +720,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
@@ -768,10 +741,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
@@ -877,20 +847,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
@@ -901,10 +868,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -1008,20 +972,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -1041,10 +1002,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
@@ -1134,10 +1092,10 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             string expectedAppTitle =
@@ -1146,7 +1104,7 @@ public class MainWindowDeleteAssetsTests
 
             DeleteDuplicatedAssets([]);
 
-            assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -1249,20 +1207,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -1291,10 +1246,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -1436,20 +1388,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -1487,10 +1436,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -1642,20 +1588,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -1682,10 +1625,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset2TempFileName));
 
@@ -1828,20 +1768,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -1870,10 +1807,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
 
@@ -2016,20 +1950,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -2049,10 +1980,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.True);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
@@ -2186,20 +2114,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -2226,10 +2151,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.False);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(
@@ -2366,20 +2288,17 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
-
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
             if (appMode == AppMode.Viewer)
             {
@@ -2409,10 +2328,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
             Assert.That(File.Exists(imagePath2ToCopy), Is.False);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
@@ -2535,10 +2451,10 @@ public class MainWindowDeleteAssetsTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             if (appMode == AppMode.Viewer)
@@ -2556,7 +2472,7 @@ public class MainWindowDeleteAssetsTests
 
             Assert.That(result, Is.EqualTo(string.Empty));
 
-            assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             CheckAfterChanges(

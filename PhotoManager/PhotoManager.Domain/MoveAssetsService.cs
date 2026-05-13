@@ -61,7 +61,6 @@ public class MoveAssetsService(
         if (result)
         {
             assetRepository.UpdateTargetPathToRecent(destinationFolder);
-            SaveCatalog(destinationFolder);
         }
 
         return result;
@@ -75,8 +74,6 @@ public class MoveAssetsService(
         {
             DeleteAsset(asset);
         }
-
-        SaveCatalog(assets[0].Folder);
     }
 
     public bool CopyAsset(string sourceFilePath, string destinationFilePath)
@@ -213,10 +210,5 @@ public class MoveAssetsService(
                 ex.Message);
             return false;
         }
-    }
-
-    private void SaveCatalog(Folder folder)
-    {
-        assetRepository.SaveCatalog(folder);
     }
 }

@@ -20,7 +20,7 @@ public class DuplicatedSetViewModelTests
     private string? _databasePath;
 
     private DuplicatedSetViewModel? _duplicatedSetViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset2;
     private Asset? _asset3;
@@ -44,13 +44,11 @@ public class DuplicatedSetViewModelTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
@@ -124,7 +122,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -215,7 +213,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -284,7 +282,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -353,7 +351,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -422,7 +420,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -476,7 +474,7 @@ public class DuplicatedSetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 

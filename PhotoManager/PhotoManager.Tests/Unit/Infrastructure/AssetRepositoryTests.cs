@@ -1,4 +1,4 @@
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
@@ -18,11 +18,10 @@ public class AssetRepositoryTests
     private string? _databaseDirectory;
     private string? _databasePath;
 
-    private TestableAssetRepository? _testableAssetRepository;
+    private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
     private TestLogger<AssetRepository>? _testLogger;
 
-    private IDatabase? _databaseMock;
     private IPathProviderService? _pathProviderServiceMock;
     private IConfigurationRoot? _configurationRootMock;
 
@@ -47,23 +46,14 @@ public class AssetRepositoryTests
     {
         _testLogger = new();
         _userConfigurationService = new(_configurationRootMock!);
-        _databaseMock = Substitute.For<IDatabase>();
-
-        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], Folder>>()).Returns([]);
-        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], Asset>>()).Returns([]);
-        _databaseMock.ReadObjectList(
-            Arg.Any<string>(), Arg.Any<Func<string[], SyncAssetsDirectoriesDefinition>>()).Returns([]);
-        _databaseMock.ReadObjectList(Arg.Any<string>(), Arg.Any<Func<string[], string>>()).Returns([]);
-        _databaseMock.ReadBlob(Arg.Any<string>()).Returns((Dictionary<string, byte[]>?)null);
-        _databaseMock.BackupExists(Arg.Any<DateTime>()).Returns(false);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
 
-        _testableAssetRepository = new(_databaseMock, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
+            _userConfigurationService, _testLogger);
 
         _asset1 = new()
         {
@@ -103,7 +93,7 @@ public class AssetRepositoryTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -113,12 +103,11 @@ public class AssetRepositoryTests
             byte[] assetData = [1, 2, 3];
 
             IOException expectedException = new("Database read error");
-            _databaseMock!.ReadBlob(Arg.Any<string>()).Throws(expectedException);
 
             using (Assert.EnterMultipleScope())
             {
                 IOException? exception = Assert.Throws<IOException>(() =>
-                    _testableAssetRepository!.AddAsset(_asset1!, assetData));
+                    _assetRepository!.AddAsset(_asset1!, assetData));
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 
@@ -134,49 +123,11 @@ public class AssetRepositoryTests
     }
 
     [Test]
-    public void SaveCatalog_DatabaseThrowsException_LogsItThrowsException()
-    {
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        try
-        {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
-            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
-            _asset1 = _asset1!.WithFolder(folder);
-
-            IOException expectedException = new("Failed to write to database");
-            _databaseMock!.When(d => d.WriteObjectList(Arg.Any<List<Asset>>(), Arg.Any<string>(),
-                Arg.Any<Func<Asset, int, object>>())).Throw(expectedException);
-
-            // Add an asset first to ensure hasChanges is true
-            _testableAssetRepository!.AddAsset(_asset1!, []);
-
-            using (Assert.EnterMultipleScope())
-            {
-                IOException? exception =
-                    Assert.Throws<IOException>(() => _testableAssetRepository!.SaveCatalog(folder));
-
-                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
-
-                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-
-                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
-            }
-        }
-        finally
-        {
-            assetsUpdatedSubscription.Dispose();
-        }
-    }
-
-    [Test]
     public void DeleteFolder_DatabaseThrowsException_LogsItAndThrowsException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -184,12 +135,11 @@ public class AssetRepositoryTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             IOException expectedException = new("Failed to access blob storage");
-            _databaseMock!.IsBlobFileExists(Arg.Any<string>()).Throws(expectedException);
 
             using (Assert.EnterMultipleScope())
             {
                 IOException? exception =
-                    Assert.Throws<IOException>(() => _testableAssetRepository!.DeleteFolder(folder));
+                    Assert.Throws<IOException>(() => _assetRepository!.DeleteFolder(folder));
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 

@@ -10,7 +10,7 @@ public class ApplicationGetRootCatalogFoldersTests
     private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -31,29 +31,28 @@ public class ApplicationGetRootCatalogFoldersTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -69,9 +68,8 @@ public class ApplicationGetRootCatalogFoldersTests
         {
             await _application!.CatalogAssetsAsync(_ => { });
 
-            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
             Assert.That(folder.Path, Is.EqualTo(assetsDirectory));
             Assert.That(folder.Name, Is.EqualTo(folderName));
@@ -83,7 +81,6 @@ public class ApplicationGetRootCatalogFoldersTests
             Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
             Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.False);
         }
         finally
         {
@@ -98,16 +95,10 @@ public class ApplicationGetRootCatalogFoldersTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
             Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
-
-            Assert.That(_assetRepository!.HasChanges(), Is.True);
-
-            _assetRepository!.SaveCatalog(folder);
-
-            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
             Folder[] folders = _application!.GetRootCatalogFolders();
 
@@ -116,7 +107,6 @@ public class ApplicationGetRootCatalogFoldersTests
             Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
             Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.False);
         }
         finally
         {
@@ -131,11 +121,10 @@ public class ApplicationGetRootCatalogFoldersTests
 
         try
         {
-            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
             Folder[] folders = _application!.GetRootCatalogFolders();
 
-            Folder? folder = _assetRepository!.GetFolderByPath(_dataDirectory!);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
             Assert.That(folder, Is.Not.Null);
             Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
             Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
@@ -145,7 +134,6 @@ public class ApplicationGetRootCatalogFoldersTests
             Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
             Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            Assert.That(_assetRepository!.HasChanges(), Is.True);
         }
         finally
         {

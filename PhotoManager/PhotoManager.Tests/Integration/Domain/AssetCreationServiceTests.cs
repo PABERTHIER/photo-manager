@@ -4,7 +4,6 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
@@ -23,7 +22,6 @@ public class AssetCreationServiceTests
     private string? _databasePath;
 
     private AssetCreationService? _assetCreationService;
-    private Database? _database;
     private UserConfigurationService? _userConfigurationService;
     private TestableAssetRepository? _testableAssetRepository;
     private TestLogger<AssetCreationService>? _testLogger;
@@ -40,7 +38,6 @@ public class AssetCreationServiceTests
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
         _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
     }
 
     [SetUp]
@@ -52,6 +49,7 @@ public class AssetCreationServiceTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -74,7 +72,7 @@ public class AssetCreationServiceTests
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database!, _pathProviderServiceMock!, imageProcessingService,
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -86,180 +84,180 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
         ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, Rotation.Rotate0, Hashes.IMAGE_1_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_1_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, FileSize.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
         PixelWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG, Rotation.Rotate90, Hashes.IMAGE_1_90_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, FileSize.IMAGE_1_180_DEG_JPG, PixelHeightAsset.IMAGE_1_180_DEG_JPG,
         PixelWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG, Rotation.Rotate180, Hashes.IMAGE_1_180_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, FileSize.IMAGE_1_270_DEG_JPG, PixelHeightAsset.IMAGE_1_270_DEG_JPG,
         PixelWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG, Rotation.Rotate270, Hashes.IMAGE_1_270_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_2_JPG, FileSize.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG, PixelWidthAsset.IMAGE_2_JPG,
         ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG, Rotation.Rotate0, Hashes.IMAGE_2_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_2_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, FileSize.IMAGE_2_DUPLICATED_JPG,
         PixelHeightAsset.IMAGE_2_DUPLICATED_JPG, PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
         ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG, Rotation.Rotate0,
-        Hashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+        Hashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_3_JPG, FileSize.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG, PixelWidthAsset.IMAGE_3_JPG,
         ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG, Rotation.Rotate0, Hashes.IMAGE_3_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_3_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_4_JPG, FileSize.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG, PixelWidthAsset.IMAGE_4_JPG,
         ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG, Rotation.Rotate0, Hashes.IMAGE_4_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_4_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_5_JPG, FileSize.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG, PixelWidthAsset.IMAGE_5_JPG,
         ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG, Rotation.Rotate0, Hashes.IMAGE_5_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_5_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_6_JPG, FileSize.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG, PixelWidthAsset.IMAGE_6_JPG,
         ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG, Rotation.Rotate0, Hashes.IMAGE_6_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_6_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_7_JPG, FileSize.IMAGE_7_JPG, PixelHeightAsset.IMAGE_7_JPG, PixelWidthAsset.IMAGE_7_JPG,
         ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG, Rotation.Rotate0, Hashes.IMAGE_7_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_7_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_8_JPEG, FileSize.IMAGE_8_JPEG, PixelHeightAsset.IMAGE_8_JPEG,
         PixelWidthAsset.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG,
-        Rotation.Rotate0, Hashes.IMAGE_8_JPEG, false, null, false, null, ImageByteSizes.IMAGE_8_JPEG, "")]
+        Rotation.Rotate0, Hashes.IMAGE_8_JPEG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_9_PNG, FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG,
         ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG, Rotation.Rotate0, Hashes.IMAGE_9_PNG, false,
-        null, false, null, ImageByteSizes.IMAGE_9_PNG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, FileSize.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG,
         PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
         ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG, Rotation.Rotate0, Hashes.IMAGE_10_PORTRAIT_PNG, false, null, false,
-        null, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+        null, "")]
     [TestCase(FileNames.IMAGE_11_HEIC, FileSize.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
         PixelWidthAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        Rotation.Rotate0, Hashes.IMAGE_11_HEIC, false, null, false, null, ImageByteSizes.IMAGE_11_HEIC, "")]
+        Rotation.Rotate0, Hashes.IMAGE_11_HEIC, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, Hashes.IMAGE_11_90_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_90_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, Hashes.IMAGE_11_180_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_180_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, Hashes.IMAGE_11_270_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_270_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, FileSize.IMAGE_WITH_UPPERCASE_NAME_JPG,
         PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         Rotation.Rotate0, Hashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+        "")]
     [TestCase(FileNames.HOMER_GIF, FileSize.HOMER_GIF, PixelHeightAsset.HOMER_GIF, PixelWidthAsset.HOMER_GIF,
         ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF, Rotation.Rotate0, Hashes.HOMER_GIF, false, null,
-        false, null, ImageByteSizes.HOMER_GIF, "")]
+        false, null, "")]
     [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, FileSize._1336_BOTTOM_LEFT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG, PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG,
         Rotation.Rotate0, Hashes._1336_BOTTOM_LEFT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_PART_JPG, FileSize._1336_BOTTOM_PART_JPG, PixelHeightAsset._1336_BOTTOM_PART_JPG,
         PixelWidthAsset._1336_BOTTOM_PART_JPG, ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
         ThumbnailHeightAsset._1336_BOTTOM_PART_JPG, Rotation.Rotate0, Hashes._1336_BOTTOM_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_BOTTOM_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileSize._1336_BOTTOM_RIGHT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG, PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG,
         Rotation.Rotate0, Hashes._1336_BOTTOM_RIGHT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_LEFT_PART_JPG, FileSize._1336_LEFT_PART_JPG, PixelHeightAsset._1336_LEFT_PART_JPG,
         PixelWidthAsset._1336_LEFT_PART_JPG, ThumbnailWidthAsset._1336_LEFT_PART_JPG,
         ThumbnailHeightAsset._1336_LEFT_PART_JPG, Rotation.Rotate0, Hashes._1336_LEFT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_ORIGINAL_JPG, FileSize._1336_ORIGINAL_JPG, PixelHeightAsset._1336_ORIGINAL_JPG,
         PixelWidthAsset._1336_ORIGINAL_JPG, ThumbnailWidthAsset._1336_ORIGINAL_JPG,
         ThumbnailHeightAsset._1336_ORIGINAL_JPG, Rotation.Rotate0, Hashes._1336_ORIGINAL_JPG, false, null, false, null,
-        ImageByteSizes._1336_ORIGINAL_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_RIGHT_PART_JPG, FileSize._1336_RIGHT_PART_JPG, PixelHeightAsset._1336_RIGHT_PART_JPG,
         PixelWidthAsset._1336_RIGHT_PART_JPG, ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
         ThumbnailHeightAsset._1336_RIGHT_PART_JPG, Rotation.Rotate0, Hashes._1336_RIGHT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, FileSize._1336_TOP_LEFT_PART_JPG,
         PixelHeightAsset._1336_TOP_LEFT_PART_JPG, PixelWidthAsset._1336_TOP_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG, ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG, Rotation.Rotate0,
-        Hashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
+        Hashes._1336_TOP_LEFT_PART_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_PART_JPG, FileSize._1336_TOP_PART_JPG, PixelHeightAsset._1336_TOP_PART_JPG,
         PixelWidthAsset._1336_TOP_PART_JPG, ThumbnailWidthAsset._1336_TOP_PART_JPG,
         ThumbnailHeightAsset._1336_TOP_PART_JPG, Rotation.Rotate0, Hashes._1336_TOP_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_TOP_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, FileSize._1336_TOP_RIGHT_PART_JPG,
         PixelHeightAsset._1336_TOP_RIGHT_PART_JPG, PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG, Rotation.Rotate0,
-        Hashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
+        Hashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_1_K_JPG, FileSize._1336_1_K_JPG, PixelHeightAsset._1336_1_K_JPG,
         PixelWidthAsset._1336_1_K_JPG, ThumbnailWidthAsset._1336_1_K_JPG, ThumbnailHeightAsset._1336_1_K_JPG,
-        Rotation.Rotate0, Hashes._1336_1_K_JPG, false, null, false, null, ImageByteSizes._1336_1_K_JPG,
+        Rotation.Rotate0, Hashes._1336_1_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_2_K_JPG, FileSize._1336_2_K_JPG, PixelHeightAsset._1336_2_K_JPG,
         PixelWidthAsset._1336_2_K_JPG, ThumbnailWidthAsset._1336_2_K_JPG, ThumbnailHeightAsset._1336_2_K_JPG,
-        Rotation.Rotate0, Hashes._1336_2_K_JPG, false, null, false, null, ImageByteSizes._1336_2_K_JPG,
+        Rotation.Rotate0, Hashes._1336_2_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_3_K_JPG, FileSize._1336_3_K_JPG, PixelHeightAsset._1336_3_K_JPG,
         PixelWidthAsset._1336_3_K_JPG, ThumbnailWidthAsset._1336_3_K_JPG, ThumbnailHeightAsset._1336_3_K_JPG,
-        Rotation.Rotate0, Hashes._1336_3_K_JPG, false, null, false, null, ImageByteSizes._1336_3_K_JPG,
+        Rotation.Rotate0, Hashes._1336_3_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, FileSize._1336_4_K_ORIGINAL_JPG,
         PixelHeightAsset._1336_4_K_ORIGINAL_JPG, PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
         ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG, Rotation.Rotate0,
-        Hashes._1336_4_K_ORIGINAL_JPG, false, null, false, null, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+        Hashes._1336_4_K_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_8_K_JPG, FileSize._1336_8_K_JPG, PixelHeightAsset._1336_8_K_JPG,
         PixelWidthAsset._1336_8_K_JPG, ThumbnailWidthAsset._1336_8_K_JPG, ThumbnailHeightAsset._1336_8_K_JPG,
-        Rotation.Rotate0, Hashes._1336_8_K_JPG, false, null, false, null, ImageByteSizes._1336_8_K_JPG,
+        Rotation.Rotate0, Hashes._1336_8_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_THUMBNAIL_JPG, FileSize._1336_THUMBNAIL_JPG, PixelHeightAsset._1336_THUMBNAIL_JPG,
         PixelWidthAsset._1336_THUMBNAIL_JPG, ThumbnailWidthAsset._1336_THUMBNAIL_JPG,
         ThumbnailHeightAsset._1336_THUMBNAIL_JPG, Rotation.Rotate0, Hashes._1336_THUMBNAIL_JPG, false, null, false,
-        null, ImageByteSizes._1336_THUMBNAIL_JPG, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames.IMAGE_1336_MINI_JPG, FileSize.IMAGE_1336_MINI_JPG, PixelHeightAsset.IMAGE_1336_MINI_JPG,
         PixelWidthAsset.IMAGE_1336_MINI_JPG, ThumbnailWidthAsset.IMAGE_1336_MINI_JPG,
         ThumbnailHeightAsset.IMAGE_1336_MINI_JPG, Rotation.Rotate0, Hashes.IMAGE_1336_MINI_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_MINI_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, FileSize.IMAGE_1336_ORIGINAL_JPG,
         PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG, PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
         ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG, Rotation.Rotate0,
-        Hashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+        Hashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
         PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG, PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         Rotation.Rotate0, Hashes.IMAGE_1336_SHIT_QUALITY_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SMALL_JPG, FileSize.IMAGE_1336_SMALL_JPG, PixelHeightAsset.IMAGE_1336_SMALL_JPG,
         PixelWidthAsset.IMAGE_1336_SMALL_JPG, ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG,
         ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG, Rotation.Rotate0, Hashes.IMAGE_1336_SMALL_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_SMALL_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames._1337_JPG, FileSize._1337_JPG, PixelHeightAsset._1337_JPG, PixelWidthAsset._1337_JPG,
         ThumbnailWidthAsset._1337_JPG, ThumbnailHeightAsset._1337_JPG, Rotation.Rotate0, Hashes._1337_JPG, false, null,
-        false, null, ImageByteSizes._1337_JPG,
+        false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
     [TestCase(FileNames._1349_JPG, FileSize._1349_JPG, PixelHeightAsset._1349_JPG, PixelWidthAsset._1349_JPG,
         ThumbnailWidthAsset._1349_JPG, ThumbnailHeightAsset._1349_JPG, Rotation.Rotate0, Hashes._1349_JPG, false, null,
-        false, null, ImageByteSizes._1349_JPG,
+        false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1350_JPG, FileSize._1350_JPG, PixelHeightAsset._1350_JPG, PixelWidthAsset._1350_JPG,
         ThumbnailWidthAsset._1350_JPG, ThumbnailHeightAsset._1350_JPG, Rotation.Rotate0, Hashes._1350_JPG, false, null,
-        false, null, ImageByteSizes._1350_JPG,
+        false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1413_JPG, FileSize._1413_JPG, PixelHeightAsset._1413_JPG, PixelWidthAsset._1413_JPG,
         ThumbnailWidthAsset._1413_JPG, ThumbnailHeightAsset._1413_JPG, Rotation.Rotate0, Hashes._1413_JPG, false, null,
-        false, null, ImageByteSizes._1413_JPG,
+        false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1414_JPG, FileSize._1414_JPG, PixelHeightAsset._1414_JPG, PixelWidthAsset._1414_JPG,
         ThumbnailWidthAsset._1414_JPG, ThumbnailHeightAsset._1414_JPG, Rotation.Rotate0, Hashes._1414_JPG, false, null,
-        false, null, ImageByteSizes._1414_JPG,
+        false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
         ThumbnailWidthAsset._1415_JPG, ThumbnailHeightAsset._1415_JPG, Rotation.Rotate270, Hashes._1415_JPG, false,
-        null, true, "The asset has been rotated", ImageByteSizes._1415_JPG,
+        null, true, "The asset has been rotated",
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void CreateAsset_PictureAndBasicHashType_ReturnsAsset(
         string fileName,
@@ -274,7 +272,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         string additionalPath)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
@@ -289,9 +286,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
@@ -318,7 +312,7 @@ public class AssetCreationServiceTests
                     isRotated,
                     rotatedMessage);
 
-                AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+                AssertCataloguedAssetValidity(asset!);
             }
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -332,180 +326,172 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
         ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, Rotation.Rotate0, PHashes.IMAGE_1_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_1_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, FileSize.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
         PixelWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG, Rotation.Rotate90, PHashes.IMAGE_1_90_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, FileSize.IMAGE_1_180_DEG_JPG, PixelHeightAsset.IMAGE_1_180_DEG_JPG,
         PixelWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG, Rotation.Rotate180, PHashes.IMAGE_1_180_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, FileSize.IMAGE_1_270_DEG_JPG, PixelHeightAsset.IMAGE_1_270_DEG_JPG,
         PixelWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG, Rotation.Rotate270, PHashes.IMAGE_1_270_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_2_JPG, FileSize.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG, PixelWidthAsset.IMAGE_2_JPG,
         ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG, Rotation.Rotate0, PHashes.IMAGE_2_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_2_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, FileSize.IMAGE_2_DUPLICATED_JPG,
         PixelHeightAsset.IMAGE_2_DUPLICATED_JPG, PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
         ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG, Rotation.Rotate0,
-        PHashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+        PHashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_3_JPG, FileSize.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG, PixelWidthAsset.IMAGE_3_JPG,
         ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG, Rotation.Rotate0, PHashes.IMAGE_3_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_3_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_4_JPG, FileSize.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG, PixelWidthAsset.IMAGE_4_JPG,
         ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG, Rotation.Rotate0, PHashes.IMAGE_4_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_4_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_5_JPG, FileSize.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG, PixelWidthAsset.IMAGE_5_JPG,
         ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG, Rotation.Rotate0, PHashes.IMAGE_5_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_5_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_6_JPG, FileSize.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG, PixelWidthAsset.IMAGE_6_JPG,
         ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG, Rotation.Rotate0, PHashes.IMAGE_6_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_6_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_7_JPG, FileSize.IMAGE_7_JPG, PixelHeightAsset.IMAGE_7_JPG, PixelWidthAsset.IMAGE_7_JPG,
         ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG, Rotation.Rotate0, PHashes.IMAGE_7_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_7_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_8_JPEG, FileSize.IMAGE_8_JPEG, PixelHeightAsset.IMAGE_8_JPEG,
         PixelWidthAsset.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG,
-        Rotation.Rotate0, PHashes.IMAGE_8_JPEG, false, null, false, null, ImageByteSizes.IMAGE_8_JPEG, "")]
+        Rotation.Rotate0, PHashes.IMAGE_8_JPEG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_9_PNG, FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG,
         ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG, Rotation.Rotate0, PHashes.IMAGE_9_PNG, false,
-        null, false, null, ImageByteSizes.IMAGE_9_PNG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, FileSize.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG,
         PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
         ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG, Rotation.Rotate0, PHashes.IMAGE_10_PORTRAIT_PNG, false, null, false,
-        null, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+        null, "")]
     [TestCase(FileNames.IMAGE_11_HEIC, FileSize.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
         PixelWidthAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        Rotation.Rotate0, PHashes.IMAGE_11_HEIC, false, null, false, null, ImageByteSizes.IMAGE_11_HEIC, "")]
+        Rotation.Rotate0, PHashes.IMAGE_11_HEIC, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, PHashes.IMAGE_11_90_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_90_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, PHashes.IMAGE_11_180_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_180_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, PHashes.IMAGE_11_270_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_270_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, FileSize.IMAGE_WITH_UPPERCASE_NAME_JPG,
         PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
-        Rotation.Rotate0, PHashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+        Rotation.Rotate0, PHashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null, "")]
     [TestCase(FileNames.HOMER_GIF, FileSize.HOMER_GIF, PixelHeightAsset.HOMER_GIF, PixelWidthAsset.HOMER_GIF,
         ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF, Rotation.Rotate0, PHashes.HOMER_GIF, false, null,
-        false, null, ImageByteSizes.HOMER_GIF, "")]
+        false, null, "")]
     [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, FileSize._1336_BOTTOM_LEFT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG, PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG,
         Rotation.Rotate0, PHashes._1336_BOTTOM_LEFT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_PART_JPG, FileSize._1336_BOTTOM_PART_JPG, PixelHeightAsset._1336_BOTTOM_PART_JPG,
         PixelWidthAsset._1336_BOTTOM_PART_JPG, ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
         ThumbnailHeightAsset._1336_BOTTOM_PART_JPG, Rotation.Rotate0, PHashes._1336_BOTTOM_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_BOTTOM_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileSize._1336_BOTTOM_RIGHT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG, PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG,
         Rotation.Rotate0, PHashes._1336_BOTTOM_RIGHT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_LEFT_PART_JPG, FileSize._1336_LEFT_PART_JPG, PixelHeightAsset._1336_LEFT_PART_JPG,
         PixelWidthAsset._1336_LEFT_PART_JPG, ThumbnailWidthAsset._1336_LEFT_PART_JPG,
         ThumbnailHeightAsset._1336_LEFT_PART_JPG, Rotation.Rotate0, PHashes._1336_LEFT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_ORIGINAL_JPG, FileSize._1336_ORIGINAL_JPG, PixelHeightAsset._1336_ORIGINAL_JPG,
         PixelWidthAsset._1336_ORIGINAL_JPG, ThumbnailWidthAsset._1336_ORIGINAL_JPG,
         ThumbnailHeightAsset._1336_ORIGINAL_JPG, Rotation.Rotate0, PHashes._1336_ORIGINAL_JPG, false, null, false, null,
-        ImageByteSizes._1336_ORIGINAL_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_RIGHT_PART_JPG, FileSize._1336_RIGHT_PART_JPG, PixelHeightAsset._1336_RIGHT_PART_JPG,
         PixelWidthAsset._1336_RIGHT_PART_JPG, ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
         ThumbnailHeightAsset._1336_RIGHT_PART_JPG, Rotation.Rotate0, PHashes._1336_RIGHT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, FileSize._1336_TOP_LEFT_PART_JPG,
         PixelHeightAsset._1336_TOP_LEFT_PART_JPG, PixelWidthAsset._1336_TOP_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG, ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG, Rotation.Rotate0,
-        PHashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        PHashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_PART_JPG, FileSize._1336_TOP_PART_JPG, PixelHeightAsset._1336_TOP_PART_JPG,
         PixelWidthAsset._1336_TOP_PART_JPG, ThumbnailWidthAsset._1336_TOP_PART_JPG,
         ThumbnailHeightAsset._1336_TOP_PART_JPG, Rotation.Rotate0, PHashes._1336_TOP_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_TOP_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, FileSize._1336_TOP_RIGHT_PART_JPG,
         PixelHeightAsset._1336_TOP_RIGHT_PART_JPG, PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG, Rotation.Rotate0,
-        PHashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        PHashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_1_K_JPG, FileSize._1336_1_K_JPG, PixelHeightAsset._1336_1_K_JPG,
         PixelWidthAsset._1336_1_K_JPG, ThumbnailWidthAsset._1336_1_K_JPG, ThumbnailHeightAsset._1336_1_K_JPG,
-        Rotation.Rotate0, PHashes._1336_1_K_JPG, false, null, false, null, ImageByteSizes._1336_1_K_JPG,
+        Rotation.Rotate0, PHashes._1336_1_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_2_K_JPG, FileSize._1336_2_K_JPG, PixelHeightAsset._1336_2_K_JPG,
         PixelWidthAsset._1336_2_K_JPG, ThumbnailWidthAsset._1336_2_K_JPG, ThumbnailHeightAsset._1336_2_K_JPG,
-        Rotation.Rotate0, PHashes._1336_2_K_JPG, false, null, false, null, ImageByteSizes._1336_2_K_JPG,
+        Rotation.Rotate0, PHashes._1336_2_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_3_K_JPG, FileSize._1336_3_K_JPG, PixelHeightAsset._1336_3_K_JPG,
         PixelWidthAsset._1336_3_K_JPG, ThumbnailWidthAsset._1336_3_K_JPG, ThumbnailHeightAsset._1336_3_K_JPG,
-        Rotation.Rotate0, PHashes._1336_3_K_JPG, false, null, false, null, ImageByteSizes._1336_3_K_JPG,
+        Rotation.Rotate0, PHashes._1336_3_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, FileSize._1336_4_K_ORIGINAL_JPG,
         PixelHeightAsset._1336_4_K_ORIGINAL_JPG, PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
         ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG, Rotation.Rotate0,
-        PHashes._1336_4_K_ORIGINAL_JPG, false, null, false, null, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+        PHashes._1336_4_K_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_8_K_JPG, FileSize._1336_8_K_JPG, PixelHeightAsset._1336_8_K_JPG,
         PixelWidthAsset._1336_8_K_JPG, ThumbnailWidthAsset._1336_8_K_JPG, ThumbnailHeightAsset._1336_8_K_JPG,
-        Rotation.Rotate0, PHashes._1336_8_K_JPG, false, null, false, null, ImageByteSizes._1336_8_K_JPG,
+        Rotation.Rotate0, PHashes._1336_8_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_THUMBNAIL_JPG, FileSize._1336_THUMBNAIL_JPG, PixelHeightAsset._1336_THUMBNAIL_JPG,
         PixelWidthAsset._1336_THUMBNAIL_JPG, ThumbnailWidthAsset._1336_THUMBNAIL_JPG,
         ThumbnailHeightAsset._1336_THUMBNAIL_JPG, Rotation.Rotate0, PHashes._1336_THUMBNAIL_JPG, false, null, false,
-        null, ImageByteSizes._1336_THUMBNAIL_JPG, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames.IMAGE_1336_MINI_JPG, FileSize.IMAGE_1336_MINI_JPG, PixelHeightAsset.IMAGE_1336_MINI_JPG,
         PixelWidthAsset.IMAGE_1336_MINI_JPG, ThumbnailWidthAsset.IMAGE_1336_MINI_JPG,
         ThumbnailHeightAsset.IMAGE_1336_MINI_JPG, Rotation.Rotate0, PHashes.IMAGE_1336_MINI_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_MINI_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, FileSize.IMAGE_1336_ORIGINAL_JPG,
         PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG, PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
         ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG, Rotation.Rotate0,
-        PHashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+        PHashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
         PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG, PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         Rotation.Rotate0, PHashes.IMAGE_1336_SHIT_QUALITY_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SMALL_JPG, FileSize.IMAGE_1336_SMALL_JPG, PixelHeightAsset.IMAGE_1336_SMALL_JPG,
         PixelWidthAsset.IMAGE_1336_SMALL_JPG, ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG,
         ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG, Rotation.Rotate0, PHashes.IMAGE_1336_SMALL_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_SMALL_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames._1337_JPG, FileSize._1337_JPG, PixelHeightAsset._1337_JPG, PixelWidthAsset._1337_JPG,
         ThumbnailWidthAsset._1337_JPG, ThumbnailHeightAsset._1337_JPG, Rotation.Rotate0, PHashes._1337_JPG, false, null,
-        false, null, ImageByteSizes._1337_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
     [TestCase(FileNames._1349_JPG, FileSize._1349_JPG, PixelHeightAsset._1349_JPG, PixelWidthAsset._1349_JPG,
         ThumbnailWidthAsset._1349_JPG, ThumbnailHeightAsset._1349_JPG, Rotation.Rotate0, PHashes._1349_JPG, false, null,
-        false, null, ImageByteSizes._1349_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1350_JPG, FileSize._1350_JPG, PixelHeightAsset._1350_JPG, PixelWidthAsset._1350_JPG,
         ThumbnailWidthAsset._1350_JPG, ThumbnailHeightAsset._1350_JPG, Rotation.Rotate0, PHashes._1350_JPG, false, null,
-        false, null, ImageByteSizes._1350_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1413_JPG, FileSize._1413_JPG, PixelHeightAsset._1413_JPG, PixelWidthAsset._1413_JPG,
         ThumbnailWidthAsset._1413_JPG, ThumbnailHeightAsset._1413_JPG, Rotation.Rotate0, PHashes._1413_JPG, false, null,
-        false, null, ImageByteSizes._1413_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1414_JPG, FileSize._1414_JPG, PixelHeightAsset._1414_JPG, PixelWidthAsset._1414_JPG,
         ThumbnailWidthAsset._1414_JPG, ThumbnailHeightAsset._1414_JPG, Rotation.Rotate0, PHashes._1414_JPG, false, null,
-        false, null, ImageByteSizes._1414_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
         ThumbnailWidthAsset._1415_JPG, ThumbnailHeightAsset._1415_JPG, Rotation.Rotate270, PHashes._1415_JPG, false,
-        null, true, "The asset has been rotated", ImageByteSizes._1415_JPG,
+        null, true, "The asset has been rotated",
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void CreateAsset_PictureAndPHashType_ReturnsAsset(
         string fileName,
@@ -520,7 +506,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         string additionalPath)
     {
         ConfigureAssetCreationService(200, 150, false, false, true, false);
@@ -536,9 +521,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -564,7 +546,7 @@ public class AssetCreationServiceTests
                     isRotated,
                     rotatedMessage);
 
-                AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+                AssertCataloguedAssetValidity(asset!);
             }
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -578,180 +560,172 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
         ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, Rotation.Rotate0, DHashes.IMAGE_1_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_1_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, FileSize.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
         PixelWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG, Rotation.Rotate90, DHashes.IMAGE_1_90_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, FileSize.IMAGE_1_180_DEG_JPG, PixelHeightAsset.IMAGE_1_180_DEG_JPG,
         PixelWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG, Rotation.Rotate180, DHashes.IMAGE_1_180_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, FileSize.IMAGE_1_270_DEG_JPG, PixelHeightAsset.IMAGE_1_270_DEG_JPG,
         PixelWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG, Rotation.Rotate270, DHashes.IMAGE_1_270_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_2_JPG, FileSize.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG, PixelWidthAsset.IMAGE_2_JPG,
         ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG, Rotation.Rotate0, DHashes.IMAGE_2_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_2_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, FileSize.IMAGE_2_DUPLICATED_JPG,
         PixelHeightAsset.IMAGE_2_DUPLICATED_JPG, PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
         ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG, Rotation.Rotate0,
-        DHashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+        DHashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_3_JPG, FileSize.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG, PixelWidthAsset.IMAGE_3_JPG,
         ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG, Rotation.Rotate0, DHashes.IMAGE_3_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_3_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_4_JPG, FileSize.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG, PixelWidthAsset.IMAGE_4_JPG,
         ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG, Rotation.Rotate0, DHashes.IMAGE_4_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_4_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_5_JPG, FileSize.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG, PixelWidthAsset.IMAGE_5_JPG,
         ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG, Rotation.Rotate0, DHashes.IMAGE_5_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_5_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_6_JPG, FileSize.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG, PixelWidthAsset.IMAGE_6_JPG,
         ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG, Rotation.Rotate0, DHashes.IMAGE_6_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_6_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_7_JPG, FileSize.IMAGE_7_JPG, PixelHeightAsset.IMAGE_7_JPG, PixelWidthAsset.IMAGE_7_JPG,
         ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG, Rotation.Rotate0, DHashes.IMAGE_7_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_7_JPG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_8_JPEG, FileSize.IMAGE_8_JPEG, PixelHeightAsset.IMAGE_8_JPEG,
         PixelWidthAsset.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG,
-        Rotation.Rotate0, DHashes.IMAGE_8_JPEG, false, null, false, null, ImageByteSizes.IMAGE_8_JPEG, "")]
+        Rotation.Rotate0, DHashes.IMAGE_8_JPEG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_9_PNG, FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG,
         ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG, Rotation.Rotate0, DHashes.IMAGE_9_PNG, false,
-        null, false, null, ImageByteSizes.IMAGE_9_PNG, "")]
+        null, false, null, "")]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, FileSize.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG,
         PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
         ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG, Rotation.Rotate0, DHashes.IMAGE_10_PORTRAIT_PNG, false, null, false,
-        null, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+        null, "")]
     [TestCase(FileNames.IMAGE_11_HEIC, FileSize.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
         PixelWidthAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        Rotation.Rotate0, DHashes.IMAGE_11_HEIC, false, null, false, null, ImageByteSizes.IMAGE_11_HEIC, "")]
+        Rotation.Rotate0, DHashes.IMAGE_11_HEIC, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, DHashes.IMAGE_11_90_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_90_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, DHashes.IMAGE_11_180_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_180_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, DHashes.IMAGE_11_270_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_270_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, FileSize.IMAGE_WITH_UPPERCASE_NAME_JPG,
         PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
-        Rotation.Rotate0, DHashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+        Rotation.Rotate0, DHashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null, "")]
     [TestCase(FileNames.HOMER_GIF, FileSize.HOMER_GIF, PixelHeightAsset.HOMER_GIF, PixelWidthAsset.HOMER_GIF,
         ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF, Rotation.Rotate0, DHashes.HOMER_GIF, false, null,
-        false, null, ImageByteSizes.HOMER_GIF, "")]
+        false, null, "")]
     [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, FileSize._1336_BOTTOM_LEFT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG, PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG,
         Rotation.Rotate0, DHashes._1336_BOTTOM_LEFT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_PART_JPG, FileSize._1336_BOTTOM_PART_JPG, PixelHeightAsset._1336_BOTTOM_PART_JPG,
         PixelWidthAsset._1336_BOTTOM_PART_JPG, ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
         ThumbnailHeightAsset._1336_BOTTOM_PART_JPG, Rotation.Rotate0, DHashes._1336_BOTTOM_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_BOTTOM_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileSize._1336_BOTTOM_RIGHT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG, PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG,
         Rotation.Rotate0, DHashes._1336_BOTTOM_RIGHT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_LEFT_PART_JPG, FileSize._1336_LEFT_PART_JPG, PixelHeightAsset._1336_LEFT_PART_JPG,
         PixelWidthAsset._1336_LEFT_PART_JPG, ThumbnailWidthAsset._1336_LEFT_PART_JPG,
         ThumbnailHeightAsset._1336_LEFT_PART_JPG, Rotation.Rotate0, DHashes._1336_LEFT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_ORIGINAL_JPG, FileSize._1336_ORIGINAL_JPG, PixelHeightAsset._1336_ORIGINAL_JPG,
         PixelWidthAsset._1336_ORIGINAL_JPG, ThumbnailWidthAsset._1336_ORIGINAL_JPG,
         ThumbnailHeightAsset._1336_ORIGINAL_JPG, Rotation.Rotate0, DHashes._1336_ORIGINAL_JPG, false, null, false, null,
-        ImageByteSizes._1336_ORIGINAL_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_RIGHT_PART_JPG, FileSize._1336_RIGHT_PART_JPG, PixelHeightAsset._1336_RIGHT_PART_JPG,
         PixelWidthAsset._1336_RIGHT_PART_JPG, ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
         ThumbnailHeightAsset._1336_RIGHT_PART_JPG, Rotation.Rotate0, DHashes._1336_RIGHT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, FileSize._1336_TOP_LEFT_PART_JPG,
         PixelHeightAsset._1336_TOP_LEFT_PART_JPG, PixelWidthAsset._1336_TOP_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG, ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG, Rotation.Rotate0,
-        DHashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        DHashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_PART_JPG, FileSize._1336_TOP_PART_JPG, PixelHeightAsset._1336_TOP_PART_JPG,
         PixelWidthAsset._1336_TOP_PART_JPG, ThumbnailWidthAsset._1336_TOP_PART_JPG,
         ThumbnailHeightAsset._1336_TOP_PART_JPG, Rotation.Rotate0, DHashes._1336_TOP_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_TOP_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, FileSize._1336_TOP_RIGHT_PART_JPG,
         PixelHeightAsset._1336_TOP_RIGHT_PART_JPG, PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG, Rotation.Rotate0,
-        DHashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        DHashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_1_K_JPG, FileSize._1336_1_K_JPG, PixelHeightAsset._1336_1_K_JPG,
         PixelWidthAsset._1336_1_K_JPG, ThumbnailWidthAsset._1336_1_K_JPG, ThumbnailHeightAsset._1336_1_K_JPG,
-        Rotation.Rotate0, DHashes._1336_1_K_JPG, false, null, false, null, ImageByteSizes._1336_1_K_JPG,
+        Rotation.Rotate0, DHashes._1336_1_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_2_K_JPG, FileSize._1336_2_K_JPG, PixelHeightAsset._1336_2_K_JPG,
         PixelWidthAsset._1336_2_K_JPG, ThumbnailWidthAsset._1336_2_K_JPG, ThumbnailHeightAsset._1336_2_K_JPG,
-        Rotation.Rotate0, DHashes._1336_2_K_JPG, false, null, false, null, ImageByteSizes._1336_2_K_JPG,
+        Rotation.Rotate0, DHashes._1336_2_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_3_K_JPG, FileSize._1336_3_K_JPG, PixelHeightAsset._1336_3_K_JPG,
         PixelWidthAsset._1336_3_K_JPG, ThumbnailWidthAsset._1336_3_K_JPG, ThumbnailHeightAsset._1336_3_K_JPG,
-        Rotation.Rotate0, DHashes._1336_3_K_JPG, false, null, false, null, ImageByteSizes._1336_3_K_JPG,
+        Rotation.Rotate0, DHashes._1336_3_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, FileSize._1336_4_K_ORIGINAL_JPG,
         PixelHeightAsset._1336_4_K_ORIGINAL_JPG, PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
         ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG, Rotation.Rotate0,
-        DHashes._1336_4_K_ORIGINAL_JPG, false, null, false, null, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+        DHashes._1336_4_K_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_8_K_JPG, FileSize._1336_8_K_JPG, PixelHeightAsset._1336_8_K_JPG,
         PixelWidthAsset._1336_8_K_JPG, ThumbnailWidthAsset._1336_8_K_JPG, ThumbnailHeightAsset._1336_8_K_JPG,
-        Rotation.Rotate0, DHashes._1336_8_K_JPG, false, null, false, null, ImageByteSizes._1336_8_K_JPG,
+        Rotation.Rotate0, DHashes._1336_8_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_THUMBNAIL_JPG, FileSize._1336_THUMBNAIL_JPG, PixelHeightAsset._1336_THUMBNAIL_JPG,
         PixelWidthAsset._1336_THUMBNAIL_JPG, ThumbnailWidthAsset._1336_THUMBNAIL_JPG,
         ThumbnailHeightAsset._1336_THUMBNAIL_JPG, Rotation.Rotate0, DHashes._1336_THUMBNAIL_JPG, false, null, false,
-        null, ImageByteSizes._1336_THUMBNAIL_JPG, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames.IMAGE_1336_MINI_JPG, FileSize.IMAGE_1336_MINI_JPG, PixelHeightAsset.IMAGE_1336_MINI_JPG,
         PixelWidthAsset.IMAGE_1336_MINI_JPG, ThumbnailWidthAsset.IMAGE_1336_MINI_JPG,
         ThumbnailHeightAsset.IMAGE_1336_MINI_JPG, Rotation.Rotate0, DHashes.IMAGE_1336_MINI_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_MINI_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, FileSize.IMAGE_1336_ORIGINAL_JPG,
         PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG, PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
         ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG, Rotation.Rotate0,
-        DHashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+        DHashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
         PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG, PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         Rotation.Rotate0, DHashes.IMAGE_1336_SHIT_QUALITY_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SMALL_JPG, FileSize.IMAGE_1336_SMALL_JPG, PixelHeightAsset.IMAGE_1336_SMALL_JPG,
         PixelWidthAsset.IMAGE_1336_SMALL_JPG, ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG,
         ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG, Rotation.Rotate0, DHashes.IMAGE_1336_SMALL_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_SMALL_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames._1337_JPG, FileSize._1337_JPG, PixelHeightAsset._1337_JPG, PixelWidthAsset._1337_JPG,
         ThumbnailWidthAsset._1337_JPG, ThumbnailHeightAsset._1337_JPG, Rotation.Rotate0, DHashes._1337_JPG, false, null,
-        false, null, ImageByteSizes._1337_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
     [TestCase(FileNames._1349_JPG, FileSize._1349_JPG, PixelHeightAsset._1349_JPG, PixelWidthAsset._1349_JPG,
         ThumbnailWidthAsset._1349_JPG, ThumbnailHeightAsset._1349_JPG, Rotation.Rotate0, DHashes._1349_JPG, false, null,
-        false, null, ImageByteSizes._1349_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1350_JPG, FileSize._1350_JPG, PixelHeightAsset._1350_JPG, PixelWidthAsset._1350_JPG,
         ThumbnailWidthAsset._1350_JPG, ThumbnailHeightAsset._1350_JPG, Rotation.Rotate0, DHashes._1350_JPG, false, null,
-        false, null, ImageByteSizes._1350_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1413_JPG, FileSize._1413_JPG, PixelHeightAsset._1413_JPG, PixelWidthAsset._1413_JPG,
         ThumbnailWidthAsset._1413_JPG, ThumbnailHeightAsset._1413_JPG, Rotation.Rotate0, DHashes._1413_JPG, false, null,
-        false, null, ImageByteSizes._1413_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1414_JPG, FileSize._1414_JPG, PixelHeightAsset._1414_JPG, PixelWidthAsset._1414_JPG,
         ThumbnailWidthAsset._1414_JPG, ThumbnailHeightAsset._1414_JPG, Rotation.Rotate0, DHashes._1414_JPG, false, null,
-        false, null, ImageByteSizes._1414_JPG,
-        $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
         ThumbnailWidthAsset._1415_JPG, ThumbnailHeightAsset._1415_JPG, Rotation.Rotate270, DHashes._1415_JPG, false,
-        null, true, "The asset has been rotated", ImageByteSizes._1415_JPG,
+        null, true, "The asset has been rotated",
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void CreateAsset_PictureAndDHashType_ReturnsAsset(
         string fileName,
@@ -766,7 +740,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         string additionalPath)
     {
         ConfigureAssetCreationService(200, 150, true, false, false, false);
@@ -782,9 +755,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -810,7 +780,7 @@ public class AssetCreationServiceTests
                     isRotated,
                     rotatedMessage);
 
-                AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+                AssertCataloguedAssetValidity(asset!);
             }
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -824,180 +794,180 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
         ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_1_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_1_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, FileSize.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
         PixelWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG, Rotation.Rotate90, MD5Hashes.IMAGE_1_90_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, FileSize.IMAGE_1_180_DEG_JPG, PixelHeightAsset.IMAGE_1_180_DEG_JPG,
         PixelWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG, Rotation.Rotate180, MD5Hashes.IMAGE_1_180_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, FileSize.IMAGE_1_270_DEG_JPG, PixelHeightAsset.IMAGE_1_270_DEG_JPG,
         PixelWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG,
         ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG, Rotation.Rotate270, MD5Hashes.IMAGE_1_270_DEG_JPG, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_2_JPG, FileSize.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG, PixelWidthAsset.IMAGE_2_JPG,
         ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_2_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_2_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, FileSize.IMAGE_2_DUPLICATED_JPG,
         PixelHeightAsset.IMAGE_2_DUPLICATED_JPG, PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
         ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG, Rotation.Rotate0,
-        MD5Hashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+        MD5Hashes.IMAGE_2_DUPLICATED_JPG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_3_JPG, FileSize.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG, PixelWidthAsset.IMAGE_3_JPG,
         ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_3_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_3_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_4_JPG, FileSize.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG, PixelWidthAsset.IMAGE_4_JPG,
         ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_4_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_4_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_5_JPG, FileSize.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG, PixelWidthAsset.IMAGE_5_JPG,
         ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_5_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_5_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_6_JPG, FileSize.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG, PixelWidthAsset.IMAGE_6_JPG,
         ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_6_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_6_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_7_JPG, FileSize.IMAGE_7_JPG, PixelHeightAsset.IMAGE_7_JPG, PixelWidthAsset.IMAGE_7_JPG,
         ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_7_JPG,
-        false, null, false, null, ImageByteSizes.IMAGE_7_JPG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_8_JPEG, FileSize.IMAGE_8_JPEG, PixelHeightAsset.IMAGE_8_JPEG,
         PixelWidthAsset.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG,
-        Rotation.Rotate0, MD5Hashes.IMAGE_8_JPEG, false, null, false, null, ImageByteSizes.IMAGE_8_JPEG, "")]
+        Rotation.Rotate0, MD5Hashes.IMAGE_8_JPEG, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_9_PNG, FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG,
         ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG, Rotation.Rotate0, MD5Hashes.IMAGE_9_PNG,
-        false, null, false, null, ImageByteSizes.IMAGE_9_PNG, "")]
+        false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, FileSize.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG,
         PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG,
         ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG, Rotation.Rotate0, MD5Hashes.IMAGE_10_PORTRAIT_PNG, false, null,
-        false, null, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+        false, null, "")]
     [TestCase(FileNames.IMAGE_11_HEIC, FileSize.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
         PixelWidthAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        Rotation.Rotate0, MD5Hashes.IMAGE_11_HEIC, false, null, false, null, ImageByteSizes.IMAGE_11_HEIC, "")]
+        Rotation.Rotate0, MD5Hashes.IMAGE_11_HEIC, false, null, false, null, "")]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, MD5Hashes.IMAGE_11_90_DEG_HEIC, false, null, true,
-        "The asset has been rotated", ImageByteSizes.IMAGE_11_90_DEG_HEIC, "")]
+        "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, MD5Hashes.IMAGE_11_180_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_180_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
         PixelWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, MD5Hashes.IMAGE_11_270_DEG_HEIC, false, null,
-        true, "The asset has been rotated", ImageByteSizes.IMAGE_11_270_DEG_HEIC, "")]
+        true, "The asset has been rotated", "")]
     [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, FileSize.IMAGE_WITH_UPPERCASE_NAME_JPG,
         PixelHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, PixelWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG,
         Rotation.Rotate0, MD5Hashes.IMAGE_WITH_UPPERCASE_NAME_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+        "")]
     [TestCase(FileNames.HOMER_GIF, FileSize.HOMER_GIF, PixelHeightAsset.HOMER_GIF, PixelWidthAsset.HOMER_GIF,
         ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF, Rotation.Rotate0, MD5Hashes.HOMER_GIF, false,
-        null, false, null, ImageByteSizes.HOMER_GIF, "")]
+        null, false, null, "")]
     [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, FileSize._1336_BOTTOM_LEFT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_LEFT_PART_JPG, PixelWidthAsset._1336_BOTTOM_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_LEFT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_LEFT_PART_JPG,
         Rotation.Rotate0, MD5Hashes._1336_BOTTOM_LEFT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_PART_JPG, FileSize._1336_BOTTOM_PART_JPG, PixelHeightAsset._1336_BOTTOM_PART_JPG,
         PixelWidthAsset._1336_BOTTOM_PART_JPG, ThumbnailWidthAsset._1336_BOTTOM_PART_JPG,
         ThumbnailHeightAsset._1336_BOTTOM_PART_JPG, Rotation.Rotate0, MD5Hashes._1336_BOTTOM_PART_JPG, false, null,
-        false, null, ImageByteSizes._1336_BOTTOM_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        false, null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileSize._1336_BOTTOM_RIGHT_PART_JPG,
         PixelHeightAsset._1336_BOTTOM_RIGHT_PART_JPG, PixelWidthAsset._1336_BOTTOM_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_BOTTOM_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_BOTTOM_RIGHT_PART_JPG,
         Rotation.Rotate0, MD5Hashes._1336_BOTTOM_RIGHT_PART_JPG, false, null, false, null,
-        ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_LEFT_PART_JPG, FileSize._1336_LEFT_PART_JPG, PixelHeightAsset._1336_LEFT_PART_JPG,
         PixelWidthAsset._1336_LEFT_PART_JPG, ThumbnailWidthAsset._1336_LEFT_PART_JPG,
         ThumbnailHeightAsset._1336_LEFT_PART_JPG, Rotation.Rotate0, MD5Hashes._1336_LEFT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_LEFT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_ORIGINAL_JPG, FileSize._1336_ORIGINAL_JPG, PixelHeightAsset._1336_ORIGINAL_JPG,
         PixelWidthAsset._1336_ORIGINAL_JPG, ThumbnailWidthAsset._1336_ORIGINAL_JPG,
         ThumbnailHeightAsset._1336_ORIGINAL_JPG, Rotation.Rotate0, MD5Hashes._1336_ORIGINAL_JPG, false, null, false,
-        null, ImageByteSizes._1336_ORIGINAL_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_RIGHT_PART_JPG, FileSize._1336_RIGHT_PART_JPG, PixelHeightAsset._1336_RIGHT_PART_JPG,
         PixelWidthAsset._1336_RIGHT_PART_JPG, ThumbnailWidthAsset._1336_RIGHT_PART_JPG,
         ThumbnailHeightAsset._1336_RIGHT_PART_JPG, Rotation.Rotate0, MD5Hashes._1336_RIGHT_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_RIGHT_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, FileSize._1336_TOP_LEFT_PART_JPG,
         PixelHeightAsset._1336_TOP_LEFT_PART_JPG, PixelWidthAsset._1336_TOP_LEFT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_LEFT_PART_JPG, ThumbnailHeightAsset._1336_TOP_LEFT_PART_JPG, Rotation.Rotate0,
-        MD5Hashes._1336_TOP_LEFT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
+        MD5Hashes._1336_TOP_LEFT_PART_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_PART_JPG, FileSize._1336_TOP_PART_JPG, PixelHeightAsset._1336_TOP_PART_JPG,
         PixelWidthAsset._1336_TOP_PART_JPG, ThumbnailWidthAsset._1336_TOP_PART_JPG,
         ThumbnailHeightAsset._1336_TOP_PART_JPG, Rotation.Rotate0, MD5Hashes._1336_TOP_PART_JPG, false, null, false,
-        null, ImageByteSizes._1336_TOP_PART_JPG, $"{Directories.DUPLICATES}\\{Directories.PART}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, FileSize._1336_TOP_RIGHT_PART_JPG,
         PixelHeightAsset._1336_TOP_RIGHT_PART_JPG, PixelWidthAsset._1336_TOP_RIGHT_PART_JPG,
         ThumbnailWidthAsset._1336_TOP_RIGHT_PART_JPG, ThumbnailHeightAsset._1336_TOP_RIGHT_PART_JPG, Rotation.Rotate0,
-        MD5Hashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
+        MD5Hashes._1336_TOP_RIGHT_PART_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
     [TestCase(FileNames._1336_1_K_JPG, FileSize._1336_1_K_JPG, PixelHeightAsset._1336_1_K_JPG,
         PixelWidthAsset._1336_1_K_JPG, ThumbnailWidthAsset._1336_1_K_JPG, ThumbnailHeightAsset._1336_1_K_JPG,
-        Rotation.Rotate0, MD5Hashes._1336_1_K_JPG, false, null, false, null, ImageByteSizes._1336_1_K_JPG,
+        Rotation.Rotate0, MD5Hashes._1336_1_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_2_K_JPG, FileSize._1336_2_K_JPG, PixelHeightAsset._1336_2_K_JPG,
         PixelWidthAsset._1336_2_K_JPG, ThumbnailWidthAsset._1336_2_K_JPG, ThumbnailHeightAsset._1336_2_K_JPG,
-        Rotation.Rotate0, MD5Hashes._1336_2_K_JPG, false, null, false, null, ImageByteSizes._1336_2_K_JPG,
+        Rotation.Rotate0, MD5Hashes._1336_2_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_3_K_JPG, FileSize._1336_3_K_JPG, PixelHeightAsset._1336_3_K_JPG,
         PixelWidthAsset._1336_3_K_JPG, ThumbnailWidthAsset._1336_3_K_JPG, ThumbnailHeightAsset._1336_3_K_JPG,
-        Rotation.Rotate0, MD5Hashes._1336_3_K_JPG, false, null, false, null, ImageByteSizes._1336_3_K_JPG,
+        Rotation.Rotate0, MD5Hashes._1336_3_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, FileSize._1336_4_K_ORIGINAL_JPG,
         PixelHeightAsset._1336_4_K_ORIGINAL_JPG, PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
         ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG, Rotation.Rotate0,
-        MD5Hashes._1336_4_K_ORIGINAL_JPG, false, null, false, null, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+        MD5Hashes._1336_4_K_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_8_K_JPG, FileSize._1336_8_K_JPG, PixelHeightAsset._1336_8_K_JPG,
         PixelWidthAsset._1336_8_K_JPG, ThumbnailWidthAsset._1336_8_K_JPG, ThumbnailHeightAsset._1336_8_K_JPG,
-        Rotation.Rotate0, MD5Hashes._1336_8_K_JPG, false, null, false, null, ImageByteSizes._1336_8_K_JPG,
+        Rotation.Rotate0, MD5Hashes._1336_8_K_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames._1336_THUMBNAIL_JPG, FileSize._1336_THUMBNAIL_JPG, PixelHeightAsset._1336_THUMBNAIL_JPG,
         PixelWidthAsset._1336_THUMBNAIL_JPG, ThumbnailWidthAsset._1336_THUMBNAIL_JPG,
         ThumbnailHeightAsset._1336_THUMBNAIL_JPG, Rotation.Rotate0, MD5Hashes._1336_THUMBNAIL_JPG, false, null, false,
-        null, ImageByteSizes._1336_THUMBNAIL_JPG, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
     [TestCase(FileNames.IMAGE_1336_MINI_JPG, FileSize.IMAGE_1336_MINI_JPG, PixelHeightAsset.IMAGE_1336_MINI_JPG,
         PixelWidthAsset.IMAGE_1336_MINI_JPG, ThumbnailWidthAsset.IMAGE_1336_MINI_JPG,
         ThumbnailHeightAsset.IMAGE_1336_MINI_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_1336_MINI_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_MINI_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, FileSize.IMAGE_1336_ORIGINAL_JPG,
         PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG, PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
         ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG, Rotation.Rotate0,
-        MD5Hashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+        MD5Hashes.IMAGE_1336_ORIGINAL_JPG, false, null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
         PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG, PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG,
         Rotation.Rotate0, MD5Hashes.IMAGE_1336_SHIT_QUALITY_JPG, false, null, false, null,
-        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames.IMAGE_1336_SMALL_JPG, FileSize.IMAGE_1336_SMALL_JPG, PixelHeightAsset.IMAGE_1336_SMALL_JPG,
         PixelWidthAsset.IMAGE_1336_SMALL_JPG, ThumbnailWidthAsset.IMAGE_1336_SMALL_JPG,
         ThumbnailHeightAsset.IMAGE_1336_SMALL_JPG, Rotation.Rotate0, MD5Hashes.IMAGE_1336_SMALL_JPG, false, null, false,
-        null, ImageByteSizes.IMAGE_1336_SMALL_JPG, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
+        null, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
     [TestCase(FileNames._1337_JPG, FileSize._1337_JPG, PixelHeightAsset._1337_JPG, PixelWidthAsset._1337_JPG,
         ThumbnailWidthAsset._1337_JPG, ThumbnailHeightAsset._1337_JPG, Rotation.Rotate0, MD5Hashes._1337_JPG, false,
-        null, false, null, ImageByteSizes._1337_JPG,
+        null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
     [TestCase(FileNames._1349_JPG, FileSize._1349_JPG, PixelHeightAsset._1349_JPG, PixelWidthAsset._1349_JPG,
         ThumbnailWidthAsset._1349_JPG, ThumbnailHeightAsset._1349_JPG, Rotation.Rotate0, MD5Hashes._1349_JPG, false,
-        null, false, null, ImageByteSizes._1349_JPG,
+        null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1350_JPG, FileSize._1350_JPG, PixelHeightAsset._1350_JPG, PixelWidthAsset._1350_JPG,
         ThumbnailWidthAsset._1350_JPG, ThumbnailHeightAsset._1350_JPG, Rotation.Rotate0, MD5Hashes._1350_JPG, false,
-        null, false, null, ImageByteSizes._1350_JPG,
+        null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
     [TestCase(FileNames._1413_JPG, FileSize._1413_JPG, PixelHeightAsset._1413_JPG, PixelWidthAsset._1413_JPG,
         ThumbnailWidthAsset._1413_JPG, ThumbnailHeightAsset._1413_JPG, Rotation.Rotate0, MD5Hashes._1413_JPG, false,
-        null, false, null, ImageByteSizes._1413_JPG,
+        null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1414_JPG, FileSize._1414_JPG, PixelHeightAsset._1414_JPG, PixelWidthAsset._1414_JPG,
         ThumbnailWidthAsset._1414_JPG, ThumbnailHeightAsset._1414_JPG, Rotation.Rotate0, MD5Hashes._1414_JPG, false,
-        null, false, null, ImageByteSizes._1414_JPG,
+        null, false, null,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
         ThumbnailWidthAsset._1415_JPG, ThumbnailHeightAsset._1415_JPG, Rotation.Rotate270, MD5Hashes._1415_JPG, false,
-        null, true, "The asset has been rotated", ImageByteSizes._1415_JPG,
+        null, true, "The asset has been rotated",
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void CreateAsset_PictureAndMD5HashType_ReturnsAsset(
         string fileName,
@@ -1012,7 +982,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         string additionalPath)
     {
         ConfigureAssetCreationService(200, 150, false, true, false, false);
@@ -1028,9 +997,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1056,7 +1022,7 @@ public class AssetCreationServiceTests
                     isRotated,
                     rotatedMessage);
 
-                AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+                AssertCataloguedAssetValidity(asset!);
             }
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -1069,7 +1035,7 @@ public class AssetCreationServiceTests
 
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
         ThumbnailWidthAsset._1415_JPG, ThumbnailHeightAsset._1415_JPG, Rotation.Rotate270, Hashes._1415_JPG, false,
-        null, true, "The asset has been rotated", ImageByteSizes._1415_JPG,
+        null, true, "The asset has been rotated",
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void CreateAsset_PreviouslyRotatedPictureAndBasicHashType_ReturnsAsset(
         string fileName,
@@ -1084,7 +1050,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         string additionalPath)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
@@ -1100,9 +1065,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1128,7 +1090,7 @@ public class AssetCreationServiceTests
                     isRotated,
                     rotatedMessage);
 
-                AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+                AssertCataloguedAssetValidity(asset!);
             }
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -1140,20 +1102,19 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    [TestCase(150, 150, 150, 84, 1653)]
-    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, ImageByteSizes.IMAGE_1_JPG)]
-    [TestCase(150, 200, 150, 84, 1653)]
-    [TestCase(0, 0, 0, 0, 30773)]
-    [TestCase(1000, 10, 1000, 562, 23730)]
-    [TestCase(10, 10000, 10, 6, 662)]
-    [TestCase(150, 10000000, 150, 84, 1653)]
-    [TestCase(-100, -100, -100, -56, 1232)]
+    [TestCase(150, 150, 150, 84)]
+    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
+    [TestCase(150, 200, 150, 84)]
+    [TestCase(0, 0, 0, 0)]
+    [TestCase(1000, 10, 1000, 562)]
+    [TestCase(10, 10000, 10, 6)]
+    [TestCase(150, 10000000, 150, 84)]
+    [TestCase(-100, -100, -100, -56)]
     public void CreateAsset_PictureAndBasicHashTypeAndDifferentThumbnailSettings_ReturnsAsset(
         int thumbnailMaxWidth,
         int thumbnailMaxHeight,
         int expectedThumbnailPixelWidth,
-        int expectedThumbnailPixelHeight,
-        int expectedImageByteSize)
+        int expectedThumbnailPixelHeight)
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
@@ -1193,9 +1154,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1219,7 +1177,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1230,22 +1188,19 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    [TestCase(150, 150, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG,
-        ImageByteSizes.IMAGE_10_PORTRAIT_PNG)]
-    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG,
-        ImageByteSizes.IMAGE_10_PORTRAIT_PNG)]
-    [TestCase(150, 200, 112, 200, 11218)]
-    [TestCase(0, 0, 0, 0, 142863)]
-    [TestCase(1000, 10, 6, 10, 282)]
-    [TestCase(10, 10000, 5625, 10000, 14790272)]
-    [TestCase(10000000, 100, 56, 100, 2501)]
-    [TestCase(-100, -100, -56, -100, 2490)]
+    [TestCase(150, 150, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(150, 200, 112, 200)]
+    [TestCase(0, 0, 0, 0)]
+    [TestCase(1000, 10, 6, 10)]
+    [TestCase(10, 10000, 5625, 10000)]
+    [TestCase(10000000, 100, 56, 100)]
+    [TestCase(-100, -100, -56, -100)]
     public void CreateAsset_PortraitPictureAndBasicHashTypeAndDifferentThumbnailSettings_ReturnsAsset(
         int thumbnailMaxWidth,
         int thumbnailMaxHeight,
         int expectedThumbnailPixelWidth,
-        int expectedThumbnailPixelHeight,
-        int expectedImageByteSize)
+        int expectedThumbnailPixelHeight)
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
@@ -1289,9 +1244,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1315,7 +1267,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1326,21 +1278,18 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    [TestCase(150, 150, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        ImageByteSizes.IMAGE_11_HEIC)]
-    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-        ImageByteSizes.IMAGE_11_HEIC)]
-    [TestCase(150, 200, 150, 200, 9594)]
-    [TestCase(0, 0, 0, 0, 634)]
-    [TestCase(1000, 10, 8, 10, 704)]
-    [TestCase(10, 10000, 7500, 10000, 7267008)]
-    [TestCase(100000, 100, 75, 100, 3187)]
+    [TestCase(150, 150, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(200, 150, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(150, 200, 150, 200)]
+    [TestCase(0, 0, 0, 0)]
+    [TestCase(1000, 10, 8, 10)]
+    [TestCase(10, 10000, 7500, 10000)]
+    [TestCase(100000, 100, 75, 100)]
     public void CreateAsset_HeicPictureAndBasicHashTypeAndDifferentThumbnailSettings_ReturnsAsset(
         int thumbnailMaxWidth,
         int thumbnailMaxHeight,
         int expectedThumbnailPixelWidth,
-        int expectedThumbnailPixelHeight,
-        int expectedImageByteSize)
+        int expectedThumbnailPixelHeight)
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
@@ -1380,9 +1329,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1406,7 +1352,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1448,8 +1394,6 @@ public class AssetCreationServiceTests
             }
         };
 
-        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
-
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
@@ -1459,9 +1403,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
@@ -1534,20 +1475,6 @@ public class AssetCreationServiceTests
             Assert.That(secondAssetFromRepository.Hash, Is.EqualTo(newSameAsset.Hash));
             Assert.That(secondAssetFromRepository.ImageData, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(asset.Folder.Path), Is.True);
-            Assert.That(thumbnails.ContainsKey(newSameAsset.Folder.Path), Is.True);
-
-            Assert.That(thumbnails[folder.Path], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folder.Path].ContainsKey(asset.FileName), Is.True);
-            Assert.That(thumbnails[folder.Path][asset.FileName], Is.Not.Null);
-            Assert.That(thumbnails[folder.Path][asset.FileName], Has.Length.EqualTo(imageByteSize));
-
-            Assert.That(thumbnails[newSameAssetFolder.Path], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[newSameAssetFolder.Path].ContainsKey(newSameAsset.FileName), Is.True);
-            Assert.That(thumbnails[newSameAssetFolder.Path][newSameAsset.FileName], Is.Not.Null);
-            Assert.That(thumbnails[newSameAssetFolder.Path][newSameAsset.FileName], Has.Length.EqualTo(imageByteSize));
-
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
         finally
@@ -1587,8 +1514,6 @@ public class AssetCreationServiceTests
             }
         };
 
-        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
-
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
@@ -1598,9 +1523,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
@@ -1625,13 +1547,13 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.That(newSameAsset, Is.Null);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1673,8 +1595,6 @@ public class AssetCreationServiceTests
             }
         };
 
-        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
-
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
@@ -1684,9 +1604,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
                 skipCatalogCheck: false);
@@ -1712,14 +1629,14 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
                 skipCatalogCheck: false);
 
             Assert.That(newSameAsset, Is.Null);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1761,8 +1678,6 @@ public class AssetCreationServiceTests
             }
         };
 
-        const int imageByteSize = ImageByteSizes.IMAGE_1_JPG;
-
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
@@ -1772,9 +1687,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
                 skipCatalogCheck: true);
@@ -1800,7 +1712,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
                 skipCatalogCheck: true);
@@ -1832,11 +1744,6 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository[1].FileName, Is.EqualTo(expectedAsset.FileName));
             Assert.That(assetsFromRepository[0].Hash, Is.EqualTo(expectedAsset.Hash));
             Assert.That(assetsFromRepository[1].Hash, Is.EqualTo(expectedAsset.Hash));
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folder.Path], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folder.Path][expectedAsset.FileName], Is.Not.Null);
-            Assert.That(thumbnails[folder.Path][expectedAsset.FileName], Has.Length.EqualTo(imageByteSize));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1874,17 +1781,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(tempDirectory, invalidFileName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -1899,10 +1801,10 @@ public class AssetCreationServiceTests
     // [TestCase(FileNames.IMAGE_9_PNG, "Corrupted_Image_1.jpg", FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG, Rotation.Rotate0, Hashes.IMAGE_9_PNG, 2148)] // Seems to work now with Win 11
     [TestCase(FileNames.IMAGE_9_PNG, "Corrupted_Image_1.heic", FileSize.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
         PixelWidthAsset.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-        Rotation.Rotate0, Hashes.IMAGE_9_PNG, 2107)]
+        Rotation.Rotate0, Hashes.IMAGE_9_PNG)]
     [TestCase(FileNames.IMAGE_1_JPG, "Corrupted_Image_1.heic", FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
         PixelWidthAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-        Rotation.Rotate0, Hashes.IMAGE_1_JPG, 2134)]
+        Rotation.Rotate0, Hashes.IMAGE_1_JPG)]
     public void CreateAsset_CorruptedPictureBasicHashType_ReturnsAssetWithCorruptedMessage(
         string initialFileName,
         string corruptedAssetFileName,
@@ -1912,8 +1814,7 @@ public class AssetCreationServiceTests
         int thumbnailPixelWidth,
         int thumbnailPixelHeight,
         Rotation imageRotation,
-        string hash,
-        int imageByteSizeExpected)
+        string hash)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
         string tempDirectory = Path.Combine(_dataDirectory!, Directories.CORRUPTED_IMAGE);
@@ -1966,9 +1867,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(tempDirectory, corruptedAssetFileName);
 
             Assert.That(asset, Is.Not.Null);
@@ -1992,7 +1890,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSizeExpected);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
         }
@@ -2018,16 +1916,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             NullReferenceException nullReferenceException =
                 new("Object reference not set to an instance of an object.");
@@ -2059,16 +1953,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             OverflowException overflowException = new("The image data generated an overflow during processing.");
             _testLogger!.AssertLogExceptions([overflowException], typeof(AssetCreationService));
@@ -2099,16 +1989,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             InvalidOperationException invalidOperationException =
                 new("Operation is not valid due to the current state of the object.");
@@ -2140,16 +2026,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             InvalidOperationException invalidOperationException =
                 new("Operation is not valid due to the current state of the object.");
@@ -2179,16 +2061,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             ArgumentNullException argumentNullException = new(nameof(directoryName));
             _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
@@ -2218,16 +2096,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             FileNotFoundException fileNotFoundException =
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
@@ -2260,16 +2134,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             FileNotFoundException fileNotFoundException =
                 new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
@@ -2296,16 +2166,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             ArgumentNullException argumentNullException = new(nameof(fileName));
             _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
@@ -2333,16 +2199,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
@@ -2372,16 +2234,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
@@ -2396,7 +2254,7 @@ public class AssetCreationServiceTests
 
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
-        Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
+        Hashes.HOMER_JPG, false, null, false, null)]
     public void CreateAsset_VideoAndBasicHashType_LogsItAndReturnsAsset(
         string fileName,
         string firstFrameFileName,
@@ -2410,8 +2268,7 @@ public class AssetCreationServiceTests
         bool isCorrupted,
         string? corruptedMessage,
         bool isRotated,
-        string? rotatedMessage,
-        int imageByteSize)
+        string? rotatedMessage)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2430,9 +2287,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset, Is.Null);
@@ -2441,8 +2295,6 @@ public class AssetCreationServiceTests
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
@@ -2472,7 +2324,7 @@ public class AssetCreationServiceTests
                 isRotated,
                 rotatedMessage);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             _testLogger!.AssertLogInfos(
             [
@@ -2490,7 +2342,7 @@ public class AssetCreationServiceTests
     // TODO: Evolve this test when the rework of video handling has been made
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
-        Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
+        Hashes.HOMER_JPG, false, null, false, null)]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter")]
     public void CreateAsset_VideoAndBasicHashTypeAndCreateFirstFrameInSameLocationAsVideo_LogsItAndReturnsAsset(
         string fileName,
@@ -2505,8 +2357,7 @@ public class AssetCreationServiceTests
         bool isCorrupted,
         string? corruptedMessage,
         bool isRotated,
-        string? rotatedMessage,
-        int imageByteSize)
+        string? rotatedMessage)
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -2525,7 +2376,7 @@ public class AssetCreationServiceTests
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database!, _pathProviderServiceMock!, imageProcessingService,
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
@@ -2556,9 +2407,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(firstFrameVideosPath, fileName, true);
 
             //Assert.That(asset, Is.Not.Null);
@@ -2566,8 +2414,6 @@ public class AssetCreationServiceTests
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             Assert.That(File.Exists(newVideoPath), Is.True);
             Assert.That(File.Exists(imagePath), Is.True);
@@ -2590,7 +2436,7 @@ public class AssetCreationServiceTests
             //     isRotated,
             //     rotatedMessage);
 
-            // AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            // AssertCataloguedAssetAndThumbnailValidity(asset!);
 
             _testLogger!.AssertLogInfos(
             [
@@ -2627,9 +2473,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset, Is.Null);
@@ -2638,8 +2481,6 @@ public class AssetCreationServiceTests
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             Exception[] expectedExceptions =
             [
@@ -2657,7 +2498,7 @@ public class AssetCreationServiceTests
 
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
         PixelWidthAsset.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG, Rotation.Rotate0,
-        Hashes.HOMER_JPG, false, null, false, null, ImageByteSizes.HOMER_JPG)]
+        Hashes.HOMER_JPG, false, null, false, null)]
     public void CreateAsset_VideoAndBasicHashTypeAndAddSameVideoTwice_LogsItAndReturnsAsset(
         string fileName,
         string firstFrameFileName,
@@ -2671,8 +2512,7 @@ public class AssetCreationServiceTests
         bool isCorrupted,
         string? corruptedMessage,
         bool isRotated,
-        string? rotatedMessage,
-        int imageByteSize)
+        string? rotatedMessage)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
@@ -2691,9 +2531,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset1, Is.Null);
@@ -2702,8 +2539,6 @@ public class AssetCreationServiceTests
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
@@ -2733,7 +2568,7 @@ public class AssetCreationServiceTests
                 isRotated,
                 rotatedMessage);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset2!);
 
             _testLogger!.AssertLogInfos(
             [
@@ -2750,9 +2585,7 @@ public class AssetCreationServiceTests
             Assert.That(File.Exists(videoPath), Is.True);
             Assert.That(File.Exists(imagePath), Is.True);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
-
-            folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
+            AssertCataloguedAssetValidity(asset2!);
 
             Asset? asset4 = _assetCreationService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
 
@@ -2763,7 +2596,7 @@ public class AssetCreationServiceTests
 
             Assert.That(asset2!.FileName, Is.EqualTo(firstFrameFileName));
 
-            AssertCataloguedAssetAndThumbnailValidity(asset2, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset2);
 
             _testLogger!.AssertLogExceptions(
             [
@@ -2804,9 +2637,6 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset1, Is.Null);
@@ -2815,8 +2645,6 @@ public class AssetCreationServiceTests
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
@@ -2857,8 +2685,6 @@ public class AssetCreationServiceTests
                 }
             };
 
-            const int expectedImageByteSize = ImageByteSizes.IMAGE_1_JPG;
-
             AssertAssetPropertyValidity(
                 asset2!,
                 firstFrameFileName,
@@ -2878,7 +2704,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Metadata.Rotated.IsTrue,
                 expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, expectedImageByteSize);
+            AssertCataloguedAssetValidity(asset2!);
 
             Exception[] expectedExceptions =
             [
@@ -2913,17 +2739,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, isVideo);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -2941,7 +2762,7 @@ public class AssetCreationServiceTests
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, FileSize.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG,
         ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG, Rotation.Rotate0, Hashes.IMAGE_1_JPG, false,
-        null, false, null, ImageByteSizes.IMAGE_1_JPG, false)]
+        null, false, null, false)]
     public void CreateAsset_PictureAndIsVideoIsTrueAndAnalyseVideosIsFalse_ReturnsAsset(
         string fileName,
         long fileSize,
@@ -2955,7 +2776,6 @@ public class AssetCreationServiceTests
         string? corruptedMessage,
         bool isRotated,
         string? rotatedMessage,
-        int imageByteSize,
         bool analyseVideos)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
@@ -2971,9 +2791,6 @@ public class AssetCreationServiceTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
 
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
@@ -2998,7 +2815,7 @@ public class AssetCreationServiceTests
                 isRotated,
                 rotatedMessage);
 
-            AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
+            AssertCataloguedAssetValidity(asset!);
 
             string imagePath = Path.Combine(firstFrameVideosPath, fileName);
             Assert.That(File.Exists(imagePath), Is.False);
@@ -3036,17 +2853,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             string imagePath = Path.Combine(firstFrameVideosPath, fileName);
             Assert.That(File.Exists(imagePath), Is.False);
@@ -3086,17 +2898,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
             string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
@@ -3132,17 +2939,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -3181,17 +2983,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -3224,17 +3021,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Assert.That(thumbnails, Is.Empty);
 
             ArgumentNullException argumentNullException = new(nameof(fileName));
             _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
@@ -3264,16 +3056,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             _testLogger!.AssertLogExceptions(
             [
@@ -3305,16 +3093,12 @@ public class AssetCreationServiceTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
             Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!, true);
 
             Assert.That(asset, Is.Null);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-            Assert.That(thumbnails, Is.Empty);
 
             // videoPath = Path.Combine(_dataDirectory!, _dataDirectory!) = _dataDirectory! (absolute path overrides)
             _testLogger!.AssertLogExceptions(
@@ -3373,24 +3157,19 @@ public class AssetCreationServiceTests
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(fileModificationDateTime.Date));
     }
 
-    private void AssertCataloguedAssetAndThumbnailValidity(Asset asset, Folder folder,
-        Dictionary<string, Dictionary<string, byte[]>> thumbnails, int imageByteSize)
+    private void AssertCataloguedAssetValidity(Asset asset)
     {
-        List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
+        using (Assert.EnterMultipleScope())
+        {
+            List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
-        Asset assetFromRepository = assetsFromRepository[0];
+            Asset assetFromRepository = assetsFromRepository[0];
 
-        Assert.That(assetFromRepository.FileName, Is.EqualTo(asset.FileName));
-        Assert.That(assetFromRepository.FolderId, Is.EqualTo(asset.FolderId));
-        Assert.That(assetFromRepository.Hash, Is.EqualTo(asset.Hash));
-        Assert.That(assetFromRepository.ImageData, Is.Null);
-
-        Assert.That(thumbnails, Has.Count.EqualTo(1));
-        Assert.That(thumbnails.ContainsKey(asset.Folder.Path), Is.True);
-        Assert.That(thumbnails[folder.Path], Has.Count.EqualTo(1));
-        Assert.That(thumbnails[folder.Path].ContainsKey(asset.FileName), Is.True);
-        Assert.That(thumbnails[folder.Path][asset.FileName], Is.Not.Null);
-        Assert.That(thumbnails[folder.Path][asset.FileName], Has.Length.EqualTo(imageByteSize));
+            Assert.That(assetFromRepository.FileName, Is.EqualTo(asset.FileName));
+            Assert.That(assetFromRepository.FolderId, Is.EqualTo(asset.FolderId));
+            Assert.That(assetFromRepository.Hash, Is.EqualTo(asset.Hash));
+            Assert.That(assetFromRepository.ImageData, Is.Null);
+        }
     }
 }

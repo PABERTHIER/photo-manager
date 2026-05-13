@@ -34,20 +34,19 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -75,7 +74,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder3.Path));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -112,7 +110,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder28"));
             Assert.That(recentTargetPaths[19], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder10"));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -150,7 +147,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -188,7 +184,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -227,7 +222,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -267,7 +261,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths.Any(x => x == folder2.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder3.Path), Is.True);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

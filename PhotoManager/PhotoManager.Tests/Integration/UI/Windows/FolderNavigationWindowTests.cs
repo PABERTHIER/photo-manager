@@ -26,7 +26,7 @@ public class FolderNavigationWindowTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -169,6 +169,7 @@ public class FolderNavigationWindowTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
         _folderNavigationViewModel = null;
     }
 
@@ -191,29 +192,28 @@ public class FolderNavigationWindowTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -230,8 +230,8 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
             List<string> recentTargetPaths = [otherDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
@@ -251,7 +251,7 @@ public class FolderNavigationWindowTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -472,7 +472,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
@@ -537,7 +537,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
@@ -602,8 +602,8 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
@@ -667,7 +667,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
 
@@ -788,7 +788,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
@@ -876,7 +876,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
@@ -964,8 +964,8 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
@@ -1052,7 +1052,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
 
@@ -1137,7 +1137,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
@@ -1316,8 +1316,8 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
@@ -1426,7 +1426,7 @@ public class FolderNavigationWindowTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;

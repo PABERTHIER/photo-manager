@@ -23,7 +23,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     private string? _databasePath;
 
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -52,29 +52,28 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -112,7 +111,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             const string fileName = FileNames.IMAGE_1_JPG;
             string filePath = Path.Combine(_dataDirectory!, fileName);
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset asset = new()
             {
@@ -142,7 +141,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -207,7 +206,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             string filePath = Path.Combine(_dataDirectory!, fileName);
             const Rotation rotation = Rotation.Rotate90;
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset asset = new()
             {
@@ -245,7 +244,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             byte[] assetData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG));
 
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -306,7 +305,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             string filePath = Path.Combine(_dataDirectory!, fileName);
             const Rotation rotation = (Rotation)999;
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset asset = new()
             {
@@ -340,7 +339,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -399,7 +398,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             string filePath = Path.Combine(_dataDirectory!, fileName);
             const Rotation rotation = Rotation.Rotate0;
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset asset = new()
             {
@@ -433,7 +432,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {

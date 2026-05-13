@@ -16,9 +16,8 @@ public class ApplicationDeleteAssetsTests
 
     private PhotoManager.Application.Application? _application;
     private MoveAssetsService? _moveAssetsService;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
-    private Database? _database;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -47,28 +46,28 @@ public class ApplicationDeleteAssetsTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        _moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        _moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -106,39 +105,22 @@ public class ApplicationDeleteAssetsTests
 
             await _application!.CatalogAssetsAsync(_ => { });
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset2FileName));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset1FileName));
 
-            Folder? sourceFolder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? sourceFolder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(sourceFolder, Is.Not.Null);
-
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2FileName), Is.True);
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1FileName), Is.True);
-
-            List<Asset> assetsInDb = _database!.ReadObjectList(
-                _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-            Assert.That(assetsInDb, Is.Not.Empty);
-            Assert.That(assetsInDb, Has.Count.EqualTo(2));
-            Assert.That(assetsInDb[0].FileName, Is.EqualTo(asset2FileName));
-            Assert.That(assetsInDb[1].FileName, Is.EqualTo(asset1FileName));
 
             _application!.DeleteAssets([assetsInRepository[0], assetsInRepository[1]]);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2FileName), Is.False);
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1FileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             Assert.That(File.Exists(destinationFilePath1), Is.False);
             Assert.That(File.Exists(destinationFilePath2), Is.False);
-
-            assetsInDb = _database!.ReadObjectList(
-                _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-            Assert.That(assetsInDb, Is.Empty);
         }
         finally
         {
@@ -171,34 +153,20 @@ public class ApplicationDeleteAssetsTests
 
             await _application!.CatalogAssetsAsync(_ => { });
 
-            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(assetFileName));
 
-            Folder? sourceFolder = _assetRepository!.GetFolderByPath(destinationDirectory);
+            Folder? sourceFolder = _testableAssetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(sourceFolder, Is.Not.Null);
-
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, assetFileName), Is.True);
-
-            List<Asset> assetsInDb = _database!.ReadObjectList(
-                _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-            Assert.That(assetsInDb, Is.Not.Empty);
-            Assert.That(assetsInDb, Has.Count.EqualTo(1));
-            Assert.That(assetsInDb[0].FileName, Is.EqualTo(assetFileName));
 
             _application!.DeleteAssets([assetsInRepository[0]]);
 
-            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, assetFileName), Is.False);
-
-            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
             Assert.That(File.Exists(destinationFilePath2), Is.False);
-
-            assetsInDb = _database!.ReadObjectList(
-                _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-            Assert.That(assetsInDb, Is.Empty);
         }
         finally
         {

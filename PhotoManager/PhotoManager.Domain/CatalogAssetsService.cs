@@ -98,6 +98,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                         });
 
                     _assetRepository.WriteBackup();
+
                     callback(new()
                     {
                         Reason = CatalogChangeReason.BackupCompleted,
@@ -117,28 +118,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
             catch (OperationCanceledException)
             {
-                // When cancellation is requested (typically the user closing the window), the in-flight folder
-                // may have produced uncommitted changes in the repository. Persist them before propagating so
-                // that work already done is not lost (resilience). Backup writing is intentionally skipped:
-                // it is expensive and can be performed on the next start.
-                try
-                {
-                    Folder? currentFolder = string.IsNullOrEmpty(_currentFolderPath)
-                        ? null
-                        : _assetRepository.GetFolderByPath(_currentFolderPath);
-
-                    if (_assetRepository.HasChanges())
-                    {
-                        _assetRepository.SaveCatalog(currentFolder);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    // Saving on cancellation is best-effort: log but never mask the OperationCanceledException.
-                    _logger.LogError(exception, "Failed to save catalog while handling cancellation: {ExMessage}",
-                        exception.Message);
-                }
-
                 callback(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessCancelled,
@@ -253,14 +232,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, deletedFileNames, token);
 
-        // folder is guaranteed non-null (assigned via AddFolder or GetFolderByPath on a known-existing path)
-        bool isBlobFileExists = _assetRepository.IsBlobFileExists(folder.BlobFileName);
-
-        if (_assetRepository.HasChanges() || !isBlobFileExists)
-        {
-            _assetRepository.SaveCatalog(folder);
-        }
-
         token.ThrowIfCancellationRequested();
 
         if (cataloguedAssetsBatchCount >= batchSize)
@@ -331,11 +302,6 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 Reason = CatalogChangeReason.FolderDeleted,
                 Message = $"Folder {directory} deleted from catalog."
             });
-        }
-
-        if (_assetRepository.HasChanges())
-        {
-            _assetRepository.SaveCatalog(folder);
         }
     }
 

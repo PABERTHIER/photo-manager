@@ -46,14 +46,12 @@ public class AssetRepositoryGetAssetsCounterTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
 
         _asset1 = new()
@@ -140,6 +138,7 @@ public class AssetRepositoryGetAssetsCounterTests
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 

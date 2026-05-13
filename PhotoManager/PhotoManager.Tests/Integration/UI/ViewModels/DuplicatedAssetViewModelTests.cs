@@ -20,7 +20,7 @@ public class DuplicatedAssetViewModelTests
     private string? _databasePath;
 
     private DuplicatedAssetViewModel? _duplicatedAssetViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -46,13 +46,11 @@ public class DuplicatedAssetViewModelTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
@@ -190,7 +188,7 @@ public class DuplicatedAssetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset3 = _asset3!.WithFolder(folder);
 
@@ -260,7 +258,7 @@ public class DuplicatedAssetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset1 = _asset1!.WithFolder(folder);
 
@@ -300,7 +298,7 @@ public class DuplicatedAssetViewModelTests
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset4 = _asset4!.WithFolder(folder);
 

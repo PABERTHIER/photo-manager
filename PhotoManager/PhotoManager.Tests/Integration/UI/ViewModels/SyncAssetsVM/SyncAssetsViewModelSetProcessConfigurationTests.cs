@@ -11,10 +11,9 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private string? _syncAssetsDirectoriesDefinitionsTableName;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
-    private Database? _database;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -40,34 +39,32 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        _syncAssetsDirectoriesDefinitionsTableName = userConfigurationService.StorageSettings.TablesSettings
-            .SyncAssetsDirectoriesDefinitionsTableName;
-
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(_database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+            catalogAssetsService,
             moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
             imageProcessingService);
         _syncAssetsViewModel = new(application);
@@ -186,9 +183,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             AssertValidConfiguration(syncAssetsConfiguration.Definitions);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(16));
 
@@ -298,9 +294,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[4].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsConfiguration.Definitions[4].DeleteAssetsNotInSource, Is.False);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(5));
 
@@ -431,9 +426,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[3].DeleteAssetsNotInSource, Is.False);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(4));
             Assert.That(syncAssetsDirectoriesDefinitions[0].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
@@ -512,9 +506,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(2));
 
@@ -547,9 +540,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            syncAssetsDirectoriesDefinitions = _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(1));
 
@@ -565,9 +556,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            syncAssetsDirectoriesDefinitions = _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Is.Empty);
 
@@ -601,9 +590,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Is.Empty);
 
@@ -699,9 +687,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Is.Empty);
 
@@ -788,9 +775,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Is.Empty);
 
@@ -852,9 +838,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = _database!.ReadObjectList(
-                _syncAssetsDirectoriesDefinitionsTableName!,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+            List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions =
+                _testableAssetRepository!.GetSyncAssetsConfiguration().Definitions;
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(2));
 

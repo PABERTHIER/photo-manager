@@ -18,7 +18,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     private string? _databasePath;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -190,29 +190,28 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _findDuplicatedAssetsViewModel = new(application);
@@ -233,7 +232,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         {
             CheckBeforeChanges();
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -247,11 +246,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData);
-            _assetRepository!.AddAsset(_asset2, assetData);
-            _assetRepository!.AddAsset(_asset3, assetData);
-            _assetRepository!.AddAsset(_asset4, assetData);
-            _assetRepository!.AddAsset(_asset5, assetData);
+            _testableAssetRepository!.AddAsset(_asset1, assetData);
+            _testableAssetRepository!.AddAsset(_asset2, assetData);
+            _testableAssetRepository!.AddAsset(_asset3, assetData);
+            _testableAssetRepository!.AddAsset(_asset4, assetData);
+            _testableAssetRepository!.AddAsset(_asset5, assetData);
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
 
@@ -384,7 +383,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         {
             CheckBeforeChanges();
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -398,11 +397,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData);
-            _assetRepository!.AddAsset(_asset2, assetData);
-            _assetRepository!.AddAsset(_asset3, assetData);
-            _assetRepository!.AddAsset(_asset4, assetData);
-            _assetRepository!.AddAsset(_asset5, assetData);
+            _testableAssetRepository!.AddAsset(_asset1, assetData);
+            _testableAssetRepository!.AddAsset(_asset2, assetData);
+            _testableAssetRepository!.AddAsset(_asset3, assetData);
+            _testableAssetRepository!.AddAsset(_asset4, assetData);
+            _testableAssetRepository!.AddAsset(_asset5, assetData);
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -520,8 +519,8 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
             string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -535,11 +534,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData);
-            _assetRepository!.AddAsset(_asset2, assetData);
-            _assetRepository!.AddAsset(_asset3, assetData);
-            _assetRepository!.AddAsset(_asset4, assetData);
-            _assetRepository!.AddAsset(_asset5, assetData);
+            _testableAssetRepository!.AddAsset(_asset1, assetData);
+            _testableAssetRepository!.AddAsset(_asset2, assetData);
+            _testableAssetRepository!.AddAsset(_asset3, assetData);
+            _testableAssetRepository!.AddAsset(_asset4, assetData);
+            _testableAssetRepository!.AddAsset(_asset5, assetData);
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -679,7 +678,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         {
             CheckBeforeChanges();
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -804,7 +803,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         {
             CheckBeforeChanges();
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -818,11 +817,11 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
             byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData);
-            _assetRepository!.AddAsset(_asset2, assetData);
-            _assetRepository!.AddAsset(_asset3, assetData);
-            _assetRepository!.AddAsset(_asset4, assetData);
-            _assetRepository!.AddAsset(_asset5, assetData);
+            _testableAssetRepository!.AddAsset(_asset1, assetData);
+            _testableAssetRepository!.AddAsset(_asset2, assetData);
+            _testableAssetRepository!.AddAsset(_asset3, assetData);
+            _testableAssetRepository!.AddAsset(_asset4, assetData);
+            _testableAssetRepository!.AddAsset(_asset5, assetData);
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];

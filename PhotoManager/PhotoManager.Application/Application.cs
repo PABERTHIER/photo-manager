@@ -105,7 +105,6 @@ public class Application(
     {
         syncConfiguration.Validate().Normalize();
         assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
-        assetRepository.SaveCatalog(null);
     }
 
     public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) =>

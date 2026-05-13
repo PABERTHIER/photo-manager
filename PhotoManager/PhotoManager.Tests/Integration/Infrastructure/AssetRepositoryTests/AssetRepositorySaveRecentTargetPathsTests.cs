@@ -34,20 +34,19 @@ public class AssetRepositorySaveRecentTargetPathsTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -72,14 +71,12 @@ public class AssetRepositorySaveRecentTargetPathsTests
             Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
             Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             _assetRepository.SaveRecentTargetPaths([]);
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 
             Assert.That(recentTargetPaths, Is.Empty);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -119,7 +116,6 @@ public class AssetRepositorySaveRecentTargetPathsTests
             Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
             Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

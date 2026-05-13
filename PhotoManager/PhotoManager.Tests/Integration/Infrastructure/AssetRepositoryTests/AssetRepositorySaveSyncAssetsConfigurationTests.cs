@@ -34,20 +34,19 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
             imageMetadataService, userConfigurationService, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -86,14 +85,12 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
             Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             _assetRepository!.SaveSyncAssetsConfiguration(new());
             syncAssetsConfiguration = _assetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -147,7 +144,6 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
             Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

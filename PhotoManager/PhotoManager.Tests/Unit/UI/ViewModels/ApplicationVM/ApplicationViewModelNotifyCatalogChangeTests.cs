@@ -20,7 +20,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private string? _databasePath;
 
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -187,29 +187,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -236,7 +235,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -261,7 +260,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(newAsset, assetData);
+            _testableAssetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
@@ -339,7 +338,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -364,7 +363,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(newAsset, assetData);
+            _testableAssetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
@@ -444,7 +443,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -469,7 +468,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(newAsset, assetData);
+            _testableAssetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
@@ -545,7 +544,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 1 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -566,11 +565,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             byte[] assetData3 = File.ReadAllBytes(filePath3);
             byte[] assetData4 = File.ReadAllBytes(filePath4);
             byte[] assetData5 = File.ReadAllBytes(filePath5);
-            _assetRepository.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData2);
-            _assetRepository.AddAsset(_asset3, assetData3);
-            _assetRepository.AddAsset(_asset4, assetData4);
-            _assetRepository.AddAsset(_asset5, assetData5);
+            _testableAssetRepository.AddAsset(_asset1, assetData1);
+            _testableAssetRepository.AddAsset(_asset2, assetData2);
+            _testableAssetRepository.AddAsset(_asset3, assetData3);
+            _testableAssetRepository.AddAsset(_asset4, assetData4);
+            _testableAssetRepository.AddAsset(_asset5, assetData5);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1];
@@ -815,7 +814,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 1 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset newAsset = new()
             {
@@ -838,7 +837,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(newAsset, assetData);
+            _testableAssetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [newAsset];
 
@@ -910,7 +909,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -1084,7 +1083,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
@@ -1169,7 +1168,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
@@ -1256,7 +1255,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
@@ -1335,7 +1334,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -1356,11 +1355,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             byte[] assetData3 = File.ReadAllBytes(filePath3);
             byte[] assetData4 = File.ReadAllBytes(filePath4);
             byte[] assetData5 = File.ReadAllBytes(filePath5);
-            _assetRepository.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData2);
-            _assetRepository.AddAsset(_asset3, assetData3);
-            _assetRepository.AddAsset(_asset4, assetData4);
-            _assetRepository.AddAsset(_asset5, assetData5);
+            _testableAssetRepository.AddAsset(_asset1, assetData1);
+            _testableAssetRepository.AddAsset(_asset2, assetData2);
+            _testableAssetRepository.AddAsset(_asset3, assetData3);
+            _testableAssetRepository.AddAsset(_asset4, assetData4);
+            _testableAssetRepository.AddAsset(_asset5, assetData5);
 
             _applicationViewModel!.SetAssets(folderPath, assets);
 
@@ -1534,7 +1533,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset1!, assetData);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData);
 
             Asset[] expectedAssets = [_asset1!];
 
@@ -1613,7 +1612,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 0 of 0 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset asset = new()
             {
@@ -1632,7 +1631,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             string statusMessage = $"Image {asset.Folder.Path} updated in catalog.";
 
@@ -1700,7 +1699,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -1874,7 +1873,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
@@ -1957,7 +1956,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
@@ -2042,7 +2041,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset3!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset3!, assetData);
+            _testableAssetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
@@ -2119,7 +2118,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -2140,11 +2139,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             byte[] assetData3 = File.ReadAllBytes(filePath3);
             byte[] assetData4 = File.ReadAllBytes(filePath4);
             byte[] assetData5 = File.ReadAllBytes(filePath5);
-            _assetRepository.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData2);
-            _assetRepository.AddAsset(_asset3, assetData3);
-            _assetRepository.AddAsset(_asset4, assetData4);
-            _assetRepository.AddAsset(_asset5, assetData5);
+            _testableAssetRepository.AddAsset(_asset1, assetData1);
+            _testableAssetRepository.AddAsset(_asset2, assetData2);
+            _testableAssetRepository.AddAsset(_asset3, assetData3);
+            _testableAssetRepository.AddAsset(_asset4, assetData4);
+            _testableAssetRepository.AddAsset(_asset5, assetData5);
 
             _applicationViewModel!.SetAssets(folderPath, assets);
 
@@ -2310,7 +2309,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository!.AddAsset(_asset1!, assetData);
+            _testableAssetRepository!.AddAsset(_asset1!, assetData);
 
             Asset[] assets = [_asset1!];
 
@@ -2387,7 +2386,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {folderPath} - image 0 of 0 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(folderPath);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             Asset asset = new()
             {
@@ -2406,7 +2405,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
-            _assetRepository.AddAsset(asset, assetData);
+            _testableAssetRepository.AddAsset(asset, assetData);
 
             string statusMessage = $"Image {asset.Folder.Path} deleted from catalog.";
 
@@ -2474,7 +2473,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -2639,7 +2638,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -2705,7 +2704,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -2774,7 +2773,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
@@ -2850,7 +2849,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -2975,7 +2974,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -3025,7 +3024,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -3091,7 +3090,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -3160,7 +3159,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
@@ -3236,7 +3235,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(otherDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
@@ -3361,7 +3360,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";

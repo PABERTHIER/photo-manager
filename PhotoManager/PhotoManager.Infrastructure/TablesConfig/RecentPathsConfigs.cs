@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Infrastructure.TablesConfig;
+﻿using PhotoManager.Infrastructure.Database;
+
+namespace PhotoManager.Infrastructure.TablesConfig;
 
 public static class RecentPathsConfigs
 {

@@ -42,6 +42,10 @@ component_management:
       name: Infrastructure
       paths:
         - PhotoManager/PhotoManager.Infrastructure/**
+    - component_id: module_persistence
+      name: Persistence
+      paths:
+        - PhotoManager/PhotoManager.Persistence/**
     - component_id: module_common
       name: Common
       paths:
