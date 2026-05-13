@@ -15,8 +15,8 @@ Follow this workflow in order:
 2. **Plan**: Briefly outline the approach — which layers are affected, what new files/classes
    are needed, and what existing code must change.
 
-3. **Architecture**: Determine if new database tables (in `TablesConfig/`), settings classes
-   (in `PhotoManager.Domain/UserConfigurationSettings/`), or service interfaces are needed.
+3. **Architecture**: Determine if new database tables (in `PhotoManager.Persistence/Sqlite/SqliteSchema.cs`),
+   settings classes (in `PhotoManager.Domain/UserConfigurationSettings/`), or service interfaces are needed.
 
 4. **Implement**: Write code following Clean Architecture layer order:
    - Domain first (entities, interfaces)

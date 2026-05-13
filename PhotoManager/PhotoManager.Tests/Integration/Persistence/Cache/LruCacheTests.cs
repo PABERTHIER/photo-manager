@@ -1,54 +1,74 @@
 ﻿using PhotoManager.Persistence.Cache;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 
 namespace PhotoManager.Tests.Integration.Persistence.Cache;
 
 [TestFixture]
 public class LruCacheTests
 {
+    private string? _dataDirectory;
+
+    private byte[]? _thumbnailData1;
+    private byte[]? _thumbnailData2;
+    private byte[]? _thumbnailData3;
+    private byte[]? _thumbnailData4;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+
+        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_1_JPG));
+        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.HOMER_GIF));
+        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
+        _thumbnailData4 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_9_PNG));
+    }
+
     [Test]
     public void Set_LoadAndEvict_MaintainsCapacity()
     {
         LruCache<Guid, Dictionary<string, byte[]>> cache = new(3);
 
-        Guid folder1 = Guid.NewGuid();
-        Guid folder2 = Guid.NewGuid();
-        Guid folder3 = Guid.NewGuid();
-        Guid folder4 = Guid.NewGuid();
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+        Guid folderId3 = Guid.NewGuid();
+        Guid folderId4 = Guid.NewGuid();
 
         Dictionary<string, byte[]> thumbnails1 = new()
         {
-            ["img1.jpg"] = [0xFF, 0xD8, 0xFF, 0xE0],
-            ["img2.jpg"] = [0x89, 0x50, 0x4E, 0x47]
+            [FileNames.IMAGE_1_JPG] = _thumbnailData1!,
+            [FileNames.HOMER_GIF] = _thumbnailData2!
         };
 
         Dictionary<string, byte[]> thumbnails2 = new()
         {
-            ["photo.png"] = [0x89, 0x50, 0x4E, 0x47, 0x0D]
+            [FileNames.IMAGE_11_90_DEG_HEIC] = _thumbnailData3!
         };
 
         Dictionary<string, byte[]> thumbnails3 = new()
         {
-            ["scan.tiff"] = [0x49, 0x49, 0x2A, 0x00]
+            [FileNames.IMAGE_9_PNG] = _thumbnailData4!
         };
 
         Dictionary<string, byte[]> thumbnails4 = new()
         {
-            ["new.jpg"] = [0xFF, 0xD8]
+            [FileNames.IMAGE_4_JPG] = _thumbnailData1!
         };
 
-        cache.Set(folder1, thumbnails1);
-        cache.Set(folder2, thumbnails2);
-        cache.Set(folder3, thumbnails3);
+        cache.Set(folderId1, thumbnails1);
+        cache.Set(folderId2, thumbnails2);
+        cache.Set(folderId3, thumbnails3);
 
         Assert.That(cache.Count, Is.EqualTo(3));
 
-        cache.Set(folder4, thumbnails4);
+        cache.Set(folderId4, thumbnails4);
 
         Assert.That(cache.Count, Is.EqualTo(3));
-        Assert.That(cache.TryGet(folder1, out _), Is.False);
-        Assert.That(cache.TryGet(folder2, out _), Is.True);
-        Assert.That(cache.TryGet(folder3, out _), Is.True);
-        Assert.That(cache.TryGet(folder4, out _), Is.True);
+        Assert.That(cache.TryGet(folderId1, out _), Is.False);
+        Assert.That(cache.TryGet(folderId2, out _), Is.True);
+        Assert.That(cache.TryGet(folderId3, out _), Is.True);
+        Assert.That(cache.TryGet(folderId4, out _), Is.True);
     }
 
     [Test]
@@ -56,37 +76,65 @@ public class LruCacheTests
     {
         LruCache<Guid, Dictionary<string, byte[]>> cache = new(2);
 
-        Guid folder1 = Guid.NewGuid();
-        Guid folder2 = Guid.NewGuid();
-        Guid folder3 = Guid.NewGuid();
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+        Guid folderId3 = Guid.NewGuid();
 
-        cache.Set(folder1, new Dictionary<string, byte[]>
+        cache.Set(folderId1, new Dictionary<string, byte[]>
         {
-            ["a.jpg"] = [1, 2, 3]
+            [FileNames.IMAGE_1_JPG] = _thumbnailData1!
         });
 
-        cache.Set(folder2, new Dictionary<string, byte[]>
+        cache.Set(folderId2, new Dictionary<string, byte[]>
         {
-            ["b.jpg"] = [4, 5, 6]
+            [FileNames.HOMER_GIF] = _thumbnailData2!
         });
 
-        cache.TryGet(folder1, out _);
+        cache.TryGet(folderId1, out _);
 
-        cache.Set(folder3, new Dictionary<string, byte[]>
+        cache.Set(folderId3, new Dictionary<string, byte[]>
         {
-            ["c.jpg"] = [7, 8, 9]
+            [FileNames.IMAGE_11_90_DEG_HEIC] = _thumbnailData3!
         });
 
-        Assert.That(cache.TryGet(folder1, out _), Is.True);
-        Assert.That(cache.TryGet(folder2, out _), Is.False);
-        Assert.That(cache.TryGet(folder3, out _), Is.True);
+        Assert.That(cache.TryGet(folderId1, out _), Is.True);
+        Assert.That(cache.TryGet(folderId2, out _), Is.False);
+        Assert.That(cache.TryGet(folderId3, out _), Is.True);
+    }
+
+    [Test]
+    public void TryGet_ExistingFolder_ReturnsCorrectThumbnailData()
+    {
+        LruCache<Guid, Dictionary<string, byte[]>> cache = new(5);
+
+        Guid folderId = Guid.NewGuid();
+
+        Dictionary<string, byte[]> thumbnails = new()
+        {
+            [FileNames.IMAGE_1_JPG] = _thumbnailData1!,
+            [FileNames.IMAGE_9_PNG] = _thumbnailData4!
+        };
+
+        cache.Set(folderId, thumbnails);
+
+        Assert.That(cache.TryGet(folderId, out Dictionary<string, byte[]> retrieved), Is.True);
+        Assert.That(retrieved, Has.Count.EqualTo(2));
+        Assert.That(retrieved[FileNames.IMAGE_1_JPG], Has.Length.EqualTo(_thumbnailData1!.Length));
+        Assert.That(retrieved[FileNames.IMAGE_9_PNG], Has.Length.EqualTo(_thumbnailData4!.Length));
     }
 
     [Test]
     public void ConcurrentThumbnailAccess_DoesNotDeadlock()
     {
         LruCache<Guid, Dictionary<string, byte[]>> cache = new(10);
-        Guid[] folderIds = [.. Enumerable.Range(0, 50).Select(_ => Guid.NewGuid())];
+        Guid[] folderIds =
+        [
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            Guid.NewGuid()
+        ];
 
         Parallel.For(0, 8, _ =>
         {
@@ -96,7 +144,7 @@ public class LruCacheTests
 
                 cache.Set(id, new Dictionary<string, byte[]>
                 {
-                    [$"img_{i}.jpg"] = [(byte)(i % 256)]
+                    [FileNames.IMAGE_1_JPG] = _thumbnailData1!
                 });
 
                 cache.TryGet(id, out Dictionary<string, byte[]> _);
@@ -114,21 +162,58 @@ public class LruCacheTests
     [Test]
     public void Set_LargeDataset_MaintainsPerformanceContract()
     {
-        LruCache<int, byte[]> cache = new(100);
+        LruCache<Guid, Dictionary<string, byte[]>> cache = new(100);
+
+        Guid[] ids = [.. Enumerable.Range(0, 10_000).Select(_ => Guid.NewGuid())];
 
         for (int i = 0; i < 10_000; i++)
         {
-            cache.Set(i, new byte[1024]);
+            cache.Set(ids[i], new Dictionary<string, byte[]>
+            {
+                [FileNames.IMAGE_1_JPG] = _thumbnailData1!
+            });
         }
 
         Assert.That(cache.Count, Is.EqualTo(100));
 
         for (int i = 9_900; i < 10_000; i++)
         {
-            Assert.That(cache.TryGet(i, out byte[] data), Is.True);
-            Assert.That(data, Has.Length.EqualTo(1024));
+            Assert.That(cache.TryGet(ids[i], out Dictionary<string, byte[]> data), Is.True);
+            Assert.That(data[FileNames.IMAGE_1_JPG], Has.Length.EqualTo(_thumbnailData1!.Length));
         }
 
-        Assert.That(cache.TryGet(0, out _), Is.False);
+        Assert.That(cache.TryGet(ids[0], out _), Is.False);
+    }
+
+    [Test]
+    public void Remove_ExistingFolder_FreesSlotForNewEntry()
+    {
+        LruCache<Guid, Dictionary<string, byte[]>> cache = new(2);
+
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+        Guid folderId3 = Guid.NewGuid();
+
+        cache.Set(folderId1, new Dictionary<string, byte[]>
+        {
+            [FileNames.IMAGE_1_JPG] = _thumbnailData1!
+        });
+
+        cache.Set(folderId2, new Dictionary<string, byte[]>
+        {
+            [FileNames.HOMER_GIF] = _thumbnailData2!
+        });
+
+        cache.Remove(folderId1);
+
+        cache.Set(folderId3, new Dictionary<string, byte[]>
+        {
+            [FileNames.IMAGE_11_90_DEG_HEIC] = _thumbnailData3!
+        });
+
+        Assert.That(cache.Count, Is.EqualTo(2));
+        Assert.That(cache.TryGet(folderId1, out _), Is.False);
+        Assert.That(cache.TryGet(folderId2, out _), Is.True);
+        Assert.That(cache.TryGet(folderId3, out _), Is.True);
     }
 }

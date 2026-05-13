@@ -1,4 +1,6 @@
-namespace PhotoManager.Tests.Integration;
+using Constants = PhotoManager.Tests.Integration.Constants;
+
+namespace PhotoManager.Tests;
 
 public static class TearDownHelper
 {

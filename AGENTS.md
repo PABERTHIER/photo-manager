@@ -72,7 +72,7 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
 
 ## Project Overview
 
-PhotoManager is a WPF desktop application for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a custom file-based database for local persistence.
+PhotoManager is a WPF desktop application for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a SQLite database for local persistence.
 
 ## Build and Test Commands
 
@@ -144,7 +144,8 @@ The solution follows Clean Architecture with the following layers:
 PhotoManager.slnx
 ├── PhotoManager.Domain/        # Core domain logic, entities, service interfaces
 ├── PhotoManager.Application/   # Application orchestration (IApplication facade)
-├── PhotoManager.Infrastructure/# External concerns (file system, image processing, database)
+├── PhotoManager.Infrastructure/# External concerns (file system, image processing)
+├── PhotoManager.Persistence/   # SQLite database, repositories, backup service
 ├── PhotoManager.Common/        # Shared utilities (hashing, image/video helpers)
 ├── PhotoManager.UI/            # WPF presentation layer (ViewModels, Views)
 ├── PhotoManager.Tests/         # NUnit tests with NSubstitute
@@ -153,13 +154,13 @@ PhotoManager.slnx
 
 ### Dependency Flow
 
-UI → Application → Domain ← Infrastructure
+UI → Application → Domain ← Infrastructure ← Persistence
 
 ### Key Architectural Patterns
 
-1. **Custom File-Based Database**: The project uses a custom database implementation (`PhotoManager.Infrastructure.Database`) that stores data in CSV-like `.db` files with blobs in a separate folder. Configuration is in `TablesConfig/`.
+1. **SQLite Persistence**: The project uses SQLite (`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`) in the `PhotoManager.Persistence` project. The database is a single `photomanager.db` file with WAL mode for concurrent reads. Schema is defined in `SqliteSchema.cs` with tables: Folders, Assets, Thumbnails, RecentPaths, SyncDefinitions.
 
-2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.xaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`.
+2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.xaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`. `AddInfrastructure()` calls `AddPersistence()` internally.
 
 3. **Hash-Based Duplicate Detection**: The `HashingHelper` supports multiple algorithms (PHash, DHash, MD5, SHA512). PHash is the most advanced and can detect duplicates between rotated images, thumbnails, and different resolutions. Controlled by `HashSettings` in `appsettings.json`.
 
@@ -172,7 +173,10 @@ UI → Application → Domain ← Infrastructure
 - `PhotoManager/PhotoManager.UI/App.xaml.cs` - Application startup, DI container setup
 - `PhotoManager/PhotoManager.Application/Application.cs` - Main application facade
 - `PhotoManager/PhotoManager.Domain/Asset.cs` - Core domain entity
-- `PhotoManager/PhotoManager.Infrastructure/Database/Database.cs` - Custom database implementation
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqlitePersistenceContext.cs` - Database initialization, backup, dispose
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteSchema.cs` - DDL schema definition
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteConnectionFactory.cs` - Connection creation with PRAGMAs
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteBackupService.cs` - Online backup + zip archive
 - `PhotoManager/PhotoManager.Common/HashingHelper.cs` - Hash algorithms for duplicate detection
 - `PhotoManager/PhotoManager.slnx` - Solution file
 
@@ -280,6 +284,7 @@ finally
 
 ## External Dependencies
 
+- **Microsoft.Data.Sqlite** + **SQLitePCLRaw.bundle_e_sqlite3** - SQLite database
 - **Magick.NET** (ImageMagick) - Image processing
 - **FFMpegCore** - Video processing (FFmpeg executables are extracted from `.rar` files on build via `FileExtractionTask.dll`)
 - **Serilog** - File logging
@@ -290,13 +295,40 @@ finally
 
 ## Working with the Database
 
-The custom database stores:
+The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a single database file:
 
-- Tables as `.db` files in `{BackupPath}/{StorageVersion}/{TablesFolderName}/`
-- Blobs in `{BackupPath}/{StorageVersion}/{BlobsFolderName}/`
-- Backups in `{BackupPath}/{StorageVersion}_Backups/`
+- Database file: `<dataDirectory>/photomanager.db`
+- Backups: `<dataDirectory>_Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
+- Connection model: one connection per operation, WAL journal mode, `busy_timeout = 5000`
 
-To add a new table, create a `DataTableProperties` in `TablesConfig/` and register it with `Database.SetDataTableProperties()`.
+### Schema (v1 — defined in `SqliteSchema.cs`)
+
+| Table              | Primary key              | Notes                                |
+|--------------------|--------------------------|--------------------------------------|
+| `Folders`          | `Id` (TEXT, GUID)        | Index on `Path`                      |
+| `Assets`           | (`FolderId`, `FileName`) | Index on `Hash`. FK → `Folders(Id)`  |
+| `Thumbnails`       | (`FolderId`, `FileName`) | `Data BLOB`. FK → `Folders(Id)`      |
+| `RecentPaths`      | `Position` (INTEGER)     | Single ordered list                  |
+| `SyncDefinitions`  | `Position` (INTEGER)     | Single ordered list                  |
+
+### Key classes (all in `PhotoManager.Persistence`)
+
+- `IPersistenceContext` / `SqlitePersistenceContext` — facade: Initialize, WriteBackup, DeleteOldBackups, Dispose
+- `ISqliteConnectionFactory` / `SqliteConnectionFactory` — opens connections with PRAGMAs applied
+- `ISqliteBackupService` / `SqliteBackupService` — online backup API + zip compression
+- `IAssetPersistence` / `AssetPersistence` — CRUD for Assets table
+- `IThumbnailPersistence` / `ThumbnailPersistence` — CRUD for Thumbnails table
+- `IFolderPersistence` / `FolderPersistence` — CRUD for Folders table
+- `IRecentPathsPersistence` / `RecentPathsPersistence` — Replace-all semantics
+- `ISyncDefinitionsPersistence` / `SyncDefinitionsPersistence` — Replace-all semantics
+- `ILruCache<TKey, TValue>` / `LruCache<TKey, TValue>` — thread-safe bounded cache
+
+### Adding a new table
+
+1. Add the DDL to `SqliteSchema.cs` `CREATE_SCRIPT`
+2. Bump `SCHEMA_VERSION` and add migration logic in `EnsureCreated()`
+3. Create a repository interface + implementation in `Repositories/`
+4. Register in `PersistenceServiceCollectionExtensions.cs`
 
 ## HEIC/HEVC Support
 

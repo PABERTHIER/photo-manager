@@ -24,7 +24,7 @@ PhotoManager is a desktop application that allows:
 
 **It is a local tool, that does not require an Internet connection to work.
 Your data stay on your computer and nothing is collected from you.
-Even the database is stored in your computer.**
+The SQLite database is stored locally on your computer.**
 
 ## Upcoming :next_track_button:
 
@@ -170,6 +170,7 @@ Improvements **WIP**.
 
 - [.NET 10.0][dotnet]
 - [Windows Presentation Foundation][wpf]
+- [SQLite][sqlite] (via [Microsoft.Data.Sqlite][ms-data-sqlite])
 - [NUnit][nunit]
 - [NSubstitute][nsubstitute]
 - [MagickImage][magickimage]
@@ -226,6 +227,8 @@ I've made a specific repo for the two customs dll, injected in the project: [pho
 
 [dotnet]: https://dotnet.microsoft.com/
 [wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
+[sqlite]: https://www.sqlite.org/
+[ms-data-sqlite]: https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/
 [nunit]: https://nunit.org/
 [nsubstitute]: https://github.com/nsubstitute/NSubstitute
 [magickimage]: https://github.com/dlemstra/Magick.NET

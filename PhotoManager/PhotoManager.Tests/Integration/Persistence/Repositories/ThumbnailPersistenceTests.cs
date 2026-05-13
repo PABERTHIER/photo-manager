@@ -1,4 +1,5 @@
 ﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 
 namespace PhotoManager.Tests.Integration.Persistence.Repositories;
 
@@ -9,14 +10,22 @@ public class ThumbnailPersistenceTests
     private string? _databaseDirectory;
     private Folder? _testFolder;
 
+    private byte[]? _thumbnailData1;
+    private byte[]? _thumbnailData2;
+    private byte[]? _thumbnailData3;
+
     private SqlitePersistenceContext? _sqlitePersistenceContext;
     private TestLogger<SqlitePersistenceContext> _testLogger = new();
-    
+
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+
+        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_1_JPG));
+        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
+        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_9_PNG));
     }
 
     [SetUp]
@@ -28,7 +37,7 @@ public class ThumbnailPersistenceTests
         _sqlitePersistenceContext = new(factory, backupService, _testLogger);
         _sqlitePersistenceContext.Initialize(_databaseDirectory!);
 
-        _testFolder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos\Test");
+        _testFolder = _sqlitePersistenceContext.Folders.Insert(_dataDirectory!);
     }
 
     [TearDown]
@@ -42,17 +51,14 @@ public class ThumbnailPersistenceTests
     [Test]
     public void GetByFolderId_WithThumbnails_ReturnsDictionary()
     {
-        byte[] data1 = [0xFF, 0xD8, 0xFF, 0xE0, 0x01, 0x02];
-        byte[] data2 = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A];
-
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "img1.jpg", data1);
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "img2.png", data2);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_9_PNG, _thumbnailData3!);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
         Assert.That(thumbnails, Has.Count.EqualTo(2));
-        Assert.That(thumbnails["img1.jpg"], Is.EqualTo(data1));
-        Assert.That(thumbnails["img2.png"], Is.EqualTo(data2));
+        Assert.That(thumbnails[FileNames.IMAGE_1_JPG], Is.EqualTo(_thumbnailData1));
+        Assert.That(thumbnails[FileNames.IMAGE_9_PNG], Is.EqualTo(_thumbnailData3));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -70,12 +76,12 @@ public class ThumbnailPersistenceTests
     [Test]
     public void ReplaceForFolder_WithThumbnails_ReplacesAll()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "old.jpg", [1, 2, 3]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
         Dictionary<string, byte[]> newThumbnails = new()
         {
-            ["new1.jpg"] = [0xF0, 0xF1, 0xF2],
-            ["new2.jpg"] = [0xA0, 0xA1, 0xA2]
+            [FileNames.IMAGE_11_90_DEG_HEIC] = _thumbnailData2!,
+            [FileNames.IMAGE_9_PNG] = _thumbnailData3!
         };
 
         _sqlitePersistenceContext!.Thumbnails.ReplaceForFolder(_testFolder!.Id, newThumbnails);
@@ -83,9 +89,9 @@ public class ThumbnailPersistenceTests
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
         Assert.That(thumbnails, Has.Count.EqualTo(2));
-        Assert.That(thumbnails.ContainsKey("old.jpg"), Is.False);
-        Assert.That(thumbnails["new1.jpg"], Is.EqualTo(new byte[] { 0xF0, 0xF1, 0xF2 }));
-        Assert.That(thumbnails["new2.jpg"], Is.EqualTo(new byte[] { 0xA0, 0xA1, 0xA2 }));
+        Assert.That(thumbnails.ContainsKey(FileNames.IMAGE_1_JPG), Is.False);
+        Assert.That(thumbnails[FileNames.IMAGE_11_90_DEG_HEIC], Is.EqualTo(_thumbnailData2));
+        Assert.That(thumbnails[FileNames.IMAGE_9_PNG], Is.EqualTo(_thumbnailData3));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -93,7 +99,7 @@ public class ThumbnailPersistenceTests
     [Test]
     public void ReplaceForFolder_EmptyDictionary_ClearsFolder()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "img.jpg", [1, 2]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
         _sqlitePersistenceContext!.Thumbnails.ReplaceForFolder(_testFolder!.Id, new Dictionary<string, byte[]>());
 
@@ -107,25 +113,26 @@ public class ThumbnailPersistenceTests
     [Test]
     public void ReplaceForFolder_OnlyAffectsTargetFolder()
     {
-        Folder folder = _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Other");
+        string duplicatesFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        Folder folder = _sqlitePersistenceContext!.Folders.Insert(duplicatesFolderPath);
 
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "a.jpg", [1]);
-        _sqlitePersistenceContext!.Thumbnails.Upsert(folder.Id, "b.jpg", [2]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(folder.Id, FileNames.IMAGE_11_90_DEG_HEIC, _thumbnailData2!);
 
         _sqlitePersistenceContext!.Thumbnails.ReplaceForFolder(
             _testFolder!.Id,
             new Dictionary<string, byte[]>
             {
-                ["c.jpg"] = [3]
+                [FileNames.IMAGE_9_PNG] = _thumbnailData3!
             });
 
         Dictionary<string, byte[]> testThumbs = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
         Dictionary<string, byte[]> otherThumbs = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(folder.Id);
 
         Assert.That(testThumbs, Has.Count.EqualTo(1));
-        Assert.That(testThumbs.ContainsKey("c.jpg"), Is.True);
+        Assert.That(testThumbs.ContainsKey(FileNames.IMAGE_9_PNG), Is.True);
         Assert.That(otherThumbs, Has.Count.EqualTo(1));
-        Assert.That(otherThumbs.ContainsKey("b.jpg"), Is.True);
+        Assert.That(otherThumbs.ContainsKey(FileNames.IMAGE_11_90_DEG_HEIC), Is.True);
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -133,14 +140,13 @@ public class ThumbnailPersistenceTests
     [Test]
     public void Upsert_NewThumbnail_Inserts()
     {
-        byte[] data = [0xFF, 0xD8, 0xFF, 0xE0];
-
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "photo.jpg", data);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
         Assert.That(thumbnails, Has.Count.EqualTo(1));
-        Assert.That(thumbnails["photo.jpg"], Is.EqualTo(data));
+        Assert.That(thumbnails[FileNames.IMAGE_1_JPG], Is.EqualTo(_thumbnailData1));
+        Assert.That(thumbnails[FileNames.IMAGE_1_JPG], Has.Length.EqualTo(_thumbnailData1!.Length));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -148,15 +154,14 @@ public class ThumbnailPersistenceTests
     [Test]
     public void Upsert_ExistingThumbnail_UpdatesData()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "photo.jpg", [1, 2, 3]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
-        byte[] newData = [10, 20, 30, 40, 50];
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "photo.jpg", newData);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData2!);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
         Assert.That(thumbnails, Has.Count.EqualTo(1));
-        Assert.That(thumbnails["photo.jpg"], Is.EqualTo(newData));
+        Assert.That(thumbnails[FileNames.IMAGE_1_JPG], Is.EqualTo(_thumbnailData2));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -164,9 +169,9 @@ public class ThumbnailPersistenceTests
     [Test]
     public void Delete_ExistingThumbnail_ReturnsTrue()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "img.jpg", [1, 2]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
-        bool isDeleted = _sqlitePersistenceContext!.Thumbnails.Delete(_testFolder!.Id, "img.jpg");
+        bool isDeleted = _sqlitePersistenceContext!.Thumbnails.Delete(_testFolder!.Id, FileNames.IMAGE_1_JPG);
 
         Assert.That(isDeleted, Is.True);
 
@@ -180,7 +185,7 @@ public class ThumbnailPersistenceTests
     [Test]
     public void Delete_NonExistentThumbnail_ReturnsFalse()
     {
-        bool isDeleted = _sqlitePersistenceContext!.Thumbnails.Delete(_testFolder!.Id, "nonexistent.jpg");
+        bool isDeleted = _sqlitePersistenceContext!.Thumbnails.Delete(_testFolder!.Id, FileNames.NON_EXISTENT_FILE_JPG);
 
         Assert.That(isDeleted, Is.False);
 
@@ -190,9 +195,9 @@ public class ThumbnailPersistenceTests
     [Test]
     public void DeleteByFolderId_WithThumbnails_ReturnsCount()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "a.jpg", [1]);
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "b.jpg", [2]);
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "c.jpg", [3]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_11_90_DEG_HEIC, _thumbnailData2!);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_9_PNG, _thumbnailData3!);
 
         int isDeleted = _sqlitePersistenceContext!.Thumbnails.DeleteByFolderId(_testFolder!.Id);
 
@@ -218,7 +223,7 @@ public class ThumbnailPersistenceTests
     [Test]
     public void ExistsForFolder_WithThumbnails_ReturnsTrue()
     {
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "img.jpg", [1, 2]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
 
         bool exists = _sqlitePersistenceContext!.Thumbnails.ExistsForFolder(_testFolder!.Id);
 
@@ -244,11 +249,11 @@ public class ThumbnailPersistenceTests
         Random random = new(42);
         random.NextBytes(largeData);
 
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "large.jpg", largeData);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, largeData);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
-        Assert.That(thumbnails["large.jpg"], Is.EqualTo(largeData));
+        Assert.That(thumbnails[FileNames.IMAGE_1_JPG], Is.EqualTo(largeData));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -256,15 +261,16 @@ public class ThumbnailPersistenceTests
     [Test]
     public void GetByFolderId_OnlyReturnsTargetFolderThumbnails()
     {
-        Folder folder = _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Other");
+        string duplicatesFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        Folder folder = _sqlitePersistenceContext!.Folders.Insert(duplicatesFolderPath);
 
-        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, "a.jpg", [1]);
-        _sqlitePersistenceContext!.Thumbnails.Upsert(folder.Id, "b.jpg", [2]);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
+        _sqlitePersistenceContext!.Thumbnails.Upsert(folder.Id, FileNames.IMAGE_11_90_DEG_HEIC, _thumbnailData2!);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext!.Thumbnails.GetByFolderId(_testFolder!.Id);
 
         Assert.That(thumbnails, Has.Count.EqualTo(1));
-        Assert.That(thumbnails.ContainsKey("a.jpg"), Is.True);
+        Assert.That(thumbnails.ContainsKey(FileNames.IMAGE_1_JPG), Is.True);
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }

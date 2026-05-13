@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Microsoft.Data.Sqlite;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Persistence;
 
@@ -12,7 +13,7 @@ public class SqlitePersistenceContextTests
     private SqliteBackupService? _backupService;
     private SqlitePersistenceContext? _sqlitePersistenceContext;
     private TestLogger<SqlitePersistenceContext> _testLogger = new();
-    
+
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -150,7 +151,6 @@ public class SqlitePersistenceContextTests
             typeof(SqlitePersistenceContext));
     }
 
-    // TODO: Nothing assert there is an overwrite, need to compare content before and after (with different content)
     [Test]
     public void WriteBackup_SameDate_OverwritesPreviousBackup()
     {
@@ -160,15 +160,22 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.WriteBackup(backupDate);
 
-        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\NewFolder");
-        _sqlitePersistenceContext!.WriteBackup(backupDate);
-
         string backupPath = Path.Combine(_databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH, "20240820.zip");
 
-        Assert.That(File.Exists(backupPath), Is.True);
+        long firstBackupSize = new FileInfo(backupPath).Length;
 
-        string backupsDir = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDir, "*.zip");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\NewFolder1");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\NewFolder2");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\NewFolder3");
+        _sqlitePersistenceContext!.WriteBackup(backupDate);
+
+        long secondBackupSize = new FileInfo(backupPath).Length;
+
+        Assert.That(File.Exists(backupPath), Is.True);
+        Assert.That(secondBackupSize, Is.GreaterThan(firstBackupSize));
+
+        string backupsDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
+        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
 
         Assert.That(files, Has.Length.EqualTo(1));
 
@@ -280,11 +287,94 @@ public class SqlitePersistenceContextTests
     }
 
     [Test]
+    public void DeleteOldBackups_KeepZero_DeletesAll()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 2, 1));
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 2, 2));
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 2, 3));
+
+        _sqlitePersistenceContext!.DeleteOldBackups(0);
+
+        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
+        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+
+        Assert.That(files, Is.Empty);
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void WriteBackup_AfterInsertingData_BackupContainsData()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Family");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Travel");
+
+        DateTime backupDate = new(2024, 6, 15);
+        _sqlitePersistenceContext!.WriteBackup(backupDate);
+
+        string backupPath = Path.Combine(_databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH, "20240615.zip");
+
+        Assert.That(File.Exists(backupPath), Is.True);
+        Assert.That(new FileInfo(backupPath).Length, Is.GreaterThan(0));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
     public void Dispose_CanBeCalledMultipleTimes()
     {
         _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
 
         Assert.DoesNotThrow(_sqlitePersistenceContext!.Dispose);
         Assert.DoesNotThrow(_sqlitePersistenceContext!.Dispose);
+    }
+
+    [Test]
+    public void Dispose_BeforeInitialize_DoesNotThrow()
+    {
+        Assert.DoesNotThrow(_sqlitePersistenceContext!.Dispose);
+    }
+
+    [Test]
+    public void Initialize_ValidDirectory_SetsSchemaVersion()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        using (SqliteConnection connection = _factory!.Open())
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA user_version;";
+                long version = Convert.ToInt64(command.ExecuteScalar());
+
+                Assert.That(version, Is.EqualTo(1));
+            }
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void DeleteOldBackups_KeepOne_DeletesAllButNewest()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 3, 1));
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 3, 2));
+        _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 3, 3));
+
+        _sqlitePersistenceContext!.DeleteOldBackups(1);
+
+        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
+        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+
+        Assert.That(files, Has.Length.EqualTo(1));
+        Assert.That(files[0], Does.Contain("20240303"));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
 }

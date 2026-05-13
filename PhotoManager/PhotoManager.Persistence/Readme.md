@@ -1,19 +1,16 @@
 # PhotoManager.Persistence
 
-A new persistence layer for PhotoManager backed by **SQLite**
-(`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`). It is **additive**:
-the legacy `PhotoManager.Infrastructure.Database` and `AssetRepository` remain
-fully functional and are still the default DI registration. Switching to the
-new engine is opt-in (single line change in
-`InfrastructureServiceCollectionExtensions`).
+The persistence layer for PhotoManager backed by **SQLite**
+(`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`). It provides all
+data storage: asset cataloging, thumbnail caching, folder tracking, sync
+definitions, and automated backups.
 
 ---
 
 ## 1. Why SQLite?
 
 We migrated away from the custom CSV+blob format because it was not designed
-for multi-threaded ingestion of thousands of images. The candidates we
-evaluated and the rationale for picking SQLite:
+for multi-threaded ingestion of thousands of images:
 
 | Option                | OS-independent | Multi-thread | ACID  | File-based | Reason rejected            |
 |-----------------------|----------------|--------------|-------|------------|----------------------------|
@@ -163,15 +160,15 @@ What we deliberately did **not** do:
 
 ---
 
-## 8. How to wire it (when you're ready)
+## 8. DI wiring
 
 ```csharp
 // PhotoManager.Infrastructure/InfrastructureServiceCollectionExtensions.cs
-services.AddPersistence();                                     // <- new
-services.AddSingleton<IAssetRepository, OptimizedAssetRepository>(); // <- replace AssetRepository
+services.AddPersistence();  // registers SqliteConnectionFactory, SqliteBackupService, SqlitePersistenceContext
+services.AddSingleton<IOptimizedAssetRepository, OptimizedAssetRepository>();
 ```
 
-Then in `App.xaml.cs`, the call chain remains
+In `App.xaml.cs`, the call chain remains
 `AddInfrastructure().AddDomain().AddApplication().AddUi()` — `AddPersistence()`
 is wired transitively through `AddInfrastructure`.
 
@@ -183,32 +180,31 @@ first repository read; data goes to
 
 ## 9. Tests
 
-Unit tests live under `PhotoManager.Tests/Unit/Persistence/`:
+Tests live under two directories:
 
-- `Cache/LruCacheTests.cs` — full LRU semantics + thread-safety.
-- `Sqlite/SqlitePersistenceContextTests.cs` — initialise / backup write /
-  backup retention / error paths.
-- `Repositories/PersistenceRepositoriesTests.cs` — CRUD on every primitive
-  repository (Folder, Asset, Thumbnail, RecentPaths, SyncDefinitions).
+**Integration tests** (`PhotoManager.Tests/Integration/Persistence/`):
+
+- `Cache/LruCacheTests.cs` — full LRU semantics with real file data.
+- `SqlitePersistenceContextTests.cs` — initialise / backup write /
+  backup retention / schema version / overwrite assertions.
+- `SqliteConnectionFactoryTests.cs` — database path, initialize, open
+  (PRAGMA verification, multiple connections, error paths).
+- `SqliteBackupServiceTests.cs` — WriteBackup, GetBackupFilesPaths,
+  DeleteBackupFile with real SQLite databases.
+- `Repositories/AssetPersistenceTests.cs` — CRUD on Assets table with
+  real asset data from Constants.
+- `Repositories/ThumbnailPersistenceTests.cs` — CRUD on Thumbnails
+  with real image bytes.
+
+**Unit tests** (`PhotoManager.Tests/Unit/Persistence/Sqlite/`):
+
+- `SqlitePersistenceContextTests.cs` — exception catch block paths
+  using NSubstitute mocks.
+- `SqliteBackupServiceTests.cs` — pre-existing snapshot cleanup,
+  IOException retry logic with file locking.
 
 Run them with:
 
 ```bash
-dotnet test PhotoManager/PhotoManager.Tests/PhotoManager.Tests.csproj \
-  --filter "FullyQualifiedName~Persistence"
+dotnet test --filter "FullyQualifiedName~Persistence" PhotoManager/PhotoManager.slnx
 ```
-
-`OptimizedAssetRepository` parity tests (mirroring the legacy
-`AssetRepositoryTests` suite) are intentionally deferred until the engine is
-selected as DI default — at which point we run the full integration suite
-against the new repository to validate behavioral parity in one pass.
-
----
-
-## 10. Future work
-
-- Migration tool: import legacy CSV/blob into SQLite (one-shot, idempotent).
-- Switch DI default to `OptimizedAssetRepository` once parity tests are green.
-- Schema v2: add columns / indexes as needed (already supported via
-  `PRAGMA user_version`).
-- Consider a write-batching queue for ingestion benchmarks.

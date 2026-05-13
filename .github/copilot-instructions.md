@@ -24,7 +24,7 @@ This file provides Copilot-specific behavioral guidance that complements `AGENTS
 ### When Suggesting Code Changes
 
 - Follow Clean Architecture layer boundaries (see `AGENTS.md` for details)
-- Never suggest code that crosses the dependency flow: UI → Application → Domain ← Infrastructure
+- Never suggest code that crosses the dependency flow: UI → Application → Domain ← Infrastructure ← Persistence
 - Match existing code patterns in the same file/project
 - All nullable reference type warnings are treated as errors (CS8600-CS8604)
 

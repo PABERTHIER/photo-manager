@@ -10,7 +10,7 @@ public class FolderPersistenceTests
 
     private SqlitePersistenceContext? _sqlitePersistenceContext;
     private TestLogger<SqlitePersistenceContext> _testLogger = new();
-    
+
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {

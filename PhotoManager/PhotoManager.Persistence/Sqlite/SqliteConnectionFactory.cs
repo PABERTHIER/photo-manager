@@ -20,6 +20,7 @@ public sealed class SqliteConnectionFactory : ISqliteConnectionFactory
     {
         if (string.IsNullOrEmpty(DatabasePath))
         {
+            // TODO: Add logger + update tests
             throw new InvalidOperationException(
                 $"The Db has not been initialized properly, the directory {DatabasePath} does not exist.");
         }
