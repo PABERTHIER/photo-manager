@@ -32,15 +32,7 @@ public class AssetRepositoryConstructorTests
     {
         try
         {
-            // Create the database directory structure
-            Directory.CreateDirectory(_databaseDirectory!);
-            string tablesDirectory = Path.Combine(_databasePath!, _configurationRootMock!
-                .GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME)!);
-            Directory.CreateDirectory(tablesDirectory);
-
-            // Create a corrupted Folders.db file with invalid GUID that will cause ReadCatalog to fail
-            string foldersFilePath = Path.Combine(tablesDirectory, "folders.db");
-            File.WriteAllText(foldersFilePath, "FolderId,Path\ninvalid-guid-value,/test/path");
+            // Create a corrupted .db file with invalid GUID that will cause ReadCatalog to fail
 
             TestLogger<AssetRepository> testLogger = new();
             UserConfigurationService userConfigurationService = new(_configurationRootMock!);

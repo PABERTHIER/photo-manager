@@ -28,14 +28,6 @@ public static class UserConfigurationKeys
     public const string PROJECT_OWNER = "appsettings:Project:Owner";
 
     public const string BACKUPS_TO_KEEP = "appsettings:Storage:BackupsToKeep";
-    public const string BLOBS_FOLDER_NAME = "appsettings:Storage:FoldersName:Blobs";
-    public const string TABLES_FOLDER_NAME = "appsettings:Storage:FoldersName:Tables";
-    public const string SEPARATOR = "appsettings:Storage:Separator";
     public const string STORAGE_VERSION = "appsettings:Storage:StorageVersion";
-    public const string ASSETS_TABLE_NAME = "appsettings:Storage:Tables:AssetsTableName";
-    public const string FOLDERS_TABLE_NAME = "appsettings:Storage:Tables:FoldersTableName";
-    public const string RECENT_TARGET_PATHS_TABLE_NAME = "appsettings:Storage:Tables:RecentTargetPathsTableName";
-    public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME =
-        "appsettings:Storage:Tables:SyncAssetsDirectoriesDefinitionsTableName";
     public const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:Storage:ThumbnailsDictionaryEntriesToKeep";
 }

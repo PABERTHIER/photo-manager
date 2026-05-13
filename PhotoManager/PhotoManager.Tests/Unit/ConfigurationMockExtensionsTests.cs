@@ -40,19 +40,7 @@ public class ConfigurationMockExtensionsTests
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME), Is.EqualTo("PhotoManager"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER), Is.EqualTo("Toto"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP), Is.EqualTo(2));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME),
-            Is.EqualTo(Directories.BLOBS));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME),
-            Is.EqualTo(Directories.TABLES));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR), Is.EqualTo("|"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION), Is.EqualTo("1.0"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME), Is.EqualTo("Assets"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME), Is.EqualTo("Folders"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME),
-            Is.EqualTo("RecentTargetPaths"));
-        Assert.That(
-            configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME),
-            Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP),
             Is.EqualTo(5));
     }

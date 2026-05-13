@@ -102,28 +102,11 @@ public class UserConfigurationService : IUserConfigurationService
         ProjectSettings = new(projectName!, projectOwner!);
 
         ushort backupsToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP);
-
-        string? folderNameBlobs = _configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME);
-        string? folderNameTables = _configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME);
-        FoldersNameSettings foldersNameSettings = new(folderNameBlobs!, folderNameTables!);
-
-        char separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray()[0] ?? '|';
         string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
-
-        string? assetsTableName = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME);
-        string? foldersTableName = _configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME);
-        string? recentTargetPathsTableName =
-            _configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME);
-        string? syncAssetsDirectoriesDefinitionsTableName =
-            _configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME);
-        TablesSettings tablesSettings = new(assetsTableName!, foldersTableName!, recentTargetPathsTableName!,
-            syncAssetsDirectoriesDefinitionsTableName!);
-
         ushort thumbnailsDictionaryEntriesToKeep =
             _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 
-        StorageSettings = new(backupsToKeep, foldersNameSettings, separator, storageVersion!, tablesSettings,
-            thumbnailsDictionaryEntriesToKeep);
+        StorageSettings = new(backupsToKeep, storageVersion!, thumbnailsDictionaryEntriesToKeep);
     }
 
     private string? GetProductVersion()

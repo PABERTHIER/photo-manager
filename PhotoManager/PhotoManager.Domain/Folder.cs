@@ -4,7 +4,6 @@ public class Folder
 {
     public required Guid Id { get; init; }
     public required string Path { get; init; }
-    public string BlobFileName => field ??= $"{Id}.bin";
 
     public string Name
     {

@@ -8,8 +8,6 @@ public static class Constants
 
     public static class Directories
     {
-        public const string BLOBS = "Blobs";
-        public const string TABLES = "Tables";
         public const string TEST_FILES = "TestFiles";
         public const string TEST_FOLDER = "TestFolder";
         public const string TEST_FOLDER_1 = "TestFolder1";

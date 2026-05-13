@@ -41,15 +41,7 @@ public static class ConfigurationMockExtensions
                 .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")
                 .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")
                 .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
-                .MockGetValue(UserConfigurationKeys.BLOBS_FOLDER_NAME, Directories.BLOBS)
-                .MockGetValue(UserConfigurationKeys.TABLES_FOLDER_NAME, Directories.TABLES)
-                .MockGetValue(UserConfigurationKeys.SEPARATOR, "|")
                 .MockGetValue(UserConfigurationKeys.STORAGE_VERSION, "1.0")
-                .MockGetValue(UserConfigurationKeys.ASSETS_TABLE_NAME, "Assets")
-                .MockGetValue(UserConfigurationKeys.FOLDERS_TABLE_NAME, "Folders")
-                .MockGetValue(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME, "RecentTargetPaths")
-                .MockGetValue(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME,
-                    "SyncAssetsDirectoriesDefinitions")
                 .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
 
         }

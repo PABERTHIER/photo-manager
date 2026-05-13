@@ -115,14 +115,7 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Storage` part is about settings of storage (update it only for a certain purpose):** :floppy_disk:
 
 - `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
-- `FoldersName.Blobs = "Blobs"`: The name of the folder to store the blobs (in the `BackupPath`).
-- `FoldersName.Tables = "Tables"`: The name of the folder to store the tables (in the `BackupPath`).
-- `Separator = "|"`: The separator used to delimit each column (data).
 - `StorageVersion = "1.0"`: The version of the local database.
-- `Tables.AssetsTableName = "Assets"`: The table's name that stores assets data (a `.db` file in `FoldersName.Tables`).
-- `Tables.FoldersTableName = "Folders"`: The table's name that stores folders data (a `.db` file in `FoldersName.Tables`).
-- `Tables.RecentTargetPathsTableName = "RecentTargetPaths"`: The table's name that stores recentTargetPaths data (a `.db` file in `FoldersName.Tables`).
-- `Tables.SyncAssetsDirectoriesDefinitionsTableName = "SyncAssetsDirectoriesDefinitions"`: The table's name that stores syncAssetsDirectoriesDefinitions data (a `.db` file in `FoldersName.Tables`).
 - `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
 
 ## Compatible picture formats :camera:
