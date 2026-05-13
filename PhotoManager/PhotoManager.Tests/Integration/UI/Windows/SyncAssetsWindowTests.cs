@@ -50,7 +50,8 @@ public class SyncAssetsWindowTests
         _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>(),
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, _fileOperationsService,

@@ -51,7 +51,8 @@ public class AssetRepositoryAddAssetTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+            imageMetadataService, userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         _asset1 = new()
         {
@@ -109,6 +110,9 @@ public class AssetRepositoryAddAssetTests
     public void TearDown()
     {
         _assetRepository?.Dispose();
+
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -150,7 +154,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -198,7 +201,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -233,7 +235,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -251,7 +252,8 @@ public class AssetRepositoryAddAssetTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_pathProviderServiceMock!,
-            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
+            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -278,7 +280,7 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -318,7 +320,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -332,7 +333,8 @@ public class AssetRepositoryAddAssetTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_pathProviderServiceMock!,
-            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
+            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -361,7 +363,7 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -401,7 +403,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -436,7 +437,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -482,7 +482,6 @@ public class AssetRepositoryAddAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

@@ -14,21 +14,16 @@ public class PathProviderServiceTests
     }
 
     [Test]
-    [TestCase("1.0", "v1.0")]
-    [TestCase("1.1", "v1.1")]
-    [TestCase("2.0", "v2.0")]
-    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion,
-        string storageVersionPath)
+    public void ResolveDataDirectory_ValidPath_ReturnsCorrectPath()
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.STORAGE_VERSION, storageVersion);
 
         UserConfigurationService userConfigurationService = new(configurationRootMock);
         PathProviderService pathProviderService = new(userConfigurationService);
 
-        string expected = Path.Combine(userConfigurationService.PathSettings.BackupPath, storageVersionPath);
+        string expected = userConfigurationService.PathSettings.BackupPath;
 
         string result = pathProviderService.ResolveDataDirectory();
 

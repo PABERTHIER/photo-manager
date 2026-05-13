@@ -252,15 +252,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
-    {
-        string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
-
-        Assert.That(storageVersion, Is.Not.Null);
-        Assert.That(storageVersion, Is.EqualTo("1.0"));
-    }
-
-    [Test]
     public void ThumbnailsDictionaryEntriesToKeep_CorrectValue_ReturnsThumbnailsDictionaryEntriesToKeepValue()
     {
         ushort thumbnailsDictionaryEntriesToKeep =

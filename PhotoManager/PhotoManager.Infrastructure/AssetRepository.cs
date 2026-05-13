@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using PhotoManager.Persistence;
 using PhotoManager.Persistence.Sqlite;
 using System.Reactive;
@@ -33,18 +32,20 @@ public class AssetRepository : IAssetRepository, IDisposable
         IImageProcessingService imageProcessingService,
         IImageMetadataService imageMetadataService,
         IUserConfigurationService userConfigurationService,
-        ILogger<AssetRepository> logger)
+        ILogger<AssetRepository> logger,
+        ILogger<SqlitePersistenceContext> persistenceContextLogger,
+        ILogger<OptimizedAssetRepository> optimizedAssetRepositoryLogger)
     {
         _ = logger;
 
-        SqlitePersistenceContext sqlitePersistenceContext = new(NullLogger<SqlitePersistenceContext>.Instance);
+        SqlitePersistenceContext sqlitePersistenceContext = new(persistenceContextLogger);
         OptimizedAssetRepository optimizedAssetRepository = new(
             sqlitePersistenceContext,
             pathProviderService,
             imageProcessingService,
             imageMetadataService,
             userConfigurationService,
-            NullLogger<OptimizedAssetRepository>.Instance);
+            optimizedAssetRepositoryLogger);
         AssetRepositoryAdapter assetRepositoryAdapter = new(optimizedAssetRepository);
 
         _assetRepositoryAdapter = assetRepositoryAdapter;

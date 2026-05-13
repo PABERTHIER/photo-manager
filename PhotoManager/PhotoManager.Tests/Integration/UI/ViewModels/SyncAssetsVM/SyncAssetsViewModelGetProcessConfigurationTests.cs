@@ -46,7 +46,8 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>(),
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,

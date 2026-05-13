@@ -51,7 +51,8 @@ public class AssetRepositoryLoadThumbnailTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, _testLogger);
+            imageMetadataService, _userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         _asset1 = new()
         {
@@ -84,12 +85,10 @@ public class AssetRepositoryLoadThumbnailTests
     public void TearDown()
     {
         _assetRepository?.Dispose();
-        _testLogger!.LoggingAssertTearDown();
 
-        if (Directory.Exists(_databaseDirectory!))
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -133,7 +132,6 @@ public class AssetRepositoryLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

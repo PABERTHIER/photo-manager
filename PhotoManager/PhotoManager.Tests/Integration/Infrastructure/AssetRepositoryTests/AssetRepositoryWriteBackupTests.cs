@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Microsoft.Data.Sqlite;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using Reactive = System.Reactive;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
@@ -40,13 +41,17 @@ public class AssetRepositoryWriteBackupTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+            imageMetadataService, userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
     }
 
     [TearDown]
     public void TearDown()
     {
         _assetRepository?.Dispose();
+
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -59,7 +64,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -69,7 +74,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + Constants.DATABASE_BACKUP_END_PATH).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -78,7 +83,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -97,7 +101,8 @@ public class AssetRepositoryWriteBackupTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger!);
+            imageMetadataService, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -105,7 +110,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(assetRepository.BackupExists(), Is.False);
@@ -115,7 +120,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(assetRepository.BackupExists(), Is.False);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + Constants.DATABASE_BACKUP_END_PATH).Length;
             Assert.That(filesInBackupDirectory, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -124,7 +129,7 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -138,7 +143,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -149,7 +154,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + Constants.DATABASE_BACKUP_END_PATH).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -158,7 +163,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -172,10 +176,11 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
             DirectoryNotFoundException expectedException =
                 new($"Could not find a part of the path '{backupFilePath}'.");
 
+            SqliteConnection.ClearAllPools();
             Directory.Delete(_databaseDirectory!, true);
 
             using (Assert.EnterMultipleScope())
@@ -191,11 +196,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            if (Directory.Exists(_databaseDirectory!))
-            {
-                Directory.Delete(_databaseDirectory!, true);
-            }
-
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -209,7 +209,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -224,7 +224,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + Constants.DATABASE_BACKUP_END_PATH).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -233,7 +233,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

@@ -53,7 +53,8 @@ public class AssetRepositoryTests
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
 
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
-            _userConfigurationService, _testLogger);
+            _userConfigurationService, _testLogger, new TestLogger<SqlitePersistenceContext>(),
+            new TestLogger<OptimizedAssetRepository>());
 
         _asset1 = new()
         {

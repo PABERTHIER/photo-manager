@@ -441,7 +441,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>(),
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -453,11 +454,10 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService =
-            new(_testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_testableAssetRepository, fileOperationsService, _userConfigurationService,
-                new TestLogger<FindDuplicatedAssetsService>());
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
+            moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
+            _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
         _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }

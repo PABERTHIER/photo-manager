@@ -40,7 +40,6 @@ public class ConfigurationMockExtensionsTests
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME), Is.EqualTo("PhotoManager"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER), Is.EqualTo("Toto"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP), Is.EqualTo(2));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION), Is.EqualTo("1.0"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP),
             Is.EqualTo(5));
     }

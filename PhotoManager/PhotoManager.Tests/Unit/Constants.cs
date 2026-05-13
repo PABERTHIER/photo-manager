@@ -2,7 +2,7 @@
 
 public static class Constants
 {
-    public const string DATABASE_END_PATH = "v1.0";
+    public const string DATABASE_END_PATH = ""; // TODO: Delete after the migration
     public const string VERSION = "v1.9.0";
 
     public static class Directories

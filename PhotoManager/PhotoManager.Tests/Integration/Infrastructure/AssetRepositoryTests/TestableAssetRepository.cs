@@ -7,13 +7,17 @@ public class TestableAssetRepository(
     IImageProcessingService imageProcessingService,
     IImageMetadataService imageMetadataService,
     IUserConfigurationService userConfigurationService,
-    ILogger<AssetRepository> logger)
+    ILogger<AssetRepository> logger,
+    ILogger<SqlitePersistenceContext> persistenceContextLogger,
+    ILogger<OptimizedAssetRepository> optimizedAssetRepositoryLogger)
     : AssetRepository(
         pathProviderService,
         imageProcessingService,
         imageMetadataService,
         userConfigurationService,
-        logger)
+        logger,
+        persistenceContextLogger,
+        optimizedAssetRepositoryLogger)
 {
     public new IObservable<System.Reactive.Unit> AssetsUpdated => base.AssetsUpdated;
 

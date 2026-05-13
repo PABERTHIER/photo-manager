@@ -223,7 +223,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>(),
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,

@@ -186,7 +186,8 @@ public class ApplicationGetAssetsByPathTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>(),
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -750,17 +751,16 @@ public class ApplicationGetAssetsByPathTests
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
             imageProcessingServiceMock, imageMetadataService, userConfigurationService,
-            new TestLogger<AssetRepository>());
+            new TestLogger<AssetRepository>(), new TestLogger<SqlitePersistenceContext>(),
+            new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
-            imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -1032,7 +1032,8 @@ public class ApplicationGetAssetsByPathTests
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
             imageProcessingServiceMock, imageMetadataService, userConfigurationService,
-            new TestLogger<AssetRepository>());
+            new TestLogger<AssetRepository>(), new TestLogger<SqlitePersistenceContext>(),
+            new TestLogger<OptimizedAssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,

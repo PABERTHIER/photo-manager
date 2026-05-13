@@ -67,7 +67,6 @@ public class FileOperationsServiceBenchmarks
             ["appsettings:Project:Name"] = "PhotoManager",
             ["appsettings:Project:Owner"] = "Test",
             ["appsettings:Storage:BackupsToKeep"] = "2",
-            ["appsettings:Storage:StorageVersion"] = "1.0",
             ["appsettings:Storage:ThumbnailsDictionaryEntriesToKeep"] = "5"
         };
 

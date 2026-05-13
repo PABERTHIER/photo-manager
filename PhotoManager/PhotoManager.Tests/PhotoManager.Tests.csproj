@@ -70,14 +70,8 @@
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Original.JPG" />
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_ShitQuality.JPG" />
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG" />
-    <None Remove="TestFiles\TestBackup\v1.0\Blobs\18033543-defb-4d37-837b-d8063eda3a25.bin" />
-    <None Remove="TestFiles\TestBackup\v1.0\Blobs\f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\assets.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\folders.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions_empty.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db" />
-    <None Remove="TestFiles\TestBackup\v1.0_Backups\20230819.zip" />
+    <None Remove="TestFiles\TestBackup\photomanager.db" />
+    <None Remove="TestFiles\TestBackup\Backups\20230819.zip" />
     <None Remove="TestFiles\TestFolder\EmptyFile.txt" />
     <None Remove="TestFiles\TestFolder\TestHiddenSubFolder\EmptyFile.txt" />
     <None Remove="TestFiles\TestFolder\TestSubFolder2\EmptyFile.txt" />
@@ -248,28 +242,10 @@
     <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Blobs\18033543-defb-4d37-837b-d8063eda3a25.bin">
+    <Content Include="TestFiles\TestBackup\photomanager.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Blobs\f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\assets.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\folders.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions_empty.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestFiles\TestBackup\v1.0_Backups\20230819.zip">
+    <Content Include="TestFiles\TestBackup\Backups\20230819.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestFolder\EmptyFile.txt">

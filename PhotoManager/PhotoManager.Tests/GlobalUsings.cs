@@ -10,6 +10,7 @@ global using PhotoManager.Domain.Interfaces;
 global using PhotoManager.Domain.UserConfigurationSettings;
 global using PhotoManager.Infrastructure;
 global using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+global using PhotoManager.Persistence.Sqlite;
 global using PhotoManager.UI.Converters;
 global using PhotoManager.UI.ViewModels;
 // System

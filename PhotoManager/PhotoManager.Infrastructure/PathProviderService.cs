@@ -2,9 +2,8 @@
 
 public class PathProviderService(IUserConfigurationService userConfigurationService) : IPathProviderService
 {
-    private readonly string _dataDirectory = Path.Combine(
-        userConfigurationService.PathSettings.BackupPath,
-        $"v{userConfigurationService.StorageSettings.StorageVersion}");
+    // TODO: Clean up afterward -> Delete the service ?
+    private readonly string _dataDirectory = userConfigurationService.PathSettings.BackupPath;
 
     public string ResolveDataDirectory()
     {

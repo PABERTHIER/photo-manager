@@ -115,7 +115,6 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Storage` part is about settings of storage (update it only for a certain purpose):** :floppy_disk:
 
 - `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
-- `StorageVersion = "1.0"`: The version of the local database.
 - `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
 
 ## Compatible picture formats :camera:

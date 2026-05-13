@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PhotoManager.Persistence;
-using PhotoManager.Persistence.Sqlite;
 
 namespace PhotoManager.Tests.Integration.Persistence;
 

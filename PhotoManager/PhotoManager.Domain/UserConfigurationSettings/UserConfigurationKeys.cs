@@ -28,6 +28,5 @@ public static class UserConfigurationKeys
     public const string PROJECT_OWNER = "appsettings:Project:Owner";
 
     public const string BACKUPS_TO_KEEP = "appsettings:Storage:BackupsToKeep";
-    public const string STORAGE_VERSION = "appsettings:Storage:StorageVersion";
     public const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:Storage:ThumbnailsDictionaryEntriesToKeep";
 }

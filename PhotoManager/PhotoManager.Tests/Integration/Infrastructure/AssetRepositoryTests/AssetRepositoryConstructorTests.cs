@@ -25,41 +25,37 @@ public class AssetRepositoryConstructorTests
         _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     // TODO: Enable it when the migration is done + fix the content
     [Test]
     [Ignore("Enable this test when using OptimizedAssetRepository implementation instead")]
     public void Constructor_ReadCatalogThrowsException_LogsItAndThrowsException()
     {
-        try
+        // Create a corrupted .db file with invalid GUID that will cause ReadCatalog to fail
+
+        TestLogger<AssetRepository> testLogger = new();
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+
+        using (Assert.EnterMultipleScope())
         {
-            // Create a corrupted .db file with invalid GUID that will cause ReadCatalog to fail
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+                new AssetRepository(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
+                    userConfigurationService, testLogger, new TestLogger<SqlitePersistenceContext>(),
+                    new TestLogger<OptimizedAssetRepository>()));
 
-            TestLogger<AssetRepository> testLogger = new();
-            UserConfigurationService userConfigurationService = new(_configurationRootMock!);
-            ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
-            FileOperationsService fileOperationsService = new(userConfigurationService,
-                new TestLogger<FileOperationsService>());
-            ImageMetadataService imageMetadataService = new(fileOperationsService,
-                new TestLogger<ImageMetadataService>());
+            Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));
 
-            using (Assert.EnterMultipleScope())
-            {
-                ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
-                    new AssetRepository(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
-                        userConfigurationService, testLogger));
-
-                Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));
-
-                Exception expectedException = new(exception?.Message);
-                testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
-            }
-        }
-        finally
-        {
-            if (Directory.Exists(_databaseDirectory!))
-            {
-                Directory.Delete(_databaseDirectory!, true);
-            }
+            Exception expectedException = new(exception?.Message);
+            testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
         }
     }
 }

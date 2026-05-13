@@ -102,11 +102,10 @@ public class UserConfigurationService : IUserConfigurationService
         ProjectSettings = new(projectName!, projectOwner!);
 
         ushort backupsToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP);
-        string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
         ushort thumbnailsDictionaryEntriesToKeep =
             _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 
-        StorageSettings = new(backupsToKeep, storageVersion!, thumbnailsDictionaryEntriesToKeep);
+        StorageSettings = new(backupsToKeep, thumbnailsDictionaryEntriesToKeep);
     }
 
     private string? GetProductVersion()

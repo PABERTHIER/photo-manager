@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PhotoManager.Persistence;
 
 namespace PhotoManager.Infrastructure;
 
@@ -8,11 +9,14 @@ public static class InfrastructureServiceCollectionExtensions
     {
         public void AddInfrastructure()
         {
+            services.AddPersistence();
             services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
             services.AddSingleton<IPathProviderService, PathProviderService>();
             services.AddSingleton<IFileOperationsService, FileOperationsService>();
             services.AddSingleton<IImageProcessingService, ImageProcessingService>();
             services.AddSingleton<IImageMetadataService, ImageMetadataService>();
+            services.AddSingleton<IOptimizedAssetRepository, OptimizedAssetRepository>();
+            services.AddSingleton<AssetRepositoryAdapter>();
             services.AddSingleton<IAssetRepository, AssetRepository>();
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
         }

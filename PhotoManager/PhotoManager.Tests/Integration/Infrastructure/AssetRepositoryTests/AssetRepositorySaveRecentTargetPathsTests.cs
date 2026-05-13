@@ -40,13 +40,17 @@ public class AssetRepositorySaveRecentTargetPathsTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+            imageMetadataService, userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
     }
 
     [TearDown]
     public void TearDown()
     {
         _assetRepository?.Dispose();
+
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -84,7 +88,6 @@ public class AssetRepositorySaveRecentTargetPathsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -123,7 +126,6 @@ public class AssetRepositorySaveRecentTargetPathsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

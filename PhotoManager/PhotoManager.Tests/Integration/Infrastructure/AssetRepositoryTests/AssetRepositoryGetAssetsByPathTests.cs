@@ -53,7 +53,8 @@ public class AssetRepositoryGetAssetsByPathTests
             new TestLogger<FileOperationsService>());
         _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            _imageMetadataService, userConfigurationService, _testLogger);
+            _imageMetadataService, userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         _asset1 = new()
         {
@@ -140,6 +141,9 @@ public class AssetRepositoryGetAssetsByPathTests
     public void TearDown()
     {
         _assetRepository?.Dispose();
+
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -217,7 +221,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -235,7 +238,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingServiceMock,
-            _imageMetadataService!, userConfigurationService, _testLogger!);
+            _imageMetadataService!, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -279,7 +283,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -329,7 +333,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -340,6 +343,8 @@ public class AssetRepositoryGetAssetsByPathTests
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
             _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        TestableAssetRepository? testableAssetRepository = null;
 
         try
         {
@@ -381,8 +386,9 @@ public class AssetRepositoryGetAssetsByPathTests
                 new TestLogger<FileOperationsService>());
             ImageMetadataService imageMetadataService = new(fileOperationsService,
                 new TestLogger<ImageMetadataService>());
-            TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-                imageMetadataService, userConfigurationService, _testLogger!);
+            testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+                imageMetadataService, userConfigurationService, _testLogger!,
+                new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
             List<Asset> cataloguedAssets2 = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets2, Has.Count.EqualTo(1));
@@ -401,7 +407,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository?.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -439,7 +445,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -488,7 +493,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -520,7 +524,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -550,7 +553,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -601,7 +603,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -618,7 +619,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
-            imageProcessingServiceMock, _imageMetadataService!, userConfigurationService, _testLogger!);
+            imageProcessingServiceMock, _imageMetadataService!, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -679,7 +681,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -761,7 +763,6 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

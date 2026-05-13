@@ -50,7 +50,8 @@ public class AssetRepositoryDeleteAssetTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
-            userConfigurationService, _testLogger);
+            userConfigurationService, _testLogger,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         _asset1 = new()
         {
@@ -83,12 +84,10 @@ public class AssetRepositoryDeleteAssetTests
     public void TearDown()
     {
         _assetRepository?.Dispose();
-        _testLogger!.LoggingAssertTearDown();
 
-        if (Directory.Exists(_databaseDirectory!))
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
+        _testLogger!.LoggingAssertTearDown();
     }
 
     [Test]
@@ -158,7 +157,8 @@ public class AssetRepositoryDeleteAssetTests
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         TestableAssetRepository testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger!);
+            imageMetadataService, userConfigurationService, _testLogger!,
+            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -185,6 +185,7 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
