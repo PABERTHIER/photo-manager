@@ -6,7 +6,15 @@
 /// <c>Microsoft.Data.Sqlite</c>; the cheap and correct pattern is open/close
 /// per logical operation. SQLite's own connection pool keeps overhead low.
 /// </summary>
-internal interface ISqliteConnectionFactory
+public interface ISqliteConnectionFactory
 {
+    /// <summary>Resolved absolute path to the SQLite database file.</summary>
+    string DatabasePath { get; }
+
+    /// <summary>
+    /// Sets the database file path. Must be called before <see cref="Open"/>.
+    /// </summary>
+    void Initialize(string databasePath);
+
     SqliteConnection Open();
 }

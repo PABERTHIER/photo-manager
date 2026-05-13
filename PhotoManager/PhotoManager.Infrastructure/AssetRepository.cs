@@ -38,7 +38,10 @@ public class AssetRepository : IAssetRepository, IDisposable
     {
         _ = logger;
 
-        SqlitePersistenceContext sqlitePersistenceContext = new(persistenceContextLogger);
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, persistenceContextLogger);
         OptimizedAssetRepository optimizedAssetRepository = new(
             sqlitePersistenceContext,
             pathProviderService,

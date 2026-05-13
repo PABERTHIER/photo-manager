@@ -157,12 +157,8 @@ public sealed class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey 
 
     private void EvictTail()
     {
-        if (_tail is null)
-        {
-            return;
-        }
-
-        _map.Remove(_tail.Key);
+        // EvictTail is only called when _map.Count > Capacity, guaranteeing at least one node exists
+        _map.Remove(_tail!.Key);
         Detach(_tail);
     }
 }

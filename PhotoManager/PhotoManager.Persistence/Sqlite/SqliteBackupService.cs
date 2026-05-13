@@ -8,7 +8,7 @@ namespace PhotoManager.Persistence.Sqlite;
 /// (<c>yyyyMMdd.zip</c>) but the archive content differs: a single
 /// <c>photomanager.db</c> snapshot produced via the SQLite online backup API.
 /// </summary>
-internal sealed class SqliteBackupService(ISqliteConnectionFactory connectionFactory)
+public sealed class SqliteBackupService(ISqliteConnectionFactory connectionFactory) : ISqliteBackupService
 {
     private const string ENTRY_NAME = "photomanager.db";
 

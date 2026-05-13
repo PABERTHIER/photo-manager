@@ -5,14 +5,25 @@
 /// and applies all required PRAGMAs every time a connection is opened
 /// (PRAGMAs in SQLite are per-connection except a few that persist).
 /// </summary>
-internal sealed class SqliteConnectionFactory(string databasePath) : ISqliteConnectionFactory
+public sealed class SqliteConnectionFactory : ISqliteConnectionFactory
 {
     private const int BUSY_TIMEOUT_MS = 5000;
 
-    public string DatabasePath { get; } = databasePath;
+    public string DatabasePath { get; private set; } = string.Empty;
+
+    public void Initialize(string databasePath)
+    {
+        DatabasePath = databasePath;
+    }
 
     public SqliteConnection Open()
     {
+        if (string.IsNullOrEmpty(DatabasePath))
+        {
+            throw new InvalidOperationException(
+                $"The Db has not been initialized properly, the directory {DatabasePath} does not exist.");
+        }
+
         SqliteConnectionStringBuilder builder = new()
         {
             DataSource = DatabasePath,

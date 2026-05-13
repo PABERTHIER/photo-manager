@@ -9,6 +9,8 @@ public static class PersistenceServiceCollectionExtensions
     {
         public void AddPersistence()
         {
+            services.AddSingleton<ISqliteConnectionFactory, SqliteConnectionFactory>();
+            services.AddSingleton<ISqliteBackupService, SqliteBackupService>();
             services.AddSingleton<IPersistenceContext, SqlitePersistenceContext>();
         }
     }

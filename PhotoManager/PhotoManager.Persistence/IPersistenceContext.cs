@@ -14,9 +14,6 @@ public interface IPersistenceContext
     /// <summary>Resolved absolute path to the SQLite database file.</summary>
     string DatabaseFilePath { get; }
 
-    /// <summary>Diagnostics for the most recent operation.</summary>
-    PersistenceDiagnostics Diagnostics { get; }
-
     /// <summary>
     /// Opens (and creates if necessary) the SQLite database under
     /// <paramref name="dataDirectory"/>. Idempotent.

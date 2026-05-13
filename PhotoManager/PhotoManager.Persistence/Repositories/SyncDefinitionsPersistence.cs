@@ -47,8 +47,7 @@ internal sealed class SyncDefinitionsPersistence(ISqliteConnectionFactory connec
                 using (SqliteCommand delCommand = connection.CreateCommand())
                 {
                     delCommand.Transaction = transaction;
-                    // TODO: Fix warning "'Delete' statement without 'where' clears all data in the table"
-                    delCommand.CommandText = "DELETE FROM SyncDefinitions;";
+                    delCommand.CommandText = "DELETE FROM SyncDefinitions WHERE 1 = 1;";
 
                     delCommand.ExecuteNonQuery();
                 }

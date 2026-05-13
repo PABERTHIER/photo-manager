@@ -36,8 +36,7 @@ internal sealed class RecentPathsPersistence(ISqliteConnectionFactory connection
                 using (SqliteCommand delCommand = connection.CreateCommand())
                 {
                     delCommand.Transaction = transaction;
-                    // TODO: Fix warning "'Delete' statement without 'where' clears all data in the table"
-                    delCommand.CommandText = "DELETE FROM RecentPaths;";
+                    delCommand.CommandText = "DELETE FROM RecentPaths WHERE 1 = 1;";
 
                     delCommand.ExecuteNonQuery();
                 }

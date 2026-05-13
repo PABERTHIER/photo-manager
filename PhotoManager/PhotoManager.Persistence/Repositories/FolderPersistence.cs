@@ -59,10 +59,9 @@ internal sealed class FolderPersistence(ISqliteConnectionFactory connectionFacto
     {
         using (SqliteConnection connection = connectionFactory.Open())
         {
-            // TODO: Remove the Mirrors legacy "first folder for the path" semantic when duplicates exist.
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = "SELECT Id, Path FROM Folders WHERE Path = $path ORDER BY rowid LIMIT 1;";
+                command.CommandText = "SELECT Id, Path FROM Folders WHERE Path = $path LIMIT 1;";
                 command.Parameters.AddWithValue("$path", path);
 
                 using (SqliteDataReader reader = command.ExecuteReader())

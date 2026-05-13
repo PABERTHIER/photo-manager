@@ -8,7 +8,10 @@ namespace PhotoManager.Persistence.Sqlite;
 /// Owns the DB file and exposes typed primitive repositories.
 /// Thread-safe: every primitive opens its own connection per call.
 /// </summary>
-public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> logger)
+public sealed class SqlitePersistenceContext(
+    ISqliteConnectionFactory factory,
+    ISqliteBackupService backupService,
+    ILogger<SqlitePersistenceContext> logger)
     : IPersistenceContext, IDisposable
 {
     public const string DATABASE_FILE_NAME = "photomanager.db";
@@ -16,17 +19,13 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
 
     private string _backupsDirectory = string.Empty;
 
-    private SqliteConnectionFactory? _factory; // TODO: Why not using interface to inject it properly ?
-    private SqliteBackupService? _backupService; // TODO: Why not using interface to inject it properly ?
-
     public IFolderPersistence Folders { get; private set; } = null!;
     public IAssetPersistence Assets { get; private set; } = null!;
     public IThumbnailPersistence Thumbnails { get; private set; } = null!;
     public IRecentPathsPersistence RecentPaths { get; private set; } = null!;
     public ISyncDefinitionsPersistence SyncDefinitions { get; private set; } = null!;
 
-    public string DatabaseFilePath { get; private set; } = string.Empty;
-    public PersistenceDiagnostics Diagnostics { get; private set; } = new();
+    public string DatabaseFilePath => factory.DatabasePath;
 
     public void Initialize(string dataDirectory)
     {
@@ -38,39 +37,31 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
         }
 
         Directory.CreateDirectory(dataDirectory);
-        DatabaseFilePath = Path.Combine(dataDirectory, DATABASE_FILE_NAME);
+
+        string databaseFilePath = Path.Combine(dataDirectory, DATABASE_FILE_NAME);
         _backupsDirectory = dataDirectory + BACKUPS_SUFFIX;
         Directory.CreateDirectory(_backupsDirectory);
 
-        // TODO: DatabaseFilePath can be init in SqliteConnectionFactory and used as a public field instead
-        // To add to that, DatabasePath in the SqliteConnectionFactory is already public, so easy to do.
-        _factory = new SqliteConnectionFactory(DatabaseFilePath);
-        _backupService = new SqliteBackupService(_factory);
+        factory.Initialize(databaseFilePath);
 
         try
         {
-            using (SqliteConnection connection = _factory.Open())
+            using (SqliteConnection connection = factory.Open())
             {
                 SqliteSchema.EnsureCreated(connection);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to initialize SQLite persistence at {DatabaseFilePath}", DatabaseFilePath);
+            logger.LogError(ex, "Failed to initialize SQLite Db at {DatabaseFilePath}", DatabaseFilePath);
             throw;
         }
 
-        Folders = new FolderPersistence(_factory);
-        Assets = new AssetPersistence(_factory);
-        Thumbnails = new ThumbnailPersistence(_factory);
-        RecentPaths = new RecentPathsPersistence(_factory);
-        SyncDefinitions = new SyncDefinitionsPersistence(_factory);
-
-        Diagnostics = new PersistenceDiagnostics
-        {
-            LastDatabasePath = DatabaseFilePath,
-            LastOperation = "Initialize"
-        };
+        Folders = new FolderPersistence(factory);
+        Assets = new AssetPersistence(factory);
+        Thumbnails = new ThumbnailPersistence(factory);
+        RecentPaths = new RecentPathsPersistence(factory);
+        SyncDefinitions = new SyncDefinitionsPersistence(factory);
     }
 
     public bool WriteBackup(DateTime backupDate)
@@ -79,16 +70,9 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
 
         string backupFilePath = ResolveBackupFilePath(backupDate);
 
-        Diagnostics = new PersistenceDiagnostics
-        {
-            LastDatabasePath = DatabaseFilePath,
-            LastBackupPath = backupFilePath,
-            LastOperation = "WriteBackup"
-        };
-
         try
         {
-            return _backupService!.WriteBackup(backupFilePath);
+            return backupService.WriteBackup(backupFilePath);
         }
         catch (Exception ex)
         {
@@ -109,24 +93,14 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
 
         try
         {
-            string[] filesPaths = _backupService!.GetBackupFilesPaths(_backupsDirectory);
-            // TODO: Why do we need to sort ?
-            Array.Sort(filesPaths, StringComparer.Ordinal);
+            string[] filesPaths = backupService.GetBackupFilesPaths(_backupsDirectory);
 
-            List<string> deletedBackupFilePaths = [];
+            Array.Sort(filesPaths, StringComparer.Ordinal);
 
             for (int i = 0; i < filesPaths.Length - backupsToKeep; i++)
             {
-                _backupService.DeleteBackupFile(filesPaths[i]);
-                deletedBackupFilePaths.Add(filesPaths[i]);
+                backupService.DeleteBackupFile(filesPaths[i]);
             }
-
-            Diagnostics = new PersistenceDiagnostics
-            {
-                LastDatabasePath = DatabaseFilePath,
-                LastOperation = "DeleteOldBackups",
-                LastDeletedBackupFilePaths = [.. deletedBackupFilePaths]
-            };
         }
         catch (Exception ex)
         {
@@ -137,7 +111,7 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
 
     private string ResolveBackupFilePath(DateTime backupDate)
     {
-        string fileName = backupDate.ToString("yyyyMMdd") + ".zip";
+        string fileName = $"{backupDate:yyyyMMdd}.zip";
         return Path.Combine(_backupsDirectory, fileName);
     }
 
@@ -146,12 +120,11 @@ public sealed class SqlitePersistenceContext(ILogger<SqlitePersistenceContext> l
         SqliteConnection.ClearAllPools();
     }
 
-    // TODO: By using interface to inject them properly, then they cannot be null, this code is useless ?
     private void EnsureInitialized()
     {
-        if (_factory == null || _backupService == null)
+        if (string.IsNullOrEmpty(DatabaseFilePath))
         {
-            InvalidOperationException ex = new("SqlitePersistenceContext has not been initialized.");
+            InvalidOperationException ex = new("Db context has not been initialized.");
             logger.LogError(ex, "{ExMessage}", ex.Message);
             throw ex;
         }
