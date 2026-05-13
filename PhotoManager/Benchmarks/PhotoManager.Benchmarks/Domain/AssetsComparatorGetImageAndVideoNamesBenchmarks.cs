@@ -1,4 +1,4 @@
-namespace PhotoManager.Benchmarks.Domain;
+﻿namespace PhotoManager.Benchmarks.Domain;
 
 // Context:
 // AssetsComparator.GetImageAndVideoNamesList starts with zero-capacity List<string> instances

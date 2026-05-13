@@ -1,4 +1,4 @@
-namespace PhotoManager.Benchmarks.Domain;
+﻿namespace PhotoManager.Benchmarks.Domain;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

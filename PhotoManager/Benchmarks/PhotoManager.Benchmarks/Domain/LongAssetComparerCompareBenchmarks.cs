@@ -1,4 +1,4 @@
-using PhotoManager.Domain.Comparers;
+﻿using PhotoManager.Domain.Comparers;
 
 namespace PhotoManager.Benchmarks.Domain;
 

@@ -1,4 +1,4 @@
-using FFMpegCore;
+﻿using FFMpegCore;
 using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Common;

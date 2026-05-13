@@ -14,6 +14,15 @@ This file provides shared guidance for AI coding agents (Claude Code, GitHub Cop
 - If a line exceeds 120 chars, wrap it appropriately (except unsplittable strings/URLs)
 - When editing files, preserve existing formatting style
 
+## File Encoding (NON-NEGOTIABLE)
+
+- **All files MUST use UTF-8 encoding with BOM** (Byte Order Mark: `EF BB BF`)
+- This is the .NET standard as specified in `.editorconfig` (`charset = utf-8`)
+- When creating or editing files, ALWAYS ensure the BOM is present
+- **Never strip the BOM** when modifying files — preserve the original encoding
+- The BOM is critical for proper file encoding detection by .NET tooling and CI/CD pipelines
+- If you edit a file and the BOM is lost, re-add it before completing the task
+
 ## Performance Optimization Workflow
 
 When optimizing performance:
@@ -54,9 +63,10 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
 
 1. Verify no compiler warnings (run `dotnet build` and check output)
 2. Verify no line exceeds 120 characters (use `dotnet format` to check)
-3. Run only relevant tests for changes made
-4. If code was modified, ensure tests pass
-5. Verify all `// TODO` comments in modified files are still present (do not silently remove them)
+3. Verify all modified files have UTF-8 BOM encoding (first 3 bytes should be `EF BB BF`)
+4. Run only relevant tests for changes made
+5. If code was modified, ensure tests pass
+6. Verify all `// TODO` comments in modified files are still present (do not silently remove them)
 
 ---
 
@@ -171,6 +181,7 @@ UI → Application → Domain ← Infrastructure
 - **Indent**: 4 spaces
 - **Max line length**: 120
 - **End of line**: CRLF
+- **File encoding**: UTF-8 with BOM for all files
 - Treat warnings as errors is enabled in builds
 - Run `dotnet format` to apply right file encoding, and code style
 - Global usings are defined in each project's `GlobalUsings.cs`

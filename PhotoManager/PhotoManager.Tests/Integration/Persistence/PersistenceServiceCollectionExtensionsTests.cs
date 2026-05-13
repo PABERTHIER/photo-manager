@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using PhotoManager.Persistence;
 using PhotoManager.Persistence.Sqlite;
 

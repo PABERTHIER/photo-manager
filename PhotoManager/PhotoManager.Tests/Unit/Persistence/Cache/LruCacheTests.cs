@@ -1,4 +1,4 @@
-using PhotoManager.Persistence.Cache;
+﻿using PhotoManager.Persistence.Cache;
 
 namespace PhotoManager.Tests.Unit.Persistence.Cache;
 

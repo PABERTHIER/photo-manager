@@ -1,4 +1,4 @@
-namespace PhotoManager.Benchmarks.Domain;
+﻿namespace PhotoManager.Benchmarks.Domain;
 
 // Context:
 // AssetsComparator.GetUpdatedFileNames calls IsUpdatedAsset() — a static factory method
