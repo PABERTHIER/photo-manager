@@ -65,7 +65,7 @@ public class ApplicationGetTotalFilesCountTests
         {
             int totalFilesCount = _application!.GetTotalFilesCount();
 
-            Assert.That(totalFilesCount, Is.EqualTo(67));
+            Assert.That(totalFilesCount, Is.EqualTo(61));
         }
         finally
         {

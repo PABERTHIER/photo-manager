@@ -78,7 +78,7 @@ public sealed class OptimizedAssetRepository : IOptimizedAssetRepository
             return existingFolder;
         }
 
-        lock (_folderCreationLock) // TODO: Why do we need locks in this file ? (Same for the other locks)
+        lock (_folderCreationLock)
         {
             if (_foldersByPath.TryGetValue(path, out existingFolder))
             {
@@ -106,12 +106,12 @@ public sealed class OptimizedAssetRepository : IOptimizedAssetRepository
 
     public HashSet<string> GetFoldersPath()
     {
-        Folder[] folders = [.. _foldersById.Values];
-        HashSet<string> foldersSet = new(folders.Length, StringComparer.Ordinal);
+        string[] paths = [.. _foldersByPath.Keys];
+        HashSet<string> foldersSet = new(paths.Length, StringComparer.Ordinal);
 
-        for (int i = 0; i < folders.Length; i++)
+        foreach (string path in paths)
         {
-            foldersSet.Add(folders[i].Path);
+            foldersSet.Add(path);
         }
 
         return foldersSet;
@@ -442,14 +442,14 @@ public sealed class OptimizedAssetRepository : IOptimizedAssetRepository
 
     public void Dispose()
     {
-        _disposed = true;
+        Volatile.Write(ref _disposed, true);
         _assetsUpdatedSubject.Dispose();
     }
 
-    // TODO: Why do we need this method ?
+    // Standard .NET IDisposable guard: prevents use-after-dispose on the Subject and persistence layer.
     private void ThrowIfDisposed()
     {
-        if (_disposed)
+        if (Volatile.Read(ref _disposed))
         {
             throw new ObjectDisposedException(nameof(OptimizedAssetRepository));
         }
@@ -637,22 +637,7 @@ public sealed class OptimizedAssetRepository : IOptimizedAssetRepository
 
     private void LoadOrFetchThumbnails(Folder folder, Asset[] assets)
     {
-        ConcurrentDictionary<string, byte[]> thumbnails;
-
-        if (_thumbnailCache.TryGet(folder.Id, out ConcurrentDictionary<string, byte[]> thumbnailsCached))
-        {
-            thumbnails = thumbnailsCached;
-        }
-        else
-        {
-            Dictionary<string, byte[]> savedThumbnails = _persistence.Thumbnails.GetByFolderId(folder.Id);
-
-            thumbnails = savedThumbnails.Count == 0
-                ? new ConcurrentDictionary<string, byte[]>(StringComparer.Ordinal)
-                : new ConcurrentDictionary<string, byte[]>(savedThumbnails, StringComparer.Ordinal);
-
-            _thumbnailCache.Set(folder.Id, thumbnails);
-        }
+        ConcurrentDictionary<string, byte[]> thumbnails = GetOrLoadThumbnails(folder);
 
         for (int i = 0; i < assets.Length; i++)
         {
@@ -673,12 +658,12 @@ public sealed class OptimizedAssetRepository : IOptimizedAssetRepository
             return thumbnailsCached;
         }
 
-        Dictionary<string, byte[]> loaded = _persistence.Thumbnails.GetByFolderId(folder.Id);
+        Dictionary<string, byte[]> savedThumbnails = _persistence.Thumbnails.GetByFolderId(folder.Id);
 
         ConcurrentDictionary<string, byte[]> thumbnails =
-            loaded.Count == 0
+            savedThumbnails.Count == 0
                 ? new ConcurrentDictionary<string, byte[]>(StringComparer.Ordinal)
-                : new ConcurrentDictionary<string, byte[]>(loaded, StringComparer.Ordinal);
+                : new ConcurrentDictionary<string, byte[]>(savedThumbnails, StringComparer.Ordinal);
 
         _thumbnailCache.Set(folder.Id, thumbnails);
 

@@ -44,14 +44,17 @@ public class AssetRepositoryDeleteAssetTests
     public void SetUp()
     {
         _testLogger = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
         _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
-            userConfigurationService, _testLogger,
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+            userConfigurationService, sqlitePersistenceContext, _testLogger);
 
         _asset1 = new()
         {
@@ -84,9 +87,7 @@ public class AssetRepositoryDeleteAssetTests
     public void TearDown()
     {
         _assetRepository?.Dispose();
-
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
-
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -151,33 +152,36 @@ public class AssetRepositoryDeleteAssetTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger!,
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            testableAssetRepository.AddFolder(folderPath);
+            assetRepository.AddFolder(folderPath);
 
-            List<Asset> assets = testableAssetRepository.GetCataloguedAssets();
+            List<Asset> assets = assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            Asset? assetDeleted = testableAssetRepository.DeleteAsset(folderPath, FileNames.NON_EXISTENT_FILE_JPG);
+            Asset? assetDeleted = assetRepository.DeleteAsset(folderPath, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(assetDeleted, Is.Null);
 
-            assets = testableAssetRepository.GetCataloguedAssets();
+            assets = assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -185,7 +189,7 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            testableAssetRepository.Dispose();
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace PhotoManager.Domain.Interfaces;
 
-public interface IAssetRepository
+public interface IAssetRepository // TODO: Update interface based on Optimized version
 {
     IObservable<Unit> AssetsUpdated { get; }
     Asset[] GetAssetsByPath(string directory);

@@ -39,6 +39,10 @@ public class AssetRepositoryConstructorTests
         // Create a corrupted .db file with invalid GUID that will cause ReadCatalog to fail
 
         TestLogger<AssetRepository> testLogger = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -49,8 +53,7 @@ public class AssetRepositoryConstructorTests
         {
             ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
                 new AssetRepository(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
-                    userConfigurationService, testLogger, new TestLogger<SqlitePersistenceContext>(),
-                    new TestLogger<OptimizedAssetRepository>()));
+                    userConfigurationService, sqlitePersistenceContext, testLogger));
 
             Assert.That(exception?.Message, Does.Contain("Error while trying to read data table"));
 

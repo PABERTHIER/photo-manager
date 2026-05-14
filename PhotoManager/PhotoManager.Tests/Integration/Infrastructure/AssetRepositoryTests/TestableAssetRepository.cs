@@ -2,23 +2,30 @@
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
-public class TestableAssetRepository(
-    IPathProviderService pathProviderService,
-    IImageProcessingService imageProcessingService,
-    IImageMetadataService imageMetadataService,
-    IUserConfigurationService userConfigurationService,
-    ILogger<AssetRepository> logger,
-    ILogger<SqlitePersistenceContext> persistenceContextLogger,
-    ILogger<OptimizedAssetRepository> optimizedAssetRepositoryLogger)
-    : AssetRepository(
-        pathProviderService,
+// TODO: Discard temp fix
+public class TestableAssetRepository : AssetRepository
+{
+    private static SqlitePersistenceContext? _sqlitePersistenceContext;
+
+    public TestableAssetRepository(IPathProviderService pathProviderService,
+        IImageProcessingService imageProcessingService,
+        IImageMetadataService imageMetadataService,
+        IUserConfigurationService userConfigurationService,
+        ILogger<AssetRepository> logger,
+        ILogger<SqlitePersistenceContext> persistenceContextLogger,
+        ILogger<OptimizedAssetRepository> optimizedAssetRepositoryLogger) : base(pathProviderService,
         imageProcessingService,
         imageMetadataService,
         userConfigurationService,
-        logger,
-        persistenceContextLogger,
-        optimizedAssetRepositoryLogger)
-{
+        _sqlitePersistenceContext!,
+        logger)
+    {
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        _sqlitePersistenceContext = new(sqliteConnectionFactory, sqliteBackupService,
+            new TestLogger<SqlitePersistenceContext>());
+    }
+
     public new IObservable<System.Reactive.Unit> AssetsUpdated => base.AssetsUpdated;
 
     public new Asset[] GetAssetsByPath(string directory) => base.GetAssetsByPath(directory);

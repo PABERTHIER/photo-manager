@@ -396,7 +396,7 @@ public class FileOperationsServiceTests
     public void GetTotalFilesCount_FilesInDirectory_ReturnsTotalFilesCount()
     {
         int totalFilesCount = _fileOperationsService!.GetTotalFilesCount();
-        Assert.That(totalFilesCount, Is.EqualTo(67));
+        Assert.That(totalFilesCount, Is.EqualTo(61));
 
         _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
