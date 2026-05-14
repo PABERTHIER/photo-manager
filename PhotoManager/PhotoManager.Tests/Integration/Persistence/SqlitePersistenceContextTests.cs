@@ -25,8 +25,8 @@ public class SqlitePersistenceContextTests
     public void SetUp()
     {
         _testLogger = new();
-        _factory = new SqliteConnectionFactory();
-        _backupService = new SqliteBackupService(_factory);
+        _factory = new(new TestLogger<SqliteConnectionFactory>());
+        _backupService = new(_factory);
         _sqlitePersistenceContext = new(_factory, _backupService, _testLogger);
     }
 

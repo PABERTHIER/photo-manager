@@ -502,7 +502,7 @@ public class AssetRepositoryTests
         _folderPersistenceMock!.GetAll().Returns([folder]);
         _assetPersistenceMock!.GetAll().Returns([]);
 
-        _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns(new Dictionary<string, byte[]>());
+        _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns([]);
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();
@@ -653,7 +653,7 @@ public class AssetRepositoryTests
         _folderPersistenceMock!.GetAll().Returns([folder]);
         _assetPersistenceMock!.GetAll().Returns([asset]);
 
-        _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns(new Dictionary<string, byte[]>());
+        _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns([]);
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();

@@ -1,11 +1,13 @@
-﻿namespace PhotoManager.Persistence.Sqlite;
+﻿using Microsoft.Extensions.Logging;
+
+namespace PhotoManager.Persistence.Sqlite;
 
 /// <summary>
 /// Default factory. Builds a connection string targeting <see cref="DatabasePath"/>
 /// and applies all required PRAGMAs every time a connection is opened
 /// (PRAGMAs in SQLite are per-connection except a few that persist).
 /// </summary>
-public sealed class SqliteConnectionFactory : ISqliteConnectionFactory
+public sealed class SqliteConnectionFactory(ILogger<SqliteConnectionFactory> logger) : ISqliteConnectionFactory
 {
     private const int BUSY_TIMEOUT_MS = 5000;
 
@@ -20,9 +22,10 @@ public sealed class SqliteConnectionFactory : ISqliteConnectionFactory
     {
         if (string.IsNullOrEmpty(DatabasePath))
         {
-            // TODO: Add logger + update tests
-            throw new InvalidOperationException(
-                $"The Db has not been initialized properly, the directory {DatabasePath} does not exist.");
+            string exceptionMessage =
+                $"The Db has not been initialized properly, the directory {DatabasePath} does not exist.";
+            logger.LogError("{exceptionMessage}", exceptionMessage);
+            throw new InvalidOperationException(exceptionMessage);
         }
 
         SqliteConnectionStringBuilder builder = new()

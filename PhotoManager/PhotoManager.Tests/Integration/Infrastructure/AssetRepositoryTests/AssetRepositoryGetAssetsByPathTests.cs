@@ -47,7 +47,7 @@ public class AssetRepositoryGetAssetsByPathTests
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
         _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
@@ -237,7 +237,7 @@ public class AssetRepositoryGetAssetsByPathTests
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
@@ -381,7 +381,7 @@ public class AssetRepositoryGetAssetsByPathTests
             IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
             pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
 
-            SqliteConnectionFactory sqliteConnectionFactory = new();
+            SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
             SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
             SqlitePersistenceContext sqlitePersistenceContext = new(
                 sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
@@ -628,7 +628,7 @@ public class AssetRepositoryGetAssetsByPathTests
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());

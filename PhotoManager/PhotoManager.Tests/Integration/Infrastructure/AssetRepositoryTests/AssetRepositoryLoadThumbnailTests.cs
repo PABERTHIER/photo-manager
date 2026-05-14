@@ -45,7 +45,7 @@ public class AssetRepositoryLoadThumbnailTests
     public void SetUp()
     {
         _testLogger = new();
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
@@ -307,7 +307,7 @@ public class AssetRepositoryLoadThumbnailTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "1");
 
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(sqliteConnectionFactory, sqliteBackupService,
             new TestLogger<SqlitePersistenceContext>());

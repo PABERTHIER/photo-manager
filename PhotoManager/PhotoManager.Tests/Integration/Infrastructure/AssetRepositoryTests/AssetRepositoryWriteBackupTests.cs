@@ -35,7 +35,7 @@ public class AssetRepositoryWriteBackupTests
     public void SetUp()
     {
         _testLogger = new();
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
@@ -93,10 +93,10 @@ public class AssetRepositoryWriteBackupTests
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP,
-            "0"); // 0 backups, so that, the new created is directly deleted
+        // 0 backups, so that, the new created is directly deleted
+        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0");
 
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());

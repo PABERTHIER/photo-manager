@@ -20,7 +20,7 @@ public class TestableAssetRepository : AssetRepository
         _sqlitePersistenceContext!,
         logger)
     {
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         _sqlitePersistenceContext = new(sqliteConnectionFactory, sqliteBackupService,
             new TestLogger<SqlitePersistenceContext>());

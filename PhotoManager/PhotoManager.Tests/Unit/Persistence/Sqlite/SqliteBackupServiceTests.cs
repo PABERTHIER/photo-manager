@@ -22,8 +22,8 @@ public class SqliteBackupServiceTests
     [SetUp]
     public void SetUp()
     {
-        _factory = new SqliteConnectionFactory();
-        _backupService = new SqliteBackupService(_factory);
+        _factory = new(new TestLogger<SqliteConnectionFactory>());
+        _backupService = new (_factory);
 
         Directory.CreateDirectory(_databaseDirectory!);
         string databasePath = Path.Combine(_databaseDirectory!, "photomanager.db");

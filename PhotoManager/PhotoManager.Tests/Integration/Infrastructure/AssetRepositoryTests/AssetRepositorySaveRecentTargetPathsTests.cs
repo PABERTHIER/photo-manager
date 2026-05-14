@@ -34,7 +34,7 @@ public class AssetRepositorySaveRecentTargetPathsTests
     public void SetUp()
     {
         _testLogger = new();
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());

@@ -39,7 +39,7 @@ public class AssetRepositoryConstructorTests
         // Create a corrupted .db file with invalid GUID that will cause ReadCatalog to fail
 
         TestLogger<AssetRepository> testLogger = new();
-        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());

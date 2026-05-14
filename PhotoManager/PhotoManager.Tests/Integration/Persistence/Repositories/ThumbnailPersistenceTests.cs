@@ -32,7 +32,7 @@ public class ThumbnailPersistenceTests
     public void SetUp()
     {
         _testLogger = new();
-        SqliteConnectionFactory factory = new();
+        SqliteConnectionFactory factory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService backupService = new(factory);
         _sqlitePersistenceContext = new(factory, backupService, _testLogger);
         _sqlitePersistenceContext.Initialize(_databaseDirectory!);
