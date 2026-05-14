@@ -172,29 +172,26 @@ public class AssetRepositoryWriteBackupTests
     }
 
     [Test]
-    public void WriteBackup_DatabaseThrowsException_LogsItAndThrowsException()
+    public void WriteBackup_DatabaseThrowsException_LogsItAndThrowsSqliteException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + Constants.DATABASE_BACKUP_END_PATH, backupDate.ToString("yyyyMMdd") + ".zip");
-            DirectoryNotFoundException expectedException =
-                new($"Could not find a part of the path '{backupFilePath}'.");
+            SqliteException expectedException = new("SQLite Error 14: 'unable to open database file'.", 14);
 
             SqliteConnection.ClearAllPools();
             Directory.Delete(_databaseDirectory!, true);
 
             using (Assert.EnterMultipleScope())
             {
-                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
-                    _assetRepository!.WriteBackup());
+                SqliteException? exception = Assert.Throws<SqliteException>(() => _assetRepository!.WriteBackup());
 
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+
                 _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }

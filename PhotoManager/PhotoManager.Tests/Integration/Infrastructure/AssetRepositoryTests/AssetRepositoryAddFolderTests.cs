@@ -79,7 +79,6 @@ public class AssetRepositoryAddFolderTests
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
 
-
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2);
 
@@ -95,10 +94,8 @@ public class AssetRepositoryAddFolderTests
             Folder[] folders = _assetRepository!.GetFolders();
 
             Assert.That(folders, Has.Length.EqualTo(2));
-            Assert.That(folders[0].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders[1].Path, Is.EqualTo(folderPath2));
-            Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
+            Assert.That(folders.Any(x => x.Path == folderPath1 && x.Id == addedFolder1.Id), Is.True);
+            Assert.That(folders.Any(x => x.Path == folderPath2 && x.Id == addedFolder2.Id), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -111,7 +108,7 @@ public class AssetRepositoryAddFolderTests
     }
 
     [Test]
-    public void AddFolder_SamePath_AddsFoldersToList()
+    public void AddFolder_SamePath_ReturnsSameFolder()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -130,8 +127,7 @@ public class AssetRepositoryAddFolderTests
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.EqualTo(addedFolder1.Path));
-            Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
-
+            Assert.That(addedFolder2.Id, Is.EqualTo(addedFolder1.Id));
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath1);
@@ -143,15 +139,13 @@ public class AssetRepositoryAddFolderTests
             Assert.That(folderByPath1.Id, Is.EqualTo(addedFolder1.Id));
 
             Assert.That(folderByPath2!.Path, Is.EqualTo(folderPath1));
-            Assert.That(folderByPath2.Id, Is.Not.EqualTo(addedFolder2.Id));
+            Assert.That(folderByPath2.Id, Is.EqualTo(addedFolder2.Id));
 
             Folder[] folders = _assetRepository!.GetFolders();
 
-            Assert.That(folders, Has.Length.EqualTo(2));
+            Assert.That(folders, Has.Length.EqualTo(1));
             Assert.That(folders[0].Path, Is.EqualTo(folderPath1));
             Assert.That(folders[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders[1].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -191,7 +185,6 @@ public class AssetRepositoryAddFolderTests
 
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
-
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2);

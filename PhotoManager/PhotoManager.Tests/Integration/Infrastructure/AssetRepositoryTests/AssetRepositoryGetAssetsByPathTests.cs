@@ -325,7 +325,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Asset[] assets = _assetRepository.GetAssetsByPath(folderPath1);
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset2.FileName));
@@ -342,7 +342,8 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_ThumbnailsAndFolderExistButThumbnailsDictionaryEntriesToKeepIs0_ReturnsEmptyArray()
+    public void
+        GetAssetsByPath_ThumbnailsAndFolderExistButThumbnailsDictionaryEntriesToKeepIs0_ReturnsAssetsWithThumbnails()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -373,10 +374,6 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
-            // Create a new repository with ThumbnailsDictionaryEntriesToKeep = 0 using a fresh database
-            // pointing to the same directory
-            // This ensures Thumbnails[folder.Path] is loaded then immediately evicted by
-            // RemoveOldThumbnailsDictionaryEntries, making Thumbnails.TryGetValue return false
             IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
             configurationRootMock.GetDefaultMockConfig();
             configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
@@ -404,8 +401,10 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Asset[] assets = assetRepository.GetAssetsByPath(folderPath);
 
-            Assert.That(cataloguedAssets2[0].ImageData, Is.Null);
-            Assert.That(assets, Is.Empty);
+            Assert.That(cataloguedAssets2[0].ImageData, Is.Not.Null);
+            Assert.That(assets, Has.Length.EqualTo(1));
+            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets[0].ImageData, Is.Not.Null);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -457,7 +456,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_FolderDoesNotExist_ReturnsEmptyArray()
+    public void GetAssetsByPath_FolderManuallyCreated_ReturnsEmptyArray()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -487,16 +486,21 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
+            Folder? autoCreatedFolder = _assetRepository.GetFolderByPath(folderPath);
+            Assert.That(autoCreatedFolder, Is.Not.Null);
+            Assert.That(autoCreatedFolder!.Path, Is.EqualTo(folderPath));
+
             Asset[] assets = _assetRepository.GetAssetsByPath(folderPath);
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
+            // Because the folder added in the repo has not the same id as the one in the Asset
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            _testLogger!.AssertLogErrors([], typeof(AssetRepository));
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
@@ -615,7 +619,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_ExceptionIsThrown_ReturnsAssetsWithPartialDataAndLogsIt()
+    public void GetAssetsByPath_ExceptionIsThrown_ReturnsEmptyArrayAndLogsIt()
     {
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
@@ -662,9 +666,9 @@ public class AssetRepositoryGetAssetsByPathTests
             cataloguedAssets = assetRepository.GetCataloguedAssets();
 
             Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset3.FileName));
+            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset3.FileName));
             Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
             Asset[] assets = assetRepository.GetAssetsByPath(folderPath);
@@ -674,9 +678,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Assert.That(cataloguedAssets[0].ImageData, Is.Null);
                 Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
-                Assert.That(assets, Has.Length.EqualTo(2));
-                Assert.That(assets[0].FileName, Is.EqualTo(_asset3.FileName));
-                Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
+                Assert.That(assets, Is.Empty);
 
                 imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
                     Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());

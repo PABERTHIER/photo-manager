@@ -241,7 +241,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
+    public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -276,9 +276,11 @@ public class AssetRepositoryAddAssetTests
             assetRepository.AddAsset(_asset1!, assetData);
 
             assets = assetRepository.GetCataloguedAssets();
-            Assert.That(assets, Is.Empty);
+            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
-            Assert.That(assetsUpdatedEvents, Is.Empty);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -415,7 +417,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_ThumbnailDataIsNull_AssetIsAddedAndAssetsUpdatedIsUpdated()
+    public void AddAsset_ThumbnailDataIsNull_AssetIsAddedAndThrowsInvalidOperationException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -423,6 +425,8 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
+            const string exceptionMessage = "Value must be set.";
+
             string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
@@ -431,7 +435,10 @@ public class AssetRepositoryAddAssetTests
             List<Asset> assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            _assetRepository.AddAsset(_asset1!, assetData!);
+            InvalidOperationException? exception =
+                Assert.Throws<InvalidOperationException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
+
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Has.Count.EqualTo(1));
@@ -440,7 +447,8 @@ public class AssetRepositoryAddAssetTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+            Exception expectedException = new(exceptionMessage);
+            _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
         }
         finally
         {

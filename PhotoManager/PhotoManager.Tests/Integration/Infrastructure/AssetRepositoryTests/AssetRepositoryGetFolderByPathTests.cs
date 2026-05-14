@@ -92,7 +92,7 @@ public class AssetRepositoryGetFolderByPathTests
     }
 
     [Test]
-    public void GetFolderByPath_SamePath_ReturnsFirstFolder()
+    public void GetFolderByPath_SamePath_ReturnsSameFolder()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -114,7 +114,9 @@ public class AssetRepositoryGetFolderByPathTests
             Assert.That(folderByPath1.Id, Is.EqualTo(addedFolder1.Id));
 
             Assert.That(folderByPath2!.Path, Is.EqualTo(folderPath1));
-            Assert.That(folderByPath2.Id, Is.Not.EqualTo(addedFolder2.Id));
+            Assert.That(folderByPath2.Id, Is.EqualTo(addedFolder2.Id));
+
+            Assert.That(addedFolder1.Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

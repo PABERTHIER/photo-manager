@@ -79,7 +79,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder3.Path));
 
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
@@ -114,7 +113,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder28"));
             Assert.That(recentTargetPaths[19], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder10"));
 
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
@@ -126,7 +124,7 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
     }
 
     [Test]
-    public void UpdateTargetPathToRecent_PathIsNull_UpdateRecentPathsAndSave()
+    public void UpdateTargetPathToRecent_PathIsNull_ThrowsInvalidOperationException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -141,15 +139,11 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
-            _assetRepository!.UpdateTargetPathToRecent(folder3);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(
+                () => _assetRepository!.UpdateTargetPathToRecent(folder3));
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
-            Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
-            Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
-            Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
-
+            Assert.That(exception?.Message, Is.EqualTo("Value must be set."));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -185,7 +179,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
-
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -223,7 +216,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
 
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
@@ -260,7 +252,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.That(recentTargetPaths.Any(x => x == folder1.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder2.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder3.Path), Is.True);
-
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 

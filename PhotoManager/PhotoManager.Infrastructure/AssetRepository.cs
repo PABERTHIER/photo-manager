@@ -25,15 +25,14 @@ public class AssetRepository : IAssetRepository, IDisposable
     private readonly ConcurrentDictionary<string, Folder> _foldersByPath = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<Guid, Folder> _foldersById = new();
     private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<string, Asset>> _assetsByFolderId = new();
-    private readonly Dictionary<string, List<Asset>> _assetsByHash = new(StringComparer.Ordinal);
 
     private readonly LruCache<Guid, ConcurrentDictionary<string, byte[]>> _thumbnailCache;
 
     private SyncAssetsConfiguration _syncAssetsConfiguration = new();
 
     private readonly Lock _folderCreationLock = new();
-    private readonly Lock _hashIndexLock = new();
     private readonly Lock _recentPathsLock = new();
+    private readonly Lock _backupLock = new();
 
     private readonly Subject<Unit> _assetsUpdatedSubject = new();
     private bool _disposed;
@@ -153,22 +152,6 @@ public class AssetRepository : IAssetRepository, IDisposable
 
             if (_assetsByFolderId.TryRemove(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets))
             {
-                lock (_hashIndexLock)
-                {
-                    foreach (Asset asset in folderAssets.Values)
-                    {
-                        if (_assetsByHash.TryGetValue(asset.Hash, out List<Asset>? bucket))
-                        {
-                            bucket.Remove(asset);
-
-                            if (bucket.Count == 0)
-                            {
-                                _assetsByHash.Remove(asset.Hash);
-                            }
-                        }
-                    }
-                }
-
                 Interlocked.Add(ref _totalAssetCount, -folderAssets.Count);
             }
 
@@ -185,7 +168,8 @@ public class AssetRepository : IAssetRepository, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting folder: {FolderPath}", folder.Path);
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            _logger.LogError(ex, "Error deleting folder: {FolderPath}", folder?.Path);
             throw;
         }
     }
@@ -227,23 +211,26 @@ public class AssetRepository : IAssetRepository, IDisposable
     {
         ThrowIfDisposed();
 
-        if (string.IsNullOrWhiteSpace(asset.Folder.Path))
-        {
-            _logger.LogError("The asset could not be added, folder path is null or empty, asset.FileName: {FileName}",
-                asset.FileName);
-            // return false; // TODO: Temp, update return type + update assertions tests
-        }
-
         try
         {
+            if (string.IsNullOrWhiteSpace(asset.Folder.Path))
+            {
+                _logger.LogError(
+                    "The asset could not be added, folder path is null or empty, asset.FileName: {FileName}",
+                    asset.FileName);
+                return;
+                // return false; // TODO: Temp, update return type + update assertions tests
+            }
+
             AddAssetCore(asset, thumbnailData);
             // return true; // TODO: Temp, update return type + update assertions tests
         }
         catch (Exception ex)
         {
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             _logger.LogError(ex, "Error adding asset: {FileName}, FolderId: {FolderId}",
-                asset.FileName, asset.FolderId);
-            // return false; // TODO: Temp, update return type + update assertions tests
+                asset?.FileName, asset?.FolderId);
+            throw;
         }
     }
 
@@ -299,9 +286,6 @@ public class AssetRepository : IAssetRepository, IDisposable
         }
 
         Asset[] assets = [.. folderAssets.Values];
-
-        // TODO: Why do we need this sort ?
-        Array.Sort(assets, static (a, b) => string.Compare(a.FileName, b.FileName, StringComparison.Ordinal));
 
         return [.. assets]; // TODO: Temp, update return type
     }
@@ -377,17 +361,20 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     public void WriteBackup()
     {
-        try
+        lock (_backupLock)
         {
-            if (_persistenceContext.WriteBackup(DateTime.Now.Date))
+            try
             {
-                _persistenceContext.DeleteOldBackups(_userConfigurationService.StorageSettings.BackupsToKeep);
+                if (_persistenceContext.WriteBackup(DateTime.Now.Date))
+                {
+                    _persistenceContext.DeleteOldBackups(_userConfigurationService.StorageSettings.BackupsToKeep);
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error writing backup");
-            throw;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error writing backup");
+                throw;
+            }
         }
     }
 
@@ -459,7 +446,7 @@ public class AssetRepository : IAssetRepository, IDisposable
     {
         if (Volatile.Read(ref _disposed))
         {
-            throw new ObjectDisposedException(nameof(OptimizedAssetRepository));
+            throw new ObjectDisposedException(nameof(AssetRepository));
         }
     }
 
@@ -505,14 +492,6 @@ public class AssetRepository : IAssetRepository, IDisposable
 
                 folderAssets.TryAdd(asset.FileName, asset);
 
-                if (!_assetsByHash.TryGetValue(asset.Hash, out List<Asset>? assetsByHash))
-                {
-                    assetsByHash = [];
-                    _assetsByHash[asset.Hash] = assetsByHash;
-                }
-
-                assetsByHash.Add(asset);
-
                 _imageMetadataService.UpdateAssetFileProperties(asset);
 
                 count++;
@@ -553,21 +532,9 @@ public class AssetRepository : IAssetRepository, IDisposable
         folderAssets[asset.FileName] = asset;
         Interlocked.Increment(ref _totalAssetCount);
 
-        lock (_hashIndexLock)
-        {
-            if (!_assetsByHash.TryGetValue(asset.Hash, out List<Asset>? assetsByHash))
-            {
-                assetsByHash = [];
-                _assetsByHash[asset.Hash] = assetsByHash;
-            }
-
-            assetsByHash.Add(asset);
-        }
-
         _persistenceContext.Assets.Upsert(asset);
-        _persistenceContext.Thumbnails.Upsert(asset.FolderId, asset.FileName, thumbnailData);
-
         _assetsUpdatedSubject.OnNext(Unit.Default);
+        _persistenceContext.Thumbnails.Upsert(asset.FolderId, asset.FileName, thumbnailData);
     }
 
     private Asset? RemoveAsset(string directory, string deletedFileName)
@@ -604,28 +571,10 @@ public class AssetRepository : IAssetRepository, IDisposable
             && folderAssets.TryRemove(deletedFileName, out assetToDelete))
         {
             Interlocked.Decrement(ref _totalAssetCount);
-            DeleteAssetInternal(assetToDelete);
+            _persistenceContext.Assets.Delete(assetToDelete.FolderId, assetToDelete.FileName);
         }
 
         return assetToDelete;
-    }
-
-    private void DeleteAssetInternal(Asset asset)
-    {
-        lock (_hashIndexLock)
-        {
-            if (_assetsByHash.TryGetValue(asset.Hash, out List<Asset>? assetsByHash))
-            {
-                assetsByHash.Remove(asset);
-
-                if (assetsByHash.Count == 0)
-                {
-                    _assetsByHash.Remove(asset.Hash);
-                }
-            }
-        }
-
-        _persistenceContext.Assets.Delete(asset.FolderId, asset.FileName);
     }
 
     private Asset[] GetAssetsByFolderId(Guid folderId)
@@ -635,12 +584,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             return [];
         }
 
-        Asset[] assets = [.. folderAssets.Values];
-
-        // TODO: Why do we need this sort ?
-        Array.Sort(assets, static (a, b) => string.Compare(a.FileName, b.FileName, StringComparison.Ordinal));
-
-        return assets;
+        return [.. folderAssets.Values];
     }
 
     private void LoadOrFetchThumbnails(Folder folder, Asset[] assets)

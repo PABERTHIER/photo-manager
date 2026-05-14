@@ -138,7 +138,7 @@ public class AssetRepositoryLoadThumbnailTests
     }
 
     [Test]
-    public void LoadThumbnail_FolderDoesNotExist_ReturnsBitmapImage()
+    public void LoadThumbnail_FolderDoesNotExist_ReturnsNull()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -165,7 +165,7 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.That(bitmapImage, Is.Not.Null);
+            Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
             Assert.That(assets, Has.Count.EqualTo(1));
@@ -297,6 +297,123 @@ public class AssetRepositoryLoadThumbnailTests
         finally
         {
             assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void LoadThumbnail_ThumbnailMissingFromCacheAndDatabase_DeletesOrphanedAssetAndFiresAssetsUpdatedEvent()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "1");
+
+        SqliteConnectionFactory sqliteConnectionFactory = new();
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(sqliteConnectionFactory, sqliteBackupService,
+            new TestLogger<SqlitePersistenceContext>());
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+        TestLogger<AssetRepository> testLogger = new();
+
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, testLogger);
+
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+
+            string filePath1 = Path.Combine(folderPath1, _asset1!.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+
+            // Add folder1 + asset1 → thumbnail occupies the single LRU slot
+            Folder folder1 = assetRepository.AddFolder(folderPath1);
+            _asset1 = _asset1.WithFolder(folder1);
+            assetRepository.AddAsset(_asset1, assetData1);
+
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+
+            // Add folder2 + asset2 → evicts folder1 from LRU (capacity = 1)
+            Folder folder2 = assetRepository.AddFolder(folderPath2);
+            Asset asset2 = new()
+            {
+                Folder = folder2,
+                FolderId = folder2.Id,
+                FileName = FileNames.IMAGE_9_PNG,
+                ImageRotation = Rotation.Rotate0,
+                Pixel = new()
+                {
+                    Asset = new()
+                    {
+                        Width = PixelWidthAsset.IMAGE_9_PNG,
+                        Height = PixelHeightAsset.IMAGE_9_PNG
+                    },
+                    Thumbnail = new()
+                    {
+                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
+                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
+                    }
+                },
+                FileProperties = new()
+                {
+                    Size = FileSize.IMAGE_9_PNG,
+                    Creation = DateTime.Now,
+                    Modification = ModificationDate.Default
+                },
+                ThumbnailCreationDateTime = DateTime.Now,
+                Hash = Hashes.IMAGE_9_PNG,
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = false, Message = null },
+                    Rotated = new() { IsTrue = false, Message = null }
+                }
+            };
+
+            assetRepository.AddAsset(asset2, [1, 2, 3]);
+
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
+            // LRU now: [folder2 only] — folder1 has been evicted
+
+            // Simulate DB inconsistency: remove asset1's thumbnail from the
+            // database so that a subsequent load will find neither cache nor DB entry
+            sqlitePersistenceContext.Thumbnails.Delete(folder1.Id, _asset1.FileName);
+
+            // asset1 still lives in _assetsByFolderId[folder1.Id],
+            // but its thumbnail is now absent from both cache and DB
+            BitmapImage? result = assetRepository.LoadThumbnail(folderPath1,
+                _asset1.FileName, _asset1.Pixel.Thumbnail.Width, _asset1.Pixel.Thumbnail.Height);
+
+            List<Asset> cataloguedAssets = assetRepository.GetCataloguedAssets();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result, Is.Null);
+
+                // One additional event emitted by the orphan-cleanup path
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
+
+                // asset1 removed from catalog; asset2 unaffected
+                Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+                Assert.That(cataloguedAssets.Any(a => a.FileName == asset2.FileName), Is.True);
+                Assert.That(cataloguedAssets.Any(a => a.FileName == _asset1.FileName), Is.False);
+
+                testLogger.AssertLogExceptions([], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+            assetRepository.Dispose();
+            testLogger.LoggingAssertTearDown();
         }
     }
 

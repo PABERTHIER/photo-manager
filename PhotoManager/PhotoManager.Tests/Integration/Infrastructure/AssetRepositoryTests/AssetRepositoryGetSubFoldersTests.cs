@@ -89,9 +89,9 @@ public class AssetRepositoryGetSubFoldersTests
             Assert.That(parentFolders1[0].Path, Is.EqualTo(childFolderPath1));
 
             Assert.That(parentFolders2, Is.Not.Empty);
-            Assert.That(parentFolders2, Has.Length.EqualTo(2));
-            Assert.That(parentFolders2[0].Path, Is.EqualTo(childFolderPath2));
-            Assert.That(parentFolders2[1].Path, Is.EqualTo(childFolderPath3));
+            Assert.That(parentFolders2, Has.Length.EqualTo(1));
+            Assert.That(parentFolders2.Any(x => x.Path == childFolderPath2), Is.True);
+            Assert.That(parentFolders2.Any(x => x.Path == childFolderPath3), Is.True);
 
             Assert.That(childFolders1, Is.Empty);
             Assert.That(childFolders2, Is.Empty);
@@ -168,7 +168,7 @@ public class AssetRepositoryGetSubFoldersTests
     }
 
     [Test]
-    public void GetSubFolders_ParentFolderIsNull_ThrowsArgumentException()
+    public void GetSubFolders_ParentFolderIsNull_ThrowsNullReferenceException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -179,12 +179,12 @@ public class AssetRepositoryGetSubFoldersTests
 
             string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
+            _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the loop
 
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => _assetRepository!.GetSubFolders(parentFolder1!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
