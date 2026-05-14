@@ -45,9 +45,12 @@ public class MoveAssetsServiceTests
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>(),
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         _assetCreationService = new(_testableAssetRepository, _fileOperationsService, imageProcessingService,

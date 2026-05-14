@@ -56,6 +56,7 @@ public class AssetRepository : IAssetRepository, IDisposable
         _userConfigurationService = userConfigurationService;
         _persistenceContext = persistenceContext;
         _logger = logger;
+
         _dataDirectory = pathProviderService.ResolveDataDirectory();
 
         ushort cacheCapacity = userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;

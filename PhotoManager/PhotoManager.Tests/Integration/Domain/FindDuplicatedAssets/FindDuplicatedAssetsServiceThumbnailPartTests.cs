@@ -105,9 +105,12 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>(),
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {

@@ -1,31 +1,23 @@
 ﻿using Microsoft.Extensions.Logging;
+using PhotoManager.Persistence;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
-// TODO: Discard temp fix
-public class TestableAssetRepository : AssetRepository
-{
-    private static SqlitePersistenceContext? _sqlitePersistenceContext;
-
-    public TestableAssetRepository(IPathProviderService pathProviderService,
-        IImageProcessingService imageProcessingService,
-        IImageMetadataService imageMetadataService,
-        IUserConfigurationService userConfigurationService,
-        ILogger<AssetRepository> logger,
-        ILogger<SqlitePersistenceContext> persistenceContextLogger,
-        ILogger<OptimizedAssetRepository> optimizedAssetRepositoryLogger) : base(pathProviderService,
+public class TestableAssetRepository(
+    IPathProviderService pathProviderService,
+    IImageProcessingService imageProcessingService,
+    IImageMetadataService imageMetadataService,
+    IUserConfigurationService userConfigurationService,
+    IPersistenceContext persistenceContext,
+    ILogger<AssetRepository> logger)
+    : AssetRepository(
+        pathProviderService,
         imageProcessingService,
         imageMetadataService,
         userConfigurationService,
-        _sqlitePersistenceContext!,
+        persistenceContext,
         logger)
-    {
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        _sqlitePersistenceContext = new(sqliteConnectionFactory, sqliteBackupService,
-            new TestLogger<SqlitePersistenceContext>());
-    }
-
+{
     public new IObservable<System.Reactive.Unit> AssetsUpdated => base.AssetsUpdated;
 
     public new Asset[] GetAssetsByPath(string directory) => base.GetAssetsByPath(directory);

@@ -440,9 +440,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>(),
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,

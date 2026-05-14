@@ -36,9 +36,12 @@ public class ApplicationGetCatalogCooldownMinutesTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>(),
-            new TestLogger<SqlitePersistenceContext>(), new TestLogger<OptimizedAssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
