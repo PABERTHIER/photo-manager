@@ -51,7 +51,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        _cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath);
+        _cataloguedAssetsByPath = [.. _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath)];
     }
 
     public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default)
@@ -172,7 +172,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
         _currentFolderPath = directory;
         // Explicit refresh for the new folder (not suppressed by the reactive guard)
-        _cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath);
+        _cataloguedAssetsByPath = [.. _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath)];
 
         if (_fileOperationsService.FolderExists(directory))
         {

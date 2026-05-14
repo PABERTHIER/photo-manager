@@ -112,10 +112,10 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> cataloguedAssets1 = _assetRepository.GetCataloguedAssetsByPath(folderPath1);
-            List<Asset> cataloguedAssets2 = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
+            Asset[] cataloguedAssets1 = _assetRepository.GetCataloguedAssetsByPath(folderPath1);
+            Asset[] cataloguedAssets2 = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
 
-            Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets1, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets2, Is.Empty);
 
             Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName,
@@ -152,7 +152,7 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
+            Asset[] cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
 
             Assert.That(cataloguedAssets, Is.Empty);
 
@@ -226,8 +226,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> cataloguedAssets1 = [];
-            List<Asset> cataloguedAssets2 = [];
+            Asset[] cataloguedAssets1 = [];
+            Asset[] cataloguedAssets2 = [];
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -235,7 +235,7 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
                 () => cataloguedAssets2 = _assetRepository.GetCataloguedAssetsByPath(folderPath2)
             );
 
-            Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets1, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets2, Is.Empty);
 
             Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName,

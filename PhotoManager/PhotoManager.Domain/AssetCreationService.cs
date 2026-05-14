@@ -287,7 +287,7 @@ public class AssetCreationService(
         };
 
         imageMetadataService.UpdateAssetFileProperties(asset);
-        assetRepository.AddAsset(asset, thumbnailBuffer);
+        assetRepository.AddAsset(asset, thumbnailBuffer); // TODO: Check the result and log if false
 
         return asset;
     }

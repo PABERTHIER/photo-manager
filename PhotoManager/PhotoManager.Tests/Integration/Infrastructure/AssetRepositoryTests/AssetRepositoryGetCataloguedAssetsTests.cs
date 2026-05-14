@@ -139,10 +139,10 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(assets, Is.Not.Empty);
-            Assert.That(assets, Has.Count.EqualTo(2));
+            Assert.That(assets, Has.Length.EqualTo(2));
             Assert.That(assets.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
@@ -166,7 +166,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
         try
         {
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(assets, Is.Empty);
 
@@ -202,9 +202,9 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> assets1 = [];
-            List<Asset> assets2 = [];
-            List<Asset> assets3 = [];
+            Asset[] assets1 = [];
+            Asset[] assets2 = [];
+            Asset[] assets3 = [];
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -214,17 +214,17 @@ public class AssetRepositoryGetCataloguedAssetsTests
             );
 
             Assert.That(assets1, Is.Not.Empty);
-            Assert.That(assets1, Has.Count.EqualTo(2));
+            Assert.That(assets1, Has.Length.EqualTo(2));
             Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets2, Is.Not.Empty);
-            Assert.That(assets2, Has.Count.EqualTo(2));
+            Assert.That(assets2, Has.Length.EqualTo(2));
             Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets3, Is.Not.Empty);
-            Assert.That(assets3, Has.Count.EqualTo(2));
+            Assert.That(assets3, Has.Length.EqualTo(2));
             Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 

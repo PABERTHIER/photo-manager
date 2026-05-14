@@ -122,8 +122,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(bitmapImage, Is.Not.Null);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Asset[] assets = _assetRepository.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -167,8 +167,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(bitmapImage, Is.Null);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Asset[] assets = _assetRepository.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -198,7 +198,7 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(bitmapImage, Is.Null);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
+            Asset[] assets = _assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -389,7 +389,7 @@ public class AssetRepositoryLoadThumbnailTests
             BitmapImage? result = assetRepository.LoadThumbnail(folderPath1,
                 _asset1.FileName, _asset1.Pixel.Thumbnail.Width, _asset1.Pixel.Thumbnail.Height);
 
-            List<Asset> cataloguedAssets = assetRepository.GetCataloguedAssets();
+            Asset[] cataloguedAssets = assetRepository.GetCataloguedAssets();
 
             using (Assert.EnterMultipleScope())
             {
@@ -402,7 +402,7 @@ public class AssetRepositoryLoadThumbnailTests
                 Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
                 // asset1 removed from catalog; asset2 unaffected
-                Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+                Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
                 Assert.That(cataloguedAssets.Any(a => a.FileName == asset2.FileName), Is.True);
                 Assert.That(cataloguedAssets.Any(a => a.FileName == _asset1.FileName), Is.False);
 
@@ -466,8 +466,8 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(bitmapImage2, Is.Not.Null);
             Assert.That(bitmapImage3, Is.Not.Null);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Asset[] assets = _assetRepository.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));

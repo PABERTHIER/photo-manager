@@ -4,8 +4,6 @@ namespace PhotoManager.Persistence;
 
 /// <summary>
 /// High-level facade for the new SQLite-backed persistence engine.
-/// Replaces <c>PhotoManager.Infrastructure.Database.IDatabase</c> at the
-/// boundary used by the new <c>OptimizedAssetRepository</c>.
 /// All operations are thread-safe (every call opens its own connection
 /// and releases it).
 /// </summary>

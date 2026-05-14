@@ -63,16 +63,16 @@ public class AssetRepositorySaveRecentTargetPathsTests
 
         try
         {
-            List<string> recentTargetPathsToSave =
+            string[] recentTargetPathsToSave =
             [
                 "D:\\Workspace\\PhotoManager\\Toto",
                 "D:\\Workspace\\PhotoManager\\Tutu"
             ];
 
             _assetRepository!.SaveRecentTargetPaths(recentTargetPathsToSave);
-            List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(2));
             Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
             Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
@@ -101,7 +101,7 @@ public class AssetRepositorySaveRecentTargetPathsTests
 
         try
         {
-            List<string> recentTargetPathsToSave =
+            string[] recentTargetPathsToSave =
             [
                 "D:\\Workspace\\PhotoManager\\Toto",
                 "D:\\Workspace\\PhotoManager\\Tutu"
@@ -114,9 +114,9 @@ public class AssetRepositorySaveRecentTargetPathsTests
                 () => _assetRepository!.SaveRecentTargetPaths(recentTargetPathsToSave)
             );
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(2));
             Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
             Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 

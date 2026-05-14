@@ -30,8 +30,8 @@ public class TestableAssetRepository(
     public new Folder? GetFolderByPath(string path) => base.GetFolderByPath(path);
     public new bool BackupExists() => base.BackupExists();
     public new void WriteBackup() => base.WriteBackup();
-    public new List<Asset> GetCataloguedAssets() => base.GetCataloguedAssets();
-    public new List<Asset> GetCataloguedAssetsByPath(string directory) => base.GetCataloguedAssetsByPath(directory);
+    public new List<Asset> GetCataloguedAssets() => [.. base.GetCataloguedAssets()];
+    public new List<Asset> GetCataloguedAssetsByPath(string directory) => [.. base.GetCataloguedAssetsByPath(directory)];
 
     public new bool IsAssetCatalogued(string directoryName, string fileName) => base.IsAssetCatalogued(
         directoryName, fileName);
@@ -42,18 +42,17 @@ public class TestableAssetRepository(
     public new void DeleteFolder(Folder folder) => base.DeleteFolder(folder);
 
     public new BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height) =>
-        base.LoadThumbnail(
-            directoryName, fileName, width, height);
+        base.LoadThumbnail(directoryName, fileName, width, height);
 
     public new SyncAssetsConfiguration GetSyncAssetsConfiguration() => base.GetSyncAssetsConfiguration();
 
     public new void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration) =>
         base.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
 
-    public new List<string> GetRecentTargetPaths() => base.GetRecentTargetPaths();
+    public new List<string> GetRecentTargetPaths() => [.. base.GetRecentTargetPaths()];
 
-    public new void SaveRecentTargetPaths(List<string> recentTargetPaths) => base.SaveRecentTargetPaths(
-        recentTargetPaths);
+    public void SaveRecentTargetPaths(List<string> recentTargetPaths) => base.SaveRecentTargetPaths(
+        [.. recentTargetPaths]);
 
     public new void UpdateTargetPathToRecent(Folder destinationFolder) => base.UpdateTargetPathToRecent(
         destinationFolder);

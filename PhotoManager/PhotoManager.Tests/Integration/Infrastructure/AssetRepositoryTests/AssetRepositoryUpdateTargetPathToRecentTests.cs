@@ -72,9 +72,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             _assetRepository!.UpdateTargetPathToRecent(folder3);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder3.Path));
@@ -106,9 +106,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
                 });
             }
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(20));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(20));
             Assert.That(recentTargetPaths[0], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder29"));
             Assert.That(recentTargetPaths[1], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder28"));
             Assert.That(recentTargetPaths[19], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder10"));
@@ -173,9 +173,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             _assetRepository!.UpdateTargetPathToRecent(folder2);
             _assetRepository!.UpdateTargetPathToRecent(folder3);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
@@ -210,9 +210,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(2));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
 
@@ -246,9 +246,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
                 () => _assetRepository!.UpdateTargetPathToRecent(folder3)
             );
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths.Any(x => x == folder1.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder2.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder3.Path), Is.True);

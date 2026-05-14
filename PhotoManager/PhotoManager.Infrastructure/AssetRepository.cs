@@ -208,7 +208,7 @@ public class AssetRepository : IAssetRepository, IDisposable
         }
     }
 
-    public void AddAsset(Asset asset, byte[] thumbnailData) // bool
+    public bool AddAsset(Asset asset, byte[] thumbnailData)
     {
         ThrowIfDisposed();
 
@@ -219,12 +219,11 @@ public class AssetRepository : IAssetRepository, IDisposable
                 _logger.LogError(
                     "The asset could not be added, folder path is null or empty, asset.FileName: {FileName}",
                     asset.FileName);
-                return;
-                // return false; // TODO: Temp, update return type + update assertions tests
+                return false;
             }
 
             AddAssetCore(asset, thumbnailData);
-            // return true; // TODO: Temp, update return type + update assertions tests
+            return true;
         }
         catch (Exception ex)
         {
@@ -257,7 +256,7 @@ public class AssetRepository : IAssetRepository, IDisposable
         return deletedAsset;
     }
 
-    public List<Asset> GetCataloguedAssets() // Asset[]
+    public Asset[] GetCataloguedAssets()
     {
         Asset[] assets = [.. _assetsByFolderId.Values.SelectMany(static inner => inner.Values)];
 
@@ -269,10 +268,10 @@ public class AssetRepository : IAssetRepository, IDisposable
             return compare != 0 ? compare : string.Compare(a.Folder.Path, b.Folder.Path, StringComparison.Ordinal);
         });
 
-        return [.. assets]; // TODO: Temp, update return type
+        return assets;
     }
 
-    public List<Asset> GetCataloguedAssetsByPath(string directory) // Asset[]
+    public Asset[] GetCataloguedAssetsByPath(string directory)
     {
         Folder? folder = GetFolderByPath(directory);
 
@@ -286,9 +285,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             return [];
         }
 
-        Asset[] assets = [.. folderAssets.Values];
-
-        return [.. assets]; // TODO: Temp, update return type
+        return [.. folderAssets.Values];
     }
 
     public bool IsAssetCatalogued(string directoryName, string fileName)
@@ -393,16 +390,14 @@ public class AssetRepository : IAssetRepository, IDisposable
         _persistenceContext.SyncDefinitions.Replace(syncAssetsConfiguration.Definitions);
     }
 
-    public List<string> GetRecentTargetPaths() // string[]
+    public string[] GetRecentTargetPaths()
     {
-        // return Volatile.Read(ref _recentTargetPaths);
-        return [.. Volatile.Read(ref _recentTargetPaths)]; // TODO: Temp, update return type
+        return Volatile.Read(ref _recentTargetPaths);
     }
 
-    public void SaveRecentTargetPaths(List<string> recentTargetPaths) // TODO: Temp, update param type -> string[]
+    public void SaveRecentTargetPaths(string[] recentTargetPaths)
     {
-        // Volatile.Write(ref _recentTargetPaths, recentTargetPaths);
-        Volatile.Write(ref _recentTargetPaths, [.. recentTargetPaths]);
+        Volatile.Write(ref _recentTargetPaths, recentTargetPaths);
 
         _persistenceContext.RecentPaths.Replace(recentTargetPaths);
     }

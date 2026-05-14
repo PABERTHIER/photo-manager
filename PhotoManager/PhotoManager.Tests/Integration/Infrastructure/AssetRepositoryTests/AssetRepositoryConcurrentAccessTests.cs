@@ -247,13 +247,13 @@ public class AssetRepositoryConcurrentAccessTests
                     DeleteAssetsNotInSource = false
                 });
 
-            List<string> recentTargetPathsToSave =
+            string[] recentTargetPathsToSave =
             [
                 "D:\\Workspace\\PhotoManager\\Toto",
                 "D:\\Workspace\\PhotoManager\\Tutu"
             ];
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             // DeleteAsset
@@ -327,7 +327,7 @@ public class AssetRepositoryConcurrentAccessTests
             using (Assert.EnterMultipleScope())
             {
                 cataloguedAssets = _assetRepository!.GetCataloguedAssets();
-                Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
+                Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
                 Assert.That(cataloguedAssets.Any(x => x.FileName == _asset1.FileName), Is.True);
                 Assert.That(cataloguedAssets.Any(x => x.FileName == _asset2.FileName), Is.True);
                 Assert.That(cataloguedAssets.Any(x => x.FileName == _asset3.FileName), Is.True);

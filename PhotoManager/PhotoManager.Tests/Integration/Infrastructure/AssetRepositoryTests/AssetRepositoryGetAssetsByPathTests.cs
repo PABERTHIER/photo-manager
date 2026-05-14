@@ -174,7 +174,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath3 = Path.Combine(folderPath2, _asset3.FileName);
             byte[] assetData3 = File.ReadAllBytes(filePath3);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1, assetData1);
@@ -188,7 +188,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
@@ -257,7 +257,7 @@ public class AssetRepositoryGetAssetsByPathTests
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
-            List<Asset> cataloguedAssets = assetRepository.GetCataloguedAssets();
+            Asset[] cataloguedAssets = assetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             assetRepository.AddAsset(_asset1, assetData);
@@ -267,7 +267,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = assetRepository.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
@@ -309,7 +309,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath = Path.Combine(folderPath2, _asset2.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset2, assetData);
@@ -319,7 +319,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset2.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
@@ -360,7 +360,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath = Path.Combine(folderPath, _asset1.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1, assetData);
@@ -370,7 +370,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
@@ -394,8 +394,8 @@ public class AssetRepositoryGetAssetsByPathTests
             assetRepository = new(pathProviderServiceMock, imageProcessingService,
                 imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
-            List<Asset> cataloguedAssets2 = assetRepository.GetCataloguedAssets();
-            Assert.That(cataloguedAssets2, Has.Count.EqualTo(1));
+            Asset[] cataloguedAssets2 = assetRepository.GetCataloguedAssets();
+            Assert.That(cataloguedAssets2, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets2[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets2[0].ImageData, Is.Null);
 
@@ -431,7 +431,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1!, assetData);
@@ -472,7 +472,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath = Path.Combine(_dataDirectory!, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1!, assetData);
@@ -482,7 +482,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
@@ -520,7 +520,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             _assetRepository!.AddFolder(folderPath);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             Asset[] assets = _assetRepository.GetAssetsByPath(folderPath);
@@ -550,7 +550,7 @@ public class AssetRepositoryGetAssetsByPathTests
         {
             string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             Asset[] assets = _assetRepository.GetAssetsByPath(folderPath);
@@ -585,7 +585,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath1 = Path.Combine(folderPath, _asset1.FileName);
             byte[] assetData = File.ReadAllBytes(filePath1);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1, assetData);
@@ -595,7 +595,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
@@ -653,7 +653,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath2 = Path.Combine(folderPath, _asset2.FileName);
             byte[] assetData2 = File.ReadAllBytes(filePath2);
 
-            List<Asset> cataloguedAssets = assetRepository.GetCataloguedAssets();
+            Asset[] cataloguedAssets = assetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             assetRepository.AddAsset(_asset3, assetData1);
@@ -665,7 +665,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = assetRepository.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(2));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset3.FileName));
@@ -724,7 +724,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string filePath3 = Path.Combine(folderPath2, _asset3.FileName);
             byte[] assetData3 = File.ReadAllBytes(filePath3);
 
-            List<Asset> cataloguedAssets = _assetRepository!.GetCataloguedAssets();
+            Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             _assetRepository.AddAsset(_asset1, assetData1);
@@ -738,7 +738,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
+            Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));

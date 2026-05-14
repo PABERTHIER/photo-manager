@@ -114,8 +114,9 @@ public class AssetRepositoryDeleteAssetTests
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
             Asset? assetDeleted1 = _assetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
@@ -174,7 +175,7 @@ public class AssetRepositoryDeleteAssetTests
 
             assetRepository.AddFolder(folderPath);
 
-            List<Asset> assets = assetRepository.GetCataloguedAssets();
+            Asset[] assets = assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
             Asset? assetDeleted = assetRepository.DeleteAsset(folderPath, FileNames.NON_EXISTENT_FILE_JPG);
@@ -214,8 +215,9 @@ public class AssetRepositoryDeleteAssetTests
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -263,8 +265,9 @@ public class AssetRepositoryDeleteAssetTests
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -315,8 +318,8 @@ public class AssetRepositoryDeleteAssetTests
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-                List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-                Assert.That(assets, Has.Count.EqualTo(1));
+                Asset[] assets = _assetRepository!.GetCataloguedAssets();
+                Assert.That(assets, Has.Length.EqualTo(1));
                 Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
@@ -355,7 +358,7 @@ public class AssetRepositoryDeleteAssetTests
         {
             string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
 
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
             Asset? assetDeleted = _assetRepository!.DeleteAsset(folderPath1, FileNames.NON_EXISTENT_FILE_JPG);
@@ -395,8 +398,8 @@ public class AssetRepositoryDeleteAssetTests
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
             Asset? assetDeleted1 = null;

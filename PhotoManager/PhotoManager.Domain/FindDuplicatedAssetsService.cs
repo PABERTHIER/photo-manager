@@ -16,7 +16,7 @@ public class FindDuplicatedAssetsService(
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets()
     {
-        List<Asset> assets = assetRepository.GetCataloguedAssets();
+        Asset[] assets = assetRepository.GetCataloguedAssets();
 
         if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
@@ -44,7 +44,7 @@ public class FindDuplicatedAssetsService(
     // DHash the hammingDistance is 5/14
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    private List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, ushort threshold)
+    private List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(Asset[] assets, ushort threshold)
     {
         List<Asset> validAssets = assets
             .AsParallel()

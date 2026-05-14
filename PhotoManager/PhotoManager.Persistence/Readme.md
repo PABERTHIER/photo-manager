@@ -119,7 +119,7 @@ PR — not blocking for the migration since both engines coexist.
 
 ## 6. Threading & observers
 
-`OptimizedAssetRepository` uses a reentrant `Lock` (`Monitor`) for in-memory
+`AssetRepository` uses a reentrant `Lock` (`Monitor`) for in-memory
 state (indexes, cache, change flag). We **deliberately avoided
 `ReaderWriterLockSlim`** because subscribers of `AssetsUpdated` may call back
 into the repository synchronously, and `ReaderWriterLockSlim` is not reentrant
@@ -134,9 +134,9 @@ read/write concurrency.
 
 ---
 
-## 7. OptimizedAssetRepository — what's new
+## 7. AssetRepository — what's new
 
-`PhotoManager.Infrastructure.OptimizedAssetRepository` is a drop-in
+`PhotoManager.Infrastructure.AssetRepository` is a drop-in
 `IAssetRepository`. Public contract is **byte-compatible** with the legacy
 repository (including legacy quirks: duplicate folders allowed,
 `LoadThumbnail` repair-on-miss). The internals are different:
@@ -165,7 +165,7 @@ What we deliberately did **not** do:
 ```csharp
 // PhotoManager.Infrastructure/InfrastructureServiceCollectionExtensions.cs
 services.AddPersistence();  // registers SqliteConnectionFactory, SqliteBackupService, SqlitePersistenceContext
-services.AddSingleton<IOptimizedAssetRepository, OptimizedAssetRepository>();
+services.AddSingleton<IAssetRepository, AssetRepository>();
 ```
 
 In `App.xaml.cs`, the call chain remains
