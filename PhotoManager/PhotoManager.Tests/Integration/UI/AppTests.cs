@@ -141,7 +141,7 @@ public class AppTests
         Assert.That(persistenceContextDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(persistenceContextDescriptor.ImplementationType,
             Is.EqualTo(typeof(SqlitePersistenceContext)));
-        
+
         // Infrastructure
         userConfigurationServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IUserConfigurationService));
