@@ -1177,6 +1177,13 @@ public class FindDuplicatedAssetsViewModelDHashTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureFindDuplicatedAssetsViewModel(int catalogBatchSize, string assetsDirectory,
         int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash,
         bool analyseVideos)
@@ -1845,7 +1852,6 @@ public class FindDuplicatedAssetsViewModelDHashTests
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }

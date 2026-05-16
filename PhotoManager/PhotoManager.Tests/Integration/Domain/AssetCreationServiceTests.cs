@@ -50,6 +50,7 @@ public class AssetCreationServiceTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -280,51 +281,44 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
+        string folderPath = Path.Combine(_dataDirectory!, additionalPath);
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+
+        string imagePath = Path.Combine(folderPath, fileName);
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
         {
-            string folderPath = Path.Combine(_dataDirectory!, additionalPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+            AssertAssetPropertyValidity(
+                asset!,
+                fileName,
+                imagePath,
+                folderPath,
+                folder,
+                fileSize,
+                pixelWidth,
+                pixelHeight,
+                thumbnailPixelWidth,
+                thumbnailPixelHeight,
+                ModificationDate.Default,
+                imageRotation,
+                hash,
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
-            string imagePath = Path.Combine(folderPath, fileName);
-            Assert.That(File.Exists(imagePath), Is.True);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
-
-            Assert.That(asset, Is.Not.Null);
-
-            using (Assert.EnterMultipleScope())
-            {
-                AssertAssetPropertyValidity(
-                    asset!,
-                    fileName,
-                    imagePath,
-                    folderPath,
-                    folder,
-                    fileSize,
-                    pixelWidth,
-                    pixelHeight,
-                    thumbnailPixelWidth,
-                    thumbnailPixelHeight,
-                    ModificationDate.Default,
-                    imageRotation,
-                    hash,
-                    isCorrupted,
-                    corruptedMessage,
-                    isRotated,
-                    rotatedMessage);
-
-                AssertCataloguedAssetValidity(asset!);
-            }
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+            AssertCataloguedAssetValidity(asset!);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -514,51 +508,44 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, true, false);
 
-        try
+        string folderPath = Path.Combine(_dataDirectory!, additionalPath);
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+
+        string imagePath = Path.Combine(folderPath, fileName);
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
         {
-            string folderPath = Path.Combine(_dataDirectory!, additionalPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+            AssertAssetPropertyValidity(
+                asset!,
+                fileName,
+                imagePath,
+                folderPath,
+                folder,
+                fileSize,
+                pixelWidth,
+                pixelHeight,
+                thumbnailPixelWidth,
+                thumbnailPixelHeight,
+                ModificationDate.Default,
+                imageRotation,
+                hash,
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
-            string imagePath = Path.Combine(folderPath, fileName);
-            Assert.That(File.Exists(imagePath), Is.True);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
-
-            Assert.That(asset, Is.Not.Null);
-
-            using (Assert.EnterMultipleScope())
-            {
-                AssertAssetPropertyValidity(
-                    asset!,
-                    fileName,
-                    imagePath,
-                    folderPath,
-                    folder,
-                    fileSize,
-                    pixelWidth,
-                    pixelHeight,
-                    thumbnailPixelWidth,
-                    thumbnailPixelHeight,
-                    ModificationDate.Default,
-                    imageRotation,
-                    hash,
-                    isCorrupted,
-                    corruptedMessage,
-                    isRotated,
-                    rotatedMessage);
-
-                AssertCataloguedAssetValidity(asset!);
-            }
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+            AssertCataloguedAssetValidity(asset!);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -748,51 +735,44 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, true, false, false, false);
 
-        try
+        string folderPath = Path.Combine(_dataDirectory!, additionalPath);
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+
+        string imagePath = Path.Combine(folderPath, fileName);
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
         {
-            string folderPath = Path.Combine(_dataDirectory!, additionalPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+            AssertAssetPropertyValidity(
+                asset!,
+                fileName,
+                imagePath,
+                folderPath,
+                folder,
+                fileSize,
+                pixelWidth,
+                pixelHeight,
+                thumbnailPixelWidth,
+                thumbnailPixelHeight,
+                ModificationDate.Default,
+                imageRotation,
+                hash,
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
-            string imagePath = Path.Combine(folderPath, fileName);
-            Assert.That(File.Exists(imagePath), Is.True);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
-
-            Assert.That(asset, Is.Not.Null);
-
-            using (Assert.EnterMultipleScope())
-            {
-                AssertAssetPropertyValidity(
-                    asset!,
-                    fileName,
-                    imagePath,
-                    folderPath,
-                    folder,
-                    fileSize,
-                    pixelWidth,
-                    pixelHeight,
-                    thumbnailPixelWidth,
-                    thumbnailPixelHeight,
-                    ModificationDate.Default,
-                    imageRotation,
-                    hash,
-                    isCorrupted,
-                    corruptedMessage,
-                    isRotated,
-                    rotatedMessage);
-
-                AssertCataloguedAssetValidity(asset!);
-            }
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+            AssertCataloguedAssetValidity(asset!);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -990,51 +970,44 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, true, false, false);
 
-        try
+        string folderPath = Path.Combine(_dataDirectory!, additionalPath);
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+
+        string imagePath = Path.Combine(folderPath, fileName);
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
         {
-            string folderPath = Path.Combine(_dataDirectory!, additionalPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+            AssertAssetPropertyValidity(
+                asset!,
+                fileName,
+                imagePath,
+                folderPath,
+                folder,
+                fileSize,
+                pixelWidth,
+                pixelHeight,
+                thumbnailPixelWidth,
+                thumbnailPixelHeight,
+                ModificationDate.Default,
+                imageRotation,
+                hash,
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
-            string imagePath = Path.Combine(folderPath, fileName);
-            Assert.That(File.Exists(imagePath), Is.True);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
-
-            Assert.That(asset, Is.Not.Null);
-
-            using (Assert.EnterMultipleScope())
-            {
-                AssertAssetPropertyValidity(
-                    asset!,
-                    fileName,
-                    imagePath,
-                    folderPath,
-                    folder,
-                    fileSize,
-                    pixelWidth,
-                    pixelHeight,
-                    thumbnailPixelWidth,
-                    thumbnailPixelHeight,
-                    ModificationDate.Default,
-                    imageRotation,
-                    hash,
-                    isCorrupted,
-                    corruptedMessage,
-                    isRotated,
-                    rotatedMessage);
-
-                AssertCataloguedAssetValidity(asset!);
-            }
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+            AssertCataloguedAssetValidity(asset!);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [TestCase(FileNames._1415_JPG, FileSize._1415_JPG, PixelHeightAsset._1415_JPG, PixelWidthAsset._1415_JPG,
@@ -1058,51 +1031,44 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
+        string folderPath = Path.Combine(_dataDirectory!, additionalPath);
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+
+        string imagePath = Path.Combine(folderPath, fileName);
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
         {
-            string folderPath = Path.Combine(_dataDirectory!, additionalPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
+            AssertAssetPropertyValidity(
+                asset!,
+                fileName,
+                imagePath,
+                folderPath,
+                folder,
+                fileSize,
+                pixelWidth,
+                pixelHeight,
+                thumbnailPixelWidth,
+                thumbnailPixelHeight,
+                ModificationDate.Default,
+                imageRotation,
+                hash,
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
-            string imagePath = Path.Combine(folderPath, fileName);
-            Assert.That(File.Exists(imagePath), Is.True);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
-
-            Assert.That(asset, Is.Not.Null);
-
-            using (Assert.EnterMultipleScope())
-            {
-                AssertAssetPropertyValidity(
-                    asset!,
-                    fileName,
-                    imagePath,
-                    folderPath,
-                    folder,
-                    fileSize,
-                    pixelWidth,
-                    pixelHeight,
-                    thumbnailPixelWidth,
-                    thumbnailPixelHeight,
-                    ModificationDate.Default,
-                    imageRotation,
-                    hash,
-                    isCorrupted,
-                    corruptedMessage,
-                    isRotated,
-                    rotatedMessage);
-
-                AssertCataloguedAssetValidity(asset!);
-            }
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+            AssertCataloguedAssetValidity(asset!);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1148,47 +1114,40 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1238,47 +1197,40 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1323,47 +1275,40 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1398,93 +1343,86 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            string newSameAssetFolderPath =
-                Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            Folder newSameAssetFolder =
-                _testableAssetRepository!.AddFolder(newSameAssetFolderPath); // Set above, not in this method
+        string newSameAssetFolderPath =
+            Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+        Folder newSameAssetFolder =
+            _testableAssetRepository!.AddFolder(newSameAssetFolderPath); // Set above, not in this method
 
-            string newSameImagePath = Path.Combine(newSameAssetFolderPath, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string newSameImagePath = Path.Combine(newSameAssetFolderPath, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            Asset? newSameAsset = _assetCreationService!.CreateAsset(newSameAssetFolderPath, expectedAsset.FileName);
+        Asset? newSameAsset = _assetCreationService!.CreateAsset(newSameAssetFolderPath, expectedAsset.FileName);
 
-            Assert.That(newSameAsset, Is.Not.Null);
+        Assert.That(newSameAsset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                newSameAsset!,
-                expectedAsset.FileName,
-                newSameImagePath,
-                newSameAssetFolderPath,
-                newSameAssetFolder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            newSameAsset!,
+            expectedAsset.FileName,
+            newSameImagePath,
+            newSameAssetFolderPath,
+            newSameAssetFolder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
-            Asset firstAssetFromRepository = assetsFromRepository[0];
+        Asset firstAssetFromRepository = assetsFromRepository[0];
 
-            Assert.That(firstAssetFromRepository.FileName, Is.EqualTo(asset!.FileName));
-            Assert.That(firstAssetFromRepository.FolderId, Is.EqualTo(asset.FolderId));
-            Assert.That(firstAssetFromRepository.Hash, Is.EqualTo(asset.Hash));
-            Assert.That(firstAssetFromRepository.ImageData, Is.Null);
+        Assert.That(firstAssetFromRepository.FileName, Is.EqualTo(asset!.FileName));
+        Assert.That(firstAssetFromRepository.FolderId, Is.EqualTo(asset.FolderId));
+        Assert.That(firstAssetFromRepository.Hash, Is.EqualTo(asset.Hash));
+        Assert.That(firstAssetFromRepository.ImageData, Is.Null);
 
-            Asset secondAssetFromRepository = assetsFromRepository[1];
+        Asset secondAssetFromRepository = assetsFromRepository[1];
 
-            Assert.That(secondAssetFromRepository.FileName, Is.EqualTo(newSameAsset!.FileName));
-            Assert.That(secondAssetFromRepository.FolderId, Is.EqualTo(newSameAsset.FolderId));
-            Assert.That(secondAssetFromRepository.Hash, Is.EqualTo(newSameAsset.Hash));
-            Assert.That(secondAssetFromRepository.ImageData, Is.Null);
+        Assert.That(secondAssetFromRepository.FileName, Is.EqualTo(newSameAsset!.FileName));
+        Assert.That(secondAssetFromRepository.FolderId, Is.EqualTo(newSameAsset.FolderId));
+        Assert.That(secondAssetFromRepository.Hash, Is.EqualTo(newSameAsset.Hash));
+        Assert.That(secondAssetFromRepository.ImageData, Is.Null);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1518,53 +1456,46 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+        Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
-            Assert.That(newSameAsset, Is.Null);
+        Assert.That(newSameAsset, Is.Null);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1599,60 +1530,53 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
-                skipCatalogCheck: false);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+            skipCatalogCheck: false);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
-                skipCatalogCheck: false);
+        Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+            skipCatalogCheck: false);
 
-            Assert.That(newSameAsset, Is.Null);
+        Assert.That(newSameAsset, Is.Null);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
     public void
-        CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageAndSkipCatalogCheckTrue_ReturnsAssetBothTimes()
+        CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageAndSkipCatalogCheckTrue_ReturnsUpdatedAsset()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
@@ -1682,79 +1606,70 @@ public class AssetCreationServiceTests
             }
         };
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
-                skipCatalogCheck: true);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+            skipCatalogCheck: true);
 
-            Assert.That(asset, Is.Not.Null);
+        Assert.That(asset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                asset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            AssertCataloguedAssetValidity(asset!);
+        AssertCataloguedAssetValidity(asset!);
 
-            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
-                skipCatalogCheck: true);
+        Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG,
+            skipCatalogCheck: true);
 
-            Assert.That(newSameAsset, Is.Not.Null);
+        Assert.That(newSameAsset, Is.Not.Null);
 
-            AssertAssetPropertyValidity(
-                newSameAsset!,
-                expectedAsset.FileName,
-                imagePath,
-                _dataDirectory!,
-                folder,
-                expectedAsset.FileProperties.Size,
-                expectedAsset.Pixel.Asset.Width,
-                expectedAsset.Pixel.Asset.Height,
-                expectedAsset.Pixel.Thumbnail.Width,
-                expectedAsset.Pixel.Thumbnail.Height,
-                expectedAsset.FileProperties.Modification,
-                expectedAsset.ImageRotation,
-                expectedAsset.Hash,
-                expectedAsset.Metadata.Corrupted.IsTrue,
-                expectedAsset.Metadata.Corrupted.Message,
-                expectedAsset.Metadata.Rotated.IsTrue,
-                expectedAsset.Metadata.Rotated.Message);
+        AssertAssetPropertyValidity(
+            newSameAsset!,
+            expectedAsset.FileName,
+            imagePath,
+            _dataDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
-            Assert.That(assetsFromRepository[0].FileName, Is.EqualTo(expectedAsset.FileName));
-            Assert.That(assetsFromRepository[1].FileName, Is.EqualTo(expectedAsset.FileName));
-            Assert.That(assetsFromRepository[0].Hash, Is.EqualTo(expectedAsset.Hash));
-            Assert.That(assetsFromRepository[1].Hash, Is.EqualTo(expectedAsset.Hash));
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
+        Assert.That(assetsFromRepository[0].FileName, Is.EqualTo(expectedAsset.FileName));
+        Assert.That(assetsFromRepository[0].Hash, Is.EqualTo(expectedAsset.Hash));
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1796,7 +1711,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(tempDirectory, true);
         }
     }
@@ -1900,7 +1814,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(tempDirectory, true);
         }
     }
@@ -1910,31 +1823,24 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.IMAGE_1_JPG;
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
+        const string assetName = FileNames.IMAGE_1_JPG;
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
 
-            Assert.That(File.Exists(imagePath), Is.True);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            NullReferenceException nullReferenceException =
-                new("Object reference not set to an instance of an object.");
-            _testLogger!.AssertLogExceptions([nullReferenceException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        NullReferenceException nullReferenceException =
+            new("Object reference not set to an instance of an object.");
+        _testLogger!.AssertLogExceptions([nullReferenceException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1947,30 +1853,23 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        try
-        {
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            OverflowException overflowException = new("The image data generated an overflow during processing.");
-            _testLogger!.AssertLogExceptions([overflowException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        OverflowException overflowException = new("The image data generated an overflow during processing.");
+        _testLogger!.AssertLogExceptions([overflowException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -1983,31 +1882,24 @@ public class AssetCreationServiceTests
 
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        try
-        {
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            InvalidOperationException invalidOperationException =
-                new("Operation is not valid due to the current state of the object.");
-            _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        InvalidOperationException invalidOperationException =
+            new("Operation is not valid due to the current state of the object.");
+        _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2020,31 +1912,24 @@ public class AssetCreationServiceTests
 
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        try
-        {
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            InvalidOperationException invalidOperationException =
-                new("Operation is not valid due to the current state of the object.");
-            _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        InvalidOperationException invalidOperationException =
+            new("Operation is not valid due to the current state of the object.");
+        _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2053,32 +1938,25 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.IMAGE_1_JPG;
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            string? directoryName = null;
+        const string assetName = FileNames.IMAGE_1_JPG;
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        string? directoryName = null;
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            ArgumentNullException argumentNullException = new(nameof(directoryName));
-            _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        ArgumentNullException argumentNullException = new(nameof(directoryName));
+        _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2086,37 +1964,30 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.IMAGE_1_JPG;
-            string directoryName =
-                Path.Combine(_dataDirectory!, Directories.TEST_FOLDER, Directories.TEST_HIDDEN_SUB_FOLDER);
+        const string assetName = FileNames.IMAGE_1_JPG;
+        string directoryName =
+            Path.Combine(_dataDirectory!, Directories.TEST_FOLDER, Directories.TEST_HIDDEN_SUB_FOLDER);
 
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            FileNotFoundException fileNotFoundException =
-                new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
-            Exception[] expectedExceptions = [fileNotFoundException];
+        FileNotFoundException fileNotFoundException =
+            new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
+        Exception[] expectedExceptions = [fileNotFoundException];
 
-            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
     }
 
     [Test]
@@ -2125,36 +1996,29 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.IMAGE_1_JPG;
-            string directoryName = Path.Combine(_dataDirectory!, assetName);
+        const string assetName = FileNames.IMAGE_1_JPG;
+        string directoryName = Path.Combine(_dataDirectory!, assetName);
 
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            FileNotFoundException fileNotFoundException =
-                new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
-            Exception[] expectedExceptions = [fileNotFoundException];
+        FileNotFoundException fileNotFoundException =
+            new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
+        Exception[] expectedExceptions = [fileNotFoundException];
 
-            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
     }
 
     [Test]
@@ -2162,28 +2026,21 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            string? fileName = null;
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        string? fileName = null;
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            ArgumentNullException argumentNullException = new(nameof(fileName));
-            _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        ArgumentNullException argumentNullException = new(nameof(fileName));
+        _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2191,34 +2048,27 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.NON_EXISTENT_FILE_JPG;
+        const string assetName = FileNames.NON_EXISTENT_FILE_JPG;
 
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.False);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.False);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
-            Exception[] expectedExceptions = [fileNotFoundException];
+        FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
+        Exception[] expectedExceptions = [fileNotFoundException];
 
-            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
     }
 
     [Test]
@@ -2226,34 +2076,27 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        try
-        {
-            const string assetName = FileNames.IMAGE_1_JPG;
+        const string assetName = FileNames.IMAGE_1_JPG;
 
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
-            Exception[] expectedExceptions = [fileNotFoundException];
+        FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
+        Exception[] expectedExceptions = [fileNotFoundException];
 
-            _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions(expectedExceptions, typeof(AssetCreationService));
     }
 
     [TestCase(FileNames.HOMER_MP4, FileNames.HOMER_JPG, FileSize.HOMER_JPG, PixelHeightAsset.HOMER_JPG,
@@ -2338,7 +2181,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
@@ -2454,7 +2296,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
@@ -2499,7 +2340,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
@@ -2614,7 +2454,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
@@ -2723,7 +2562,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
@@ -2737,34 +2575,27 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
 
-        try
-        {
-            string filePath = Path.Combine(_dataDirectory!, fileName);
-            Assert.That(File.Exists(filePath), Is.True);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
+        Assert.That(File.Exists(filePath), Is.True);
 
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, isVideo);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, isVideo);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+        string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
-            string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
-            Assert.That(File.Exists(imagePath), Is.False);
+        string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
+        Assert.That(File.Exists(imagePath), Is.False);
 
-            _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2832,7 +2663,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (analyseVideos)
             {
@@ -2879,7 +2709,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (analyseVideos)
             {
@@ -2894,36 +2723,29 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
-        try
-        {
-            const string assetName = FileNames.HOMER_MP4;
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            string? directoryName = null;
+        const string assetName = FileNames.HOMER_MP4;
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        string? directoryName = null;
 
-            string imagePath = Path.Combine(_dataDirectory!, assetName);
-            Assert.That(File.Exists(imagePath), Is.True);
+        string imagePath = Path.Combine(_dataDirectory!, assetName);
+        Assert.That(File.Exists(imagePath), Is.True);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName, true);
+        Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName, true);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
-            Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
+        string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+        string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
+        Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
 
-            ArgumentNullException argumentNullException = new(nameof(directoryName));
-            _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        ArgumentNullException argumentNullException = new(nameof(directoryName));
+        _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -2966,7 +2788,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(_userConfigurationService!.PathSettings.FirstFrameVideosPath, true);
         }
     }
@@ -3010,7 +2831,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(_userConfigurationService!.PathSettings.FirstFrameVideosPath, true);
         }
     }
@@ -3021,28 +2841,21 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
-        try
-        {
-            string? fileName = null;
-            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+        string? fileName = null;
+        _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!, true);
+        Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName!, true);
 
-            Assert.That(asset, Is.Null);
+        Assert.That(asset, Is.Null);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            ArgumentNullException argumentNullException = new(nameof(fileName));
-            _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        ArgumentNullException argumentNullException = new(nameof(fileName));
+        _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
     [Test]
@@ -3078,7 +2891,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(_userConfigurationService!.PathSettings.FirstFrameVideosPath, true);
         }
     }
@@ -3117,7 +2929,6 @@ public class AssetCreationServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(_userConfigurationService!.PathSettings.FirstFrameVideosPath, true);
         }
     }

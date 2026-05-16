@@ -160,6 +160,13 @@ public class ApplicationGetAssetsCounterTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -236,7 +243,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (analyseVideos)
             {
@@ -327,7 +333,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -355,7 +360,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -415,7 +419,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

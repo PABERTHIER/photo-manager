@@ -8,6 +8,7 @@ public class SqlitePersistenceContextTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
+    private string? _backupsDirectory;
 
     private SqliteConnectionFactory? _factory;
     private SqliteBackupService? _backupService;
@@ -19,6 +20,7 @@ public class SqlitePersistenceContextTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _backupsDirectory = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
     }
 
     [SetUp]
@@ -55,9 +57,7 @@ public class SqlitePersistenceContextTests
     {
         _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
 
-        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
-
-        Assert.That(Directory.Exists(backupsDirectory), Is.True);
+        Assert.That(Directory.Exists(_backupsDirectory), Is.True);
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -130,7 +130,7 @@ public class SqlitePersistenceContextTests
 
         Assert.That(result, Is.True);
 
-        string expectedFilePath = Path.Combine(_databaseDirectory + Constants.DATABASE_BACKUP_END_PATH, "20240315.zip");
+        string expectedFilePath = Path.Combine(_backupsDirectory!, "20240315.zip");
         Assert.That(File.Exists(expectedFilePath), Is.True);
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
@@ -160,7 +160,7 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.WriteBackup(backupDate);
 
-        string backupPath = Path.Combine(_databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH, "20240820.zip");
+        string backupPath = Path.Combine(_backupsDirectory!, "20240820.zip");
 
         long firstBackupSize = new FileInfo(backupPath).Length;
 
@@ -174,8 +174,7 @@ public class SqlitePersistenceContextTests
         Assert.That(File.Exists(backupPath), Is.True);
         Assert.That(secondBackupSize, Is.GreaterThan(firstBackupSize));
 
-        string backupsDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+        string[] files = Directory.GetFiles(_backupsDirectory!, "*.zip");
 
         Assert.That(files, Has.Length.EqualTo(1));
 
@@ -233,8 +232,7 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.DeleteOldBackups(2);
 
-        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+        string[] files = Directory.GetFiles(_backupsDirectory!, "*.zip");
 
         Assert.That(files, Has.Length.EqualTo(2));
         Assert.That(files.Any(f => f.Contains("20240103")), Is.True);
@@ -278,8 +276,7 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.DeleteOldBackups(10);
 
-        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+        string[] files = Directory.GetFiles(_backupsDirectory!, "*.zip");
 
         Assert.That(files, Has.Length.EqualTo(2));
 
@@ -297,8 +294,7 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.DeleteOldBackups(0);
 
-        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+        string[] files = Directory.GetFiles(_backupsDirectory!, "*.zip");
 
         Assert.That(files, Is.Empty);
 
@@ -316,7 +312,7 @@ public class SqlitePersistenceContextTests
         DateTime backupDate = new(2024, 6, 15);
         _sqlitePersistenceContext!.WriteBackup(backupDate);
 
-        string backupPath = Path.Combine(_databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH, "20240615.zip");
+        string backupPath = Path.Combine(_backupsDirectory!, "20240615.zip");
 
         Assert.That(File.Exists(backupPath), Is.True);
         Assert.That(new FileInfo(backupPath).Length, Is.GreaterThan(0));
@@ -369,8 +365,7 @@ public class SqlitePersistenceContextTests
 
         _sqlitePersistenceContext!.DeleteOldBackups(1);
 
-        string backupsDirectory = _databaseDirectory + Constants.DATABASE_BACKUP_END_PATH;
-        string[] files = Directory.GetFiles(backupsDirectory, "*.zip");
+        string[] files = Directory.GetFiles(_backupsDirectory!, "*.zip");
 
         Assert.That(files, Has.Length.EqualTo(1));
         Assert.That(files[0], Does.Contain("20240303"));

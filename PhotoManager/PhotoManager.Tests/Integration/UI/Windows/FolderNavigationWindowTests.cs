@@ -170,6 +170,7 @@ public class FolderNavigationWindowTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _folderNavigationViewModel = null;
     }
 
@@ -461,7 +462,6 @@ public class FolderNavigationWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(otherDirectory, true);
         }
     }
@@ -474,61 +474,54 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                null,
-                false,
-                false,
-                [.. recentTargetPaths],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            null,
+            false,
+            false,
+            [.. recentTargetPaths],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -539,60 +532,53 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, []);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                null,
-                false,
-                false,
-                [],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            null,
+            false,
+            false,
+            [],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -604,61 +590,54 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel, folder1, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
+        CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder2.Path));
-            Assert.That(selectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder2.Path));
+        Assert.That(selectedPath, Is.EqualTo(otherDirectory));
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                null,
-                false,
-                false,
-                [],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            null,
+            false,
+            false,
+            [],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -669,58 +648,51 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, null, folder, false, []);
+        CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                null,
-                false,
-                folder,
-                null,
-                false,
-                false,
-                [],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            null,
+            false,
+            folder,
+            null,
+            false,
+            false,
+            [],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -731,55 +703,48 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            _folderNavigationViewModel = new(_applicationViewModel!, null!, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, null!, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, null, null, false, []);
+        CheckBeforeChanges(assetsDirectory, null, null, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => Init());
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => Init());
 
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                null,
-                false,
-                null,
-                null,
-                false,
-                false,
-                [],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            null,
+            false,
+            null,
+            null,
+            false,
+            false,
+            [],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -790,84 +755,77 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -878,83 +836,76 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, []);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -966,84 +917,77 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel, folder1, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
+        CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder2.Path));
-            Assert.That(selectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder2.Path));
+        Assert.That(selectedPath, Is.EqualTo(otherDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                expectedSelectedFolder,
-                true,
-                false,
-                [],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            expectedSelectedFolder,
+            true,
+            false,
+            [],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                expectedSelectedFolder,
-                true,
-                false,
-                [],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            expectedSelectedFolder,
+            true,
+            false,
+            [],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1054,81 +998,74 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder, []);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, null, folder, false, []);
+        CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                null,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            null,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                null,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            null,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1139,84 +1076,77 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = expectedTargetPath };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = expectedTargetPath };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                expectedTargetPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            expectedTargetPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                expectedTargetPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            expectedTargetPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1230,84 +1160,77 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = new() { Id = Guid.NewGuid(), Path = sourceFolderPath! };
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = new() { Id = Guid.NewGuid(), Path = sourceFolderPath! };
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = null!;
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = null!;
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(sourceFolderPath));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(sourceFolderPath));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                expectedSelectedFolder,
-                false,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            expectedSelectedFolder,
+            false,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1318,106 +1241,99 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder1, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder1, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder2, folder1, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder2, folder1, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder2.Path));
-            Assert.That(selectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder2.Path));
+        Assert.That(selectedPath, Is.EqualTo(otherDirectory));
 
-            FolderSelected(selectedPath);
+        FolderSelected(selectedPath);
 
-            Confirm();
+        Confirm();
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                expectedSelectedFolder,
-                true,
-                true,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            expectedSelectedFolder,
+            true,
+            true,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            Cancel();
+        Cancel();
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                expectedSelectedFolder,
-                true,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            expectedSelectedFolder,
+            true,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                folderNavigationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder2,
-                false,
-                folder1,
-                expectedSelectedFolder,
-                true,
-                false,
-                [.. recentTargetPaths],
-                selectedPath);
+        CheckInstance(
+            folderNavigationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder2,
+            false,
+            folder1,
+            expectedSelectedFolder,
+            true,
+            false,
+            [.. recentTargetPaths],
+            selectedPath);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1428,82 +1344,75 @@ public class FolderNavigationWindowTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
-            List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        List<string> recentTargetPaths = [assetsDirectory];
 
-            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+        _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
+        _folderNavigationViewModel = new(_applicationViewModel, folder, recentTargetPaths);
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<string> notifyApplicationViewModelPropertyChangedEvents,
-                List<FolderNavigationViewModel> folderNavigationViewModelInstances,
-                List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<string> notifyApplicationViewModelPropertyChangedEvents,
+            List<FolderNavigationViewModel> folderNavigationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
+        CheckBeforeChanges(assetsDirectory, folder, folder, false, [.. recentTargetPaths]);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            string selectedPath = Init();
+        string selectedPath = Init();
 
-            Assert.That(selectedPath, Is.EqualTo(folder.Path));
-            Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(folder.Path));
+        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
 
-            Confirm();
+        Confirm();
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                null,
-                false,
-                false,
-                [.. recentTargetPaths],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            null,
+            false,
+            false,
+            [.. recentTargetPaths],
+            null);
 
-            Cancel();
+        Cancel();
 
-            CheckAfterChanges(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                string.Empty,
-                [],
-                null,
-                null!,
-                folder,
-                false,
-                folder,
-                null,
-                false,
-                false,
-                [.. recentTargetPaths],
-                null);
+        CheckAfterChanges(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            string.Empty,
+            [],
+            null,
+            null!,
+            folder,
+            false,
+            folder,
+            null,
+            false,
+            false,
+            [.. recentTargetPaths],
+            null);
 
-            Assert.That(folderNavigationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+        Assert.That(folderNavigationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

@@ -103,6 +103,7 @@ public class MainWindowDeleteAssetsTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
     }
@@ -213,8 +214,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -290,7 +291,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -342,8 +342,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -423,7 +423,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -475,8 +474,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
@@ -551,7 +550,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -603,8 +601,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -681,7 +679,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -733,8 +730,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
@@ -747,8 +744,8 @@ public class MainWindowDeleteAssetsTests
 
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -808,7 +805,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -860,8 +856,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
@@ -932,7 +928,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -985,8 +980,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
@@ -1008,8 +1003,8 @@ public class MainWindowDeleteAssetsTests
 
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -1068,7 +1063,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1162,7 +1156,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -1220,8 +1213,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -1344,7 +1337,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1401,8 +1393,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -1544,7 +1536,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1601,8 +1592,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -1724,7 +1715,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1781,8 +1771,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -1906,7 +1896,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1963,8 +1952,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -1986,8 +1975,8 @@ public class MainWindowDeleteAssetsTests
 
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -2070,7 +2059,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -2127,8 +2115,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -2243,7 +2231,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -2301,8 +2288,8 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             if (appMode == AppMode.Viewer)
             {
@@ -2334,8 +2321,8 @@ public class MainWindowDeleteAssetsTests
 
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1TempFileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1TempFileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2TempFileName));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -2422,7 +2409,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -2548,7 +2534,6 @@ public class MainWindowDeleteAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

@@ -185,74 +185,74 @@ public class DuplicatedAssetViewModelTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     [Test]
     public void Properties_AssetAndVisibleAndParentViewModelAndUpdateVisible_UpdatesVisible()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
-        try
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+
+        _asset3 = _asset3!.WithFolder(folder);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2! };
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3 };
+
+        _duplicatedAssetViewModel = new()
         {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+            Asset = _asset3,
+            ParentViewModel = [duplicatedAssetViewModel1, duplicatedAssetViewModel2]
+        };
 
-            _asset3 = _asset3!.WithFolder(folder);
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
+        ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2! };
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3 };
+        CheckBeforeChanges(
+            _asset3,
+            Visibility.Visible,
+            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+            _asset2!.FileName,
+            2);
 
-            _duplicatedAssetViewModel = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = [duplicatedAssetViewModel1, duplicatedAssetViewModel2]
-            };
+        _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
-            ) = NotifyPropertyChangedEvents();
+        CheckAfterChanges(
+            _duplicatedAssetViewModel!,
+            _asset3,
+            Visibility.Collapsed,
+            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+            _asset2.FileName,
+            2);
 
-            CheckBeforeChanges(
-                _asset3,
-                Visibility.Visible,
-                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2!.FileName,
-                2);
+        _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
+        CheckAfterChanges(
+            _duplicatedAssetViewModel!,
+            _asset3,
+            Visibility.Hidden,
+            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+            _asset2.FileName,
+            2);
 
-            CheckAfterChanges(
-                _duplicatedAssetViewModel!,
-                _asset3,
-                Visibility.Collapsed,
-                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
-                2);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
-
-            CheckAfterChanges(
-                _duplicatedAssetViewModel!,
-                _asset3,
-                Visibility.Hidden,
-                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
-                2);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
-
-            CheckInstance(
-                duplicatedAssetViewModelInstances,
-                _asset3,
-                Visibility.Hidden,
-                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
-                2);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            duplicatedAssetViewModelInstances,
+            _asset3,
+            Visibility.Hidden,
+            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+            _asset2.FileName,
+            2);
     }
 
     [Test]
@@ -260,39 +260,32 @@ public class DuplicatedAssetViewModelTests
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _asset1 = _asset1!.WithFolder(folder);
+        _asset1 = _asset1!.WithFolder(folder);
 
-            _duplicatedAssetViewModel = new() { Asset = _asset1, Visible = Visibility.Hidden };
+        _duplicatedAssetViewModel = new() { Asset = _asset1, Visible = Visibility.Hidden };
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(_asset1, Visibility.Hidden, [], null, 0);
+        CheckBeforeChanges(_asset1, Visibility.Hidden, [], null, 0);
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
+        _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Collapsed, [], null, 0);
+        CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Collapsed, [], null, 0);
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Visible;
+        _duplicatedAssetViewModel!.Visible = Visibility.Visible;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Visible, [], null, 0);
+        CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Visible, [], null, 0);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            CheckInstance(duplicatedAssetViewModelInstances, _asset1, Visibility.Visible, [], null, 0);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(duplicatedAssetViewModelInstances, _asset1, Visibility.Visible, [], null, 0);
     }
 
     [Test]
@@ -300,39 +293,32 @@ public class DuplicatedAssetViewModelTests
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _asset4 = _asset4!.WithFolder(folder);
+        _asset4 = _asset4!.WithFolder(folder);
 
-            _duplicatedAssetViewModel = new() { Asset = _asset4 };
+        _duplicatedAssetViewModel = new() { Asset = _asset4 };
 
-            (
-                List<string> notifyPropertyChangedEvents,
-                List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
-            ) = NotifyPropertyChangedEvents();
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
+        ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(_asset4, Visibility.Visible, [], null, 0);
+        CheckBeforeChanges(_asset4, Visibility.Visible, [], null, 0);
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
+        _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Collapsed, [], null, 0);
+        CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Collapsed, [], null, 0);
 
-            _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
+        _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Hidden, [], null, 0);
+        CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Hidden, [], null, 0);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            CheckInstance(duplicatedAssetViewModelInstances, _asset4, Visibility.Hidden, [], null, 0);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(duplicatedAssetViewModelInstances, _asset4, Visibility.Hidden, [], null, 0);
     }
 
     private (List<string> notifyPropertyChangedEvents, List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances)

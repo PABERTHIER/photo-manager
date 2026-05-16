@@ -179,6 +179,7 @@ public class MainWindowGetExemptedFolderPathTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
     }
@@ -344,7 +345,6 @@ public class MainWindowGetExemptedFolderPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(expectedExemptedFolderPath, true);
         }
     }
@@ -429,7 +429,6 @@ public class MainWindowGetExemptedFolderPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

@@ -9,6 +9,7 @@ public class SqliteBackupServiceTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
+    private string? _backupsDirectory;
 
     private SqliteConnectionFactory? _factory;
     private SqliteBackupService? _backupService;
@@ -20,6 +21,7 @@ public class SqliteBackupServiceTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _backupsDirectory = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
     }
 
     [SetUp]
@@ -43,8 +45,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_ValidPath_CreatesZipFile()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240101.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240101.zip");
 
         bool result = _backupService!.WriteBackup(backupFilePath);
 
@@ -57,8 +58,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_ValidPath_ZipContainsPhotomanagerDb()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240102.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240102.zip");
 
         _backupService!.WriteBackup(backupFilePath);
 
@@ -75,8 +75,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_ExistingBackupFile_OverwritesPrevious()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240103.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240103.zip");
 
         _backupService!.WriteBackup(backupFilePath);
 
@@ -114,8 +113,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_CleansUpTmpFile()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240105.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240105.zip");
 
         _backupService!.WriteBackup(backupFilePath);
 
@@ -131,8 +129,7 @@ public class SqliteBackupServiceTests
     {
         _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Vacation");
 
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240106.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240106.zip");
 
         _backupService!.WriteBackup(backupFilePath);
 
@@ -168,13 +165,11 @@ public class SqliteBackupServiceTests
     [Test]
     public void GetBackupFilesPaths_DirectoryWithZipFiles_ReturnsFilePaths()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
+        _backupService!.WriteBackup(Path.Combine(_backupsDirectory!, "20240101.zip"));
+        _backupService!.WriteBackup(Path.Combine(_backupsDirectory!, "20240102.zip"));
+        _backupService!.WriteBackup(Path.Combine(_backupsDirectory!, "20240103.zip"));
 
-        _backupService!.WriteBackup(Path.Combine(backupDirectory, "20240101.zip"));
-        _backupService!.WriteBackup(Path.Combine(backupDirectory, "20240102.zip"));
-        _backupService!.WriteBackup(Path.Combine(backupDirectory, "20240103.zip"));
-
-        string[] paths = _backupService!.GetBackupFilesPaths(backupDirectory);
+        string[] paths = _backupService!.GetBackupFilesPaths(_backupsDirectory!);
 
         Assert.That(paths, Has.Length.EqualTo(3));
         Assert.That(paths.Any(p => p.Contains("20240101.zip")), Is.True);
@@ -212,14 +207,12 @@ public class SqliteBackupServiceTests
     [Test]
     public void GetBackupFilesPaths_DirectoryWithNonZipFiles_ReturnsOnlyZipFiles()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
+        _backupService!.WriteBackup(Path.Combine(_backupsDirectory!, "20240101.zip"));
 
-        _backupService!.WriteBackup(Path.Combine(backupDirectory, "20240101.zip"));
+        File.WriteAllText(Path.Combine(_backupsDirectory!, "notes.txt"), "Some notes");
+        File.WriteAllText(Path.Combine(_backupsDirectory!, "data.db"), "Not a zip");
 
-        File.WriteAllText(Path.Combine(backupDirectory, "notes.txt"), "Some notes");
-        File.WriteAllText(Path.Combine(backupDirectory, "data.db"), "Not a zip");
-
-        string[] paths = _backupService!.GetBackupFilesPaths(backupDirectory);
+        string[] paths = _backupService!.GetBackupFilesPaths(_backupsDirectory!);
 
         Assert.That(paths, Has.Length.EqualTo(1));
         Assert.That(paths[0], Does.Contain("20240101.zip"));
@@ -230,8 +223,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void DeleteBackupFile_ExistingFile_RemovesFile()
     {
-        string backupDirectory = _databaseDirectory! + Constants.DATABASE_BACKUP_END_PATH;
-        string backupFilePath = Path.Combine(backupDirectory, "20240201.zip");
+        string backupFilePath = Path.Combine(_backupsDirectory!, "20240201.zip");
 
         _backupService!.WriteBackup(backupFilePath);
 
@@ -247,7 +239,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void DeleteBackupFile_NonExistentFile_DoesNotThrow()
     {
-        string nonExistentFile = Path.Combine(_databaseDirectory!, "nonexistent.zip");
+        string nonExistentFile = Path.Combine(_backupsDirectory!, "nonexistent.zip");
 
         Assert.DoesNotThrow(() => _backupService!.DeleteBackupFile(nonExistentFile));
 

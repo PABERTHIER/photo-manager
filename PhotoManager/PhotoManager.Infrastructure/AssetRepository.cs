@@ -223,6 +223,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             }
 
             AddAssetCore(asset, thumbnailData);
+
             return true;
         }
         catch (Exception ex)

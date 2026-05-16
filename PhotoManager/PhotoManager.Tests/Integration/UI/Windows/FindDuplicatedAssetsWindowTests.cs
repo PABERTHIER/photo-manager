@@ -482,6 +482,13 @@ public class FindDuplicatedAssetsWindowTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureFindDuplicatedAssetsViewModel(
         int catalogBatchSize,
         string assetsDirectory,
@@ -1595,7 +1602,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }
@@ -1688,7 +1694,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -2500,7 +2505,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }
@@ -2592,7 +2596,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -3036,7 +3039,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }
@@ -3129,7 +3131,6 @@ public class FindDuplicatedAssetsWindowTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

@@ -24,6 +24,13 @@ public class ApplicationViewModelGetSubFoldersTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -87,104 +94,97 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(assetsDirectory);
+
+        string parentFolderPath1 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_2);
+        string parentFolderPath3 = Path.Combine(assetsDirectory, Directories.NOT_DUPLICATE);
+        string parentFolderPath4 = Path.Combine(assetsDirectory, Directories.PART);
+        string parentFolderPath5 = Path.Combine(assetsDirectory, Directories.RESOLUTION);
+        string parentFolderPath6 = Path.Combine(assetsDirectory, Directories.THUMBNAIL);
+
+        string childFolderPath1 = Path.Combine(parentFolderPath3, Directories.SAMPLE_1);
+        string childFolderPath2 = Path.Combine(parentFolderPath3, Directories.SAMPLE_2);
+        string childFolderPath3 = Path.Combine(parentFolderPath3, Directories.SAMPLE_3);
+
+        await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+        Folder? parentFolder1 = _testableAssetRepository!.GetFolderByPath(parentFolderPath1);
+        Folder? parentFolder2 = _testableAssetRepository!.GetFolderByPath(parentFolderPath2);
+        Folder? parentFolder3 = _testableAssetRepository!.GetFolderByPath(parentFolderPath3);
+        Folder? parentFolder4 = _testableAssetRepository!.GetFolderByPath(parentFolderPath4);
+        Folder? parentFolder5 = _testableAssetRepository!.GetFolderByPath(parentFolderPath5);
+        Folder? parentFolder6 = _testableAssetRepository!.GetFolderByPath(parentFolderPath6);
+
+        Assert.That(parentFolder1, Is.Not.Null);
+        Assert.That(parentFolder2, Is.Not.Null);
+        Assert.That(parentFolder3, Is.Not.Null);
+        Assert.That(parentFolder4, Is.Not.Null);
+        Assert.That(parentFolder5, Is.Not.Null);
+        Assert.That(parentFolder6, Is.Not.Null);
+
+        Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
+        Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
+        Folder[] parentFolders3 = _applicationViewModel!.GetSubFolders(parentFolder3);
+        Folder[] parentFolders4 = _applicationViewModel!.GetSubFolders(parentFolder4);
+        Folder[] parentFolders5 = _applicationViewModel!.GetSubFolders(parentFolder5);
+        Folder[] parentFolders6 = _applicationViewModel!.GetSubFolders(parentFolder6);
+
+        Assert.That(parentFolders1, Is.Empty);
+        Assert.That(parentFolders2, Is.Empty);
+
+        Assert.That(parentFolders3, Is.Not.Empty);
+        Assert.That(parentFolders3, Has.Length.EqualTo(3));
+        Assert.That(parentFolders3.Any(x => x.Path == childFolderPath1));
+        Assert.That(parentFolders3.Any(x => x.Path == childFolderPath2));
+        Assert.That(parentFolders3.Any(x => x.Path == childFolderPath3));
+
+        Assert.That(parentFolders4, Is.Empty);
+        Assert.That(parentFolders5, Is.Empty);
+        Assert.That(parentFolders6, Is.Empty);
+
+        Folder? childFolder1 = _testableAssetRepository!.GetFolderByPath(childFolderPath1);
+        Folder? childFolder2 = _testableAssetRepository!.GetFolderByPath(childFolderPath2);
+        Folder? childFolder3 = _testableAssetRepository!.GetFolderByPath(childFolderPath3);
+
+        Assert.That(childFolder1, Is.Not.Null);
+        Assert.That(childFolder2, Is.Not.Null);
+        Assert.That(childFolder3, Is.Not.Null);
+
+        Folder[] childFolders1 = _applicationViewModel!.GetSubFolders(childFolder1);
+        Folder[] childFolders2 = _applicationViewModel!.GetSubFolders(childFolder2);
+        Folder[] childFolders3 = _applicationViewModel!.GetSubFolders(childFolder3);
+
+        Assert.That(childFolders1, Is.Empty);
+        Assert.That(childFolders2, Is.Empty);
+        Assert.That(childFolders3, Is.Empty);
+
+        const string expectedStatusMessage = "The catalog process has ended.";
+
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, expectedStatusMessage);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(54));
+
+        for (int i = 0; i < 54; i++)
         {
-            CheckBeforeChanges(assetsDirectory);
-
-            string parentFolderPath1 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_2);
-            string parentFolderPath3 = Path.Combine(assetsDirectory, Directories.NOT_DUPLICATE);
-            string parentFolderPath4 = Path.Combine(assetsDirectory, Directories.PART);
-            string parentFolderPath5 = Path.Combine(assetsDirectory, Directories.RESOLUTION);
-            string parentFolderPath6 = Path.Combine(assetsDirectory, Directories.THUMBNAIL);
-
-            string childFolderPath1 = Path.Combine(parentFolderPath3, Directories.SAMPLE_1);
-            string childFolderPath2 = Path.Combine(parentFolderPath3, Directories.SAMPLE_2);
-            string childFolderPath3 = Path.Combine(parentFolderPath3, Directories.SAMPLE_3);
-
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
-
-            Folder? parentFolder1 = _testableAssetRepository!.GetFolderByPath(parentFolderPath1);
-            Folder? parentFolder2 = _testableAssetRepository!.GetFolderByPath(parentFolderPath2);
-            Folder? parentFolder3 = _testableAssetRepository!.GetFolderByPath(parentFolderPath3);
-            Folder? parentFolder4 = _testableAssetRepository!.GetFolderByPath(parentFolderPath4);
-            Folder? parentFolder5 = _testableAssetRepository!.GetFolderByPath(parentFolderPath5);
-            Folder? parentFolder6 = _testableAssetRepository!.GetFolderByPath(parentFolderPath6);
-
-            Assert.That(parentFolder1, Is.Not.Null);
-            Assert.That(parentFolder2, Is.Not.Null);
-            Assert.That(parentFolder3, Is.Not.Null);
-            Assert.That(parentFolder4, Is.Not.Null);
-            Assert.That(parentFolder5, Is.Not.Null);
-            Assert.That(parentFolder6, Is.Not.Null);
-
-            Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
-            Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
-            Folder[] parentFolders3 = _applicationViewModel!.GetSubFolders(parentFolder3);
-            Folder[] parentFolders4 = _applicationViewModel!.GetSubFolders(parentFolder4);
-            Folder[] parentFolders5 = _applicationViewModel!.GetSubFolders(parentFolder5);
-            Folder[] parentFolders6 = _applicationViewModel!.GetSubFolders(parentFolder6);
-
-            Assert.That(parentFolders1, Is.Empty);
-            Assert.That(parentFolders2, Is.Empty);
-
-            Assert.That(parentFolders3, Is.Not.Empty);
-            Assert.That(parentFolders3, Has.Length.EqualTo(3));
-            Assert.That(parentFolders3[0].Path, Is.EqualTo(childFolderPath1));
-            Assert.That(parentFolders3[1].Path, Is.EqualTo(childFolderPath2));
-            Assert.That(parentFolders3[2].Path, Is.EqualTo(childFolderPath3));
-
-            Assert.That(parentFolders4, Is.Empty);
-            Assert.That(parentFolders5, Is.Empty);
-            Assert.That(parentFolders6, Is.Empty);
-
-            Folder? childFolder1 = _testableAssetRepository!.GetFolderByPath(childFolderPath1);
-            Folder? childFolder2 = _testableAssetRepository!.GetFolderByPath(childFolderPath2);
-            Folder? childFolder3 = _testableAssetRepository!.GetFolderByPath(childFolderPath3);
-
-            Assert.That(childFolder1, Is.Not.Null);
-            Assert.That(childFolder2, Is.Not.Null);
-            Assert.That(childFolder3, Is.Not.Null);
-
-            Folder[] childFolders1 = _applicationViewModel!.GetSubFolders(childFolder1);
-            Folder[] childFolders2 = _applicationViewModel!.GetSubFolders(childFolder2);
-            Folder[] childFolders3 = _applicationViewModel!.GetSubFolders(childFolder3);
-
-            Assert.That(childFolders1, Is.Empty);
-            Assert.That(childFolders2, Is.Empty);
-            Assert.That(childFolders3, Is.Empty);
-
-            const string expectedStatusMessage = "The catalog process has ended.";
-
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, expectedStatusMessage);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(54));
-
-            for (int i = 0; i < 54; i++)
-            {
-                Assert.That(notifyPropertyChangedEvents[i], Is.EqualTo("StatusMessage"));
-            }
-
-            CheckInstance(applicationViewModelInstances, assetsDirectory, expectedStatusMessage);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Has.Count.EqualTo(9));
-            Assert.That(folderAddedEvents[0], Is.EqualTo(parentFolder1));
-            Assert.That(folderAddedEvents[1], Is.EqualTo(parentFolder2));
-            Assert.That(folderAddedEvents[2], Is.EqualTo(parentFolder3));
-            Assert.That(folderAddedEvents[3], Is.EqualTo(childFolder1));
-            Assert.That(folderAddedEvents[4], Is.EqualTo(childFolder2));
-            Assert.That(folderAddedEvents[5], Is.EqualTo(childFolder3));
-            Assert.That(folderAddedEvents[6], Is.EqualTo(parentFolder4));
-            Assert.That(folderAddedEvents[7], Is.EqualTo(parentFolder5));
-            Assert.That(folderAddedEvents[8], Is.EqualTo(parentFolder6));
-
-            Assert.That(folderRemovedEvents, Is.Empty);
+            Assert.That(notifyPropertyChangedEvents[i], Is.EqualTo("StatusMessage"));
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        CheckInstance(applicationViewModelInstances, assetsDirectory, expectedStatusMessage);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Has.Count.EqualTo(9));
+        Assert.That(folderAddedEvents[0], Is.EqualTo(parentFolder1));
+        Assert.That(folderAddedEvents[1], Is.EqualTo(parentFolder2));
+        Assert.That(folderAddedEvents[2], Is.EqualTo(parentFolder3));
+        Assert.That(folderAddedEvents[3], Is.EqualTo(childFolder1));
+        Assert.That(folderAddedEvents[4], Is.EqualTo(childFolder2));
+        Assert.That(folderAddedEvents[5], Is.EqualTo(childFolder3));
+        Assert.That(folderAddedEvents[6], Is.EqualTo(parentFolder4));
+        Assert.That(folderAddedEvents[7], Is.EqualTo(parentFolder5));
+        Assert.That(folderAddedEvents[8], Is.EqualTo(parentFolder6));
+
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -198,58 +198,51 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
-            string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
-            string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
+        string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
+        string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
+        string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_3);
 
-            Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
-            Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
+        Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
+        Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
 
-            Folder childFolder1 = _testableAssetRepository!.AddFolder(childFolderPath1);
-            Folder childFolder2 = _testableAssetRepository!.AddFolder(childFolderPath2);
-            Folder childFolder3 = _testableAssetRepository!.AddFolder(childFolderPath3);
+        Folder childFolder1 = _testableAssetRepository!.AddFolder(childFolderPath1);
+        Folder childFolder2 = _testableAssetRepository!.AddFolder(childFolderPath2);
+        Folder childFolder3 = _testableAssetRepository!.AddFolder(childFolderPath3);
 
-            Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
-            Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
+        Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
+        Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
 
-            Folder[] childFolders1 = _applicationViewModel!.GetSubFolders(childFolder1);
-            Folder[] childFolders2 = _applicationViewModel!.GetSubFolders(childFolder2);
-            Folder[] childFolders3 = _applicationViewModel!.GetSubFolders(childFolder3);
+        Folder[] childFolders1 = _applicationViewModel!.GetSubFolders(childFolder1);
+        Folder[] childFolders2 = _applicationViewModel!.GetSubFolders(childFolder2);
+        Folder[] childFolders3 = _applicationViewModel!.GetSubFolders(childFolder3);
 
-            Assert.That(parentFolders1, Is.Not.Empty);
-            Assert.That(parentFolders1, Has.Length.EqualTo(1));
-            Assert.That(parentFolders1[0].Path, Is.EqualTo(childFolderPath1));
+        Assert.That(parentFolders1, Is.Not.Empty);
+        Assert.That(parentFolders1, Has.Length.EqualTo(1));
+        Assert.That(parentFolders1[0].Path, Is.EqualTo(childFolderPath1));
 
-            Assert.That(parentFolders2, Is.Not.Empty);
-            Assert.That(parentFolders2, Has.Length.EqualTo(2));
-            Assert.That(parentFolders2[0].Path, Is.EqualTo(childFolderPath2));
-            Assert.That(parentFolders2[1].Path, Is.EqualTo(childFolderPath3));
+        Assert.That(parentFolders2, Is.Not.Empty);
+        Assert.That(parentFolders2, Has.Length.EqualTo(2));
+        Assert.That(parentFolders2.Any(x => x.Path == childFolderPath2));
+        Assert.That(parentFolders2.Any(x => x.Path == childFolderPath3));
 
-            Assert.That(childFolders1, Is.Empty);
-            Assert.That(childFolders2, Is.Empty);
-            Assert.That(childFolders3, Is.Empty);
+        Assert.That(childFolders1, Is.Empty);
+        Assert.That(childFolders2, Is.Empty);
+        Assert.That(childFolders3, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -263,36 +256,29 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
-            Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
+        Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
+        Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
 
-            Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
-            Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
+        Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
+        Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
 
-            Assert.That(parentFolders1, Is.Empty);
-            Assert.That(parentFolders2, Is.Empty);
+        Assert.That(parentFolders1, Is.Empty);
+        Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -306,40 +292,33 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
-            Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
+        Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
+        Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
 
-            Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
-            Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
+        Folder[] parentFolders1 = _applicationViewModel!.GetSubFolders(parentFolder1);
+        Folder[] parentFolders2 = _applicationViewModel!.GetSubFolders(parentFolder2);
 
-            Assert.That(parentFolders1, Is.Empty);
-            Assert.That(parentFolders2, Is.Empty);
+        Assert.That(parentFolders1, Is.Empty);
+        Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
-    public void GetSubFolders_ParentFolderIsNull_ThrowsArgumentException()
+    public void GetSubFolders_ParentFolderIsNull_ThrowsNullReferenceException()
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -349,36 +328,29 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            Folder? parentFolder1 = null;
+        Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            // At least one folder to trigger the Where on folders
-            _testableAssetRepository!.AddFolder(parentFolderPath2);
+        // At least one folder to trigger the Where on folders
+        _testableAssetRepository!.AddFolder(parentFolderPath2);
 
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _applicationViewModel!.GetSubFolders(parentFolder1!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GetSubFolders(parentFolder1!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

@@ -217,6 +217,7 @@ public class MainWindowFindDuplicatesTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
         _findDuplicatedAssetsViewModel = null;
@@ -453,7 +454,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -601,7 +601,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -751,7 +750,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -899,7 +897,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -1010,7 +1007,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -1105,7 +1101,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

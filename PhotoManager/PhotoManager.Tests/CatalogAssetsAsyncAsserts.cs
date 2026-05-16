@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using PhotoManager.Tests.Integration;
+using System.IO.Compression;
 
 namespace PhotoManager.Tests;
 
@@ -15,8 +16,41 @@ public static class CatalogAssetsAsyncAsserts
 
     public static void CheckBackupAfter(string databaseBackupPath, string backupFilePath)
     {
-        ZipFile.ExtractToDirectory(backupFilePath, databaseBackupPath);
+        string databaseBackupFilePath = Path.Combine(databaseBackupPath, Constants.DATABASE_FILE_NAME);
+
         Assert.That(File.Exists(backupFilePath), Is.True);
+        ZipFile.ExtractToDirectory(backupFilePath, databaseBackupPath);
+
+        Assert.That(File.Exists(databaseBackupFilePath), Is.True);
+        File.Delete(databaseBackupFilePath);
+    }
+
+    public static void AssertAssetsPropertyValidityAndImageData(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, string folderPath, Folder folder)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+            Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
+        }
+    }
+
+    public static void AssertAssetsPropertyValidityAndImageData(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, List<string> folderPath, List<Folder> folders)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+            string expectedFolderPath = folderPath.First(x => x == expectedAsset.Folder.Path);
+            Folder expectedFolder = folders.First(x => x.Path == expectedAsset.Folder.Path);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, expectedFolderPath, expectedFolder);
+            Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
+        }
     }
 
     public static void AssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath,
@@ -26,9 +60,34 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
     }
 
+    public static void AssertAssetsPropertyValidity(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, string folderPath, Folder folder)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+        }
+    }
+
+    public static void AssertAssetsPropertyValidity(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, List<string> folderPaths, List<Folder> folders)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+            string folderPath = folderPaths.First(x => x == expectedAsset.Folder.Path);
+            Folder folder = folders.First(x => x.Path == expectedAsset.Folder.Path);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+        }
+    }
+
     public static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
-        string folderPath,
-        Folder folder)
+        string folderPath, Folder folder)
     {
         DateTime actualDate = DateTime.Now.Date;
 
@@ -204,11 +263,11 @@ public static class CatalogAssetsAsyncAsserts
     private static void AssertCataloguedAssetsByPath(IReadOnlyList<Asset> expectedAssets,
         CatalogChangeCallbackEventArgs catalogChange)
     {
-        for (int i = 0; i < catalogChange.CataloguedAssetsByPath.Count; i++)
+        foreach (Asset cataloguedAssetByPath in catalogChange.CataloguedAssetsByPath)
         {
-            Asset currentExpectedAsset = expectedAssets[i];
-            AssertAssetPropertyValidityAndImageData(catalogChange.CataloguedAssetsByPath[i], currentExpectedAsset,
-                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == cataloguedAssetByPath.FileName);
+            AssertAssetPropertyValidityAndImageData(cataloguedAssetByPath, expectedAsset,
+                expectedAsset.FullPath, expectedAsset.Folder.Path, expectedAsset.Folder);
         }
     }
 

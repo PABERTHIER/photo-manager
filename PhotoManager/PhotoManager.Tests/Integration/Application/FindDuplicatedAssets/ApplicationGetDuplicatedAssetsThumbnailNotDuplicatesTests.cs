@@ -283,6 +283,13 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, int pHashThreshold,
         bool detectThumbnails)
@@ -354,55 +361,48 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+        string folderPath2 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+        string folderPath3 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+        Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+        Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_HASH);
+        _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_HASH);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_HASH);
+        _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_HASH);
+        _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_HASH);
+        _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_HASH);
+        _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_HASH);
+        _asset8 = _asset8!.WithFolder(folder4)
+            .WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository.AddAsset(_asset2, assetData);
+        _testableAssetRepository.AddAsset(_asset3, assetData);
+        _testableAssetRepository.AddAsset(_asset4, assetData);
+        _testableAssetRepository.AddAsset(_asset5, assetData);
+        _testableAssetRepository.AddAsset(_asset6, assetData);
+        _testableAssetRepository.AddAsset(_asset7, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-            string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
-            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
-            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
-
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_HASH);
-            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_HASH);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_HASH);
-            _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_HASH);
-            _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_HASH);
-            _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_HASH);
-            _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_HASH);
-            _asset8 = _asset8!.WithFolder(folder4)
-                .WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository.AddAsset(_asset2, assetData);
-            _testableAssetRepository.AddAsset(_asset3, assetData);
-            _testableAssetRepository.AddAsset(_asset4, assetData);
-            _testableAssetRepository.AddAsset(_asset5, assetData);
-            _testableAssetRepository.AddAsset(_asset6, assetData);
-            _testableAssetRepository.AddAsset(_asset7, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList = [.. assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList = [.. assetsName];
+            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
     }
 
@@ -425,55 +425,48 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+        string folderPath2 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+        string folderPath3 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+        Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+        Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_MD5_HASH);
+        _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_MD5_HASH);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_MD5_HASH);
+        _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_MD5_HASH);
+        _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_MD5_HASH);
+        _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_MD5_HASH);
+        _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_MD5_HASH);
+        _asset8 = _asset8!.WithFolder(folder4)
+            .WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository.AddAsset(_asset2, assetData);
+        _testableAssetRepository.AddAsset(_asset3, assetData);
+        _testableAssetRepository.AddAsset(_asset4, assetData);
+        _testableAssetRepository.AddAsset(_asset5, assetData);
+        _testableAssetRepository.AddAsset(_asset6, assetData);
+        _testableAssetRepository.AddAsset(_asset7, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-            string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
-            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
-            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
-
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_MD5_HASH);
-            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_MD5_HASH);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_MD5_HASH);
-            _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_MD5_HASH);
-            _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_MD5_HASH);
-            _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_MD5_HASH);
-            _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_MD5_HASH);
-            _asset8 = _asset8!.WithFolder(folder4)
-                .WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository.AddAsset(_asset2, assetData);
-            _testableAssetRepository.AddAsset(_asset3, assetData);
-            _testableAssetRepository.AddAsset(_asset4, assetData);
-            _testableAssetRepository.AddAsset(_asset5, assetData);
-            _testableAssetRepository.AddAsset(_asset6, assetData);
-            _testableAssetRepository.AddAsset(_asset7, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList = [.. assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList = [.. assetsName];
+            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
     }
 
@@ -489,39 +482,32 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_D_HASH);
+        _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_D_HASH);
+        _asset8 = _asset8!.WithFolder(folder4)
+            .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository.AddAsset(_asset2, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
-
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_D_HASH);
-            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder4)
-                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository.AddAsset(_asset2, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList = [.. assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList = [.. assetsName];
+            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
     }
 
@@ -537,39 +523,32 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+
+        _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET1349_D_HASH);
+        _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET1350_D_HASH);
+        _asset8 = _asset8!.WithFolder(folder2)
+            .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset3, assetData);
+        _testableAssetRepository.AddAsset(_asset4, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
-
-            _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET1349_D_HASH);
-            _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET1350_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder2)
-                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset3, assetData);
-            _testableAssetRepository.AddAsset(_asset4, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList = [.. assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList = [.. assetsName];
+            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
     }
 
@@ -585,41 +564,34 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+
+        _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET1413_D_HASH);
+        _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET1414_D_HASH);
+        _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1415_D_HASH);
+        _asset8 = _asset8!.WithFolder(folder2)
+            .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset5, assetData);
+        _testableAssetRepository.AddAsset(_asset6, assetData);
+        _testableAssetRepository.AddAsset(_asset7, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-            string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
-
-            _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET1413_D_HASH);
-            _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET1414_D_HASH);
-            _asset7 = _asset7!.WithFolder(folder1).WithHash(ASSET1415_D_HASH);
-            _asset8 = _asset8!.WithFolder(folder2)
-                .WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset5, assetData);
-            _testableAssetRepository.AddAsset(_asset6, assetData);
-            _testableAssetRepository.AddAsset(_asset7, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList = [.. assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList = [.. assetsName];
+            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
     }
 
@@ -696,65 +668,58 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        try
+        string folderPath1 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+        string folderPath2 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+        string folderPath3 = Path.Combine(_dataDirectory!,
+            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
+        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+        Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+        Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_P_HASH);
+        _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_P_HASH);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_P_HASH);
+        _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_P_HASH);
+        _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_P_HASH);
+        _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_P_HASH);
+        _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_P_HASH);
+        _asset8 = _asset8!.WithFolder(folder4)
+            .WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository.AddAsset(_asset2, assetData);
+        _testableAssetRepository.AddAsset(_asset3, assetData);
+        _testableAssetRepository.AddAsset(_asset4, assetData);
+        _testableAssetRepository.AddAsset(_asset5, assetData);
+        _testableAssetRepository.AddAsset(_asset6, assetData);
+        _testableAssetRepository.AddAsset(_asset7, assetData);
+        _testableAssetRepository.AddAsset(_asset8, assetData);
+
+        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+        if (expected > 0)
         {
-            string folderPath1 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-            string folderPath3 = Path.Combine(_dataDirectory!,
-                $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-            string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
-            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
-            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
-
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_P_HASH);
-            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_P_HASH);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(ASSET1349_P_HASH);
-            _asset4 = _asset4!.WithFolder(folder2).WithHash(ASSET1350_P_HASH);
-            _asset5 = _asset5!.WithFolder(folder3).WithHash(ASSET1413_P_HASH);
-            _asset6 = _asset6!.WithFolder(folder3).WithHash(ASSET1414_P_HASH);
-            _asset7 = _asset7!.WithFolder(folder3).WithHash(ASSET1415_P_HASH);
-            _asset8 = _asset8!.WithFolder(folder4)
-                .WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository.AddAsset(_asset2, assetData);
-            _testableAssetRepository.AddAsset(_asset3, assetData);
-            _testableAssetRepository.AddAsset(_asset4, assetData);
-            _testableAssetRepository.AddAsset(_asset5, assetData);
-            _testableAssetRepository.AddAsset(_asset6, assetData);
-            _testableAssetRepository.AddAsset(_asset7, assetData);
-            _testableAssetRepository.AddAsset(_asset8, assetData);
-
-            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
-
-            if (expected > 0)
-            {
-                IList<string> assetsNameList1 = [.. assetsName1];
-                Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-            if (expected > 1)
-            {
-                IList<string> assetsNameList2 = [.. assetsName2];
-                Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
-            }
-            if (expected > 2)
-            {
-                IList<string> assetsNameList3 = [.. assetsName3];
-                Assert.That(assetsNameList3.SequenceEqual(duplicatedAssets[2].Select(y => y.FileName)), Is.True);
-            }
+            IList<string> assetsNameList1 = [.. assetsName1];
+            Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
         }
-        finally
+        if (expected > 1)
         {
-            Directory.Delete(_databaseDirectory!, true);
+            IList<string> assetsNameList2 = [.. assetsName2];
+            Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
+        }
+        if (expected > 2)
+        {
+            IList<string> assetsNameList3 = [.. assetsName3];
+            Assert.That(assetsNameList3.SequenceEqual(duplicatedAssets[2].Select(y => y.FileName)), Is.True);
         }
     }
 }

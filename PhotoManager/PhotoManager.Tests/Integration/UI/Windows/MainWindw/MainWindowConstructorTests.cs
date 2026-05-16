@@ -17,6 +17,7 @@ public class MainWindowConstructorTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -29,6 +30,8 @@ public class MainWindowConstructorTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _folderNavigationViewModel = null;
     }
 
@@ -53,24 +56,24 @@ public class MainWindowConstructorTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
             imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
             new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -93,49 +96,42 @@ public class MainWindowConstructorTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!, expectedProjectName, expectedProjectOwner);
+        CheckBeforeChanges(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
-            Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
+        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
 
-            _folderNavigationViewModel = new(_applicationViewModel!, sourceFolder, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, sourceFolder, []);
 
-            CancellationTokenSource cancellationTokenSource = new();
+        CancellationTokenSource cancellationTokenSource = new();
 
-            Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
-            Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
+        Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
+        Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
+        Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                expectedProjectName,
-                expectedProjectOwner);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _dataDirectory!,
+            expectedProjectName,
+            expectedProjectOwner);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                _dataDirectory!,
-                expectedProjectName,
-                expectedProjectOwner,
-                sourceFolder);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            _dataDirectory!,
+            expectedProjectName,
+            expectedProjectOwner,
+            sourceFolder);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedProjectName,
-                expectedProjectOwner);
+        CheckInstance(
+            applicationViewModelInstances,
+            _dataDirectory!,
+            expectedProjectName,
+            expectedProjectOwner);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

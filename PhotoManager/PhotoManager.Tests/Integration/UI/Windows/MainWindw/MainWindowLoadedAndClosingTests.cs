@@ -187,6 +187,7 @@ public class MainWindowLoadedAndClosingTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
 
@@ -406,7 +407,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -517,7 +517,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -648,7 +647,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -760,7 +758,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }
@@ -855,7 +852,6 @@ public class MainWindowLoadedAndClosingTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }
@@ -949,7 +945,6 @@ public class MainWindowLoadedAndClosingTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }

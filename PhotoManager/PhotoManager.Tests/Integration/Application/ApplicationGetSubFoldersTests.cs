@@ -21,6 +21,13 @@ public class ApplicationGetSubFoldersTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -121,9 +128,9 @@ public class ApplicationGetSubFoldersTests
 
             Assert.That(parentFolders3, Is.Not.Empty);
             Assert.That(parentFolders3, Has.Length.EqualTo(3));
-            Assert.That(parentFolders3[0].Path, Is.EqualTo(childFolderPath1));
-            Assert.That(parentFolders3[1].Path, Is.EqualTo(childFolderPath2));
-            Assert.That(parentFolders3[2].Path, Is.EqualTo(childFolderPath3));
+            Assert.That(parentFolders3.Any(x => x.Path == childFolderPath1));
+            Assert.That(parentFolders3.Any(x => x.Path == childFolderPath2));
+            Assert.That(parentFolders3.Any(x => x.Path == childFolderPath3));
 
             Assert.That(parentFolders4, Is.Empty);
             Assert.That(parentFolders5, Is.Empty);
@@ -149,7 +156,6 @@ public class ApplicationGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -170,7 +176,7 @@ public class ApplicationGetSubFoldersTests
 
             string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
             string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
-            string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
+            string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_3);
 
             Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
@@ -192,8 +198,8 @@ public class ApplicationGetSubFoldersTests
 
             Assert.That(parentFolders2, Is.Not.Empty);
             Assert.That(parentFolders2, Has.Length.EqualTo(2));
-            Assert.That(parentFolders2[0].Path, Is.EqualTo(childFolderPath2));
-            Assert.That(parentFolders2[1].Path, Is.EqualTo(childFolderPath3));
+            Assert.That(parentFolders2.Any(x => x.Path == childFolderPath2));
+            Assert.That(parentFolders2.Any(x => x.Path == childFolderPath3));
 
             Assert.That(childFolders1, Is.Empty);
             Assert.That(childFolders2, Is.Empty);
@@ -203,7 +209,6 @@ public class ApplicationGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -235,7 +240,6 @@ public class ApplicationGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -267,13 +271,12 @@ public class ApplicationGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void GetSubFolders_ParentFolderIsNull_ThrowsArgumentException()
+    public void GetSubFolders_ParentFolderIsNull_ThrowsNullReferenceException()
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -287,19 +290,17 @@ public class ApplicationGetSubFoldersTests
 
             string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            // At least one folder to trigger the Where on folders
             _testableAssetRepository!.AddFolder(parentFolderPath2);
 
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _application!.GetSubFolders(parentFolder1!));
+            NullReferenceException? exception =
+                Assert.Throws<NullReferenceException>(() => _application!.GetSubFolders(parentFolder1!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

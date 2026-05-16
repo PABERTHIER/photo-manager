@@ -188,6 +188,13 @@ public class ApplicationLoadThumbnailTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -300,7 +307,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -352,7 +358,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(tempDirectory, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -429,13 +434,12 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void LoadThumbnail_FolderDoesNotExist_SetsBitmapImageToTheAsset()
+    public void LoadThumbnail_FolderDoesNotExist_DoesNotSetBitmapImageToTheAsset()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
@@ -463,7 +467,7 @@ public class ApplicationLoadThumbnailTests
 
             _application!.LoadThumbnail(_asset1!);
 
-            Assert.That(_asset1!.ImageData, Is.Not.Null);
+            Assert.That(_asset1!.ImageData, Is.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assets, Has.Count.EqualTo(1));
@@ -473,7 +477,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -510,7 +513,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -548,7 +550,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -609,7 +610,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -688,7 +688,6 @@ public class ApplicationLoadThumbnailTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

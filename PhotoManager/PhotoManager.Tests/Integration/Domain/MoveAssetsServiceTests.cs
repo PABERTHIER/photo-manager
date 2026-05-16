@@ -64,6 +64,7 @@ public class MoveAssetsServiceTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -161,7 +162,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -270,7 +270,6 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -371,7 +370,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -483,7 +481,6 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -571,7 +568,6 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
@@ -701,7 +697,6 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -806,7 +801,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -849,7 +843,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -963,7 +956,6 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1057,7 +1049,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1066,25 +1057,18 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_AssetsIsNull_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
     {
-        try
-        {
-            Asset[]? assets = null;
+        Asset[]? assets = null;
 
-            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
-            Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
+        Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
@@ -1092,25 +1076,18 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_AssetsIsEmpty_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
     {
-        try
-        {
-            Asset[] assets = [];
+        Asset[] assets = [];
 
-            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
-            Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
+        Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
@@ -1118,62 +1095,55 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_OneAssetIsNull_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
     {
-        try
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+
+        Asset asset1 = new()
         {
-            Guid folderId1 = Guid.NewGuid();
-            Guid folderId2 = Guid.NewGuid();
-
-            Asset asset1 = new()
+            FolderId = folderId1,
+            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
             {
-                FolderId = folderId1,
-                Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset? asset2 = null;
-            Asset asset3 = new()
-            {
-                FolderId = folderId2,
-                Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-
-            Asset[] assets = [asset1, asset2!, asset3];
-
-            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
-
-            Assert.That(exception?.Message, Is.EqualTo("asset cannot be null. (Parameter 'asset')"));
-            Assert.That(exception?.ParamName, Is.EqualTo("asset"));
-
-            _testLogger!.AssertLogErrors(["Cannot validate asset because one of the assets in the array is null."],
-                typeof(MoveAssetsService));
-        }
-        finally
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset? asset2 = null;
+        Asset asset3 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            FolderId = folderId2,
+            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_2_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+
+        Asset[] assets = [asset1, asset2!, asset3];
+
+        Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
+
+        Assert.That(exception?.Message, Is.EqualTo("asset cannot be null. (Parameter 'asset')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("asset"));
+
+        _testLogger!.AssertLogErrors(["Cannot validate asset because one of the assets in the array is null."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
@@ -1181,32 +1151,90 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_OneAssetFolderIsNull_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
     {
-        try
-        {
-            Guid folderId1 = Guid.NewGuid();
-            Guid folderId2 = Guid.NewGuid();
-            Folder? folder = null;
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+        Folder? folder = null;
 
-            Asset asset1 = new()
+        Asset asset1 = new()
+        {
+            FolderId = folderId1,
+            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
             {
-                FolderId = folderId1,
-                Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset2 = new()
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset asset2 = new()
+        {
+            FolderId = Guid.Empty,
+            Folder = folder!,
+            FileName = FileNames.NON_EXISTENT_FILE_JPG,
+            Pixel = new()
             {
-                FolderId = Guid.Empty,
-                Folder = folder!,
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset asset3 = new()
+        {
+            FolderId = folderId2,
+            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_2_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+
+        Asset[] assets = [asset1, asset2, asset3];
+
+        Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
+
+        Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
+
+        _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
+            typeof(MoveAssetsService));
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void MoveAssets_DestinationFolderIsNull_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
+    {
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+
+        Asset[] assets =
+        [
+            new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
                 FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
@@ -1222,92 +1250,20 @@ public class MoveAssetsServiceTests
                     }
                 },
                 Hash = string.Empty
-            };
-            Asset asset3 = new()
-            {
-                FolderId = folderId2,
-                Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            }
+        ];
 
-            Asset[] assets = [asset1, asset2, asset3];
+        Folder? destinationFolder = null;
 
-            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _moveAssetsService!.MoveAssets(assets, destinationFolder!, preserveOriginalFile));
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
+        Assert.That(exception?.Message,
+            Is.EqualTo("destinationFolder cannot be null. (Parameter 'destinationFolder')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(destinationFolder)));
 
-            Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
-
-            _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public void MoveAssets_DestinationFolderIsNull_LogsItAndThrowsArgumentNullException(bool preserveOriginalFile)
-    {
-        try
-        {
-            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-
-            Asset[] assets =
-            [
-                new()
-                {
-                    FolderId = folder.Id,
-                    Folder = folder,
-                    FileName = FileNames.NON_EXISTENT_FILE_JPG,
-                    Pixel = new()
-                    {
-                        Asset = new()
-                        {
-                            Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                            Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                        },
-                        Thumbnail = new()
-                        {
-                            Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                            Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                        }
-                    },
-                    Hash = string.Empty
-                }
-            ];
-
-            Folder? destinationFolder = null;
-
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _moveAssetsService!.MoveAssets(assets, destinationFolder!, preserveOriginalFile));
-
-            Assert.That(exception?.Message,
-                Is.EqualTo("destinationFolder cannot be null. (Parameter 'destinationFolder')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(destinationFolder)));
-
-            _testLogger!.AssertLogErrors(["Cannot move assets because the destination folder is null."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(["Cannot move assets because the destination folder is null."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
@@ -1363,7 +1319,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1397,6 +1352,8 @@ public class MoveAssetsServiceTests
             Assert.That(File.Exists(sourceFilePath2), Is.True);
             Assert.That(File.Exists(destinationFilePath2), Is.True);
 
+            _testableAssetRepository!.AddFolder(destinationDirectory);
+
             Asset? asset1 = _assetCreationService!.CreateAsset(destinationDirectory, asset1FileName);
             Assert.That(asset1, Is.Not.Null);
             Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory, asset2FileName);
@@ -1405,8 +1362,8 @@ public class MoveAssetsServiceTests
             Asset[] assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(2));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1.FileName));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2.FileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset1.FileName));
+            Assert.That(assetsInRepository.Any(x => x.FileName == asset2.FileName));
 
             _moveAssetsService!.DeleteAssets([asset1, asset2]);
 
@@ -1421,7 +1378,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1452,6 +1408,8 @@ public class MoveAssetsServiceTests
             Assert.That(File.Exists(sourceFilePath2), Is.True);
             Assert.That(File.Exists(destinationFilePath2), Is.True);
 
+            _testableAssetRepository!.AddFolder(destinationDirectory);
+
             Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, FileNames.IMAGE_6_JPG);
             Assert.That(asset, Is.Not.Null);
 
@@ -1473,236 +1431,200 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
     public void DeleteAssets_AssetsIsNull_LogsItAndThrowsArgumentNullException()
     {
-        try
-        {
-            Asset[]? assets = null;
+        Asset[]? assets = null;
 
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
-            Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
+        Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
     public void DeleteAssets_AssetsIsEmpty_LogsItAndThrowsArgumentNullException()
     {
-        try
-        {
-            Asset[] assets = [];
+        Asset[] assets = [];
 
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
 
-            Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
+        Assert.That(exception?.Message, Is.EqualTo("assets cannot be null or empty. (Parameter 'assets')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(assets)));
 
-            _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
-                typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(["Cannot validate assets because the assets array is null or empty."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
     public void DeleteAssets_OneAssetIsNull_LogsItAndThrowsArgumentNullException()
     {
-        try
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+
+        Asset asset1 = new()
         {
-            Guid folderId1 = Guid.NewGuid();
-            Guid folderId2 = Guid.NewGuid();
-
-            Asset asset1 = new()
+            FolderId = folderId1,
+            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
             {
-                FolderId = folderId1,
-                Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset? asset2 = null;
-            Asset asset3 = new()
-            {
-                FolderId = folderId2,
-                Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-
-            Asset[] assets = [asset1, asset2!, asset3];
-
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
-
-            Assert.That(exception?.Message, Is.EqualTo("asset cannot be null. (Parameter 'asset')"));
-            Assert.That(exception?.ParamName, Is.EqualTo("asset"));
-
-            _testLogger!.AssertLogErrors(["Cannot validate asset because one of the assets in the array is null."],
-                typeof(MoveAssetsService));
-        }
-        finally
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset? asset2 = null;
+        Asset asset3 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            FolderId = folderId2,
+            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_2_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+
+        Asset[] assets = [asset1, asset2!, asset3];
+
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
+
+        Assert.That(exception?.Message, Is.EqualTo("asset cannot be null. (Parameter 'asset')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("asset"));
+
+        _testLogger!.AssertLogErrors(["Cannot validate asset because one of the assets in the array is null."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
     public void DeleteAssets_OneAssetFolderIsNull_LogsItAndThrowsArgumentNullException()
     {
-        try
+        Guid folderId1 = Guid.NewGuid();
+        Guid folderId2 = Guid.NewGuid();
+        Folder? folder = null;
+
+        Asset asset1 = new()
         {
-            Guid folderId1 = Guid.NewGuid();
-            Guid folderId2 = Guid.NewGuid();
-            Folder? folder = null;
-
-            Asset asset1 = new()
+            FolderId = folderId1,
+            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
             {
-                FolderId = folderId1,
-                Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset2 = new()
-            {
-                FolderId = Guid.Empty,
-                Folder = folder!,
-                FileName = FileNames.NON_EXISTENT_FILE_JPG,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset3 = new()
-            {
-                FolderId = folderId2,
-                Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-
-            Asset[] assets = [asset1, asset2, asset3];
-
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
-
-            Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
-            Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
-
-            _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
-                typeof(MoveAssetsService));
-        }
-        finally
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset asset2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            FolderId = Guid.Empty,
+            Folder = folder!,
+            FileName = FileNames.NON_EXISTENT_FILE_JPG,
+            Pixel = new()
+            {
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+        Asset asset3 = new()
+        {
+            FolderId = folderId2,
+            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            FileName = FileNames.IMAGE_2_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
+                }
+            },
+            Hash = string.Empty
+        };
+
+        Asset[] assets = [asset1, asset2, asset3];
+
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
+
+        Assert.That(exception?.Message, Is.EqualTo("asset.Folder cannot be null. (Parameter 'Folder')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(Folder)));
+
+        _testLogger!.AssertLogErrors([$"Cannot validate asset '{asset2.FileName}' because the folder is null."],
+            typeof(MoveAssetsService));
     }
 
     [Test]
     public void DeleteAssets_AssetDoesNotExists_LogsItAndThrowsFileNotFoundException()
     {
-        try
-        {
-            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
-            Asset asset = new()
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = FileNames.NON_EXISTENT_FILE_JPG,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = FileNames.NON_EXISTENT_FILE_JPG,
-                Pixel = new()
+                Asset = new()
                 {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                    }
+                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
                 },
-                Hash = string.Empty
-            };
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
+                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
+                }
+            },
+            Hash = string.Empty
+        };
 
-            Asset[] assets = [asset];
+        Asset[] assets = [asset];
 
-            FileNotFoundException? exception =
-                Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets));
+        FileNotFoundException? exception =
+            Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets));
 
-            Assert.That(exception?.Message, Is.EqualTo($"File does not exist: '{asset.FullPath}'."));
+        Assert.That(exception?.Message, Is.EqualTo($"File does not exist: '{asset.FullPath}'."));
 
-            _testLogger!.AssertLogErrors(
-            [
-                $"Cannot validate asset '{asset.FileName}' because the file does not exist at '{asset.FullPath}'."
-            ], typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        _testLogger!.AssertLogErrors(
+        [
+            $"Cannot validate asset '{asset.FileName}' because the file does not exist at '{asset.FullPath}'."
+        ], typeof(MoveAssetsService));
     }
 
     [Test]
@@ -1726,7 +1648,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
 
             _testLogger!.AssertLogErrors([], typeof(MoveAssetsService));
         }
@@ -1764,7 +1685,6 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
@@ -1801,7 +1721,6 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1829,7 +1748,6 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1867,7 +1785,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1894,7 +1811,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1930,7 +1846,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1961,7 +1876,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1993,7 +1907,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2018,7 +1931,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2026,27 +1938,20 @@ public class MoveAssetsServiceTests
     public void CopyAsset_FileInSourceDoesNotExistButExistsInTheDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
 
-        try
-        {
-            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
-            string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+        string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
+        bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
-            Assert.That(hasBeenCopied, Is.False);
-            Assert.That(File.Exists(sourceFilePath), Is.False);
-            Assert.That(File.Exists(destinationFilePath), Is.True);
+        Assert.That(hasBeenCopied, Is.False);
+        Assert.That(File.Exists(sourceFilePath), Is.False);
+        Assert.That(File.Exists(destinationFilePath), Is.True);
 
-            string[] messages =
-            [
-                $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
-            ];
-            _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        string[] messages =
+        [
+            $"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."
+        ];
+        _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
     }
 
     [Test]
@@ -2075,7 +1980,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2083,22 +1987,15 @@ public class MoveAssetsServiceTests
     public void CopyAsset_DestinationIsEmpty_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
 
-        try
-        {
-            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string destinationFilePath = string.Empty;
+        string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string destinationFilePath = string.Empty;
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
+        bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
-            Assert.That(hasBeenCopied, Is.False);
+        Assert.That(hasBeenCopied, Is.False);
 
-            string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
+        _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
     }
 
     [Test]
@@ -2126,7 +2023,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2134,47 +2030,33 @@ public class MoveAssetsServiceTests
     public void CopyAsset_SourceIsNullButFileExistsInDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
 
-        try
-        {
-            string? sourceFilePath = null;
-            string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string? sourceFilePath = null;
+        string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath);
+        bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath);
 
-            Assert.That(hasBeenCopied, Is.False);
+        Assert.That(hasBeenCopied, Is.False);
 
-            string[] messages =
-            [
-                $"Cannot copy '(null)' into '{destinationFilePath}' because the file already exists in the destination."
-            ];
-            _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        string[] messages =
+        [
+            $"Cannot copy '(null)' into '{destinationFilePath}' because the file already exists in the destination."
+        ];
+        _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
     }
 
     [Test]
     public void CopyAsset_DestinationIsNull_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
 
-        try
-        {
-            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string? destinationFilePath = null;
+        string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string? destinationFilePath = null;
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);
+        bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);
 
-            Assert.That(hasBeenCopied, Is.False);
+        Assert.That(hasBeenCopied, Is.False);
 
-            string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
-            _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
+        _testLogger!.AssertLogErrors(messages, typeof(MoveAssetsService));
     }
 
     [Test]
@@ -2207,7 +2089,6 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 }

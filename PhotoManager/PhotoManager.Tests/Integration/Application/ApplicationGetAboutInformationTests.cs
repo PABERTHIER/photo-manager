@@ -13,6 +13,7 @@ public class ApplicationGetAboutInformationTests
     private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -20,6 +21,13 @@ public class ApplicationGetAboutInformationTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureApplication(string assetsDirectory, string projectName, string projectOwner)
@@ -43,24 +51,24 @@ public class ApplicationGetAboutInformationTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
             imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
             new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -75,20 +83,13 @@ public class ApplicationGetAboutInformationTests
     {
         ConfigureApplication(_dataDirectory!, projectName, projectOwner);
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
 
-            Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
-            Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
-            Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
-            Assert.That(aboutInformation.Version, Does.StartWith("v"));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
+        Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
+        Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
+        Assert.That(aboutInformation.Version, Does.StartWith("v"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     [Test]
@@ -96,19 +97,12 @@ public class ApplicationGetAboutInformationTests
     {
         ConfigureApplication(_dataDirectory!, "PhotoManager", "Toto");
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
 
-            Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
-            Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
-            Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
+        Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     [Test]
@@ -123,17 +117,10 @@ public class ApplicationGetAboutInformationTests
         AssemblyBuilder assemblyBuilder =
             AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(assemblyBuilder);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(assemblyBuilder);
 
-            Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
-            Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
+        Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 }

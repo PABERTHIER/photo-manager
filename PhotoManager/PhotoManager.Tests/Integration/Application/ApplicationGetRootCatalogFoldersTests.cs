@@ -20,6 +20,13 @@ public class ApplicationGetRootCatalogFoldersTests
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(string assetsDirectory)
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
@@ -68,28 +75,21 @@ public class ApplicationGetRootCatalogFoldersTests
 
         ConfigureApplication(assetsDirectory);
 
-        try
-        {
-            await _application!.CatalogAssetsAsync(_ => { });
+        await _application!.CatalogAssetsAsync(_ => { });
 
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-            Assert.That(folder.Path, Is.EqualTo(assetsDirectory));
-            Assert.That(folder.Name, Is.EqualTo(folderName));
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Path, Is.EqualTo(assetsDirectory));
+        Assert.That(folder.Name, Is.EqualTo(folderName));
 
-            Folder[] folders = _application!.GetRootCatalogFolders();
-            Assert.That(folders, Has.Length.EqualTo(1));
+        Folder[] folders = _application!.GetRootCatalogFolders();
+        Assert.That(folders, Has.Length.EqualTo(1));
 
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
     }
 
     [Test]
@@ -97,25 +97,18 @@ public class ApplicationGetRootCatalogFoldersTests
     {
         ConfigureApplication(_dataDirectory!);
 
-        try
-        {
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
+        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
-            Folder[] folders = _application!.GetRootCatalogFolders();
+        Folder[] folders = _application!.GetRootCatalogFolders();
 
-            Assert.That(folders, Has.Length.EqualTo(1));
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders, Has.Length.EqualTo(1));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
     }
 
     [Test]
@@ -123,25 +116,18 @@ public class ApplicationGetRootCatalogFoldersTests
     {
         ConfigureApplication(_dataDirectory!);
 
-        try
-        {
 
-            Folder[] folders = _application!.GetRootCatalogFolders();
+        Folder[] folders = _application!.GetRootCatalogFolders();
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
-            Assert.That(folder, Is.Not.Null);
-            Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
-            Assert.That(folders, Has.Length.EqualTo(1));
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders, Has.Length.EqualTo(1));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
     }
 }

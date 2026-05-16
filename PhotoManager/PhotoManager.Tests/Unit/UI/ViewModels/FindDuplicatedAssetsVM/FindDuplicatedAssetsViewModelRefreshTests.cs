@@ -164,6 +164,13 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureFindDuplicatedAssetsViewModel(
         int catalogBatchSize,
         string assetsDirectory,
@@ -232,144 +239,137 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository!.AddAsset(_asset2, assetData);
+        _testableAssetRepository!.AddAsset(_asset3, assetData);
+        _testableAssetRepository!.AddAsset(_asset4, assetData);
+        _testableAssetRepository!.AddAsset(_asset5, assetData);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
         {
-            CheckBeforeChanges();
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash1 = Hashes.IMAGE_1_JPG;
-            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
-            _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
-
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
-            _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository!.AddAsset(_asset2, assetData);
-            _testableAssetRepository!.AddAsset(_asset3, assetData);
-            _testableAssetRepository!.AddAsset(_asset4, assetData);
-            _testableAssetRepository!.AddAsset(_asset5, assetData);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1];
-            List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Refresh
-            _findDuplicatedAssetsViewModel!.Refresh();
-
-            duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-
-            duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Refresh
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-        }
-        finally
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1];
+        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        // Refresh
+        _findDuplicatedAssetsViewModel!.Refresh();
+
+        duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        duplicatedAssetViewModel1 = new()
+        {
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
+
+        duplicatedAssetViewModel2 = new()
+        {
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+        // Refresh
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
     }
 
     [Test]
@@ -383,126 +383,119 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository!.AddAsset(_asset2, assetData);
+        _testableAssetRepository!.AddAsset(_asset3, assetData);
+        _testableAssetRepository!.AddAsset(_asset4, assetData);
+        _testableAssetRepository!.AddAsset(_asset5, assetData);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
         {
-            CheckBeforeChanges();
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash1 = Hashes.IMAGE_1_JPG;
-            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
-            _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
-
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
-            _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository!.AddAsset(_asset2, assetData);
-            _testableAssetRepository!.AddAsset(_asset3, assetData);
-            _testableAssetRepository!.AddAsset(_asset4, assetData);
-            _testableAssetRepository!.AddAsset(_asset5, assetData);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-            List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Refresh
-            _findDuplicatedAssetsViewModel!.Refresh();
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Refresh
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-        }
-        finally
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        // Refresh
+        _findDuplicatedAssetsViewModel!.Refresh();
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+        // Refresh
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
     }
 
     [Test]
@@ -517,154 +510,147 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+
+        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder2).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder1).WithHash(hash2);
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository!.AddAsset(_asset2, assetData);
+        _testableAssetRepository!.AddAsset(_asset3, assetData);
+        _testableAssetRepository!.AddAsset(_asset4, assetData);
+        _testableAssetRepository!.AddAsset(_asset5, assetData);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
         {
-            CheckBeforeChanges();
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
-
-            Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
-
-            const string hash1 = Hashes.IMAGE_1_JPG;
-            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-            _asset1 = _asset1!.WithFolder(folder2).WithHash(hash1);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
-
-            _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
-            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder1).WithHash(hash2);
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository!.AddAsset(_asset2, assetData);
-            _testableAssetRepository!.AddAsset(_asset3, assetData);
-            _testableAssetRepository!.AddAsset(_asset4, assetData);
-            _testableAssetRepository!.AddAsset(_asset5, assetData);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-            List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Refresh
-            _findDuplicatedAssetsViewModel!.Refresh();
-
-            duplicatedAssetSet2 = [];
-
-            duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetsSets = [duplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet2,
-                duplicatedAssetViewModel3);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Refresh
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet2,
-                duplicatedAssetViewModel3);
-        }
-        finally
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        // Refresh
+        _findDuplicatedAssetsViewModel!.Refresh();
+
+        duplicatedAssetSet2 = [];
+
+        duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        expectedDuplicatedAssetsSets = [duplicatedAssetSet2];
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet2,
+            duplicatedAssetViewModel3);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+        // Refresh
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet2,
+            duplicatedAssetViewModel3);
     }
 
     [Test]
@@ -678,118 +664,111 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
         {
-            CheckBeforeChanges();
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash1 = Hashes.IMAGE_1_JPG;
-            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
-            _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
-
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
-            _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-            List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Refresh
-            _findDuplicatedAssetsViewModel!.Refresh();
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                [],
-                0,
-                0,
-                [],
-                null);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Refresh
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                [],
-                0,
-                0,
-                [],
-                null);
-        }
-        finally
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        // Refresh
+        _findDuplicatedAssetsViewModel!.Refresh();
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            [],
+            0,
+            0,
+            [],
+            null);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(10));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+        // Refresh
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            [],
+            0,
+            0,
+            [],
+            null);
     }
 
     [Test]
@@ -803,101 +782,94 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
+
+        byte[] assetData = [1, 2, 3];
+
+        _testableAssetRepository!.AddAsset(_asset1, assetData);
+        _testableAssetRepository!.AddAsset(_asset2, assetData);
+        _testableAssetRepository!.AddAsset(_asset3, assetData);
+        _testableAssetRepository!.AddAsset(_asset4, assetData);
+        _testableAssetRepository!.AddAsset(_asset5, assetData);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
         {
-            CheckBeforeChanges();
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash1 = Hashes.IMAGE_1_JPG;
-            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
-            _asset3 = _asset3!.WithFolder(folder).WithHash(hash1);
-
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
-            _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
-
-            byte[] assetData = [1, 2, 3];
-
-            _testableAssetRepository!.AddAsset(_asset1, assetData);
-            _testableAssetRepository!.AddAsset(_asset2, assetData);
-            _testableAssetRepository!.AddAsset(_asset3, assetData);
-            _testableAssetRepository!.AddAsset(_asset4, assetData);
-            _testableAssetRepository!.AddAsset(_asset5, assetData);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-
-            _findDuplicatedAssetsViewModel!.Refresh();
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-        }
-        finally
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+
+        _findDuplicatedAssetsViewModel!.Refresh();
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            duplicatedAssetSet1,
+            duplicatedAssetViewModel1);
     }
 
     [Test]
@@ -911,41 +883,34 @@ public class FindDuplicatedAssetsViewModelRefreshTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            _findDuplicatedAssetsViewModel!.Refresh();
+        _findDuplicatedAssetsViewModel!.Refresh();
 
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                [],
-                0,
-                0,
-                [],
-                null);
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            [],
+            0,
+            0,
+            [],
+            null);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            Assert.That(messagesInformationSent, Is.Empty);
+        Assert.That(messagesInformationSent, Is.Empty);
 
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                [],
-                0,
-                0,
-                [],
-                null);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            [],
+            0,
+            0,
+            [],
+            null);
     }
 
     private

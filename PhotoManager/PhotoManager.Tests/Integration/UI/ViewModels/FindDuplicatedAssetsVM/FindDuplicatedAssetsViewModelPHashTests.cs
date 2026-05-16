@@ -1052,6 +1052,13 @@ public class FindDuplicatedAssetsViewModelPHashTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureFindDuplicatedAssetsViewModel(
         int catalogBatchSize,
         string assetsDirectory,
@@ -1628,7 +1635,6 @@ public class FindDuplicatedAssetsViewModelPHashTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }
@@ -2061,7 +2067,6 @@ public class FindDuplicatedAssetsViewModelPHashTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
     }

@@ -18,6 +18,7 @@ public class SyncAssetsWindowTests
     private SyncAssetsViewModel? _syncAssetsViewModel;
     private MoveAssetsService? _moveAssetsService;
     private FileOperationsService? _fileOperationsService;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -25,6 +26,13 @@ public class SyncAssetsWindowTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -53,24 +61,24 @@ public class SyncAssetsWindowTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(testableAssetRepository, _fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, _fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, _fileOperationsService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, _fileOperationsService,
             imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
             new TestLogger<CatalogAssetsService>());
-        _moveAssetsService = new(testableAssetRepository, _fileOperationsService, assetCreationService,
+        _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, _fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, _fileOperationsService, assetsComparator,
             _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, _fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, _fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             _fileOperationsService, imageProcessingService);
         _syncAssetsViewModel = new(application);
@@ -84,75 +92,68 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Toto\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Toto",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Tutu\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Tutu",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
+        SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
 
-            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
+        _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
+        _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.ViewDescription,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                true,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.ViewDescription,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            true,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.ViewDescription,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                true,
-                false,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.ViewDescription,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            true,
+            false,
+            false);
     }
 
     [Test]
@@ -163,51 +164,44 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
+        Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
+        _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.ViewDescription,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                true,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.ViewDescription,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            true,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.ViewDescription,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                true,
-                false,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.ViewDescription,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            true,
+            false,
+            false);
     }
 
     [Test]
@@ -218,54 +212,47 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
     }
 
     [Test]
@@ -276,123 +263,116 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Toto\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Toto",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Tutu\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Tutu",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
+        SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
 
-            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
+        _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
 
-            SyncAssetsConfiguration configuration = new();
-            configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
-            _syncAssetsViewModel!.SetProcessConfiguration(configuration);
+        SyncAssetsConfiguration configuration = new();
+        configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
+        _syncAssetsViewModel!.SetProcessConfiguration(configuration);
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
     }
 
     [Test]
@@ -403,170 +383,163 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Toto\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Toto",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Tutu\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Tutu",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
+        SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
 
-            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
+        _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
 
-            SyncAssetsConfiguration configuration = new();
-            configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
-            _syncAssetsViewModel!.SetProcessConfiguration(configuration);
+        SyncAssetsConfiguration configuration = new();
+        configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
+        _syncAssetsViewModel!.SetProcessConfiguration(configuration);
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Run));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Run));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Run,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                false,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Run,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            false,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                syncAssetsConfiguration.Definitions,
-                [],
-                [],
-                ProcessStep.Run,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                false,
-                false,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            syncAssetsConfiguration.Definitions,
+            [],
+            [],
+            ProcessStep.Run,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            false,
+            false,
+            false);
     }
 
     [Test]
@@ -967,7 +940,6 @@ public class SyncAssetsWindowTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -979,210 +951,203 @@ public class SyncAssetsWindowTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Configure));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.Configure,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                false,
-                true,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.Configure,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            false,
+            true,
+            false);
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Run));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.Run));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.Run,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                false,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.Run,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            false,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.Run,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                Visibility.Hidden,
-                false,
-                false,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.Run,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            Visibility.Hidden,
+            false,
+            false,
+            false);
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewResults));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewResults));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.ViewResults,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                false,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.ViewResults,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            false,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.ViewResults,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                false,
-                false,
-                false);
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.ViewResults,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            false,
+            false,
+            false);
 
-            _syncAssetsViewModel!.AdvanceStep();
+        _syncAssetsViewModel!.AdvanceStep();
 
-            Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewResults));
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewResults));
 
-            CheckAfterChanges(
-                _syncAssetsViewModel!,
-                [],
-                [],
-                [],
-                ProcessStep.ViewResults,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                false,
-                false,
-                false);
+        CheckAfterChanges(
+            _syncAssetsViewModel!,
+            [],
+            [],
+            [],
+            ProcessStep.ViewResults,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            false,
+            false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(24));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanConfigure"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("Step"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("DescriptionVisible"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ConfigurationVisible"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("RunVisible"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ResultsVisible"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(24));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanConfigure"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("Step"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("DescriptionVisible"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ConfigurationVisible"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("RunVisible"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ResultsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanConfigure"));
 
-            CheckInstance(
-                syncAssetsViewModelInstances,
-                [],
-                [],
-                [],
-                ProcessStep.ViewResults,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Hidden,
-                Visibility.Visible,
-                false,
-                false,
-                false);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(
+            syncAssetsViewModelInstances,
+            [],
+            [],
+            [],
+            ProcessStep.ViewResults,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Hidden,
+            Visibility.Visible,
+            false,
+            false,
+            false);
     }
 
     private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)

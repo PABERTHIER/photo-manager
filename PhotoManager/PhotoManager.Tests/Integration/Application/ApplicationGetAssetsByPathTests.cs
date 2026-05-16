@@ -162,6 +162,13 @@ public class ApplicationGetAssetsByPathTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -218,92 +225,88 @@ public class ApplicationGetAssetsByPathTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
-        {
-            List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Is.Empty);
+        List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(cataloguedAssets, Is.Empty);
 
-            await _application!.CatalogAssetsAsync(_ => { });
+        await _application!.CatalogAssetsAsync(_ => { });
 
-            bool folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
-            Assert.That(folderExists, Is.True);
+        bool folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
+        Assert.That(folderExists, Is.True);
 
-            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(4));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(_asset1!.Hash));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].Hash, Is.EqualTo(_asset2!.Hash));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].Hash, Is.EqualTo(_asset3!.Hash));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[3].FileName, Is.EqualTo(_asset4!.FileName));
-            Assert.That(cataloguedAssets[3].Hash, Is.EqualTo(_asset4!.Hash));
-            Assert.That(cataloguedAssets[3].ImageData, Is.Null);
+        cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(cataloguedAssets, Has.Count.EqualTo(4));
+        Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1!.FileName));
+        Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(_asset1!.Hash));
+        Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+        Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+        Assert.That(cataloguedAssets[1].Hash, Is.EqualTo(_asset2!.Hash));
+        Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+        Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
+        Assert.That(cataloguedAssets[2].Hash, Is.EqualTo(_asset3!.Hash));
+        Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+        Assert.That(cataloguedAssets[3].FileName, Is.EqualTo(_asset4!.FileName));
+        Assert.That(cataloguedAssets[3].Hash, Is.EqualTo(_asset4!.Hash));
+        Assert.That(cataloguedAssets[3].ImageData, Is.Null);
 
-            Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
-            Assert.That(assetsInRepository, Has.Length.EqualTo(4));
+        Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
+        Assert.That(assetsInRepository, Has.Length.EqualTo(4));
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[3].ImageData, Is.Not.Null);
+        Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
+        Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
+        Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
+        Assert.That(cataloguedAssets[3].ImageData, Is.Not.Null);
 
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(assetsInRepository[0].Hash, Is.EqualTo(_asset1!.Hash));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assetsInRepository[1].Hash, Is.EqualTo(_asset2!.Hash));
-            Assert.That(assetsInRepository[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(assetsInRepository[2].Hash, Is.EqualTo(_asset3!.Hash));
-            Assert.That(assetsInRepository[3].FileName, Is.EqualTo(_asset4!.FileName));
-            Assert.That(assetsInRepository[3].Hash, Is.EqualTo(_asset4!.Hash));
+        Asset assetsInRepository1 = assetsInRepository.First(x => x.FileName == _asset1!.FileName);
+        Assert.That(assetsInRepository1.Hash, Is.EqualTo(_asset1!.Hash));
 
-            Folder folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory)!;
+        Asset assetsInRepository2 = assetsInRepository.First(x => x.FileName == _asset2!.FileName);
+        Assert.That(assetsInRepository2.Hash, Is.EqualTo(_asset2!.Hash));
 
-            _asset1 = _asset1!.WithFolder(folder);
-            _asset2 = _asset2!.WithFolder(folder);
-            _asset3 = _asset3!.WithFolder(folder);
-            _asset4 = _asset4!.WithFolder(folder);
+        Asset assetsInRepository3 = assetsInRepository.First(x => x.FileName == _asset3!.FileName);
+        Assert.That(assetsInRepository3.Hash, Is.EqualTo(_asset3!.Hash));
 
-            Assert.That(File.Exists(_asset1!.FullPath), Is.True);
-            Assert.That(File.Exists(_asset2!.FullPath), Is.True);
-            Assert.That(File.Exists(_asset3!.FullPath), Is.True);
-            Assert.That(File.Exists(_asset4!.FullPath), Is.True);
+        Asset assetsInRepository4 = assetsInRepository.First(x => x.FileName == _asset4!.FileName);
+        Assert.That(assetsInRepository4.Hash, Is.EqualTo(_asset4!.Hash));
 
-            Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
+        Folder folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory)!;
 
-            Assert.That(assets, Has.Length.EqualTo(4));
+        _asset1 = _asset1!.WithFolder(folder);
+        _asset2 = _asset2!.WithFolder(folder);
+        _asset3 = _asset3!.WithFolder(folder);
+        _asset4 = _asset4!.WithFolder(folder);
 
-            Assert.That(assets[0].FolderId, Is.EqualTo(_asset1!.FolderId));
-            Assert.That(assets[0].Folder.Path, Is.EqualTo(_asset1!.Folder.Path));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(assets[0].Hash, Is.EqualTo(_asset1!.Hash));
-            Assert.That(assets[0].ImageData, Is.Not.Null);
+        Assert.That(File.Exists(_asset1!.FullPath), Is.True);
+        Assert.That(File.Exists(_asset2!.FullPath), Is.True);
+        Assert.That(File.Exists(_asset3!.FullPath), Is.True);
+        Assert.That(File.Exists(_asset4!.FullPath), Is.True);
 
-            Assert.That(assets[1].FolderId, Is.EqualTo(_asset2!.FolderId));
-            Assert.That(assets[1].Folder.Path, Is.EqualTo(_asset2!.Folder.Path));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets[1].Hash, Is.EqualTo(_asset2!.Hash));
-            Assert.That(assets[1].ImageData, Is.Not.Null);
+        Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
-            Assert.That(assets[2].FolderId, Is.EqualTo(_asset3!.FolderId));
-            Assert.That(assets[2].Folder.Path, Is.EqualTo(_asset3!.Folder.Path));
-            Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(assets[2].Hash, Is.EqualTo(_asset3!.Hash));
-            Assert.That(assets[2].ImageData, Is.Not.Null);
+        Assert.That(assets, Has.Length.EqualTo(4));
 
-            Assert.That(assets[3].FolderId, Is.EqualTo(_asset4!.FolderId));
-            Assert.That(assets[3].Folder.Path, Is.EqualTo(_asset4!.Folder.Path));
-            Assert.That(assets[3].FileName, Is.EqualTo(_asset4!.FileName));
-            Assert.That(assets[3].Hash, Is.EqualTo(_asset4!.Hash));
-            Assert.That(assets[3].ImageData, Is.Not.Null);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Asset asset1 = assets.First(x => x.FileName == _asset1!.FileName);
+        Assert.That(asset1.FolderId, Is.EqualTo(_asset1!.FolderId));
+        Assert.That(asset1.Folder.Path, Is.EqualTo(_asset1!.Folder.Path));
+        Assert.That(asset1.Hash, Is.EqualTo(_asset1!.Hash));
+        Assert.That(asset1.ImageData, Is.Not.Null);
+
+        Asset asset2 = assets.First(x => x.FileName == _asset2!.FileName);
+        Assert.That(asset2.FolderId, Is.EqualTo(_asset2!.FolderId));
+        Assert.That(asset2.Folder.Path, Is.EqualTo(_asset2!.Folder.Path));
+        Assert.That(asset2.Hash, Is.EqualTo(_asset2!.Hash));
+        Assert.That(asset2.ImageData, Is.Not.Null);
+
+        Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
+        Assert.That(asset3.FolderId, Is.EqualTo(_asset3!.FolderId));
+        Assert.That(asset3.Folder.Path, Is.EqualTo(_asset3!.Folder.Path));
+        Assert.That(asset3.Hash, Is.EqualTo(_asset3!.Hash));
+        Assert.That(asset3.ImageData, Is.Not.Null);
+
+        Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
+        Assert.That(asset4.FolderId, Is.EqualTo(_asset4!.FolderId));
+        Assert.That(asset4.Folder.Path, Is.EqualTo(_asset4!.Folder.Path));
+        Assert.That(asset4.Hash, Is.EqualTo(_asset4!.Hash));
+        Assert.That(asset4.ImageData, Is.Not.Null);
     }
 
     [Test]
@@ -350,26 +353,26 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assetsInRepository, Has.Length.EqualTo(20));
 
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.HOMER_GIF));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
-            Assert.That(assetsInRepository[2].FileName, Is.EqualTo(FileNames.IMAGE_10_PORTRAIT_PNG));
-            Assert.That(assetsInRepository[3].FileName, Is.EqualTo(FileNames.IMAGE_1_180_DEG_JPG));
-            Assert.That(assetsInRepository[4].FileName, Is.EqualTo(FileNames.IMAGE_1_270_DEG_JPG));
-            Assert.That(assetsInRepository[5].FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
-            Assert.That(assetsInRepository[6].FileName, Is.EqualTo(FileNames.IMAGE_2_DUPLICATED_JPG));
-            Assert.That(assetsInRepository[7].FileName, Is.EqualTo(FileNames.IMAGE_2_JPG));
-            Assert.That(assetsInRepository[8].FileName, Is.EqualTo(FileNames.IMAGE_3_JPG));
-            Assert.That(assetsInRepository[9].FileName, Is.EqualTo(FileNames.IMAGE_4_JPG));
-            Assert.That(assetsInRepository[10].FileName, Is.EqualTo(FileNames.IMAGE_5_JPG));
-            Assert.That(assetsInRepository[11].FileName, Is.EqualTo(FileNames.IMAGE_6_JPG));
-            Assert.That(assetsInRepository[12].FileName, Is.EqualTo(FileNames.IMAGE_7_JPG));
-            Assert.That(assetsInRepository[13].FileName, Is.EqualTo(FileNames.IMAGE_8_JPEG));
-            Assert.That(assetsInRepository[14].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
-            Assert.That(assetsInRepository[15].FileName, Is.EqualTo(FileNames.IMAGE_11_HEIC));
-            Assert.That(assetsInRepository[16].FileName, Is.EqualTo(FileNames.IMAGE_11_180_DEG_HEIC));
-            Assert.That(assetsInRepository[17].FileName, Is.EqualTo(FileNames.IMAGE_11_270_DEG_HEIC));
-            Assert.That(assetsInRepository[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
-            Assert.That(assetsInRepository[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.HOMER_GIF));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_1_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_10_PORTRAIT_PNG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_1_180_DEG_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_1_270_DEG_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_1_90_DEG_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_2_DUPLICATED_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_2_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_3_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_4_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_5_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_6_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_7_JPG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_8_JPEG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_9_PNG));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_11_HEIC));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_11_180_DEG_HEIC));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_11_270_DEG_HEIC));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_11_90_DEG_HEIC));
+            Assert.That(assetsInRepository.Any(x => x.FileName == FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
 
             for (int i = 0; i < assetsInRepository.Length; i++)
             {
@@ -380,26 +383,26 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Has.Length.EqualTo(20));
 
-            Assert.That(assets[0].FileName, Is.EqualTo(FileNames.HOMER_GIF));
-            Assert.That(assets[1].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
-            Assert.That(assets[2].FileName, Is.EqualTo(FileNames.IMAGE_10_PORTRAIT_PNG));
-            Assert.That(assets[3].FileName, Is.EqualTo(FileNames.IMAGE_1_180_DEG_JPG));
-            Assert.That(assets[4].FileName, Is.EqualTo(FileNames.IMAGE_1_270_DEG_JPG));
-            Assert.That(assets[5].FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
-            Assert.That(assets[6].FileName, Is.EqualTo(FileNames.IMAGE_2_DUPLICATED_JPG));
-            Assert.That(assets[7].FileName, Is.EqualTo(FileNames.IMAGE_2_JPG));
-            Assert.That(assets[8].FileName, Is.EqualTo(FileNames.IMAGE_3_JPG));
-            Assert.That(assets[9].FileName, Is.EqualTo(FileNames.IMAGE_4_JPG));
-            Assert.That(assets[10].FileName, Is.EqualTo(FileNames.IMAGE_5_JPG));
-            Assert.That(assets[11].FileName, Is.EqualTo(FileNames.IMAGE_6_JPG));
-            Assert.That(assets[12].FileName, Is.EqualTo(FileNames.IMAGE_7_JPG));
-            Assert.That(assets[13].FileName, Is.EqualTo(FileNames.IMAGE_8_JPEG));
-            Assert.That(assets[14].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
-            Assert.That(assets[15].FileName, Is.EqualTo(FileNames.IMAGE_11_HEIC));
-            Assert.That(assets[16].FileName, Is.EqualTo(FileNames.IMAGE_11_180_DEG_HEIC));
-            Assert.That(assets[17].FileName, Is.EqualTo(FileNames.IMAGE_11_270_DEG_HEIC));
-            Assert.That(assets[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
-            Assert.That(assets[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.HOMER_GIF));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_1_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_10_PORTRAIT_PNG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_1_180_DEG_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_1_270_DEG_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_1_90_DEG_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_2_DUPLICATED_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_2_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_3_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_4_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_5_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_6_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_7_JPG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_8_JPEG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_9_PNG));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_11_HEIC));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_11_180_DEG_HEIC));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_11_270_DEG_HEIC));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_11_90_DEG_HEIC));
+            Assert.That(assets.Any(x => x.FileName == FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
 
             // duplicatesDirectory
             folderExists = _testableAssetRepository!.FolderExists(duplicatesDirectory);
@@ -442,27 +445,37 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assetsInRepository, Has.Length.EqualTo(4));
 
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(assetsInRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assetsInRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsInRepository[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(assetsInRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsInRepository[3].FileName, Is.EqualTo(_asset4!.FileName));
-            Assert.That(assetsInRepository[3].ImageData, Is.Not.Null);
+            Asset assetsInRepository1 = assetsInRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsInRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsInRepository2 = assetsInRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsInRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsInRepository3 = assetsInRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsInRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsInRepository4 = assetsInRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsInRepository4.ImageData, Is.Not.Null);
 
             assets = _application!.GetAssetsByPath(duplicatesNewFolder2Directory);
 
             Assert.That(assets, Has.Length.EqualTo(4));
 
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(assets[0].ImageData, Is.Not.Null);
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets[1].ImageData, Is.Not.Null);
-            Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(assets[2].ImageData, Is.Not.Null);
-            Assert.That(assets[3].FileName, Is.EqualTo(_asset4!.FileName));
-            Assert.That(assets[3].ImageData, Is.Not.Null);
+            Asset asset1 = assets.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(asset1.Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(asset1.ImageData, Is.Not.Null);
+
+            Asset asset2 = assets.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(asset2.Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(asset2.ImageData, Is.Not.Null);
+
+            Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(asset3.Hash, Is.EqualTo(_asset3!.Hash));
+            Assert.That(asset3.ImageData, Is.Not.Null);
+
+            Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(asset4.Hash, Is.EqualTo(_asset4!.Hash));
+            Assert.That(asset4.ImageData, Is.Not.Null);
 
             // testFolderDirectory
             folderExists = _testableAssetRepository!.FolderExists(testFolderDirectory);
@@ -505,8 +518,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
-
             if (analyseVideos)
             {
                 Directory.Delete(outputVideoFirstFrameDirectory, true);
@@ -521,80 +532,73 @@ public class ApplicationGetAssetsByPathTests
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        try
+        List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(cataloguedAssets, Is.Empty);
+
+        bool folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
+        Assert.That(folderExists, Is.False);
+
+        Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
+
+        folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
+        Assert.That(folderExists, Is.True);
+
+        Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
+
+        Assert.That(assetsInRepository, Is.Empty);
+
+        Assert.That(assets, Is.Empty); // Because folder added but assets not catalogued yet
+
+        Folder folder = _testableAssetRepository.GetFolderByPath(assetsDirectory)!;
+
+        Asset asset = new()
         {
-            List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Is.Empty);
-
-            bool folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
-            Assert.That(folderExists, Is.False);
-
-            Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
-
-            folderExists = _testableAssetRepository!.FolderExists(assetsDirectory);
-            Assert.That(folderExists, Is.True);
-
-            Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
-
-            Assert.That(assetsInRepository, Is.Empty);
-
-            Assert.That(assets, Is.Empty); // Because folder added but assets not catalogued yet
-
-            Folder folder = _testableAssetRepository.GetFolderByPath(assetsDirectory)!;
-
-            Asset asset = new()
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = FileNames.IMAGE_1_JPG,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
                 }
-            };
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
 
-            await _application!.CatalogAssetsAsync(_ => { });
+        await _application!.CatalogAssetsAsync(_ => { });
 
-            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(asset.FileName));
-            Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(asset.Hash));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+        cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
+        Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(asset.FileName));
+        Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(asset.Hash));
+        Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
-            Assert.That(File.Exists(asset.FullPath), Is.True);
+        Assert.That(File.Exists(asset.FullPath), Is.True);
 
-            assets = _application!.GetAssetsByPath(assetsDirectory);
+        assets = _application!.GetAssetsByPath(assetsDirectory);
 
-            Assert.That(assets, Has.Length.EqualTo(1));
-            Assert.That(assets[0].FolderId, Is.EqualTo(asset.FolderId));
-            Assert.That(assets[0].Folder.Path, Is.EqualTo(asset.Folder.Path));
-            Assert.That(assets[0].FileName, Is.EqualTo(asset.FileName));
-            Assert.That(assets[0].Hash, Is.EqualTo(asset.Hash));
-            Assert.That(assets[0].ImageData, Is.Not.Null);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(assets, Has.Length.EqualTo(1));
+        Assert.That(assets[0].FolderId, Is.EqualTo(asset.FolderId));
+        Assert.That(assets[0].Folder.Path, Is.EqualTo(asset.Folder.Path));
+        Assert.That(assets[0].FileName, Is.EqualTo(asset.FileName));
+        Assert.That(assets[0].Hash, Is.EqualTo(asset.Hash));
+        Assert.That(assets[0].ImageData, Is.Not.Null);
     }
 
     [Test]
@@ -627,7 +631,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -644,22 +647,15 @@ public class ApplicationGetAssetsByPathTests
     {
         ConfigureApplication(100, string.Empty, 200, 150, false, false, false, false);
 
-        try
+        if (folderExists && directory != null)
         {
-            if (folderExists && directory != null)
-            {
-                _testableAssetRepository!.AddFolder(directory);
-            }
-
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _application!.GetAssetsByPath(directory!));
-
-            Assert.That(exception?.Message, Is.EqualTo("Directory cannot be null or empty."));
+            _testableAssetRepository!.AddFolder(directory);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _application!.GetAssetsByPath(directory!));
+
+        Assert.That(exception?.Message, Is.EqualTo("Directory cannot be null or empty."));
     }
 
     [Test]
@@ -700,6 +696,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
@@ -716,9 +713,17 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Has.Length.EqualTo(3));
 
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Asset asset1 = assets.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(asset1.Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(asset1.ImageData, Is.Not.Null);
+
+            Asset asset2 = assets.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(asset2.Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(asset2.ImageData, Is.Not.Null);
+
+            Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(asset3.Hash, Is.EqualTo(_asset3!.Hash));
+            Assert.That(asset3.ImageData, Is.Not.Null);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -727,7 +732,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -798,6 +802,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
@@ -816,7 +821,7 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -848,13 +853,14 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
             Asset[] assets = _application!.GetAssetsByPath(folderPath1);
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -864,7 +870,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -893,6 +898,7 @@ public class ApplicationGetAssetsByPathTests
 
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             Assert.That(assets, Is.Empty);
@@ -901,7 +907,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -934,6 +939,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
@@ -949,7 +955,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -973,6 +978,7 @@ public class ApplicationGetAssetsByPathTests
 
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             Assert.That(assets, Is.Empty);
@@ -981,7 +987,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -1004,6 +1009,7 @@ public class ApplicationGetAssetsByPathTests
 
             Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
 
             Assert.That(assets, Is.Empty);
@@ -1012,13 +1018,12 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void GetAssetsByPath_ExceptionIsThrown_ReturnsAssetsWithPartialData()
+    public void GetAssetsByPath_ExceptionIsThrown_ReturnsEmptyArray()
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -1089,20 +1094,22 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+
+            Asset cataloguedAsset1 = cataloguedAssets.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(cataloguedAsset1.Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(cataloguedAsset1.ImageData, Is.Null);
+
+            Asset cataloguedAsset2 = cataloguedAssets.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(cataloguedAsset2.Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(cataloguedAsset2.ImageData, Is.Null);
 
             Asset[] assets = application.GetAssetsByPath(folderPath);
+            Assert.That(assets, Is.Empty);
 
             Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-
-            Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
                 Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
@@ -1113,7 +1120,7 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            testableAssetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -1156,13 +1163,20 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
+            cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+
+            Asset cataloguedAsset1 = cataloguedAssets.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(cataloguedAsset1.Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(cataloguedAsset1.ImageData, Is.Null);
+
+            Asset cataloguedAsset2 = cataloguedAssets.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(cataloguedAsset2.Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(cataloguedAsset2.ImageData, Is.Null);
+
+            Asset cataloguedAsset3 = cataloguedAssets.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(cataloguedAsset3.Hash, Is.EqualTo(_asset3!.Hash));
+            Assert.That(cataloguedAsset3.ImageData, Is.Null);
 
             Asset[] assets1 = [];
             Asset[] assets2 = [];
@@ -1180,12 +1194,23 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets1, Has.Length.EqualTo(3));
             Assert.That(assets2, Has.Length.EqualTo(3));
 
-            Assert.That(assets1[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets1[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets1[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(assets2[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets2[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets2[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Asset asset1First = assets1.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(asset1First.Hash, Is.EqualTo(_asset1!.Hash));
+
+            Asset asset2First = assets1.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(asset2First.Hash, Is.EqualTo(_asset2!.Hash));
+
+            Asset asset3First = assets1.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(asset3First.Hash, Is.EqualTo(_asset3!.Hash));
+
+            Asset asset1Second = assets1.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(asset1Second.Hash, Is.EqualTo(_asset1!.Hash));
+
+            Asset asset2Second = assets1.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(asset2Second.Hash, Is.EqualTo(_asset2!.Hash));
+
+            Asset asset3Second = assets1.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(asset3Second.Hash, Is.EqualTo(_asset3!.Hash));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1194,7 +1219,6 @@ public class ApplicationGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

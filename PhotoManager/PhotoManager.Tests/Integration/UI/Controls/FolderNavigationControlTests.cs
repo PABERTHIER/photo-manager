@@ -34,6 +34,7 @@ public class FolderNavigationControlTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _folderNavigationViewModel = null;
     }
 
@@ -104,45 +105,38 @@ public class FolderNavigationControlTests
 
         List<EventArgs> notifyFolderSelectedEvents = NotifyFolderSelected();
 
-        try
-        {
-            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
 
-            CheckBeforeChanges(assetsDirectory, null, folder1, []);
+        CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
-            // First SelectedItemChanged
-            string newSelectedPath = SelectedItemChanged(folder2);
+        // First SelectedItemChanged
+        string newSelectedPath = SelectedItemChanged(folder2);
 
-            Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            // Second SelectedItemChanged
-            newSelectedPath = SelectedItemChanged(folder1);
+        // Second SelectedItemChanged
+        newSelectedPath = SelectedItemChanged(folder1);
 
-            Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            Assert.That(applicationViewModelInstances, Is.Empty);
+        Assert.That(applicationViewModelInstances, Is.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
 
-            Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
-            Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
+        Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
     }
 
     [Test]
@@ -162,44 +156,37 @@ public class FolderNavigationControlTests
 
         List<EventArgs> notifyFolderSelectedEvents = NotifyFolderSelected();
 
-        try
-        {
-            Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
 
-            CheckBeforeChanges(assetsDirectory, null, folder1, []);
+        CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
-            // First SelectedItemChanged
-            string newSelectedPath = SelectedItemChanged(folder2);
+        // First SelectedItemChanged
+        string newSelectedPath = SelectedItemChanged(folder2);
 
-            Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            // Second SelectedItemChanged
-            newSelectedPath = SelectedItemChanged(folder1);
+        // Second SelectedItemChanged
+        newSelectedPath = SelectedItemChanged(folder1);
 
-            Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            Assert.That(applicationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(applicationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
 
-            Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
-            Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
+        Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
     }
 
     private

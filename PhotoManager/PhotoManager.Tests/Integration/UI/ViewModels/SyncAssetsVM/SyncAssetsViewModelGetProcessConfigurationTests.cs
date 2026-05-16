@@ -13,6 +13,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
     private string? _databasePath;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -20,6 +21,13 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -49,24 +57,24 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
             imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
             imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
             new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService,
             moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
             imageProcessingService);
@@ -81,48 +89,41 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Toto\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Toto",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Tutu\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Tutu",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
+        SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
 
-            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
+        _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
@@ -133,24 +134,17 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
+        SyncAssetsConfiguration syncAssetsConfiguration = _syncAssetsViewModel!.GetProcessConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
+        Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
@@ -161,69 +155,62 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Toto\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Toto",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
-            syncAssetsConfigurationToSave.Definitions.Add(
-                new()
-                {
-                    SourceDirectory = "C:\\Tutu\\Screenshots",
-                    DestinationDirectory = "C:\\Images\\Tutu",
-                    IncludeSubFolders = false,
-                    DeleteAssetsNotInSource = false
-                });
+        SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Toto\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Toto",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
+        syncAssetsConfigurationToSave.Definitions.Add(
+            new()
+            {
+                SourceDirectory = "C:\\Tutu\\Screenshots",
+                DestinationDirectory = "C:\\Images\\Tutu",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            });
 
-            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
+        _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfigurationToSave);
 
-            SyncAssetsConfiguration syncAssetsConfiguration1 = new();
-            SyncAssetsConfiguration syncAssetsConfiguration2 = new();
-            SyncAssetsConfiguration syncAssetsConfiguration3 = new();
+        SyncAssetsConfiguration syncAssetsConfiguration1 = new();
+        SyncAssetsConfiguration syncAssetsConfiguration2 = new();
+        SyncAssetsConfiguration syncAssetsConfiguration3 = new();
 
-            // Simulate concurrent access
-            Parallel.Invoke(
-                () => syncAssetsConfiguration1 = _syncAssetsViewModel!.GetProcessConfiguration(),
-                () => syncAssetsConfiguration2 = _syncAssetsViewModel!.GetProcessConfiguration(),
-                () => syncAssetsConfiguration3 = _syncAssetsViewModel!.GetProcessConfiguration()
-            );
+        // Simulate concurrent access
+        Parallel.Invoke(
+            () => syncAssetsConfiguration1 = _syncAssetsViewModel!.GetProcessConfiguration(),
+            () => syncAssetsConfiguration2 = _syncAssetsViewModel!.GetProcessConfiguration(),
+            () => syncAssetsConfiguration3 = _syncAssetsViewModel!.GetProcessConfiguration()
+        );
 
-            Assert.That(syncAssetsConfiguration1.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration1.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration1.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration1.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration1.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration1.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration1.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration1.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration1.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration1.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.That(syncAssetsConfiguration2.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration2.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration2.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration2.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration2.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration2.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration2.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration2.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration2.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration2.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.That(syncAssetsConfiguration3.Definitions, Has.Count.EqualTo(2));
-            Assert.That(syncAssetsConfiguration3.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
-            Assert.That(syncAssetsConfiguration3.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-            Assert.That(syncAssetsConfiguration3.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
-            Assert.That(syncAssetsConfiguration3.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(syncAssetsConfiguration3.Definitions, Has.Count.EqualTo(2));
+        Assert.That(syncAssetsConfiguration3.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+        Assert.That(syncAssetsConfiguration3.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(syncAssetsConfiguration3.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+        Assert.That(syncAssetsConfiguration3.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)

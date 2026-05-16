@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 
 namespace PhotoManager.Tests.Unit.Persistence.Sqlite;
 
@@ -55,7 +55,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_PreExistingSnapshotFile_DeletesItBeforeBackup()
     {
-        string backupDirectory = _databaseDirectory! + Integration.Constants.DATABASE_BACKUP_END_PATH;
+        string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
         Directory.CreateDirectory(backupDirectory);
 
         string backupFilePath = Path.Combine(backupDirectory, "20240501.zip");
@@ -74,7 +74,7 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetriesAndSucceeds()
     {
-        string backupDirectory = _databaseDirectory! + Integration.Constants.DATABASE_BACKUP_END_PATH;
+        string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
         Directory.CreateDirectory(backupDirectory);
 
         string backupFilePath = Path.Combine(backupDirectory, "20240502.zip");
@@ -119,7 +119,7 @@ public class SqliteBackupServiceTests
     [Retry(3)]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetrySucceedsAfterLockReleased()
     {
-        string backupDirectory = _databaseDirectory! + Integration.Constants.DATABASE_BACKUP_END_PATH;
+        string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
         Directory.CreateDirectory(backupDirectory);
 
         string backupFilePath = Path.Combine(backupDirectory, "20240503.zip");

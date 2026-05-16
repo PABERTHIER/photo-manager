@@ -3,7 +3,8 @@
 public static class Constants
 {
     public const string DATABASE_END_PATH = ""; // TODO: Delete after the migration
-    public const string DATABASE_BACKUP_END_PATH = "_Backups";
+    public const string DATABASE_BACKUP_END_PATH = "Backups";
+    public const string DATABASE_FILE_NAME = "photomanager.db";
     public const string VERSION = "v1.9.0";
 
     public static class Directories

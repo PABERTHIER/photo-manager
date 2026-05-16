@@ -178,6 +178,7 @@ public class MainWindowToggleImageViewTests
     public void TearDown()
     {
         _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
     }
@@ -254,337 +255,330 @@ public class MainWindowToggleImageViewTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
+        CheckBeforeChanges(assetsDirectory);
 
-            MainWindowsInit();
+        MainWindowsInit();
 
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+        await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
 
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
+        Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            // First ToggleImageView
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset1.FileName} - image 1 of 4 - sorted by file name ascending";
+        // First ToggleImageView
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset1.FileName} - image 1 of 4 - sorted by file name ascending";
 
-            string result = ToggleImageView();
+        string result = ToggleImageView();
 
-            Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
+        Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                _asset1,
-                false,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            AppMode.Viewer,
+            Visibility.Hidden,
+            Visibility.Visible,
+            0,
+            expectedAppTitle,
+            expectedAssets,
+            _asset1,
+            false,
+            true);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                _asset1,
-                false,
-                true,
-                _sourceFolder!);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            AppMode.Viewer,
+            Visibility.Hidden,
+            Visibility.Visible,
+            0,
+            expectedAppTitle,
+            expectedAssets,
+            _asset1,
+            false,
+            true,
+            _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            // ChangeAppMode 1
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        // ChangeAppMode 1
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
-            // Second ToggleImageView
-            expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+        // Second ToggleImageView
+        expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
 
-            result = ToggleImageView();
+        result = ToggleImageView();
 
-            Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
+        Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                _asset1,
-                false,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            AppMode.Thumbnails,
+            Visibility.Visible,
+            Visibility.Hidden,
+            0,
+            expectedAppTitle,
+            expectedAssets,
+            _asset1,
+            false,
+            true);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                _asset1,
-                false,
-                true,
-                _sourceFolder!);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            AppMode.Thumbnails,
+            Visibility.Visible,
+            Visibility.Hidden,
+            0,
+            expectedAppTitle,
+            expectedAssets,
+            _asset1,
+            false,
+            true,
+            _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            // ChangeAppMode 1
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 2
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        // ChangeAppMode 1
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 2
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
 
-            // Third ToggleImageView
-            expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset4.FileName} - image 4 of 4 - sorted by file name ascending";
+        // Third ToggleImageView
+        expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset4.FileName} - image 4 of 4 - sorted by file name ascending";
 
-            _applicationViewModel!.ViewerPosition = 3;
+        _applicationViewModel!.ViewerPosition = 3;
 
-            result = ToggleImageView();
+        result = ToggleImageView();
 
-            Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
+        Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
-                3,
-                expectedAppTitle,
-                expectedAssets,
-                _asset4,
-                true,
-                false);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            AppMode.Viewer,
+            Visibility.Hidden,
+            Visibility.Visible,
+            3,
+            expectedAppTitle,
+            expectedAssets,
+            _asset4,
+            true,
+            false);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
-                3,
-                expectedAppTitle,
-                expectedAssets,
-                _asset4,
-                true,
-                false,
-                _sourceFolder!);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            AppMode.Viewer,
+            Visibility.Hidden,
+            Visibility.Visible,
+            3,
+            expectedAppTitle,
+            expectedAssets,
+            _asset4,
+            true,
+            false,
+            _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(34));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            // ChangeAppMode 1
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 2
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            // ViewerPosition update 1
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 3
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(34));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        // ChangeAppMode 1
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 2
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+        // ViewerPosition update 1
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 3
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
 
-            // Fourth ToggleImageView
-            expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 3 of 4 - sorted by file name ascending";
+        // Fourth ToggleImageView
+        expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 3 of 4 - sorted by file name ascending";
 
-            _applicationViewModel!.GoToPreviousAsset();
+        _applicationViewModel!.GoToPreviousAsset();
 
-            result = ToggleImageView();
+        result = ToggleImageView();
 
-            Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
+        Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
-                2,
-                expectedAppTitle,
-                expectedAssets,
-                _asset3,
-                true,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            AppMode.Thumbnails,
+            Visibility.Visible,
+            Visibility.Hidden,
+            2,
+            expectedAppTitle,
+            expectedAssets,
+            _asset3,
+            true,
+            true);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
-                2,
-                expectedAppTitle,
-                expectedAssets,
-                _asset3,
-                true,
-                true,
-                _sourceFolder!);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            AppMode.Thumbnails,
+            Visibility.Visible,
+            Visibility.Hidden,
+            2,
+            expectedAppTitle,
+            expectedAssets,
+            _asset3,
+            true,
+            true,
+            _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(43));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            // ChangeAppMode 1
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 2
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            // ViewerPosition update 1
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 3
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
-            // GoToPreviousAsset
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("AppTitle"));
-            // ChangeAppMode 4
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ViewerVisible"));
-            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(43));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        // ChangeAppMode 1
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 2
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+        // ViewerPosition update 1
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 3
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
+        // GoToPreviousAsset
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("ViewerPosition"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("AppTitle"));
+        // ChangeAppMode 4
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("AppMode"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("ThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
-                2,
-                expectedAppTitle,
-                expectedAssets,
-                _asset3,
-                true,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            AppMode.Thumbnails,
+            Visibility.Visible,
+            Visibility.Hidden,
+            2,
+            expectedAppTitle,
+            expectedAssets,
+            _asset3,
+            true,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -730,7 +724,6 @@ public class MainWindowToggleImageViewTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

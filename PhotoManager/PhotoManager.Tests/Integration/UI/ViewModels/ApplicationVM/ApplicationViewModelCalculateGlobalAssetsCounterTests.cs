@@ -163,6 +163,13 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -253,7 +260,6 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (analyseVideos)
             {
@@ -275,104 +281,97 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
+        CheckBeforeChanges(assetsDirectory);
 
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _asset1 = _asset1!.WithFolder(folder);
-            _asset2 = _asset2!.WithFolder(folder);
-            _asset3 = _asset3!.WithFolder(folder);
-            _asset4 = _asset4!.WithFolder(folder);
+        _asset1 = _asset1!.WithFolder(folder);
+        _asset2 = _asset2!.WithFolder(folder);
+        _asset3 = _asset3!.WithFolder(folder);
+        _asset4 = _asset4!.WithFolder(folder);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 0");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 0");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 0");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 0");
 
-            _testableAssetRepository.AddAsset(_asset1!, []);
+        _testableAssetRepository.AddAsset(_asset1!, []);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 1");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 1");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 1");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 1");
 
-            _testableAssetRepository.AddAsset(_asset2!, []);
+        _testableAssetRepository.AddAsset(_asset2!, []);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 2");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 2");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 2");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 2");
 
-            _testableAssetRepository.AddAsset(_asset3!, []);
+        _testableAssetRepository.AddAsset(_asset3!, []);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 3");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 3");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 3");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 3");
 
-            _testableAssetRepository.DeleteAsset(assetsDirectory, _asset3.FileName);
+        _testableAssetRepository.DeleteAsset(assetsDirectory, _asset3.FileName);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 2");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 2");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 2");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 2");
 
-            _testableAssetRepository.AddAsset(_asset4!, []);
+        _testableAssetRepository.AddAsset(_asset4!, []);
 
-            _applicationViewModel!.CalculateGlobalAssetsCounter();
+        _applicationViewModel!.CalculateGlobalAssetsCounter();
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 3");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 3");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 3");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 3");
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -409,7 +408,6 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -427,46 +425,39 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
+        CheckBeforeChanges(assetsDirectory);
 
-            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
-            _asset1 = _asset1!.WithFolder(folder);
-            _asset2 = _asset2!.WithFolder(folder);
-            _asset3 = _asset3!.WithFolder(folder);
-            _asset4 = _asset4!.WithFolder(folder);
+        _asset1 = _asset1!.WithFolder(folder);
+        _asset2 = _asset2!.WithFolder(folder);
+        _asset3 = _asset3!.WithFolder(folder);
+        _asset4 = _asset4!.WithFolder(folder);
 
-            _testableAssetRepository.AddAsset(_asset1!, []);
-            _testableAssetRepository.AddAsset(_asset2!, []);
-            _testableAssetRepository.AddAsset(_asset3!, []);
-            _testableAssetRepository.AddAsset(_asset4!, []);
+        _testableAssetRepository.AddAsset(_asset1!, []);
+        _testableAssetRepository.AddAsset(_asset2!, []);
+        _testableAssetRepository.AddAsset(_asset3!, []);
+        _testableAssetRepository.AddAsset(_asset4!, []);
 
-            // Simulate concurrent access
-            Parallel.Invoke(
-                () => _applicationViewModel!.CalculateGlobalAssetsCounter(),
-                () => _applicationViewModel!.CalculateGlobalAssetsCounter(),
-                () => _applicationViewModel!.CalculateGlobalAssetsCounter()
-            );
+        // Simulate concurrent access
+        Parallel.Invoke(
+            () => _applicationViewModel!.CalculateGlobalAssetsCounter(),
+            () => _applicationViewModel!.CalculateGlobalAssetsCounter(),
+            () => _applicationViewModel!.CalculateGlobalAssetsCounter()
+        );
 
-            CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 4");
+        CheckAfterChanges(_applicationViewModel!, assetsDirectory, "Total number of assets: 4");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 4");
+        CheckInstance(applicationViewModelInstances, assetsDirectory, "Total number of assets: 4");
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

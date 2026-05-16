@@ -159,6 +159,13 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplicationViewModel(string assetsDirectory)
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
@@ -215,83 +222,76 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
+        CheckBeforeChanges(assetsDirectory);
 
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+        await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-            Assert.That(folder.Path, Is.EqualTo(assetsDirectory));
-            Assert.That(folder.Name, Is.EqualTo(folderName));
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Path, Is.EqualTo(assetsDirectory));
+        Assert.That(folder.Name, Is.EqualTo(folderName));
 
-            _asset1 = _asset1!.WithFolder(folder);
-            _asset2 = _asset2!.WithFolder(folder);
-            _asset3 = _asset3!.WithFolder(folder);
-            _asset4 = _asset4!.WithFolder(folder);
+        _asset1 = _asset1!.WithFolder(folder);
+        _asset2 = _asset2!.WithFolder(folder);
+        _asset3 = _asset3!.WithFolder(folder);
+        _asset4 = _asset4!.WithFolder(folder);
 
-            Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
-            Assert.That(folders, Has.Length.EqualTo(1));
+        Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
+        Assert.That(folders, Has.Length.EqualTo(1));
 
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            Asset[] expectedObservableAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
+        Asset[] expectedObservableAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
-            const string expectedStatusMessage = "The catalog process has ended.";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+        const string expectedStatusMessage = "The catalog process has ended.";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedObservableAssets,
-                expectedStatusMessage,
-                _asset1,
-                false,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            expectedObservableAssets,
+            expectedStatusMessage,
+            _asset1,
+            false,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedObservableAssets,
-                expectedStatusMessage,
-                _asset1,
-                false,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            expectedObservableAssets,
+            expectedStatusMessage,
+            _asset1,
+            false,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -305,41 +305,34 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
+        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
-            Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
+        Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
 
-            Assert.That(folders, Has.Length.EqualTo(1));
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders, Has.Length.EqualTo(1));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
-                false);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
-                false, false);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+            false, false);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -353,41 +346,34 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_dataDirectory!);
 
-            Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
+        Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
-            Assert.That(folder, Is.Not.Null);
-            Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
-            Assert.That(folders, Has.Length.EqualTo(1));
-            Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
-            Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
+        Assert.That(folders, Has.Length.EqualTo(1));
+        Assert.That(folders[0].Id, Is.EqualTo(folder.Id));
+        Assert.That(folders[0].Path, Is.EqualTo(folder.Path));
+        Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
-                false);
+        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
-                false, false);
+        CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+            false, false);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

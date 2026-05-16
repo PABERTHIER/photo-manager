@@ -15,7 +15,7 @@ public sealed class SqlitePersistenceContext(
     : IPersistenceContext, IDisposable
 {
     public const string DATABASE_FILE_NAME = "photomanager.db";
-    private const string BACKUPS_SUFFIX = "_Backups";
+    private const string BACKUPS_SUFFIX = "Backups";
 
     private string _backupsDirectory = string.Empty;
 
@@ -39,7 +39,7 @@ public sealed class SqlitePersistenceContext(
         Directory.CreateDirectory(dataDirectory);
 
         string databaseFilePath = Path.Combine(dataDirectory, DATABASE_FILE_NAME);
-        _backupsDirectory = dataDirectory + BACKUPS_SUFFIX;
+        _backupsDirectory = Path.Combine(dataDirectory, BACKUPS_SUFFIX);
         Directory.CreateDirectory(_backupsDirectory);
 
         factory.Initialize(databaseFilePath);
