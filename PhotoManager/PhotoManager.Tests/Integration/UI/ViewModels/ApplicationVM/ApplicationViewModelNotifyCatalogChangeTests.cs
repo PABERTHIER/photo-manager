@@ -1912,12 +1912,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 assetsDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
             NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -3629,12 +3629,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 assetsDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
             NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -5716,8 +5716,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(15));
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 tempDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
@@ -5730,7 +5733,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder2!,
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -5743,7 +5745,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
@@ -5759,6 +5761,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5806,8 +5809,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(21));
+            Assert.That(catalogChanges, Has.Count.EqualTo(23));
 
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeAssetDeleted(catalogChanges,
                 tempDirectory,
                 assetsDirectory,
@@ -5818,7 +5824,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false,
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -5831,7 +5836,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
@@ -5853,6 +5858,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5895,10 +5902,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(28));
+            Assert.That(catalogChanges, Has.Count.EqualTo(31));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, folders,
+                assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeAssetDeleted(catalogChanges,
                 tempDirectory,
                 assetsDirectory,
@@ -5911,7 +5921,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory,
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -5924,7 +5933,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(31));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
@@ -5953,6 +5962,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6474,9 +6486,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 assetsDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
@@ -6494,9 +6503,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 imageUpdatedDirectory, ref increment);
             NotifyCatalogChangeAssetUpdated(
                 catalogChanges,
@@ -6510,6 +6516,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 subDirDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -7176,9 +7188,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 assetsDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
@@ -7196,9 +7205,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 imageUpdatedDirectory, ref increment);
             NotifyCatalogChangeAssetUpdated(
                 catalogChanges,
@@ -7212,6 +7218,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 subDirDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
@@ -7889,24 +7901,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeAssetCreated(
-                catalogChanges,
-                firstFrameVideosDirectory,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
-                folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
-                _asset5Temp!,
-                videoFirstFrameFolder!,
-                ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                subDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
                 assetsDirectory,
                 ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
@@ -7934,6 +7928,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 imageUpdatedFolder!,
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                firstFrameVideosDirectory,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
+                _asset5Temp!,
+                videoFirstFrameFolder!,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 

@@ -69,7 +69,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
                 HashSet<string> foldersPathToCatalog = GetFoldersPathToCatalog();
 
-                foreach (string path in foldersPathToCatalog)
+                foreach (string path in foldersPathToCatalog.OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
                 {
                     token.ThrowIfCancellationRequested();
 
@@ -239,7 +239,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        IEnumerable<DirectoryInfo> subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
+        IEnumerable<DirectoryInfo> subdirectories = new DirectoryInfo(directory).EnumerateDirectories()
+            .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase);
 
         foreach (DirectoryInfo subdirectory in subdirectories)
         {

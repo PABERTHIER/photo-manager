@@ -542,10 +542,6 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_8_JPEG, ImageByteSizes.IMAGE_8_JPEG, "")]
     [TestCase(FileNames.IMAGE_9_PNG, ImageByteSizes.IMAGE_9_PNG, "")]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
-    [TestCase(FileNames.IMAGE_11_HEIC, 10275, "")]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 10595, "")]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 10086, "")]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 10914, "")]
     [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
     [TestCase(FileNames.HOMER_GIF, ImageByteSizes.HOMER_GIF, "")]
     [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
@@ -640,6 +636,39 @@ public class ImageProcessingServiceTests
 
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Has.Length.EqualTo(imageByteSize));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    // HEIC thumbnail byte sizes vary across machines because the Windows HEIF Image Extensions codec
+    // (installed via Microsoft Store) differs between environments. Different codec versions produce
+    // slightly different decoded pixel data, leading to different JPEG re-encoding sizes (~1% variance).
+    // A 2% tolerance accommodates codec differences while still catching genuine encoding regressions.
+    [Test]
+    [TestCase(FileNames.IMAGE_11_HEIC, 10275)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 10595)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 10086)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 10914)]
+    public void LoadBitmapThumbnailImage_WithoutRotationAndValidHeicImage_ReturnsValidBitmapImage(
+        string fileName, int expectedByteSize)
+    {
+        string filePath = Path.Combine(_dataDirectory!, fileName);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
+        int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
+
+        BitmapImage thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+
+        Assert.That(thumbnailImage, Is.Not.Null);
+        Assert.That(thumbnailImage.PixelWidth, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.PixelHeight, Is.EqualTo(thumbnailHeight));
+
+        byte[] imageBuffer = _imageProcessingService.GetJpegBitmapImage(thumbnailImage);
+
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer.Length, Is.EqualTo(expectedByteSize).Within(2).Percent);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }

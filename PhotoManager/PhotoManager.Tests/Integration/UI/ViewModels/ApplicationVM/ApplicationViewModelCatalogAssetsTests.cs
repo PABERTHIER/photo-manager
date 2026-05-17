@@ -1606,12 +1606,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -2956,12 +2956,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -4558,7 +4558,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(15));
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             increment = 0;
 
@@ -4577,12 +4577,14 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory,
                 folderToAssetsMappingSecondSync[folder2!], _asset2, folder2!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
@@ -4625,7 +4627,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(21));
+            Assert.That(catalogChanges, Has.Count.EqualTo(23));
 
             increment = 0;
 
@@ -4646,22 +4648,27 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory,
                 folderToAssetsMappingSecondSync[folder2], _asset2, folder2, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
-                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [_asset2Temp],
                 _asset2, folder2, false, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -4698,7 +4705,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(28));
+            Assert.That(catalogChanges, Has.Count.EqualTo(31));
 
             increment = 0;
 
@@ -4718,35 +4725,41 @@ public class ApplicationViewModelCatalogAssetsTests
                 CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders,
+                assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1,
                 [folder2], tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory,
                 folderToAssetsMappingSecondSync[folder2], _asset2, folder2, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
-                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders,
+                assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [_asset2Temp],
                 _asset2, folder2, false, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
-                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders,
+                assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
+                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [], _asset2Temp,
                 folder2, false, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderDeleted(catalogChanges, 1, foldersInRepository.Length,
                 tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
-                ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -5233,10 +5246,6 @@ public class ApplicationViewModelCatalogAssetsTests
 
             // Second part (second sync)
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
                 ref increment);
@@ -5247,10 +5256,6 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageDeletedDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, imageUpdatedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory,
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
@@ -5259,6 +5264,14 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, subDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, subSubDirDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
@@ -5719,10 +5732,6 @@ public class ApplicationViewModelCatalogAssetsTests
 
             // Second part (second sync)
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
                 ref increment);
@@ -5733,10 +5742,6 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageDeletedDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, imageUpdatedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory,
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
@@ -5745,6 +5750,14 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, subDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, subSubDirDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
@@ -6214,25 +6227,6 @@ public class ApplicationViewModelCatalogAssetsTests
 
             // Second part (second sync)
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                catalogChanges,
-                firstFrameVideosDirectory,
-                folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
-                _asset5Temp!,
-                videoFirstFrameFolder!,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
-                foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
                 foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
                 ref increment);
@@ -6247,6 +6241,25 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory,
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageUpdatedDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                catalogChanges,
+                firstFrameVideosDirectory,
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
+                _asset5Temp!,
+                videoFirstFrameFolder!,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, subDirDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory,
+                ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count,
+                foldersInRepository, subSubDirDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory,
                 ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges,
                 CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
