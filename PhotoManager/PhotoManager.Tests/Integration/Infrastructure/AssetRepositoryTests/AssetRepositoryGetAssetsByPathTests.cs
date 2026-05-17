@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetAssetsByPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -31,8 +31,8 @@ public class AssetRepositoryGetAssetsByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -43,7 +43,7 @@ public class AssetRepositoryGetAssetsByPathTests
     {
         _testLogger = new();
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
@@ -155,8 +155,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder1 = _assetRepository!.AddFolder(folderPath1);
             Folder folder2 = _assetRepository!.AddFolder(folderPath2);
 
@@ -229,7 +229,7 @@ public class AssetRepositoryGetAssetsByPathTests
     {
         BitmapImage? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
@@ -249,7 +249,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
             Folder folder = assetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -299,8 +299,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = _assetRepository!.AddFolder(folderPath1);
 
             _asset2 = _asset2!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -351,7 +351,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
             Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -377,7 +377,7 @@ public class AssetRepositoryGetAssetsByPathTests
             configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
             IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-            pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+            pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
             SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
             SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
@@ -425,7 +425,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = _dataDirectory!;
+            string folderPath = _assetsDirectory!;
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -462,12 +462,12 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
             Guid folderId = Guid.NewGuid();
             Folder folder = new() { Id = folderId, Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder);
-            string filePath = Path.Combine(_dataDirectory!, _asset1!.FileName);
+            string filePath = Path.Combine(_assetsDirectory!, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
             Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
@@ -515,7 +515,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             _assetRepository!.AddFolder(folderPath);
 
             Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
@@ -546,7 +546,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
             Asset[] cataloguedAssets = _assetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -576,7 +576,7 @@ public class AssetRepositoryGetAssetsByPathTests
         try
         {
             string? directory = null;
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
             Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -620,7 +620,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void GetAssetsByPath_ExceptionIsThrown_ReturnsEmptyArrayAndLogsIt()
     {
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
@@ -640,7 +640,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = assetRepository.AddFolder(folderPath);
 
             _asset3 = _asset3!.WithFolder(folder);
@@ -705,8 +705,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder1 = _assetRepository!.AddFolder(folderPath1);
             Folder folder2 = _assetRepository!.AddFolder(folderPath2);
 

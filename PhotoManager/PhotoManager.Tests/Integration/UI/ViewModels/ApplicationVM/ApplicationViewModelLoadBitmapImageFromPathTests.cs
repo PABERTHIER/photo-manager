@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelLoadBitmapImageFromPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -32,8 +32,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _asset1 = new()
         {
@@ -181,7 +181,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -217,7 +217,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     [Test]
     public async Task LoadBitmapImageFromPath_CataloguedAssets_ReturnsBitmapImage()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -521,7 +521,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     [Test]
     public void LoadBitmapImageFromPath_NoCataloguedAssets_ThrowsNullReferenceException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -529,7 +529,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         NullReferenceException? exception =
             Assert.Throws<NullReferenceException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
@@ -537,14 +537,14 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(exception?.Message, Is.EqualTo("CurrentAsset is null"));
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-        CheckAfterChanges(_applicationViewModel!, 0, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+        CheckAfterChanges(_applicationViewModel!, 0, _assetsDirectory!, expectedAppTitle, [], string.Empty, null,
             false, false);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, 0, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+        CheckInstance(applicationViewModelInstances, 0, _assetsDirectory!, expectedAppTitle, [], string.Empty, null,
             false, false);
 
         // Because the root folder is already added

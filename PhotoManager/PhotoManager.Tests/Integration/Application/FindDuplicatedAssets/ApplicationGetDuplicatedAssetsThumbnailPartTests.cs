@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Integration.Application.FindDuplicatedAssets;
 [TestFixture]
 public class ApplicationGetDuplicatedAssetsThumbnailPartTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -82,8 +82,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -439,7 +439,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -490,10 +490,10 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
     public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(int thresholdToMock,
         int expected, string[] assetsName)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -553,10 +553,10 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
     public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(int thresholdToMock,
         int expected, string[] assetsName)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -631,10 +631,10 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
     public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(int thresholdToMock,
         int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3, string[] assetsName4)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -779,10 +779,10 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
     public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(int thresholdToMock,
         int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };

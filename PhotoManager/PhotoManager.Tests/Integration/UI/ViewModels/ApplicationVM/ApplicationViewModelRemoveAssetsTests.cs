@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelRemoveAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -32,8 +32,8 @@ public class ApplicationViewModelRemoveAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -187,7 +187,7 @@ public class ApplicationViewModelRemoveAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -223,7 +223,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public async Task RemoveAssets_CataloguedAssets_RemovesAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -343,7 +343,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public async Task RemoveAssets_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 

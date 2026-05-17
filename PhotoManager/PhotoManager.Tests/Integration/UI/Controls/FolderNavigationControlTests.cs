@@ -12,7 +12,7 @@ namespace PhotoManager.Tests.Integration.UI.Controls;
 [TestFixture]
 public class FolderNavigationControlTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -24,8 +24,8 @@ public class FolderNavigationControlTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -53,7 +53,7 @@ public class FolderNavigationControlTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -89,8 +89,8 @@ public class FolderNavigationControlTests
     [Test]
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsNotSameAsSource_UpdatesSelectedPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
             Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -140,8 +140,8 @@ public class FolderNavigationControlTests
     [Test]
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsSameAsSource_UpdatesSelectedPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
             Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);

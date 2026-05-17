@@ -5,7 +5,7 @@ namespace PhotoManager.Tests.Unit.Infrastructure;
 [TestFixture]
 public class ImageMetadataServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private ImageMetadataService? _imageMetadataService;
     private FileOperationsService? _fileOperationService;
@@ -15,11 +15,11 @@ public class ImageMetadataServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory);
 
         _userConfigurationService = new(configurationRootMock);
         _fileOperationService = new(_userConfigurationService, new TestLogger<FileOperationsService>());

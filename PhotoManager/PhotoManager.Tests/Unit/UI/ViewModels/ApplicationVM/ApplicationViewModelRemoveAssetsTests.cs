@@ -15,7 +15,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelRemoveAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -30,15 +30,15 @@ public class ApplicationViewModelRemoveAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         Guid folderId = Guid.NewGuid();
 
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -63,7 +63,7 @@ public class ApplicationViewModelRemoveAssetsTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -88,7 +88,7 @@ public class ApplicationViewModelRemoveAssetsTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -113,7 +113,7 @@ public class ApplicationViewModelRemoveAssetsTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -138,7 +138,7 @@ public class ApplicationViewModelRemoveAssetsTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -186,7 +186,7 @@ public class ApplicationViewModelRemoveAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -223,7 +223,7 @@ public class ApplicationViewModelRemoveAssetsTests
     public void
         RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInFirstPosition_RemovesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -231,22 +231,22 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 2 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 2 - sorted by file name ascending";
 
         Asset[] assets = [_asset2!, _asset4!, _asset5!];
         Asset[] expectedAssets = [_asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         _applicationViewModel!.RemoveAssets([_asset2!]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -265,7 +265,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -283,7 +283,7 @@ public class ApplicationViewModelRemoveAssetsTests
     public void
         RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInMiddlePosition_RemovesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -291,23 +291,23 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 1;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 2 of 2 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 2 of 2 - sorted by file name ascending";
 
         Asset[] assets = [_asset2!, _asset4!, _asset5!];
         Asset[] expectedAssets = [_asset2!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
         _applicationViewModel!.GoToNextAsset();
 
         _applicationViewModel!.RemoveAssets([_asset4!]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -332,7 +332,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -350,7 +350,7 @@ public class ApplicationViewModelRemoveAssetsTests
     public void
         RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInLastPosition_RemovesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -358,16 +358,16 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 1;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 2 of 2 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 2 of 2 - sorted by file name ascending";
 
         Asset[] assets = [_asset2!, _asset4!, _asset5!];
         Asset[] expectedAssets = [_asset2!, _asset4!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
         _applicationViewModel!.GoToNextAsset();
         _applicationViewModel!.GoToNextAsset();
 
@@ -375,7 +375,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -411,7 +411,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedViewerPosition,
             expectedAppTitle,
             expectedAssets,
@@ -428,7 +428,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsHasAssetsAndAssetsHasTheSameAssets_RemovesAllAssets()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -436,21 +436,21 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
         Asset[] expectedAssets = [];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         _applicationViewModel!.RemoveAssets(assets);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -469,7 +469,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -486,7 +486,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsHasOneAssetAndAssetsHasTheSameAsset_RemovesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -494,21 +494,21 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         Asset[] assets = [_asset1!];
         Asset[] expectedAssets = [];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         _applicationViewModel!.RemoveAssets([assets[0]]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -527,7 +527,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -544,7 +544,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsHasOneAssetAndAssetsHasNotTheSameAsset_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -552,21 +552,21 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 1 - sorted by file name ascending";
 
         Asset[] assets = [_asset1!];
         Asset[] expectedAssets = [_asset1!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         _applicationViewModel!.RemoveAssets([_asset2!]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -582,7 +582,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -599,7 +599,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsHasTwoAssetsAndAssetsHasOneSameAndOneDifferentAsset_RemovesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -607,21 +607,21 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 1 - sorted by file name ascending";
 
         Asset[] assets = [_asset1!, _asset2!];
         Asset[] expectedAssets = [_asset2!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         _applicationViewModel!.RemoveAssets([_asset4!, _asset1!]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -640,7 +640,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -657,7 +657,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsNotEmpty_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -665,16 +665,16 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.RemoveAssets([_asset1!, _asset3!]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -687,7 +687,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -704,7 +704,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsEmpty_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -712,16 +712,16 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.RemoveAssets([]);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -734,7 +734,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -751,7 +751,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsNull_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -759,16 +759,16 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.RemoveAssets(null!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -781,7 +781,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             [],
@@ -798,7 +798,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsEmpty_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -806,21 +806,21 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 1 - sorted by file name ascending";
 
         Asset[] assetsToSet = [_asset1!];
         Asset[] assetsToRemove = [];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assetsToSet);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assetsToSet);
 
         _applicationViewModel!.RemoveAssets(assetsToRemove);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             assetsToSet,
@@ -836,7 +836,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             assetsToSet,
@@ -853,7 +853,7 @@ public class ApplicationViewModelRemoveAssetsTests
     [Test]
     public void RemoveAssets_ObservableAssetsIsNotEmptyAssetsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -861,15 +861,15 @@ public class ApplicationViewModelRemoveAssetsTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 1 - sorted by file name ascending";
 
         Asset[] assetsToSet = [_asset1!];
         Asset[] assetsToRemove = null!;
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assetsToSet);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assetsToSet);
 
         NullReferenceException? exception =
             Assert.Throws<NullReferenceException>(() => _applicationViewModel!.RemoveAssets(assetsToRemove));
@@ -878,7 +878,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             assetsToSet,
@@ -894,7 +894,7 @@ public class ApplicationViewModelRemoveAssetsTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             0,
             expectedAppTitle,
             assetsToSet,

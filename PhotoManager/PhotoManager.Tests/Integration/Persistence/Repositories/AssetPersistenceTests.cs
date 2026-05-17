@@ -11,7 +11,7 @@ namespace PhotoManager.Tests.Integration.Persistence.Repositories;
 [TestFixture]
 public class AssetPersistenceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private Folder? _testFolder;
 
@@ -21,8 +21,8 @@ public class AssetPersistenceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -34,7 +34,7 @@ public class AssetPersistenceTests
         _sqlitePersistenceContext = new(factory, backupService, _testLogger);
         _sqlitePersistenceContext.Initialize(_databaseDirectory!);
 
-        _testFolder = _sqlitePersistenceContext.Folders.Insert(_dataDirectory!);
+        _testFolder = _sqlitePersistenceContext.Folders.Insert(_assetsDirectory!);
     }
 
     [TearDown]
@@ -323,7 +323,7 @@ public class AssetPersistenceTests
     [Test]
     public void GetByFolderId_OnlyReturnsAssetsForSpecifiedFolder()
     {
-        string otherFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherFolderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         Folder otherFolder = _sqlitePersistenceContext!.Folders.Insert(otherFolderPath);
 
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
@@ -358,7 +358,7 @@ public class AssetPersistenceTests
     [Test]
     public void GetAll_WithAssets_ReturnsAll()
     {
-        string otherFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherFolderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         Folder otherFolder = _sqlitePersistenceContext!.Folders.Insert(otherFolderPath);
 
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
@@ -382,7 +382,7 @@ public class AssetPersistenceTests
     [Test]
     public void GetByHash_ExistingHash_ReturnsMatchingAssets()
     {
-        string otherFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherFolderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         Folder otherFolder = _sqlitePersistenceContext!.Folders.Insert(otherFolderPath);
 
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(

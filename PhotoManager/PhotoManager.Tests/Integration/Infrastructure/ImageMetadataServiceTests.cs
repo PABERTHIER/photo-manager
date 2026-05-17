@@ -12,7 +12,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class ImageMetadataServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private ImageMetadataService? _imageMetadataService;
     private FileOperationsService? _fileOperationService;
@@ -22,11 +22,11 @@ public class ImageMetadataServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory);
 
         _userConfigurationService = new(configurationRootMock);
         _fileOperationService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
@@ -61,7 +61,7 @@ public class ImageMetadataServiceTests
         1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _imageMetadataService!.GetExifOrientation(
@@ -78,7 +78,7 @@ public class ImageMetadataServiceTests
     [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _imageMetadataService!.GetExifOrientation(
@@ -171,7 +171,7 @@ public class ImageMetadataServiceTests
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName,
         int expectedOrientation)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _imageMetadataService!.GetHeicExifOrientation(buffer,
@@ -231,7 +231,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetsFileProperties_SomeFilesExist_PopulatesAssetsFileProperties()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -243,13 +243,13 @@ public class ImageMetadataServiceTests
             const string fileName4 = FileNames.IMAGE_11_HEIC;
             const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string sourceFilePath1 = Path.Combine(_assetsDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, fileName2);
             string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
-            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string sourceFilePath3 = Path.Combine(_assetsDirectory!, fileName3);
             string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
-            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string sourceFilePath4 = Path.Combine(_assetsDirectory!, fileName4);
             string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
 
             File.Copy(sourceFilePath1, destinationFilePath1);
@@ -414,7 +414,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetsFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -426,13 +426,13 @@ public class ImageMetadataServiceTests
             const string fileName4 = FileNames.IMAGE_11_HEIC;
             const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string sourceFilePath1 = Path.Combine(_assetsDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, fileName2);
             string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
-            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string sourceFilePath3 = Path.Combine(_assetsDirectory!, fileName3);
             string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
-            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string sourceFilePath4 = Path.Combine(_assetsDirectory!, fileName4);
             string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
 
             File.Copy(sourceFilePath1, destinationFilePath1);
@@ -581,7 +581,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetsFileProperties_OneAssetIsNull_ThrowsNullReferenceException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -593,13 +593,13 @@ public class ImageMetadataServiceTests
             const string fileName4 = FileNames.IMAGE_11_HEIC;
             const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string sourceFilePath1 = Path.Combine(_assetsDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, fileName2);
             string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
-            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string sourceFilePath3 = Path.Combine(_assetsDirectory!, fileName3);
             string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
-            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string sourceFilePath4 = Path.Combine(_assetsDirectory!, fileName4);
             string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
 
             File.Copy(sourceFilePath1, destinationFilePath1);
@@ -725,7 +725,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetFileProperties_FileExists_PopulatesAssetDates()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -733,7 +733,7 @@ public class ImageMetadataServiceTests
 
             const string fileName = FileNames.IMAGE_1_JPG;
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
+            string sourceFilePath = Path.Combine(_assetsDirectory!, fileName);
             string destinationFilePath = Path.Combine(destinationPath, fileName);
 
             File.Copy(sourceFilePath, destinationFilePath);
@@ -783,7 +783,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetFileProperties_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -836,7 +836,7 @@ public class ImageMetadataServiceTests
     [Test]
     public void UpdateAssetFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
@@ -844,7 +844,7 @@ public class ImageMetadataServiceTests
 
             const string fileName = FileNames.IMAGE_1_JPG;
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
+            string sourceFilePath = Path.Combine(_assetsDirectory!, fileName);
             string destinationFilePath = Path.Combine(destinationPath, fileName);
 
             File.Copy(sourceFilePath, destinationFilePath);

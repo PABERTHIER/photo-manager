@@ -11,7 +11,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows;
 [TestFixture]
 public class SyncAssetsWindowTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
@@ -22,8 +22,8 @@ public class SyncAssetsWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -50,7 +50,7 @@ public class SyncAssetsWindowTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
@@ -85,7 +85,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void Initialize_HasConfiguration_NotifiesAndSetsDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -157,7 +157,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void Initialize_HasNoConfiguration_NotifiesAndSetsEmptyDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -205,7 +205,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void ContinueButton_FromDescription_NotifiesAndSetsStepToConfigure()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -256,7 +256,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void SaveButton_FromConfigure_NotifiesAndSavesDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -376,7 +376,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void ContinueButton_FromConfigure_NotifiesAndSetsToRun()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -543,15 +543,15 @@ public class SyncAssetsWindowTests
     [Test]
     public async Task RunButton_FromRun_NotifiesAndSetsStepToViewResults()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
-        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string sourceToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -944,7 +944,7 @@ public class SyncAssetsWindowTests
     [Test]
     public void AdvanceStep_AllStepsWithoutDefinitions_NotifiesAndSetsRightStep()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();

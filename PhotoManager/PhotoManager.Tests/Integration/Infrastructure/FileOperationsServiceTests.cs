@@ -10,7 +10,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class FileOperationsServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private FileOperationsService? _fileOperationsService;
     private UserConfigurationService? _userConfigurationService;
@@ -19,11 +19,11 @@ public class FileOperationsServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory);
 
         _userConfigurationService = new(configurationRootMock);
     }
@@ -44,7 +44,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetSubDirectories_ValidDirectory_ReturnsArrayOfSubDirectories()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string directoryPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         DirectoryInfo[] subDirectories = _fileOperationsService!.GetSubDirectories(directoryPath);
 
@@ -63,7 +63,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetSubDirectories_InvalidDirectory_ThrowsDirectoryNotFoundException()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string directoryPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         DirectoryNotFoundException? exception =
             Assert.Throws<DirectoryNotFoundException>(() => _fileOperationsService!.GetSubDirectories(directoryPath));
@@ -76,7 +76,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetRecursiveSubDirectories_ValidDirectory_ReturnsArrayOfRecursiveSubDirectories()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string directoryPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         DirectoryInfo[] recursiveSubDirectories = _fileOperationsService!.GetRecursiveSubDirectories(directoryPath);
 
@@ -97,7 +97,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetRecursiveSubDirectories_InvalidDirectory_ThrowsDirectoryNotFoundException()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string directoryPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         DirectoryNotFoundException? exception =
             Assert.Throws<DirectoryNotFoundException>(() =>
@@ -111,7 +111,7 @@ public class FileOperationsServiceTests
     [Test]
     public void CreateDirectory_ValidDirectory_CreatesDirectory()
     {
-        string testDirectory = Path.Combine(_dataDirectory!, Directories.TEST_DIRECTORY);
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_DIRECTORY);
 
         _fileOperationsService!.CreateDirectory(testDirectory);
 
@@ -127,14 +127,14 @@ public class FileOperationsServiceTests
     {
         const string fileName = FileNames.IMAGE_1_JPG;
         const string newFileName = FileNames.IMAGE_TO_DELETE_JPG;
-        string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
-        string destinationFilePath = Path.Combine(_dataDirectory!, newFileName);
+        string sourceFilePath = Path.Combine(_assetsDirectory!, fileName);
+        string destinationFilePath = Path.Combine(_assetsDirectory!, newFileName);
 
         File.Copy(sourceFilePath, destinationFilePath);
 
         Assert.That(File.Exists(destinationFilePath), Is.True);
 
-        _fileOperationsService!.DeleteFile(_dataDirectory!, newFileName);
+        _fileOperationsService!.DeleteFile(_assetsDirectory!, newFileName);
 
         Assert.That(File.Exists(destinationFilePath), Is.False);
 
@@ -145,11 +145,11 @@ public class FileOperationsServiceTests
     public void DeleteFile_FileDoesNotExist_NoActionTaken()
     {
         const string testFileName = FileNames.NON_EXISTENT_IMAGE_JPG;
-        string testFilePath = Path.Combine(_dataDirectory!, testFileName);
+        string testFilePath = Path.Combine(_assetsDirectory!, testFileName);
 
         Assert.That(File.Exists(testFilePath), Is.False);
 
-        Assert.DoesNotThrow(() => _fileOperationsService!.DeleteFile(_dataDirectory!, testFileName));
+        Assert.DoesNotThrow(() => _fileOperationsService!.DeleteFile(_assetsDirectory!, testFileName));
 
         _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
@@ -158,8 +158,8 @@ public class FileOperationsServiceTests
     public void DeleteFile_FileIsLocked_LogsItAndDoesNotThrowAndNoActionTaken()
     {
         const string testFileName = FileNames.IMAGE_TO_DELETE_JPG;
-        string tempDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
-        string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string tempDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string sourceFilePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         try
         {
@@ -195,7 +195,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetFileNames_ReturnsFileNames()
     {
-        string[] fileNames = _fileOperationsService!.GetFileNames(_dataDirectory!);
+        string[] fileNames = _fileOperationsService!.GetFileNames(_assetsDirectory!);
 
         Assert.That(fileNames, Has.Length.GreaterThanOrEqualTo(2));
         Assert.That(fileNames, Does.Contain(FileNames.IMAGE_2_JPG));
@@ -207,7 +207,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetFileBytes_FileExists_ReturnsFileBytes()
     {
-        string testFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string testFilePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         byte[] actualBytes = _fileOperationsService!.GetFileBytes(testFilePath);
 
@@ -220,7 +220,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetFileBytes_FileDoesNotExist_ThrowsFileNotFoundException()
     {
-        string nonExistentFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+        string nonExistentFilePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
 
         FileNotFoundException? exception =
             Assert.Throws<FileNotFoundException>(() => _fileOperationsService!.GetFileBytes(nonExistentFilePath));
@@ -234,8 +234,8 @@ public class FileOperationsServiceTests
     public void GetFileBytes_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
     {
         UnauthorizedAccessException? exception =
-            Assert.Throws<UnauthorizedAccessException>(() => _fileOperationsService!.GetFileBytes(_dataDirectory!));
-        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
+            Assert.Throws<UnauthorizedAccessException>(() => _fileOperationsService!.GetFileBytes(_assetsDirectory!));
+        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_assetsDirectory!}' is denied."));
 
         _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
@@ -243,7 +243,7 @@ public class FileOperationsServiceTests
     [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
-        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
         Asset asset = new()
         {
             FolderId = folder.Id,
@@ -267,7 +267,7 @@ public class FileOperationsServiceTests
     [Test]
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
-        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
         Asset asset = new()
         {
             FolderId = folder.Id,
@@ -327,7 +327,7 @@ public class FileOperationsServiceTests
     [Test]
     public void FileExistsFullPath_ExistingFile_ReturnsTrue()
     {
-        string fullPath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string fullPath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         bool exists = _fileOperationsService!.FileExists(fullPath);
 
@@ -339,7 +339,7 @@ public class FileOperationsServiceTests
     [Test]
     public void FileExistsFullPath_FileDoesNotExist_ReturnsFalse()
     {
-        string fullPath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
+        string fullPath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
 
         bool exists = _fileOperationsService!.FileExists(fullPath);
 
@@ -363,7 +363,7 @@ public class FileOperationsServiceTests
     [Test]
     public void FolderExists_ExistingFolder_ReturnsTrue()
     {
-        bool exists = _fileOperationsService!.FolderExists(_dataDirectory!);
+        bool exists = _fileOperationsService!.FolderExists(_assetsDirectory!);
 
         Assert.That(exists, Is.True);
 
@@ -404,7 +404,7 @@ public class FileOperationsServiceTests
     [Test]
     public void GetTotalFilesCount_EmptyDirectory_ReturnsTotalFilesCount()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         try
         {

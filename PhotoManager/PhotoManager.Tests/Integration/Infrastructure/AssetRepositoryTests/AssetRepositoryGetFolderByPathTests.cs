@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetFolderByPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -18,14 +18,14 @@ public class AssetRepositoryGetFolderByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -61,8 +61,8 @@ public class AssetRepositoryGetFolderByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
@@ -97,7 +97,7 @@ public class AssetRepositoryGetFolderByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath1);
@@ -134,7 +134,7 @@ public class AssetRepositoryGetFolderByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
 
@@ -162,7 +162,7 @@ public class AssetRepositoryGetFolderByPathTests
 
             string? folderPath1 = null;
 
-            _assetRepository!.AddFolder(Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1));
+            _assetRepository!.AddFolder(Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1));
 
             ArgumentNullException? exception =
                 Assert.Throws<ArgumentNullException>(() => _assetRepository!.GetFolderByPath(folderPath1!));
@@ -187,14 +187,14 @@ public class AssetRepositoryGetFolderByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            Folder? folderByPath1 = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-            Folder? folderByPath2 = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder? folderByPath1 = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
+            Folder? folderByPath2 = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
 
             // Simulate concurrent access
             Parallel.Invoke(

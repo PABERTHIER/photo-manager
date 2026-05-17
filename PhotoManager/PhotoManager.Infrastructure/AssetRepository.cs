@@ -12,7 +12,7 @@ public class AssetRepository : IAssetRepository, IDisposable
 {
     private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
 
-    private readonly string _dataDirectory;
+    private readonly string _databaseDirectory;
     private int _totalAssetCount;
     private string[] _recentTargetPaths = [];
 
@@ -57,7 +57,7 @@ public class AssetRepository : IAssetRepository, IDisposable
         _persistenceContext = persistenceContext;
         _logger = logger;
 
-        _dataDirectory = pathProviderService.ResolveDataDirectory();
+        _databaseDirectory = pathProviderService.ResolveDatabaseDirectory();
 
         ushort cacheCapacity = userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
@@ -451,7 +451,7 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     private void Initialize()
     {
-        _persistenceContext.Initialize(_dataDirectory);
+        _persistenceContext.Initialize(_databaseDirectory);
         ReadCatalog();
     }
 

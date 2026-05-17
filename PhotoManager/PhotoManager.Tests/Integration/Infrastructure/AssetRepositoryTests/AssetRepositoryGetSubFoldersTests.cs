@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetSubFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -18,14 +18,14 @@ public class AssetRepositoryGetSubFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -61,8 +61,8 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
             string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
@@ -113,8 +113,8 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -143,8 +143,8 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
@@ -175,7 +175,7 @@ public class AssetRepositoryGetSubFoldersTests
         {
             Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the loop
 

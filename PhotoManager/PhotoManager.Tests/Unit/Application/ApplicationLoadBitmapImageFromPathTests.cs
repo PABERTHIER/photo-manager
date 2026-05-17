@@ -8,7 +8,7 @@ namespace PhotoManager.Tests.Unit.Application;
 [TestFixture]
 public class ApplicationLoadBitmapImageFromPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -17,8 +17,8 @@ public class ApplicationLoadBitmapImageFromPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -45,7 +45,7 @@ public class ApplicationLoadBitmapImageFromPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -85,9 +85,9 @@ public class ApplicationLoadBitmapImageFromPathTests
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith,
         int expectedHeight)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -105,9 +105,9 @@ public class ApplicationLoadBitmapImageFromPathTests
     [Test]
     public void LoadBitmapImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
         const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
@@ -122,7 +122,7 @@ public class ApplicationLoadBitmapImageFromPathTests
     [Test]
     public void LoadBitmapImageFromPath_FilePathIsNull_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string? filePath = null;
         const Rotation rotation = Rotation.Rotate90;
@@ -139,9 +139,9 @@ public class ApplicationLoadBitmapImageFromPathTests
     [Test]
     public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception =
@@ -154,9 +154,9 @@ public class ApplicationLoadBitmapImageFromPathTests
     [Test]
     public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const Rotation rotation = Rotation.Rotate0;
 
         BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);

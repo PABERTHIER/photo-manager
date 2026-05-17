@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryAddAssetTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -29,14 +29,14 @@ public class AssetRepositoryAddAssetTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -124,7 +124,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder1 = _assetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
@@ -169,7 +169,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath };
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
@@ -219,7 +219,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
@@ -271,7 +271,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = assetRepository.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
@@ -308,7 +308,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
             Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
@@ -439,7 +439,7 @@ public class AssetRepositoryAddAssetTests
         {
             const string exceptionMessage = "Value must be set.";
 
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[]? assetData = null;
@@ -477,7 +477,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder1 = _assetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 

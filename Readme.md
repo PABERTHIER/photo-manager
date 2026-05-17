@@ -47,7 +47,7 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 - Unzip the content of the zip file to a new folder.
 - [Configure the appsettings.json file](#config-file-card_file_box)
 - Run `PhotoManager.UI.exe`.
-- The application saves the cataloged files in the following path: `BackupPath` (Path settings).
+- The application saves the cataloged files in the following path: `DatabasePath` (Path settings).
 
 ## Config file :card_file_box:
 
@@ -103,7 +103,7 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Paths` part is about settings of paths:** :open_file_folder:
 
 - `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
-- `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database and backup will be stored.
+- `DatabasePath = "the_directory\\to_your_local_database"`:  The directory where the database and backup will be stored.
 - `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
 - `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 

@@ -8,14 +8,14 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class UserConfigurationServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        string configFilePath = Path.Combine(_dataDirectory, "appsettings.json");
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        string configFilePath = Path.Combine(_assetsDirectory, "appsettings.json");
 
         IConfigurationBuilder builder =
             new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
@@ -193,12 +193,12 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void BackupPath_CorrectValue_ReturnsBackupPathValue()
+    public void DatabasePath_CorrectValue_ReturnsDatabasePathValue()
     {
-        string backupPath = _userConfigurationService!.PathSettings.BackupPath;
+        string databasePath = _userConfigurationService!.PathSettings.DatabasePath;
 
-        Assert.That(backupPath, Is.Not.Null);
-        Assert.That(backupPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Backup"));
+        Assert.That(databasePath, Is.Not.Null);
+        Assert.That(databasePath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Database"));
     }
 
     [Test]

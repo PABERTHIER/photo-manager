@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Persistence.Repositories;
 [TestFixture]
 public class ThumbnailPersistenceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private Folder? _testFolder;
 
@@ -20,12 +20,12 @@ public class ThumbnailPersistenceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
-        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_1_JPG));
-        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
-        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_9_PNG));
+        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_1_JPG));
+        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
+        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_9_PNG));
     }
 
     [SetUp]
@@ -37,7 +37,7 @@ public class ThumbnailPersistenceTests
         _sqlitePersistenceContext = new(factory, backupService, _testLogger);
         _sqlitePersistenceContext.Initialize(_databaseDirectory!);
 
-        _testFolder = _sqlitePersistenceContext.Folders.Insert(_dataDirectory!);
+        _testFolder = _sqlitePersistenceContext.Folders.Insert(_assetsDirectory!);
     }
 
     [TearDown]
@@ -113,7 +113,7 @@ public class ThumbnailPersistenceTests
     [Test]
     public void ReplaceForFolder_OnlyAffectsTargetFolder()
     {
-        string duplicatesFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesFolderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         Folder folder = _sqlitePersistenceContext!.Folders.Insert(duplicatesFolderPath);
 
         _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);
@@ -261,7 +261,7 @@ public class ThumbnailPersistenceTests
     [Test]
     public void GetByFolderId_OnlyReturnsTargetFolderThumbnails()
     {
-        string duplicatesFolderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesFolderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         Folder folder = _sqlitePersistenceContext!.Folders.Insert(duplicatesFolderPath);
 
         _sqlitePersistenceContext!.Thumbnails.Upsert(_testFolder!.Id, FileNames.IMAGE_1_JPG, _thumbnailData1!);

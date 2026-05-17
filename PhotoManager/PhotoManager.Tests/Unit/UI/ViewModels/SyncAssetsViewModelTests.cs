@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels;
 [TestFixture]
 public class SyncAssetsViewModelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
@@ -18,8 +18,8 @@ public class SyncAssetsViewModelTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -46,7 +46,7 @@ public class SyncAssetsViewModelTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -82,7 +82,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Description_CorrectValue_ReturnsDescription()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -110,7 +110,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Definitions_HasDefinitions_NotifiesChangesAndReturnsDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -161,7 +161,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Definitions_SameDefinitions_NotifiesChangesAndReturnsDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -213,7 +213,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Definitions_EmptyDefinitions_NotifiesChangesAndReturnsEmptyCollection()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -237,7 +237,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Definitions_NoDefinitions_DoesNotNotifyChangesAndReturnsEmptyCollection()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -256,7 +256,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void Definitions_DefinitionsIsNull_NotifiesChangesAndReturnsNull()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
@@ -275,7 +275,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void DeleteDefinition_HasDefinitions_NotifiesChangesAndDeletesDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -379,7 +379,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void DeleteDefinition_DuplicateDefinitionsInTheCollection_NotifiesChangesAndDeletesGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -441,7 +441,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void DeleteDefinition_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -468,7 +468,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void DeleteDefinition_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -520,7 +520,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void DeleteDefinition_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -575,7 +575,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUpAndMoveDown_HasDefinitions_UpdatesDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -663,7 +663,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_FirstDefinition_DoesNotMoveUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -718,7 +718,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_NotFirstAndNotLastDefinition_MovesUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -786,7 +786,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_LastDefinition_MovesUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -854,7 +854,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_DuplicateDefinitionsInTheCollection_MovesUpGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -923,7 +923,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_OnlyOneDefinition_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -960,7 +960,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1019,7 +1019,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1051,7 +1051,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_DefinitionsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
@@ -1079,7 +1079,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveUp_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1134,7 +1134,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_FirstAndNotLastDefinition_MovesDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1202,7 +1202,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_NotFirstAndNotLastDefinition_MovesDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1270,7 +1270,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_LastDefinition_DoesNotMoveDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1338,7 +1338,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_DuplicateDefinitionsInTheCollection_MovesDownGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1407,7 +1407,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_OnlyOneDefinition_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1444,7 +1444,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1503,7 +1503,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -1535,7 +1535,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_DefinitionsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
@@ -1563,7 +1563,7 @@ public class SyncAssetsViewModelTests
     [Test]
     public void MoveDown_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();

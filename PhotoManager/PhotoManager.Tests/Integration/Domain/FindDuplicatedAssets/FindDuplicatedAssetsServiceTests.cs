@@ -13,7 +13,7 @@ namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 [TestFixture]
 public class FindDuplicatedAssetsServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
@@ -31,14 +31,14 @@ public class FindDuplicatedAssetsServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -215,8 +215,8 @@ public class FindDuplicatedAssetsServiceTests
     [Test]
     public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
     {
-        string sourcePath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string sourcePath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string sourcePath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
@@ -268,7 +268,7 @@ public class FindDuplicatedAssetsServiceTests
     public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
     {
         const string hash = Hashes.IMAGE_9_PNG;
-        string sourcePath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
@@ -312,8 +312,8 @@ public class FindDuplicatedAssetsServiceTests
     [Test]
     public void GetDuplicatedAssets_DuplicatesButOneFileDoesNotExist_ReturnsEmptyList()
     {
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -334,8 +334,8 @@ public class FindDuplicatedAssetsServiceTests
     [Test]
     public void GetDuplicatedAssets_FilesDoNotExist_ReturnsEmptyList()
     {
-        string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-        string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_1);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -371,7 +371,7 @@ public class FindDuplicatedAssetsServiceTests
     [Test]
     public void GetDuplicatedAssets_NoDuplicatedAssets_ReturnsEmptyList()
     {
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 

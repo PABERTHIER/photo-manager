@@ -10,7 +10,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationDeleteAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -21,8 +21,8 @@ public class ApplicationDeleteAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -49,7 +49,7 @@ public class ApplicationDeleteAssetsTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -83,7 +83,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public async Task DeleteAssets_AssetsAreValid_DeletesAssetsAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
 
@@ -94,7 +94,7 @@ public class ApplicationDeleteAssetsTests
             const string asset1FileName = FileNames.IMAGE_6_JPG;
             const string asset2FileName = FileNames.IMAGE_1_JPG;
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
+            string sourceFilePath1 = Path.Combine(_assetsDirectory!, asset1FileName);
             string destinationFilePath1 = Path.Combine(destinationDirectory, asset1FileName);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath1, destinationFilePath1);
@@ -103,7 +103,7 @@ public class ApplicationDeleteAssetsTests
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.True);
 
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, asset2FileName);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, asset2FileName);
             string destinationFilePath2 = Path.Combine(destinationDirectory, asset2FileName);
 
             hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2);
@@ -140,7 +140,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public async Task DeleteAssets_AssetIsValid_DeletesAssetAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
 
@@ -150,7 +150,7 @@ public class ApplicationDeleteAssetsTests
 
             const string assetFileName = FileNames.IMAGE_1_JPG;
 
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, assetFileName);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, assetFileName);
             string destinationFilePath2 = Path.Combine(destinationDirectory, assetFileName);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2);
@@ -185,7 +185,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public void DeleteAssets_AssetsIsNull_ThrowsArgumentNullException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         Asset[]? assets = null;
 
@@ -199,7 +199,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public void DeleteAssets_AssetsIsEmpty_ThrowsArgumentNullException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         Asset[] assets = [];
 
@@ -213,7 +213,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public void DeleteAssets_OneAssetIsNull_ThrowsArgumentNullException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         Guid folderId1 = Guid.NewGuid();
         Guid folderId2 = Guid.NewGuid();
@@ -221,7 +221,7 @@ public class ApplicationDeleteAssetsTests
         Asset asset1 = new()
         {
             FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -238,7 +238,7 @@ public class ApplicationDeleteAssetsTests
         Asset asset3 = new()
         {
             FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -264,7 +264,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public void DeleteAssets_OneAssetFolderIsNull_ThrowsArgumentNullException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         Guid folderId1 = Guid.NewGuid();
         Guid folderId2 = Guid.NewGuid();
@@ -273,7 +273,7 @@ public class ApplicationDeleteAssetsTests
         Asset asset1 = new()
         {
             FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _dataDirectory! },
+            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -309,7 +309,7 @@ public class ApplicationDeleteAssetsTests
         Asset asset3 = new()
         {
             FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _dataDirectory! },
+            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -335,9 +335,9 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public void DeleteAssets_AssetDoesNotExists_ThrowsFileNotFoundException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
 
         Asset asset = new()
         {

@@ -10,7 +10,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows;
 [TestFixture]
 public class AboutWindowTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -19,8 +19,8 @@ public class AboutWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -41,7 +41,7 @@ public class AboutWindowTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -81,7 +81,7 @@ public class AboutWindowTests
         string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, projectName, projectOwner);
+        ConfigureApplication(_assetsDirectory!, projectName, projectOwner);
 
         AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
 
@@ -100,7 +100,7 @@ public class AboutWindowTests
     [Test]
     public void Constructor_WithDifferentAssembly_SetsTitle()
     {
-        ConfigureApplication(_dataDirectory!, "PhotoManager", "Toto");
+        ConfigureApplication(_assetsDirectory!, "PhotoManager", "Toto");
 
         AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
 
@@ -121,7 +121,7 @@ public class AboutWindowTests
     public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
+        ConfigureApplication(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
 
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
         AssemblyBuilder assemblyBuilder =

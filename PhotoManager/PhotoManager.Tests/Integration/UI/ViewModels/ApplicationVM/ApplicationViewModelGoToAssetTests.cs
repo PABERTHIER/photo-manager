@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGoToAssetTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -33,8 +33,8 @@ public class ApplicationViewModelGoToAssetTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -165,7 +165,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset5 = new()
         {
             FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! },
+            Folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -213,7 +213,7 @@ public class ApplicationViewModelGoToAssetTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -249,7 +249,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public async Task GoToAsset_CataloguedAssetsAndAssetIsInCurrentDirectory_GoesToAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -527,7 +527,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public async Task GoToAsset_CataloguedAssetsAndAssetIsNotInCurrentDirectory_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -616,7 +616,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public async Task GoToAsset_CataloguedAssetsAndAssetDoesNotExist_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -717,7 +717,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public async Task GoToAsset_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -793,7 +793,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public async Task GoToAsset_AppModeAndCataloguedAssetsAndAssetIsInCurrentDirectory_ChangesAppModeAndGoesToAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1097,7 +1097,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public async Task GoToAsset_AppModeAndCataloguedAssetsAndAssetIsNotInCurrentDirectory_DoesNothing(AppMode appMode)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1188,7 +1188,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public async Task GoToAsset_AppModeAndCataloguedAssetsAndAssetDoesNotExist_DoesNothing(AppMode appMode)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1291,7 +1291,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public async Task GoToAsset_AppModeAndNoCataloguedAssets_DoesNothing(AppMode appMode)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 

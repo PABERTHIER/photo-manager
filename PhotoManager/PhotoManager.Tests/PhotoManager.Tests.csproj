@@ -70,8 +70,8 @@
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Original.JPG" />
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_ShitQuality.JPG" />
     <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG" />
-    <None Remove="TestFiles\TestBackup\photomanager.db" />
-    <None Remove="TestFiles\TestBackup\Backups\20230819.zip" />
+    <None Remove="TestFiles\TestDatabase\photomanager.db" />
+    <None Remove="TestFiles\TestDatabase\Backups\20230819.zip" />
     <None Remove="TestFiles\TestFolder\EmptyFile.txt" />
     <None Remove="TestFiles\TestFolder\TestHiddenSubFolder\EmptyFile.txt" />
     <None Remove="TestFiles\TestFolder\TestSubFolder2\EmptyFile.txt" />
@@ -242,10 +242,10 @@
     <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\photomanager.db">
+    <Content Include="TestFiles\TestDatabase\photomanager.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\Backups\20230819.zip">
+    <Content Include="TestFiles\TestDatabase\Backups\20230819.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestFolder\EmptyFile.txt">

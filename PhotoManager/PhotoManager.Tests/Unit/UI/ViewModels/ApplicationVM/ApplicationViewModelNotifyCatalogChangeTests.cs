@@ -15,7 +15,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelNotifyCatalogChangeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -30,8 +30,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -42,7 +42,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -67,7 +67,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -92,7 +92,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -117,7 +117,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -142,7 +142,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory! },
+            Folder = new() { Id = folderId, Path = _assetsDirectory! },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -190,7 +190,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -227,7 +227,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndOneNewAssetAndCurrentFolder_NotifiesCatalogChangeAndAddsAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -235,7 +235,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -323,7 +323,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneNewAssetAndCurrentFolderAndPassingAllFields_NotifiesCatalogChangeAndAddsAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -331,7 +331,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -421,7 +421,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneNewAssetAndCurrentFolderAndNotPassingCataloguedAssetsByPath_NotifiesCatalogChangeAndAddsAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -429,7 +429,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -515,7 +515,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_NoCataloguedAssetsAndNewAssetsAndCurrentFolder_NotifiesCatalogChangeAndAddsAssets()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -523,7 +523,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -778,7 +778,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_NoCataloguedAssetsAndOneNewAssetAndCurrentFolder_NotifiesCatalogChangeAndAddsAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -786,7 +786,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -866,9 +866,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndOneNewAssetAndNotCurrentFolder_UpdatesStatusMessage()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -876,10 +876,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
@@ -907,7 +907,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -921,7 +921,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -938,7 +938,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -954,7 +954,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndNewAssetIsNullAndCurrentFolder_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -962,16 +962,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
         string statusMessage = string.Empty;
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -985,7 +985,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1002,7 +1002,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1021,7 +1021,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneUpdatedAssetAndCurrentFolder_NotifiesCatalogChangeAndUpdatesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1029,7 +1029,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1099,7 +1099,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneUpdatedAssetAndCurrentFolderAndPassingAllFields_NotifiesCatalogChangeAndUpdatesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1107,7 +1107,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1179,7 +1179,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneUpdatedAssetAndCurrentFolderAndNotPassingCataloguedAssetsByPath_NotifiesCatalogChangeAndUpdatesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1187,7 +1187,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1256,7 +1256,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndUpdatedAssetsAndCurrentFolder_NotifiesCatalogChangeAndUpdatesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1264,7 +1264,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1445,7 +1445,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_OneCataloguedAssetAndOneUpdatedAssetAndCurrentFolder_NotifiesCatalogChangeAndUpdatesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1453,7 +1453,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1520,7 +1520,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_NoCataloguedAssetsAndOneUpdatedAssetAndCurrentFolder_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1528,7 +1528,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1600,9 +1600,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndOneUpdatedAssetAndNotCurrentFolder_UpdatesStatusMessage()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1610,10 +1610,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
@@ -1641,7 +1641,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         string statusMessage = $"Image {updatedAsset.Folder.Path} updated in catalog.";
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -1655,7 +1655,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1672,7 +1672,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1688,7 +1688,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndUpdatedAssetIsNullAndCurrentFolder_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1696,16 +1696,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
         string statusMessage = string.Empty;
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -1719,7 +1719,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1736,7 +1736,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -1755,7 +1755,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneDeletedAssetAndCurrentFolder_NotifiesCatalogChangeAndDeletesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1763,7 +1763,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1831,7 +1831,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneDeletedAssetAndCurrentFolderAndPassingAllFields_NotifiesCatalogChangeAndDeletesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1839,7 +1839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1909,7 +1909,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndOneDeletedAssetAndCurrentFolderAndNotPassingCataloguedAssetsByPath_NotifiesCatalogChangeAndDeletesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1917,7 +1917,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -1984,7 +1984,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_CataloguedAssetsAndDeletedAssetsAndCurrentFolder_NotifiesCatalogChangeAndDeletesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1992,7 +1992,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -2165,7 +2165,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_OneCataloguedAssetAndOneDeletedAssetAndCurrentFolder_NotifiesCatalogChangeAndDeletesAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2173,7 +2173,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -2238,7 +2238,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_NoCataloguedAssetsAndOneDeletedAssetAndCurrentFolder_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2246,7 +2246,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        string folderPath = _dataDirectory!;
+        string folderPath = _assetsDirectory!;
 
         CheckBeforeChanges(folderPath);
 
@@ -2318,9 +2318,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndOneDeletedAssetAndNotCurrentFolder_UpdatesStatusMessage()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2328,10 +2328,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
@@ -2359,7 +2359,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         string statusMessage = $"Image {deletedAsset.Folder.Path} deleted from catalog.";
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2373,7 +2373,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2390,7 +2390,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2406,7 +2406,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndDeletedAssetIsNullAndCurrentFolder_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2414,16 +2414,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
         string statusMessage = string.Empty;
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2437,7 +2437,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2454,7 +2454,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2472,9 +2472,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderCreatedAndOtherDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2482,12 +2482,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2501,7 +2501,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2515,7 +2515,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2533,7 +2533,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderCreatedAndCurrentDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2541,13 +2541,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
-        string statusMessage = $"Folder {_dataDirectory} added to catalog.";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string statusMessage = $"Folder {_assetsDirectory} added to catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2560,7 +2560,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2574,7 +2574,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2593,9 +2593,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_FolderCreatedAndCataloguedAssetsAndOtherDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2603,17 +2603,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2626,7 +2626,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2643,7 +2643,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2662,9 +2662,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_FolderCreatedAndOtherDirectoryAndPassingAllFields_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2672,12 +2672,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2694,7 +2694,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2708,7 +2708,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2726,7 +2726,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderCreatedAndFolderIsNull_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2734,10 +2734,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = string.Empty;
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2751,7 +2751,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2765,7 +2765,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2781,15 +2781,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderCreatedAndNoSubscribers_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
-        string statusMessage = $"Folder {_dataDirectory} added to catalog.";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string statusMessage = $"Folder {_assetsDirectory} added to catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2802,7 +2802,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2816,9 +2816,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderDeletedAndOtherDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2826,12 +2826,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2845,7 +2845,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2859,7 +2859,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2877,7 +2877,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderDeletedAndCurrentDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2885,13 +2885,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
-        string statusMessage = $"Folder {_dataDirectory} deleted from catalog.";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string statusMessage = $"Folder {_assetsDirectory} deleted from catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2904,7 +2904,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2918,7 +2918,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -2937,9 +2937,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_FolderDeletedAndCataloguedAssetsAndOtherDirectory_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2947,17 +2947,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -2970,7 +2970,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -2987,7 +2987,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             expectedAssets,
@@ -3006,9 +3006,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_FolderDeletedAndOtherDirectoryAndPassingAllFields_NotifiesCatalogChangeAndEmitsEvent()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3016,12 +3016,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder folder = _testableAssetRepository!.AddFolder(otherDirectory);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3038,7 +3038,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3052,7 +3052,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3070,7 +3070,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderDeletedAndFolderIsNull_UpdatesStatusMessage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3078,10 +3078,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = string.Empty;
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3095,7 +3095,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3109,7 +3109,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3125,15 +3125,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_FolderDeletedAndNoSubscribers_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
-        string statusMessage = $"Folder {_dataDirectory} deleted from catalog.";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+        string statusMessage = $"Folder {_assetsDirectory} deleted from catalog.";
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
@@ -3146,7 +3146,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3169,7 +3169,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(CatalogChangeReason.CatalogProcessEnded)]
     public void NotifyCatalogChange_OtherReasons_UpdatesStatusMessage(CatalogChangeReason reason)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3177,10 +3177,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
         string statusMessage = string.Empty;
 
         CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3193,7 +3193,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3207,7 +3207,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             statusMessage,
             [],
@@ -3223,7 +3223,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public void NotifyCatalogChange_CatalogChangeCallbackEventArgsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3231,10 +3231,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
         NullReferenceException? exception =
             Assert.Throws<NullReferenceException>(() => _applicationViewModel!.NotifyCatalogChange(null!));
@@ -3243,7 +3243,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             string.Empty,
             [],
@@ -3255,7 +3255,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedAppTitle,
             string.Empty,
             [],

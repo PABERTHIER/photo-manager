@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetSyncAssetsConfigurationTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -16,8 +16,8 @@ public class ApplicationGetSyncAssetsConfigurationTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -44,7 +44,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -78,7 +78,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
     [Test]
     public void GetSyncAssetsConfiguration_SyncAssetsConfiguration_ReturnsSyncAssetsConfiguration()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -125,7 +125,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
     [Test]
     public void GetSyncAssetsConfiguration_NoSyncAssetsConfiguration_ReturnsEmptyList()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -148,7 +148,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
     [Test]
     public void GetSyncAssetsConfiguration_ConcurrentAccess_SyncAssetsConfigurationIsHandledSafely()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =

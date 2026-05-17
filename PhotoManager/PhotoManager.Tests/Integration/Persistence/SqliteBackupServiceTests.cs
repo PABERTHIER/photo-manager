@@ -13,7 +13,7 @@ namespace PhotoManager.Tests.Integration.Persistence;
 [TestFixture]
 public class SqliteBackupServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private string? _backupsDirectory;
 
@@ -25,8 +25,8 @@ public class SqliteBackupServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _backupsDirectory = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
     }
 
@@ -174,10 +174,10 @@ public class SqliteBackupServiceTests
             Rotation.Rotate0, false, null, false, null));
 
         // ─── Thumbnails ────────────────────────────────────────────────────────
-        byte[] jpgThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG));
-        byte[] pngThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG));
-        byte[] gifThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.HOMER_GIF));
-        byte[] heicThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC));
+        byte[] jpgThumbnailData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG));
+        byte[] pngThumbnailData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG));
+        byte[] gifThumbnailData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF));
+        byte[] heicThumbnailData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC));
 
         // Upsert one thumbnail then replace all Vacation thumbnails (simulates a full folder sync)
         _sqlitePersistenceContext.Thumbnails.Upsert(vacationFolder.Id, FileNames.IMAGE_1_JPG, jpgThumbnailData);

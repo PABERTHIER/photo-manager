@@ -5,7 +5,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetRootCatalogFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -14,8 +14,8 @@ public class ApplicationGetRootCatalogFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -34,7 +34,7 @@ public class ApplicationGetRootCatalogFoldersTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -69,7 +69,7 @@ public class ApplicationGetRootCatalogFoldersTests
     public async Task GetRootCatalogFolders_CataloguedAssets_ReturnsRootCatalogFolders()
     {
         const string folderName = Directories.NEW_FOLDER_2;
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, folderName);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, folderName);
 
         ConfigureApplication(assetsDirectory);
 
@@ -93,11 +93,11 @@ public class ApplicationGetRootCatalogFoldersTests
     [Test]
     public void GetRootCatalogFolders_FolderIsAdded_ReturnsRootCatalogFolders()
     {
-        ConfigureApplication(_dataDirectory!);
+        ConfigureApplication(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Path, Is.EqualTo(_assetsDirectory!));
         Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
         Folder[] folders = _application!.GetRootCatalogFolders();
@@ -112,14 +112,14 @@ public class ApplicationGetRootCatalogFoldersTests
     [Test]
     public void GetRootCatalogFolders_FolderIsNotAdded_AddsFolderAndReturnsRootCatalogFolders()
     {
-        ConfigureApplication(_dataDirectory!);
+        ConfigureApplication(_assetsDirectory!);
 
 
         Folder[] folders = _application!.GetRootCatalogFolders();
 
-        Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(_assetsDirectory!);
         Assert.That(folder, Is.Not.Null);
-        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Path, Is.EqualTo(_assetsDirectory!));
         Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
         Assert.That(folders, Has.Length.EqualTo(1));

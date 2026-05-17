@@ -7,7 +7,7 @@ namespace PhotoManager.Tests.Integration.Persistence.Cache;
 [TestFixture]
 public class LruCacheTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private byte[]? _thumbnailData1;
     private byte[]? _thumbnailData2;
@@ -17,12 +17,12 @@ public class LruCacheTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_1_JPG));
-        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.HOMER_GIF));
-        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
-        _thumbnailData4 = File.ReadAllBytes(Path.Combine(_dataDirectory, FileNames.IMAGE_9_PNG));
+        _thumbnailData1 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_1_JPG));
+        _thumbnailData2 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.HOMER_GIF));
+        _thumbnailData3 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_11_90_DEG_HEIC));
+        _thumbnailData4 = File.ReadAllBytes(Path.Combine(_assetsDirectory, FileNames.IMAGE_9_PNG));
     }
 
     [Test]

@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.FindDuplicatedAssetsVM;
 [TestFixture]
 public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
@@ -31,8 +31,8 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -223,7 +223,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -260,9 +260,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -275,10 +275,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -391,9 +391,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndNewPositions_ReturnsAllOtherMatchingDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -406,10 +406,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -533,9 +533,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentAsset_ReturnsMatchingDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -548,10 +548,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -662,9 +662,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentSet_ReturnsMatchingDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -677,10 +677,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -791,9 +791,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSets_ReturnsMatchingDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -806,10 +806,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -927,9 +927,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetThatHasDuplicates_ReturnsAllOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -942,10 +942,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash = Hashes.IMAGE_1_JPG;
@@ -1053,9 +1053,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsDifferentFolders_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1068,10 +1068,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash = Hashes.IMAGE_1_JPG;
@@ -1158,9 +1158,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsSameFolder_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1174,7 +1174,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash = Hashes.IMAGE_1_JPG;
 
@@ -1259,9 +1259,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndTwoSets_ReturnsMatchingAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1274,10 +1274,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1374,9 +1374,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatching_ReturnsAssetInTheRootDirectory()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1390,7 +1390,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash = Hashes.IMAGE_1_JPG;
 
@@ -1467,9 +1467,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsWithSameNameAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1482,10 +1482,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1580,9 +1580,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetMatchingAndTwoSetsOfDuplicatesWithTwoAssetsWithSameName_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1595,10 +1595,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1698,9 +1698,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsThatHasOneCollapsedDuplicatesAndThreeSets_ReturnsOtherDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1713,10 +1713,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1830,9 +1830,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneAssetCollapsedThatHasOneDuplicatesAndThreeSets_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1845,10 +1845,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1964,9 +1964,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetAndOneDuplicateIsCollapsedAndTwoSets_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1979,10 +1979,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2088,9 +2088,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsOneCollapsedAssetThatHasOneCollapsedDuplicateAndThreeSets_ReturnsOtherDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2103,10 +2103,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2222,9 +2222,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndAllOtherAssetsAreCollapsed_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2237,10 +2237,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2358,9 +2358,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasTwoAssetsCollapsedThatHaveDuplicatesAndThreeSets_ReturnsAllOtherMatchingDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2373,10 +2373,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2494,9 +2494,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderContainsAssetsAndThreeSetsWithOneCollapsed_ReturnsOtherDuplicatedAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2509,10 +2509,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2630,9 +2630,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasAssetsWithSomeDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2645,10 +2645,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2735,9 +2735,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderHasAssetsWithNoDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2750,10 +2750,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2826,9 +2826,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameAndHash_ReturnsOtherDuplicatedAsset()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2842,7 +2842,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -2930,9 +2930,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameButDifferentHash_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2946,7 +2946,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -3014,9 +3014,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = _dataDirectory!;
+        string exemptedFolderPath = _assetsDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3029,9 +3029,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3125,11 +3125,11 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheOtherDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         string exemptedFolderPath = Path.Combine(otherDirectory);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3142,7 +3142,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3236,9 +3236,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     public void
         GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = _dataDirectory!;
+        string exemptedFolderPath = _assetsDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3251,7 +3251,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -3343,9 +3343,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderDoesNotContainAssetsAndDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3358,9 +3358,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3453,9 +3453,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderDoesNotContainAssetsAndNoDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3496,9 +3496,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderIsEmptyAndDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3515,9 +3515,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
             Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-            Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
             Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3615,9 +3615,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderIsEmptyAndNoDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3667,9 +3667,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathDoesNotExistAndDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3682,9 +3682,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3777,9 +3777,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathDoesNotExistAndNoDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3822,7 +3822,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = string.Empty;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3833,9 +3833,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3930,7 +3930,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = string.Empty;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3971,7 +3971,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = null!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3982,9 +3982,9 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -4079,7 +4079,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     {
         string exemptedFolderPath = null!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (

@@ -5,7 +5,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetCatalogCooldownMinutesTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -14,8 +14,8 @@ public class ApplicationGetCatalogCooldownMinutesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -36,7 +36,7 @@ public class ApplicationGetCatalogCooldownMinutesTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -74,7 +74,7 @@ public class ApplicationGetCatalogCooldownMinutesTests
     public void GetCatalogCooldownMinutes_CorrectValue_ReturnsCatalogCooldownMinutesValue(
         ushort expectedCatalogCooldownMinutes)
     {
-        ConfigureApplication(_dataDirectory!, expectedCatalogCooldownMinutes);
+        ConfigureApplication(_assetsDirectory!, expectedCatalogCooldownMinutes);
 
         ushort catalogCooldownMinutes = _application!.GetCatalogCooldownMinutes();
 

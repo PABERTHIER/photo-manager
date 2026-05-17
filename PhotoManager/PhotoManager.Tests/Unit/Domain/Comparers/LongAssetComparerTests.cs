@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Unit.Domain.Comparers;
 [TestFixture]
 public class LongAssetComparerTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -20,14 +20,14 @@ public class LongAssetComparerTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Guid folderId = Guid.NewGuid();
 
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "Image 1.jpg",
             Pixel = new()
             {
@@ -47,7 +47,7 @@ public class LongAssetComparerTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "image 1.jpg",
             Pixel = new()
             {
@@ -67,7 +67,7 @@ public class LongAssetComparerTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "Image_1.jpg",
             Pixel = new()
             {
@@ -87,7 +87,7 @@ public class LongAssetComparerTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "IMAGE 1.jpg",
             Pixel = new()
             {
@@ -107,7 +107,7 @@ public class LongAssetComparerTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "Image1.jpg",
             Pixel = new()
             {
@@ -127,7 +127,7 @@ public class LongAssetComparerTests
         _asset6 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "Image 1_duplicate.jpg",
             Pixel = new()
             {
@@ -147,7 +147,7 @@ public class LongAssetComparerTests
         _asset7 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "Image 10.jpg",
             Pixel = new()
             {
@@ -167,7 +167,7 @@ public class LongAssetComparerTests
         _asset8 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = "picture.png",
             Pixel = new()
             {

@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryLoadThumbnailTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -29,14 +29,14 @@ public class AssetRepositoryLoadThumbnailTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -99,7 +99,7 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            string folderPath = _dataDirectory!;
+            string folderPath = _assetsDirectory!;
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -144,7 +144,7 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            string folderPath = _dataDirectory!;
+            string folderPath = _assetsDirectory!;
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -189,7 +189,7 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             BitmapImage? bitmapImage = _assetRepository!.LoadThumbnail(
-                _dataDirectory!,
+                _assetsDirectory!,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
@@ -221,7 +221,7 @@ public class AssetRepositoryLoadThumbnailTests
             const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
 
             string? directoryName = null;
-            Folder addedFolder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _assetRepository!.AddFolder(_assetsDirectory!);
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
@@ -267,7 +267,7 @@ public class AssetRepositoryLoadThumbnailTests
         {
             const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
 
-            Folder addedFolder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _assetRepository!.AddFolder(_assetsDirectory!);
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
@@ -281,7 +281,7 @@ public class AssetRepositoryLoadThumbnailTests
             using (Assert.EnterMultipleScope())
             {
                 ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                    _assetRepository!.LoadThumbnail(_dataDirectory!, fileName!, 0, 0));
+                    _assetRepository!.LoadThumbnail(_assetsDirectory!, fileName!, 0, 0));
 
                 Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
@@ -324,8 +324,8 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
             string filePath1 = Path.Combine(folderPath1, _asset1!.FileName);
             byte[] assetData1 = File.ReadAllBytes(filePath1);
@@ -424,7 +424,7 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            string folderPath = _dataDirectory!;
+            string folderPath = _assetsDirectory!;
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 

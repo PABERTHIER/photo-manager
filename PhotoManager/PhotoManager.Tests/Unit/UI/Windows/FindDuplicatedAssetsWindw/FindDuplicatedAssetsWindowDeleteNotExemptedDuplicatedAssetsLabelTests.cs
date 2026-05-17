@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Unit.UI.Windows.FindDuplicatedAssetsWindw;
 [TestFixture]
 public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
@@ -39,8 +39,8 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -231,7 +231,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -268,9 +268,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -288,10 +288,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -414,9 +414,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndNewPositions_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -434,10 +434,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -571,9 +571,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -591,10 +591,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -715,9 +715,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -735,10 +735,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -859,9 +859,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -879,10 +879,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1006,9 +1006,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasDuplicates_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1026,10 +1026,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash = Hashes.IMAGE_1_JPG;
@@ -1146,9 +1146,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsDifferentFolders_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1166,10 +1166,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash = Hashes.IMAGE_1_JPG;
@@ -1264,9 +1264,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsSameFolder_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1285,7 +1285,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash = Hashes.IMAGE_1_JPG;
 
@@ -1379,9 +1379,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndTwoSets_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingAssets()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1399,10 +1399,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1507,9 +1507,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatching_SendsDeleteDuplicatedAssetsEventAndCollapsesAssetsInTheRootDirectory()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1528,7 +1528,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash = Hashes.IMAGE_1_JPG;
 
@@ -1613,9 +1613,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsWithSameNameAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1633,10 +1633,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1737,9 +1737,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetMatchingAndTwoSetsOfDuplicatesWithTwoAssetsWithSameName_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1757,10 +1757,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1866,9 +1866,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsAssetsThatHasOneCollapsedDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -1886,10 +1886,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2013,9 +2013,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsOneAssetCollapsedThatHasOneDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2033,10 +2033,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2162,9 +2162,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsOneCollapsedAssetAndOneDuplicateIsCollapsedAndTwoSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2182,10 +2182,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2300,9 +2300,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsOneCollapsedAssetThatHasOneCollapsedDuplicateAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2320,10 +2320,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2449,9 +2449,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndAllOtherAssetsAreCollapsed_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2469,10 +2469,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2599,9 +2599,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsCollapsedThatHaveDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2619,10 +2619,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2750,9 +2750,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderContainsAssetsAndThreeSetsWithOneCollapsed_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2770,10 +2770,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2901,9 +2901,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasAssetsWithSomeDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -2921,10 +2921,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3018,9 +3018,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasAssetsWithNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3038,10 +3038,10 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3120,9 +3120,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameAndHash_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicate()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3141,7 +3141,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -3235,9 +3235,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameButDifferentHash_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3256,7 +3256,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
         Folder exemptedFolder = _testableAssetRepository!.AddFolder(exemptedFolderPath);
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -3330,9 +3330,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = _dataDirectory!;
+        string exemptedFolderPath = _assetsDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3350,9 +3350,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3452,11 +3452,11 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheOtherDirectoryAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
         string exemptedFolderPath = Path.Combine(otherDirectory);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3474,7 +3474,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3574,9 +3574,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = _dataDirectory!;
+        string exemptedFolderPath = _assetsDirectory!;
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3594,7 +3594,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
         const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -3693,9 +3693,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderDoesNotContainAssetsAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3713,9 +3713,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -3815,9 +3815,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderDoesNotContainAssetsAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3873,9 +3873,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderIsEmptyAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -3897,9 +3897,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
             Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-            Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
             Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
@@ -4004,9 +4004,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderIsEmptyAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.FOLDER_2);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -4071,9 +4071,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathDoesNotExistAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -4091,9 +4091,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -4193,9 +4193,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathDoesNotExistAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, exemptedFolderPath, 200, 150, false, false, false,
             false);
 
         (
@@ -4251,7 +4251,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsEmptyAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, string.Empty, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, string.Empty, 200, 150, false, false, false,
             false);
 
         (
@@ -4267,9 +4267,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -4369,7 +4369,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsEmptyAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, string.Empty, 200, 150, false, false, false,
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, string.Empty, 200, 150, false, false, false,
             false);
 
         (
@@ -4423,7 +4423,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, null!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, null!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4438,9 +4438,9 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -4540,7 +4540,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     public void
         DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, null!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, null!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,

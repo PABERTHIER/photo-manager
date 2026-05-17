@@ -24,7 +24,7 @@ public class MainWindowLoadedAndClosingTests
 {
     private static readonly ILogger Log = new TestLogger<MainWindowLoadedAndClosingTests>();
 
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -46,8 +46,8 @@ public class MainWindowLoadedAndClosingTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -226,7 +226,7 @@ public class MainWindowLoadedAndClosingTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -265,7 +265,7 @@ public class MainWindowLoadedAndClosingTests
     public async Task
         WindowLoaded_CataloguedAssetsAndSyncAssetsEveryXMinutesAndIsCancellationRequestedAndWindowClosing_CatalogsAssetsThreeTimesAndClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 1, assetsDirectory, 200, 150, true, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -412,7 +412,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_CataloguedAssetsAndIsCancellationRequestedAndWindowClosing_ClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -522,7 +522,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_CataloguedAssetsAndWindowClosing_CatalogsAssetsAndClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -652,7 +652,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_NoCataloguedAssetsAndWindowClosing_ClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -764,7 +764,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsCompleted_CancelsTaskAndCancellationToken()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -858,7 +858,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsNotCompleted_CancelsTaskAndCancellationToken()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();

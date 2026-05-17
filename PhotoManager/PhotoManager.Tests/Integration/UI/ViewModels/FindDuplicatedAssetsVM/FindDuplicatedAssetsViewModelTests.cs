@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 [TestFixture]
 public class FindDuplicatedAssetsViewModelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
@@ -34,8 +34,8 @@ public class FindDuplicatedAssetsViewModelTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -255,7 +255,7 @@ public class FindDuplicatedAssetsViewModelTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -291,7 +291,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndOneDuplicatesSet_SetsDuplicates()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -392,7 +392,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndNoDuplicates_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
             Directories.SAMPLE_1);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
@@ -461,7 +461,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -535,7 +535,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_DuplicatesAndPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -677,7 +677,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_CataloguedAssetsAndDuplicatesAndNoPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -771,7 +771,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_CataloguedAssetsAndNoDuplicates_SetsDuplicatedAssetSetsToEmpty()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
             Directories.SAMPLE_1);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
@@ -836,7 +836,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_NoCataloguedAssets_SetsDuplicatedAssetSetsToEmpty()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -906,7 +906,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseAllDuplicatedAsset_CollapsesAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1018,7 +1018,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseCurrentDuplicatedAsset_CollapsesAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1125,7 +1125,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseNotCurrentDuplicatedAsset_CollapsesAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1232,7 +1232,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1302,7 +1302,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1411,7 +1411,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1520,7 +1520,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndNoDuplicates_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
             Directories.SAMPLE_1);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
@@ -1585,7 +1585,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_NoCataloguedAssets_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1654,7 +1654,7 @@ public class FindDuplicatedAssetsViewModelTests
     public async Task
         GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndOneMatchingDuplicatesInExemptedFolder_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1673,7 +1673,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
             string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_9_PNG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1796,7 +1796,7 @@ public class FindDuplicatedAssetsViewModelTests
     public async Task
         GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndTwoSameMatchingDuplicatesInExemptedFolder_ReturnsOtherDuplicatedAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1815,7 +1815,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_DUPLICATE_JPG);
 
@@ -1969,7 +1969,7 @@ public class FindDuplicatedAssetsViewModelTests
     public async Task
         GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndOneMatchingDuplicateInExemptedFolder_ReturnsOtherDuplicatedAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -1988,7 +1988,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -2130,7 +2130,7 @@ public class FindDuplicatedAssetsViewModelTests
     public async Task
         GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndNoMatchingDuplicatesInExemptedFolder_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -2149,7 +2149,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_2_JPG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_JPG);
             string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_2_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -2256,7 +2256,7 @@ public class FindDuplicatedAssetsViewModelTests
     public async Task
         GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndNoAssetsInExemptedFolder_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
@@ -2373,7 +2373,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndNoDuplicates_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE,
             Directories.SAMPLE_1);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
@@ -2448,7 +2448,7 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_NoCataloguedAssets_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,

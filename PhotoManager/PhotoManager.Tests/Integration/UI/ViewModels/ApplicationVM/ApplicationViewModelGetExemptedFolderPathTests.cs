@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGetExemptedFolderPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -18,8 +18,8 @@ public class ApplicationViewModelGetExemptedFolderPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -39,7 +39,7 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -77,7 +77,7 @@ public class ApplicationViewModelGetExemptedFolderPathTests
     [TestCase("E:\\Workspace\\PhotoManager\\Test\\test2")]
     public void GetExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue(string expectedExemptedFolderPath)
     {
-        ConfigureApplicationViewModel(_dataDirectory!, expectedExemptedFolderPath);
+        ConfigureApplicationViewModel(_assetsDirectory!, expectedExemptedFolderPath);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -85,18 +85,18 @@ public class ApplicationViewModelGetExemptedFolderPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string exemptedFolderPath = _applicationViewModel!.GetExemptedFolderPath();
 
         Assert.That(exemptedFolderPath, Is.Not.Null);
         Assert.That(exemptedFolderPath, Is.EqualTo(expectedExemptedFolderPath));
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);

@@ -3,10 +3,10 @@
 public class PathProviderService(IUserConfigurationService userConfigurationService) : IPathProviderService
 {
     // TODO: Clean up afterward -> Delete the service ?
-    private readonly string _dataDirectory = userConfigurationService.PathSettings.BackupPath;
+    private readonly string _databaseDirectory = userConfigurationService.PathSettings.DatabasePath;
 
-    public string ResolveDataDirectory()
+    public string ResolveDatabaseDirectory()
     {
-        return _dataDirectory;
+        return _databaseDirectory;
     }
 }

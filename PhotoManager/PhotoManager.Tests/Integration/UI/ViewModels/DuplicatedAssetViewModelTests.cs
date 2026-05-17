@@ -15,7 +15,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels;
 [TestFixture]
 public class DuplicatedAssetViewModelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private DuplicatedAssetViewModel? _duplicatedAssetViewModel;
@@ -29,8 +29,8 @@ public class DuplicatedAssetViewModelTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -42,7 +42,7 @@ public class DuplicatedAssetViewModelTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -193,7 +193,7 @@ public class DuplicatedAssetViewModelTests
     [Test]
     public void Properties_AssetAndVisibleAndParentViewModelAndUpdateVisible_UpdatesVisible()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
@@ -256,7 +256,7 @@ public class DuplicatedAssetViewModelTests
     [Test]
     public void Properties_AssetAndVisibleAndUpdateVisible_UpdatesVisible()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
@@ -289,7 +289,7 @@ public class DuplicatedAssetViewModelTests
     [Test]
     public void Properties_AssetAndUpdateVisible_UpdatesVisible()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 

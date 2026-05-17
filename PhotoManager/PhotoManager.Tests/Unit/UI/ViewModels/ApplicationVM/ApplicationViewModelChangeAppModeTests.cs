@@ -15,7 +15,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelChangeAppModeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -31,15 +31,15 @@ public class ApplicationViewModelChangeAppModeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         Guid folderId = Guid.NewGuid();
 
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -64,7 +64,7 @@ public class ApplicationViewModelChangeAppModeTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -89,7 +89,7 @@ public class ApplicationViewModelChangeAppModeTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -114,7 +114,7 @@ public class ApplicationViewModelChangeAppModeTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -139,7 +139,7 @@ public class ApplicationViewModelChangeAppModeTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -194,7 +194,7 @@ public class ApplicationViewModelChangeAppModeTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -229,7 +229,7 @@ public class ApplicationViewModelChangeAppModeTests
     [Test]
     public void ChangeAppMode_AssetsAndChangePosition_ChangesAppMode()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -237,15 +237,15 @@ public class ApplicationViewModelChangeAppModeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - {_asset4!.FileName} - image 4 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - {_asset4!.FileName} - image 4 of 5 - sorted by file name ascending";
         const int expectedViewerPosition = 3;
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
         _applicationViewModel!.GoToNextAsset();
         _applicationViewModel!.GoToNextAsset();
         _applicationViewModel!.GoToNextAsset();
@@ -255,7 +255,7 @@ public class ApplicationViewModelChangeAppModeTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Viewer,
             Visibility.Hidden,
             Visibility.Visible,
@@ -297,13 +297,13 @@ public class ApplicationViewModelChangeAppModeTests
 
         // Second ChangeAppMode
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 4 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 4 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.ChangeAppMode();
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -350,7 +350,7 @@ public class ApplicationViewModelChangeAppModeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -370,7 +370,7 @@ public class ApplicationViewModelChangeAppModeTests
     [Test]
     public void ChangeAppMode_NoAssets_ChangesAppMode()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -378,16 +378,16 @@ public class ApplicationViewModelChangeAppModeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} -  - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.ChangeAppMode();
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Viewer,
             Visibility.Hidden,
             Visibility.Visible,
@@ -406,13 +406,13 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.ChangeAppMode();
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -436,7 +436,7 @@ public class ApplicationViewModelChangeAppModeTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,

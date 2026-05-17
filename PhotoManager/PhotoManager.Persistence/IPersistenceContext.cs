@@ -14,9 +14,9 @@ public interface IPersistenceContext
 
     /// <summary>
     /// Opens (and creates if necessary) the SQLite database under
-    /// <paramref name="dataDirectory"/>. Idempotent.
+    /// <paramref name="databaseDirectory"/>. Idempotent.
     /// </summary>
-    void Initialize(string dataDirectory);
+    void Initialize(string databaseDirectory);
 
     IFolderPersistence Folders { get; }
     IAssetPersistence Assets { get; }

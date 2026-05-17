@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows;
 [TestFixture]
 public class FindDuplicatedAssetsWindowTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
@@ -49,8 +49,8 @@ public class FindDuplicatedAssetsWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -513,7 +513,7 @@ public class FindDuplicatedAssetsWindowTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -550,7 +550,7 @@ public class FindDuplicatedAssetsWindowTests
     public async Task
         DeleteLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
-        string rootDirectory = _dataDirectory!;
+        string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -558,7 +558,7 @@ public class FindDuplicatedAssetsWindowTests
         string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
         string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
         string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false,
             true);
@@ -1463,8 +1463,8 @@ public class FindDuplicatedAssetsWindowTests
     [Test]
     public async Task DeleteLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
             false);
@@ -1550,7 +1550,7 @@ public class FindDuplicatedAssetsWindowTests
     public async Task
         DeleteAllLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAssets()
     {
-        string rootDirectory = _dataDirectory!;
+        string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -1558,7 +1558,7 @@ public class FindDuplicatedAssetsWindowTests
         string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
         string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
         string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false,
             true);
@@ -2388,8 +2388,8 @@ public class FindDuplicatedAssetsWindowTests
     [Test]
     public async Task DeleteAllLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
             false);
@@ -2474,7 +2474,7 @@ public class FindDuplicatedAssetsWindowTests
     public async Task
         DeleteAllNotExemptedLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAssets()
     {
-        string rootDirectory = _dataDirectory!;
+        string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -2887,8 +2887,8 @@ public class FindDuplicatedAssetsWindowTests
     [Test]
     public async Task DeleteAllNotExemptedLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false,
             false);

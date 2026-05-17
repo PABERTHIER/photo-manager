@@ -13,7 +13,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationCatalogAssetsAsyncTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
@@ -40,13 +40,13 @@ public class ApplicationCatalogAssetsAsyncTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
+        _defaultAssetsDirectory = Path.Combine(_assetsDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -375,7 +375,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExists_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -472,7 +472,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -480,10 +480,10 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -628,7 +628,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_SyncTheAssetsButNotTheVideo()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -636,10 +636,10 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -771,7 +771,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -868,7 +868,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_SyncTheAssetsButNotTheCorruptedImage(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -877,8 +877,8 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -989,7 +989,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsEqualTo0_StopsTheSync()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(0, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1058,7 +1058,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1236,7 +1236,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1244,9 +1244,9 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -1476,7 +1476,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1484,9 +1484,9 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -1687,7 +1687,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_SyncTheAssets(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -1695,8 +1695,8 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -1873,7 +1873,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1882,8 +1882,8 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2080,7 +2080,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_SyncTheAssets(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -2265,7 +2265,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_SyncTheAssetsAndRemovesDeletedOne(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -2445,7 +2445,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, true);
@@ -2454,9 +2454,9 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2687,7 +2687,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -2696,9 +2696,9 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2901,7 +2901,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_SyncTheAssets(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3157,7 +3157,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
         ConfigureApplication(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3166,8 +3166,8 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -3345,7 +3345,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_SyncTheAssetsAndRemovesDeletedOne(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3531,7 +3531,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3713,7 +3713,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -3961,7 +3961,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_SyncTheAssetsAndDoesNotRemoveAllDeletedOnes(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_TO_DELETE);
 
         ConfigureApplication(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3971,8 +3971,8 @@ public class ApplicationCatalogAssetsAsyncTests
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
             string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
@@ -4306,7 +4306,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -4325,11 +4325,11 @@ public class ApplicationCatalogAssetsAsyncTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -4794,7 +4794,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssetsButNotTheVideoInSubdirectory()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -4813,11 +4813,11 @@ public class ApplicationCatalogAssetsAsyncTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -5256,7 +5256,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_SyncTheAssetsButTheVideoInSubdirectoryInTheSecondSync()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -5275,11 +5275,11 @@ public class ApplicationCatalogAssetsAsyncTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -5734,7 +5734,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public void
         CatalogAssetsAsync_AssetsAndCancellationDuringAssetCreation_SavesCatalogAndThrowsOperationCanceledException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -5820,7 +5820,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_AssetsAlreadyCataloguedAndCancellationDuringInspection_ThrowsOperationCanceledExceptionWithoutSaving()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -5961,7 +5961,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_DeletedSubfolderAndCatalogBatchSizeIsEqualTo0_StopsWithoutProcessingDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -6151,7 +6151,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task
         CatalogAssetsAsync_DeletedSubfolderWithMultipleAssetsAndSmallBatchSize_DeletesOnlyFirstAssetFromDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePath1 = Path.Combine(tempDirectory, _asset1Temp!.FileName);
         string destinationFilePath2 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
@@ -6167,7 +6167,7 @@ public class ApplicationCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
             string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath5 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath6 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath6 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath5, destinationFilePath1);
             File.Copy(imagePath6, destinationFilePath2);
@@ -6482,7 +6482,7 @@ public class ApplicationCatalogAssetsAsyncTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -6653,7 +6653,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_SyncTheAssets(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -6811,7 +6811,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_SyncTheAssets(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -6990,7 +6990,7 @@ public class ApplicationCatalogAssetsAsyncTests
         CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_SyncTheAssets(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
@@ -7213,7 +7213,7 @@ public class ApplicationCatalogAssetsAsyncTests
     public async Task CatalogAssetsAsync_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -7221,7 +7221,7 @@ public class ApplicationCatalogAssetsAsyncTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string imagePathToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath, imagePathToCopy);

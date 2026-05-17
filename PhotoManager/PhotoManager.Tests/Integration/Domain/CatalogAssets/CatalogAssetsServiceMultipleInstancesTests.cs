@@ -13,7 +13,7 @@ namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
 [TestFixture]
 public class CatalogAssetsServiceMultipleInstancesTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private string? _databaseBackupPath;
     // private string? _defaultAssetsDirectory;
@@ -38,13 +38,13 @@ public class CatalogAssetsServiceMultipleInstancesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
-        // _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
+        // _defaultAssetsDirectory = Path.Combine(_assetsDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -352,7 +352,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     public async Task
         CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDeleteTwoInstances_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -370,11 +370,11 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
@@ -841,7 +841,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndSyncTwoDifferentDirectories_SyncTheAssets(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -934,7 +934,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
         // Second Sync "after closing the app" to change the directory, so new instance
 
-        assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+        assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 

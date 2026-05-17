@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelSetExecutionTimeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -18,8 +18,8 @@ public class ApplicationViewModelSetExecutionTimeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -38,7 +38,7 @@ public class ApplicationViewModelSetExecutionTimeTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -79,7 +79,7 @@ public class ApplicationViewModelSetExecutionTimeTests
     [TestCase(1000)]
     public void SetExecutionTime_CorrectTimeSpan_SetsExecutionTimeWording(long ticks)
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -87,18 +87,18 @@ public class ApplicationViewModelSetExecutionTimeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         TimeSpan executionTime = new(ticks);
 
         _applicationViewModel!.SetExecutionTime(executionTime);
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, $"Execution time: {executionTime}");
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, $"Execution time: {executionTime}");
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
@@ -108,7 +108,7 @@ public class ApplicationViewModelSetExecutionTimeTests
     [Test]
     public void SetExecutionTime_IncorrectTimeSpan_SetsExecutionTimeWording()
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -116,18 +116,18 @@ public class ApplicationViewModelSetExecutionTimeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         TimeSpan executionTime = new(-1000);
 
         _applicationViewModel!.SetExecutionTime(executionTime);
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, $"Execution time: {executionTime}");
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, $"Execution time: {executionTime}");
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);

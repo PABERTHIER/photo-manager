@@ -8,7 +8,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.SyncAssetsVM;
 [TestFixture]
 public class SyncAssetsViewModelSetProcessConfigurationTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
@@ -17,8 +17,8 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -45,7 +45,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -82,7 +82,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [Test]
     public void SetProcessConfiguration_ValidDefinitions_SavesConfiguration()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -219,7 +219,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         string expectedSourceDirectory,
         string expectedDestinationDirectory)
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -339,7 +339,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [Test]
     public void SetProcessConfiguration_SomeDefinitionsAreValidAndSomeInvalid_SavesSomeConfiguration()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -456,7 +456,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     public void
         SetProcessConfiguration_SyncAssetsConfigurationWithDifferentConfigurations_SavesConfigurationAndEraseThePreviousOne()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -556,7 +556,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [Test]
     public void SetProcessConfiguration_SyncAssetsConfigurationHasNoDefinition_SavesNoConfiguration()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -584,7 +584,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [Test]
     public void SetProcessConfiguration_DefinitionsAreInvalid_SavesNoConfiguration()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -675,7 +675,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     public void
         SetProcessConfiguration_DefinitionsWithNullPathsForSourceOrDestination_ThrowsArgumentNullExceptionAndDoesNotSaveConfiguration()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
@@ -755,7 +755,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
     [Test]
     public void SetProcessConfiguration_ConcurrentAccess_SyncAssetsConfigurationIsHandledSafely()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();

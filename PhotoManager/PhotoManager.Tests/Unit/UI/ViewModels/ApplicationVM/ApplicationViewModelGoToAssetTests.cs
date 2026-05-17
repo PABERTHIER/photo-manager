@@ -15,7 +15,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGoToAssetTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -31,15 +31,15 @@ public class ApplicationViewModelGoToAssetTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         Guid folderId = Guid.NewGuid();
 
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -64,7 +64,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -89,7 +89,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -114,7 +114,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -139,7 +139,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -164,7 +164,7 @@ public class ApplicationViewModelGoToAssetTests
         _asset6 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = Path.Combine(_dataDirectory, Directories.FOLDER_1) },
+            Folder = new() { Id = folderId, Path = Path.Combine(_assetsDirectory, Directories.FOLDER_1) },
             FileName = FileNames.IMAGE_6_JPG,
             Pixel = new()
             {
@@ -212,7 +212,7 @@ public class ApplicationViewModelGoToAssetTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -248,7 +248,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public void GoToAsset_AssetIsInCurrentDirectory_GoesToAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -256,22 +256,22 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         int expectedViewerPosition = 1;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 2 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         // First GoToAsset
         _applicationViewModel!.GoToAsset(_asset2!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -297,13 +297,13 @@ public class ApplicationViewModelGoToAssetTests
         // Second GoToAsset
         expectedViewerPosition = 4;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 5 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset5!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -335,13 +335,13 @@ public class ApplicationViewModelGoToAssetTests
         // Third GoToAsset
         expectedViewerPosition = 4;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 5 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset5!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -379,13 +379,13 @@ public class ApplicationViewModelGoToAssetTests
         // Fourth GoToAsset
         expectedViewerPosition = 0;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset1!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -428,7 +428,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -448,7 +448,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public void GoToAsset_AssetIsNotInCurrentDirectory_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -456,21 +456,21 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         _applicationViewModel!.GoToAsset(_asset6!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -489,7 +489,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -509,7 +509,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public void GoToAsset_NoObservableAssets_DoesNothing()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -517,17 +517,17 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset2!);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -543,7 +543,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -563,7 +563,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public void GoToAsset_AssetIsNull_ThrowsNullReferenceException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -571,15 +571,15 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         NullReferenceException? exception =
             Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!));
@@ -588,7 +588,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -607,7 +607,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -627,7 +627,7 @@ public class ApplicationViewModelGoToAssetTests
     [Test]
     public void GoToAsset_AppModeAndAssetIsInCurrentDirectory_ChangesAppModeAndGoesToAsset()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -635,22 +635,22 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         int expectedViewerPosition = 1;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - {_asset2!.FileName} - image 2 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - {_asset2!.FileName} - image 2 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         // First GoToAsset
         _applicationViewModel!.GoToAsset(_asset2, AppMode.Viewer);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Viewer,
             Visibility.Hidden,
             Visibility.Visible,
@@ -680,13 +680,13 @@ public class ApplicationViewModelGoToAssetTests
         // Second GoToAsset
         expectedViewerPosition = 4;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - {_asset5!.FileName} - image 5 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - {_asset5!.FileName} - image 5 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset5, AppMode.Viewer);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Viewer,
             Visibility.Hidden,
             Visibility.Visible,
@@ -722,13 +722,13 @@ public class ApplicationViewModelGoToAssetTests
         // Third GoToAsset
         expectedViewerPosition = 4;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 5 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset5, AppMode.Thumbnails);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -774,13 +774,13 @@ public class ApplicationViewModelGoToAssetTests
         // Fourth GoToAsset
         expectedViewerPosition = 0;
         expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset1!, AppMode.Thumbnails);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -831,7 +831,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -853,7 +853,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public void GoToAsset_AppModeAndAssetIsNotInCurrentDirectory_DoesNothing(AppMode appMode)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -861,21 +861,21 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         _applicationViewModel!.GoToAsset(_asset6!, appMode);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -894,7 +894,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -916,7 +916,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public void GoToAsset_AppModeAndNoObservableAssets_DoesNothing(AppMode appMode)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -924,17 +924,17 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 0 of 0 - sorted by file name ascending";
 
         _applicationViewModel!.GoToAsset(_asset2!, appMode);
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -950,7 +950,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -972,7 +972,7 @@ public class ApplicationViewModelGoToAssetTests
     [TestCase(AppMode.Viewer)]
     public void GoToAsset_AppModeAndAssetIsNull_ThrowsNullReferenceException(AppMode appMode)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -980,15 +980,15 @@ public class ApplicationViewModelGoToAssetTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const int expectedViewerPosition = 0;
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory!} - image 1 of 5 - sorted by file name ascending";
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, expectedAssets);
 
         NullReferenceException? exception =
             Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!, appMode));
@@ -997,7 +997,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,
@@ -1016,7 +1016,7 @@ public class ApplicationViewModelGoToAssetTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             AppMode.Thumbnails,
             Visibility.Visible,
             Visibility.Hidden,

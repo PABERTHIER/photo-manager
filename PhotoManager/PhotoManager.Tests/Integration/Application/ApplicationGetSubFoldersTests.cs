@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetSubFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -15,8 +15,8 @@ public class ApplicationGetSubFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -43,7 +43,7 @@ public class ApplicationGetSubFoldersTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -77,7 +77,7 @@ public class ApplicationGetSubFoldersTests
     [Test]
     public async Task GetSubFolders_CataloguedAssetsAndParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -161,7 +161,7 @@ public class ApplicationGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -169,8 +169,8 @@ public class ApplicationGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
             string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
@@ -214,7 +214,7 @@ public class ApplicationGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasNoSubFolders_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -222,8 +222,8 @@ public class ApplicationGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
@@ -245,7 +245,7 @@ public class ApplicationGetSubFoldersTests
     [Test]
     public void GetSubFolders_NoFoldersRegistered_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -253,8 +253,8 @@ public class ApplicationGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
@@ -276,7 +276,7 @@ public class ApplicationGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentFolderIsNull_ThrowsNullReferenceException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -286,7 +286,7 @@ public class ApplicationGetSubFoldersTests
         {
             Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             _testableAssetRepository!.AddFolder(parentFolderPath2);
 

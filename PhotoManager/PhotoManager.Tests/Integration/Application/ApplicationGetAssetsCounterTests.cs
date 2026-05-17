@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetAssetsCounterTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -29,8 +29,8 @@ public class ApplicationGetAssetsCounterTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -182,7 +182,7 @@ public class ApplicationGetAssetsCounterTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -218,7 +218,7 @@ public class ApplicationGetAssetsCounterTests
     [TestCase(true)]
     public async Task GetAssetsCounter_CataloguedAssets_ReturnsNumberOfAssets(bool analyseVideos)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, analyseVideos);
 
         string outputVideoFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -254,7 +254,7 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_AssetsExist_ReturnsNumberOfAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -338,7 +338,7 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_NoAsset_Returns0()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -366,7 +366,7 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_ConcurrentAccess_AssetsAreHandledSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

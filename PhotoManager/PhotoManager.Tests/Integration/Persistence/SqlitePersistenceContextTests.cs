@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Persistence;
 [TestFixture]
 public class SqlitePersistenceContextTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private string? _backupsDirectory;
 
@@ -18,8 +18,8 @@ public class SqlitePersistenceContextTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _backupsDirectory = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
     }
 
@@ -79,18 +79,18 @@ public class SqlitePersistenceContextTests
     [Test]
     [TestCase("")]
     [TestCase("   ")]
-    public void Initialize_EmptyString_ThrowsArgumentException(string dataDirectory)
+    public void Initialize_EmptyString_ThrowsArgumentException(string databaseDirectory)
     {
-        const string expectedMessage = "dataDirectory must not be empty.";
+        const string expectedMessage = "databaseDirectory must not be empty.";
 
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => _sqlitePersistenceContext!.Initialize(dataDirectory));
+            Assert.Throws<ArgumentException>(() => _sqlitePersistenceContext!.Initialize(databaseDirectory));
 
-        Assert.That(exception?.Message, Is.EqualTo($"{expectedMessage} (Parameter 'dataDirectory')"));
-        Assert.That(exception.ParamName, Is.EqualTo("dataDirectory"));
+        Assert.That(exception?.Message, Is.EqualTo($"{expectedMessage} (Parameter 'databaseDirectory')"));
+        Assert.That(exception.ParamName, Is.EqualTo("databaseDirectory"));
 
         _testLogger.AssertLogExceptions(
-            [new ArgumentException(expectedMessage, nameof(dataDirectory))],
+            [new ArgumentException(expectedMessage, nameof(databaseDirectory))],
             typeof(SqlitePersistenceContext));
     }
 

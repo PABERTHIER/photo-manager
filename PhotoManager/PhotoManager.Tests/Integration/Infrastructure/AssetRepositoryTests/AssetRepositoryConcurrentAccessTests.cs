@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryConcurrentAccessTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private AssetRepository? _assetRepository;
@@ -30,14 +30,14 @@ public class AssetRepositoryConcurrentAccessTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -205,10 +205,10 @@ public class AssetRepositoryConcurrentAccessTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-            string folderPath3 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_3);
-            string folderPath4 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_4);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath3 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_3);
+            string folderPath4 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_4);
             Folder folder1 = _assetRepository!.AddFolder(folderPath1);
             Folder folder2 = _assetRepository!.AddFolder(folderPath2);
 
@@ -255,8 +255,8 @@ public class AssetRepositoryConcurrentAccessTests
             Assert.That(cataloguedAssets, Is.Empty);
 
             // DeleteAsset
-            string folderPath5 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_5);
-            string folderPath6 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_6);
+            string folderPath5 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_5);
+            string folderPath6 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_6);
             Folder folder5 = _assetRepository!.AddFolder(folderPath5);
             Folder folder6 = _assetRepository!.AddFolder(folderPath6);
 

@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelNotifyCatalogChangeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
@@ -44,13 +44,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
+        _defaultAssetsDirectory = Path.Combine(_assetsDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -378,7 +378,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExists_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -524,7 +524,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -540,10 +540,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -766,7 +766,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -782,10 +782,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -986,7 +986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -1124,7 +1124,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_NotifiesChangesButNotTheCorruptedImage(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1141,8 +1141,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -1291,7 +1291,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsEqualTo0_NotifiesNoAssetChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(0, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1392,7 +1392,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1666,7 +1666,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1682,9 +1682,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2013,7 +2013,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -2029,9 +2029,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2321,7 +2321,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -2337,8 +2337,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2568,7 +2568,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -2585,8 +2585,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2839,7 +2839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3119,7 +3119,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3386,7 +3386,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
@@ -3403,9 +3403,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -3735,7 +3735,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -3752,9 +3752,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -4046,7 +4046,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -4439,7 +4439,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -4456,8 +4456,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -4689,7 +4689,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -4960,7 +4960,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_NotifiesNoAssetChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -5208,7 +5208,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -5534,7 +5534,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_TO_DELETE);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -5552,8 +5552,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
             string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
@@ -5997,7 +5997,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -6024,11 +6024,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -6725,7 +6725,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -6752,11 +6752,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -7426,7 +7426,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -7453,11 +7453,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -8149,7 +8149,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_AssetsAndCancellationDuringAssetCreation_SavesCatalogAndThrowsOperationCanceledException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -8247,7 +8247,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAlreadyCataloguedAndCancellationDuringInspection_ThrowsOperationCanceledExceptionWithoutSaving()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -8396,7 +8396,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_DeletedSubfolderAndCatalogBatchSizeIsEqualTo0_StopsWithoutProcessingDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -8597,7 +8597,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_DeletedSubfolderWithMultipleAssetsAndSmallBatchSize_DeletesOnlyFirstAssetFromDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePath1 = Path.Combine(tempDirectory, _asset1Temp!.FileName);
         string destinationFilePath2 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
@@ -8615,7 +8615,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
             string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath5 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath6 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath6 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath5, destinationFilePath1);
             File.Copy(imagePath6, destinationFilePath2);
@@ -9011,7 +9011,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_RootCatalogFolderPointsToAFile_NotifiesNoAssetChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -9261,7 +9261,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -9484,7 +9484,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -9758,7 +9758,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
@@ -10095,7 +10095,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_NotifiesNoAssetChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -10111,7 +10111,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string imagePathToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath, imagePathToCopy);

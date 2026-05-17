@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGetSubFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -18,8 +18,8 @@ public class ApplicationViewModelGetSubFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -46,7 +46,7 @@ public class ApplicationViewModelGetSubFoldersTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -82,7 +82,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public async Task GetSubFolders_CataloguedAssetsAndParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -188,7 +188,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -196,10 +196,10 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
         string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
         string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
@@ -232,11 +232,11 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(childFolders2, Is.Empty);
         Assert.That(childFolders3, Is.Empty);
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, string.Empty);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, string.Empty);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
@@ -246,7 +246,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasNoSubFolders_ReturnsEmptyArray()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -254,10 +254,10 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
         Folder parentFolder1 = _testableAssetRepository!.AddFolder(parentFolderPath1);
         Folder parentFolder2 = _testableAssetRepository!.AddFolder(parentFolderPath2);
@@ -268,11 +268,11 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(parentFolders1, Is.Empty);
         Assert.That(parentFolders2, Is.Empty);
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, string.Empty);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, string.Empty);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
@@ -282,7 +282,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public void GetSubFolders_NoFoldersRegistered_ReturnsEmptyArray()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -290,10 +290,10 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+        string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
         Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
         Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
@@ -304,11 +304,11 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(parentFolders1, Is.Empty);
         Assert.That(parentFolders2, Is.Empty);
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, string.Empty);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, string.Empty);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
@@ -318,7 +318,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentFolderIsNull_ThrowsNullReferenceException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -326,11 +326,11 @@ public class ApplicationViewModelGetSubFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder? parentFolder1 = null;
 
-        string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+        string parentFolderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
         // At least one folder to trigger the Where on folders
         _testableAssetRepository!.AddFolder(parentFolderPath2);
@@ -340,11 +340,11 @@ public class ApplicationViewModelGetSubFoldersTests
 
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, string.Empty);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, string.Empty);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);

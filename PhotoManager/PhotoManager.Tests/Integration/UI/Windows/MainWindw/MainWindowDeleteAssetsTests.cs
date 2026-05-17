@@ -20,7 +20,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 public class MainWindowDeleteAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -36,8 +36,8 @@ public class MainWindowDeleteAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -130,7 +130,7 @@ public class MainWindowDeleteAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -168,7 +168,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndMultipleAssets_DeletesAssets()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -187,10 +187,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -296,7 +296,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndDeleteTwice_DeletesAssets()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -315,10 +315,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -428,7 +428,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndCurrentAsset_DeletesAsset()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -447,10 +447,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -555,7 +555,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndNotCurrentAsset_DeletesAsset()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -574,10 +574,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -684,7 +684,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndEmptyArray_DoesNothing()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -703,10 +703,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -810,7 +810,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndUnknownAssetsAndFileExists_DeletesFiles()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -829,10 +829,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -934,7 +934,7 @@ public class MainWindowDeleteAssetsTests
     public async Task
         DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -953,10 +953,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1068,7 +1068,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1167,7 +1167,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1186,10 +1186,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1347,7 +1347,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1366,10 +1366,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1546,7 +1546,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1565,10 +1565,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1725,7 +1725,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1744,10 +1744,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -1906,7 +1906,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1925,10 +1925,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -2069,7 +2069,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -2088,10 +2088,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -2242,7 +2242,7 @@ public class MainWindowDeleteAssetsTests
             Visibility expectedThumbnailsVisible,
             Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -2261,10 +2261,10 @@ public class MainWindowDeleteAssetsTests
             const string asset1TempFileName = FileNames.IMAGE_1_JPG;
             const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
-            string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
+            string imagePath1 = Path.Combine(_assetsDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
 
-            string imagePath2 = Path.Combine(_dataDirectory!, asset2TempFileName);
+            string imagePath2 = Path.Combine(_assetsDirectory!, asset2TempFileName);
             string imagePath2ToCopy = Path.Combine(destinationDirectory, asset2TempFileName);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -2419,7 +2419,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 

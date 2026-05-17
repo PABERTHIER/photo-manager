@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGetRootCatalogFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -32,8 +32,8 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _asset1 = new()
         {
@@ -173,7 +173,7 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -210,7 +210,7 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
     public async Task GetRootCatalogFolders_CataloguedAssets_ReturnsRootCatalogFolders()
     {
         const string folderName = Directories.NEW_FOLDER_2;
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, folderName);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, folderName);
 
         ConfigureApplicationViewModel(assetsDirectory);
 
@@ -295,7 +295,7 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
     [Test]
     public void GetRootCatalogFolders_FolderIsAdded_ReturnsRootCatalogFolders()
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -303,11 +303,11 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Path, Is.EqualTo(_assetsDirectory!));
         Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
         Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
@@ -318,14 +318,14 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, expectedAppTitle, [], string.Empty, null, false,
             false);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, expectedAppTitle, [], string.Empty, null,
             false, false);
 
         // Because the root folder is already added
@@ -336,7 +336,7 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
     [Test]
     public void GetRootCatalogFolders_FolderIsNotAdded_AddsFolderAndReturnsRootCatalogFolders()
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -344,13 +344,13 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         Folder[] folders = _applicationViewModel!.GetRootCatalogFolders();
 
-        Folder? folder = _testableAssetRepository!.GetFolderByPath(_dataDirectory!);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(_assetsDirectory!);
         Assert.That(folder, Is.Not.Null);
-        Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
+        Assert.That(folder.Path, Is.EqualTo(_assetsDirectory!));
         Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
         Assert.That(folders, Has.Length.EqualTo(1));
@@ -359,14 +359,14 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         Assert.That(folders[0].Name, Is.EqualTo(folder.Name));
 
         string expectedAppTitle =
-            $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false,
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, expectedAppTitle, [], string.Empty, null, false,
             false);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, expectedAppTitle, [], string.Empty, null,
             false, false);
 
         // Because the root folder is already added

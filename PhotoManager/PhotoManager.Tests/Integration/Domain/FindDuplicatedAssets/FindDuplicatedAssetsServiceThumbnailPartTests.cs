@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailPartTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private TestableAssetRepository? _testableAssetRepository;
@@ -84,8 +84,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -93,7 +93,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -466,8 +466,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -532,8 +532,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -613,8 +613,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -764,8 +764,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };

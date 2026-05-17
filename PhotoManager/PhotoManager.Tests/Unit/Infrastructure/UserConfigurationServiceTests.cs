@@ -188,12 +188,12 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void BackupPath_CorrectValue_ReturnsBackupPathValue()
+    public void DatabasePath_CorrectValue_ReturnsDatabasePathValue()
     {
-        string backupPath = _userConfigurationService!.PathSettings.BackupPath;
+        string databasePath = _userConfigurationService!.PathSettings.DatabasePath;
 
-        Assert.That(backupPath, Is.Not.Null);
-        Assert.That(backupPath, Is.EqualTo("C:\\Path\\To\\Backup"));
+        Assert.That(databasePath, Is.Not.Null);
+        Assert.That(databasePath, Is.EqualTo("C:\\Path\\To\\Database"));
     }
 
     [Test]

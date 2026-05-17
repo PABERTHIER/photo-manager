@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private TestableAssetRepository? _testableAssetRepository;
@@ -74,8 +74,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -83,7 +83,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -333,13 +333,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath2 = Path.Combine(_dataDirectory!,
+        string folderPath2 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath3 = Path.Combine(_dataDirectory!,
+        string folderPath3 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -400,13 +400,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath2 = Path.Combine(_dataDirectory!,
+        string folderPath2 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath3 = Path.Combine(_dataDirectory!,
+        string folderPath3 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -460,9 +460,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
@@ -504,9 +504,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -548,9 +548,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -655,13 +655,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
-        string folderPath1 = Path.Combine(_dataDirectory!,
+        string folderPath1 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath2 = Path.Combine(_dataDirectory!,
+        string folderPath2 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath3 = Path.Combine(_dataDirectory!,
+        string folderPath3 = Path.Combine(_assetsDirectory!,
             $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };

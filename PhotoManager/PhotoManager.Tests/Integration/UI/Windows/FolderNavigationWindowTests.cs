@@ -20,7 +20,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows;
 [TestFixture]
 public class FolderNavigationWindowTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -35,8 +35,8 @@ public class FolderNavigationWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -189,7 +189,7 @@ public class FolderNavigationWindowTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -225,8 +225,8 @@ public class FolderNavigationWindowTests
     [Test]
     public async Task ConstructorAndFolderTreeViewFolderSelectedAndConfirmAndCancel_CataloguedAssets_PerformsCorrectly()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
             Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -468,7 +468,7 @@ public class FolderNavigationWindowTests
     public void
         Constructor_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -526,7 +526,7 @@ public class FolderNavigationWindowTests
     public void
         Constructor_SourceFolderAndLastSelectedFolderIsSourceAndNoRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -583,8 +583,8 @@ public class FolderNavigationWindowTests
     public void
         Constructor_SourceFolderAndLastSelectedFolderIsNotSourceAndNoRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -642,7 +642,7 @@ public class FolderNavigationWindowTests
     public void
         Constructor_SourceFolderAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsSelectedPathWithSourceFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -697,7 +697,7 @@ public class FolderNavigationWindowTests
     public void
         Constructor_SourceFolderIsNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_ThrowsNullReferenceException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -749,7 +749,7 @@ public class FolderNavigationWindowTests
     public void
         FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -830,7 +830,7 @@ public class FolderNavigationWindowTests
     public void
         FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsSourceAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -910,8 +910,8 @@ public class FolderNavigationWindowTests
     public void
         FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsNotSourceAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -992,7 +992,7 @@ public class FolderNavigationWindowTests
     public void
         FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1069,8 +1069,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderPathEndsWithAntiSlash_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.TEMP_EMPTY_FOLDER}\\");
-        string expectedTargetPath = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.TEMP_EMPTY_FOLDER}\\");
+        string expectedTargetPath = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1154,7 +1154,7 @@ public class FolderNavigationWindowTests
     [TestCase("     ")]
     public void FolderTreeViewFolderSelected_SourceFolderPathHasWrongValue_SetsTargetPath(string? sourceFolderPath)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1234,8 +1234,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void ConfirmAndCancel_SourceFolderAndLastSelectedFolderIsNotSourceAndRecentTargetPaths_UpdatesHasConfirmed()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1338,7 +1338,7 @@ public class FolderNavigationWindowTests
     public void
         ConfirmAndCancel_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_DoesNotUpdateHasConfirmed()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

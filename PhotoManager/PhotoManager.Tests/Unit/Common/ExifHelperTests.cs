@@ -7,7 +7,7 @@ namespace PhotoManager.Tests.Unit.Common;
 [TestFixture]
 public class ExifHelperTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private UserConfigurationService? _userConfigurationService;
 
@@ -16,7 +16,7 @@ public class ExifHelperTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -52,7 +52,7 @@ public class ExifHelperTests
         1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(
@@ -69,7 +69,7 @@ public class ExifHelperTests
     [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(
@@ -162,7 +162,7 @@ public class ExifHelperTests
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName,
         int expectedOrientation)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(buffer,
@@ -271,7 +271,7 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_11_HEIC)]
     public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGdiPlusImage(validImageData, _testLogger!);
@@ -298,7 +298,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidHeic(validHeicData, _testLogger!);

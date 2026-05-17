@@ -27,19 +27,19 @@ public sealed class SqlitePersistenceContext(
 
     public string DatabaseFilePath => factory.DatabasePath;
 
-    public void Initialize(string dataDirectory)
+    public void Initialize(string databaseDirectory)
     {
-        if (string.IsNullOrWhiteSpace(dataDirectory))
+        if (string.IsNullOrWhiteSpace(databaseDirectory))
         {
-            ArgumentException ex = new("dataDirectory must not be empty.", nameof(dataDirectory));
+            ArgumentException ex = new("databaseDirectory must not be empty.", nameof(databaseDirectory));
             logger.LogError(ex, "{ExMessage}", ex.Message);
             throw ex;
         }
 
-        Directory.CreateDirectory(dataDirectory);
+        Directory.CreateDirectory(databaseDirectory);
 
-        string databaseFilePath = Path.Combine(dataDirectory, DATABASE_FILE_NAME);
-        _backupsDirectory = Path.Combine(dataDirectory, BACKUPS_SUFFIX);
+        string databaseFilePath = Path.Combine(databaseDirectory, DATABASE_FILE_NAME);
+        _backupsDirectory = Path.Combine(databaseDirectory, BACKUPS_SUFFIX);
         Directory.CreateDirectory(_backupsDirectory);
 
         factory.Initialize(databaseFilePath);

@@ -11,7 +11,7 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 public class MainWindowConstructorTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -21,8 +21,8 @@ public class MainWindowConstructorTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -44,7 +44,7 @@ public class MainWindowConstructorTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -86,7 +86,7 @@ public class MainWindowConstructorTests
         string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplicationViewModel(_dataDirectory!, projectName, projectOwner);
+        ConfigureApplicationViewModel(_assetsDirectory!, projectName, projectOwner);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -94,7 +94,7 @@ public class MainWindowConstructorTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!, expectedProjectName, expectedProjectOwner);
+        CheckBeforeChanges(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
 
         Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
 
@@ -108,13 +108,13 @@ public class MainWindowConstructorTests
 
         CheckAfterChanges(
             _applicationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedProjectName,
             expectedProjectOwner);
 
         CheckFolderNavigationViewModel(
             _folderNavigationViewModel!,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedProjectName,
             expectedProjectOwner,
             sourceFolder);
@@ -123,7 +123,7 @@ public class MainWindowConstructorTests
 
         CheckInstance(
             applicationViewModelInstances,
-            _dataDirectory!,
+            _assetsDirectory!,
             expectedProjectName,
             expectedProjectOwner);
 

@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -27,8 +27,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -55,7 +55,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -97,7 +97,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation,
         int expectedWidth, int expectedHeight)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -105,12 +105,12 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const string fileName = FileNames.IMAGE_11_HEIC;
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         Asset asset = new()
         {
@@ -170,14 +170,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
             false);
 
         // Because the root folder is already added
@@ -205,7 +205,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         long expectedFileSize,
         string expectedHash)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -213,11 +213,11 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         Asset asset = new()
         {
@@ -273,14 +273,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
             false);
 
         // Because the root folder is already added
@@ -291,7 +291,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [Test]
     public void LoadBitmapHeicImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -299,13 +299,13 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const string fileName = FileNames.NON_EXISTENT_IMAGE_HEIC;
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         const Rotation rotation = Rotation.Rotate90;
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         Asset asset = new()
         {
@@ -341,7 +341,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             }
         };
 
-        byte[] assetData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC));
+        byte[] assetData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC));
 
         _testableAssetRepository.AddAsset(asset, assetData);
 
@@ -365,14 +365,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
             false);
 
         // Because the root folder is already added
@@ -383,7 +383,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [Test]
     public void LoadBitmapHeicImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -391,13 +391,13 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         const string fileName = FileNames.IMAGE_11_HEIC;
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         const Rotation rotation = (Rotation)999;
 
-        Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
         Asset asset = new()
         {
@@ -450,14 +450,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
             false);
 
         // Because the root folder is already added

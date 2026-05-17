@@ -5,27 +5,27 @@ namespace PhotoManager.Tests.Unit.Infrastructure;
 [TestFixture]
 public class PathProviderServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [Test]
-    public void ResolveDataDirectory_ValidPath_ReturnsCorrectPath()
+    public void ResolveDatabaseDirectory_ValidPath_ReturnsCorrectPath()
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory!);
 
         UserConfigurationService userConfigurationService = new(configurationRootMock);
         PathProviderService pathProviderService = new(userConfigurationService);
 
-        string expected = userConfigurationService.PathSettings.BackupPath;
+        string expected = userConfigurationService.PathSettings.DatabasePath;
 
-        string result = pathProviderService.ResolveDataDirectory();
+        string result = pathProviderService.ResolveDatabaseDirectory();
 
         Assert.That(string.IsNullOrWhiteSpace(result), Is.False);
         Assert.That(result, Is.EqualTo(expected));

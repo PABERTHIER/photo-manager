@@ -7,7 +7,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class ImageProcessingServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private ImageProcessingService? _imageProcessingService;
     private UserConfigurationService? _userConfigurationService;
@@ -16,7 +16,7 @@ public class ImageProcessingServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [SetUp]
@@ -42,7 +42,7 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
@@ -50,7 +50,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -71,7 +71,7 @@ public class ImageProcessingServiceTests
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -81,7 +81,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -130,7 +130,7 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
@@ -138,7 +138,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -159,7 +159,7 @@ public class ImageProcessingServiceTests
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -169,7 +169,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -218,7 +218,7 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
@@ -226,7 +226,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -247,7 +247,7 @@ public class ImageProcessingServiceTests
     [Test]
     public void GetGifBitmapImage_HeicValidImage_ReturnsGifByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -257,7 +257,7 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
+        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
@@ -309,7 +309,7 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_11_HEIC)]
     public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = _imageProcessingService!.IsValidGdiPlusImage(validImageData);
@@ -336,7 +336,7 @@ public class ImageProcessingServiceTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = _imageProcessingService!.IsValidHeic(validHeicData);
@@ -448,8 +448,8 @@ public class ImageProcessingServiceTests
         string fileName, Rotation rotation, int imageByteSize, string additionalPath)
     {
         string folderPath = string.IsNullOrEmpty(additionalPath)
-            ? _dataDirectory!
-            : Path.Combine(_dataDirectory!, additionalPath);
+            ? _assetsDirectory!
+            : Path.Combine(_assetsDirectory!, additionalPath);
 
         string filePath = Path.Combine(folderPath, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -499,7 +499,7 @@ public class ImageProcessingServiceTests
     public void LoadBitmapHeicThumbnailImage_ValidImage_ReturnsValidBitmapImage(
         string fileName, Rotation rotation, int imageByteSize)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
@@ -602,8 +602,8 @@ public class ImageProcessingServiceTests
         string fileName, int imageByteSize, string additionalPath)
     {
         string folderPath = string.IsNullOrEmpty(additionalPath)
-            ? _dataDirectory!
-            : Path.Combine(_dataDirectory!, additionalPath);
+            ? _assetsDirectory!
+            : Path.Combine(_assetsDirectory!, additionalPath);
 
         string filePath = Path.Combine(folderPath, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -652,7 +652,7 @@ public class ImageProcessingServiceTests
     public void LoadBitmapThumbnailImage_WithoutRotationAndValidHeicImage_ReturnsValidBitmapImage(
         string fileName, int expectedByteSize)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;

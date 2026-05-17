@@ -8,7 +8,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetAboutInformationTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -17,8 +17,8 @@ public class ApplicationGetAboutInformationTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -39,7 +39,7 @@ public class ApplicationGetAboutInformationTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -79,7 +79,7 @@ public class ApplicationGetAboutInformationTests
         string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, projectName, projectOwner);
+        ConfigureApplication(_assetsDirectory!, projectName, projectOwner);
 
         AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
 
@@ -93,7 +93,7 @@ public class ApplicationGetAboutInformationTests
     [Test]
     public void GetAboutInformation_WithDifferentAssembly_ReturnsDifferentProduct()
     {
-        ConfigureApplication(_dataDirectory!, "PhotoManager", "Toto");
+        ConfigureApplication(_assetsDirectory!, "PhotoManager", "Toto");
 
         AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
 
@@ -109,7 +109,7 @@ public class ApplicationGetAboutInformationTests
     public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct(
         string expectedProjectName, string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
+        ConfigureApplication(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
 
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
         AssemblyBuilder assemblyBuilder =

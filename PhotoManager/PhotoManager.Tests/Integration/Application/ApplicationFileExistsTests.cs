@@ -6,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationFileExistsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -15,8 +15,8 @@ public class ApplicationFileExistsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -43,7 +43,7 @@ public class ApplicationFileExistsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -77,9 +77,9 @@ public class ApplicationFileExistsTests
     [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string fullPath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string fullPath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         bool exists = _application!.FileExists(fullPath);
 
@@ -89,9 +89,9 @@ public class ApplicationFileExistsTests
     [Test]
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string fullPath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+        string fullPath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
 
         bool exists = _application!.FileExists(fullPath);
 
@@ -101,7 +101,7 @@ public class ApplicationFileExistsTests
     [Test]
     public void FileExists_NullPath_ReturnsFalse()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string? fullPath = null;
 

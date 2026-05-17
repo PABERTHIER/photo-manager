@@ -2,6 +2,6 @@
 
 public record PathSettings(
     string AssetsDirectory,
-    string BackupPath,
+    string DatabasePath,
     string ExemptedFolderPath,
     string FirstFrameVideosPath);

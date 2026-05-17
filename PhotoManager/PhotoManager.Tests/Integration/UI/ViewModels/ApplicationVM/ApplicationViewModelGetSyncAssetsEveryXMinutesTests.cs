@@ -9,7 +9,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -18,8 +18,8 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -40,7 +40,7 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -79,7 +79,7 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
     public void GetSyncAssetsEveryXMinutes_CorrectValue_ReturnsSyncAssetsEveryXMinutesValue(
         bool expectedSyncAssetsEveryXMinutes)
     {
-        ConfigureApplicationViewModel(_dataDirectory!, expectedSyncAssetsEveryXMinutes);
+        ConfigureApplicationViewModel(_assetsDirectory!, expectedSyncAssetsEveryXMinutes);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -87,17 +87,17 @@ public class ApplicationViewModelGetSyncAssetsEveryXMinutesTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
         bool syncAssetsEveryXMinutes = _applicationViewModel!.GetSyncAssetsEveryXMinutes();
 
         Assert.That(syncAssetsEveryXMinutes, Is.EqualTo(expectedSyncAssetsEveryXMinutes));
 
-        CheckAfterChanges(_applicationViewModel!, _dataDirectory!);
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-        CheckInstance(applicationViewModelInstances, _dataDirectory!);
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);

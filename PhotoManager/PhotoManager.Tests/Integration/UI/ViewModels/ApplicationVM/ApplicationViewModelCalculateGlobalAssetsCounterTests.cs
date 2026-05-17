@@ -17,7 +17,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelCalculateGlobalAssetsCounterTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private ApplicationViewModel? _applicationViewModel;
@@ -32,8 +32,8 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -185,7 +185,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -223,7 +223,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     [TestCase(true)]
     public async Task CalculateGlobalAssetsCounter_CataloguedAssets_SetsGlobalAssetsCounterWording(bool analyseVideos)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, analyseVideos);
 
         string outputVideoFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -235,7 +235,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            CheckBeforeChanges(_assetsDirectory!);
 
             await _applicationViewModel!.CatalogAssets(_ => { });
 
@@ -243,13 +243,13 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
 
             int globalAssetsCounter = analyseVideos ? 52 : 51;
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!,
+            CheckAfterChanges(_applicationViewModel!, _assetsDirectory!,
                 $"Total number of assets: {globalAssetsCounter}");
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!,
+            CheckInstance(applicationViewModelInstances, _assetsDirectory!,
                 $"Total number of assets: {globalAssetsCounter}");
 
             // Because the root folder is already added
@@ -269,7 +269,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     [Test]
     public void CalculateGlobalAssetsCounter_AssetsExist_SetsGlobalAssetsCounterWording()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -375,7 +375,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     [Test]
     public void CalculateGlobalAssetsCounter_NoAsset_SetsGlobalAssetsCounterWording()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -413,7 +413,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     [Test]
     public void CalculateGlobalAssetsCounter_ConcurrentAccess_SetsGlobalAssetsCounterWordingSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 

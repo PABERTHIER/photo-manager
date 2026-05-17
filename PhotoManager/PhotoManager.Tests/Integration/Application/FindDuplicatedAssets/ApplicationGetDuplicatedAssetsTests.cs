@@ -16,7 +16,7 @@ namespace PhotoManager.Tests.Integration.Application.FindDuplicatedAssets;
 [TestFixture]
 public class ApplicationGetDuplicatedAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -33,8 +33,8 @@ public class ApplicationGetDuplicatedAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -210,7 +210,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -244,11 +244,11 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsBasicHash_ReturnsListOfDuplicatedSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -306,11 +306,11 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsDHash_ReturnsListOfDuplicatedSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, true, false, false, false);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -414,11 +414,11 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsMD5Hash_ReturnsListOfDuplicatedSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, true, false, false);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -476,11 +476,11 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsPHash_ReturnsListOfDuplicatedSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, true, false);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -538,7 +538,7 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsPHashAndDetectThumbnails_ReturnsListOfDuplicatedSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
@@ -552,7 +552,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -583,7 +583,7 @@ public class ApplicationGetDuplicatedAssetsTests
             findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -657,9 +657,9 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssets_ReturnsListOfDuplicatedSets()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string duplicatesDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
+        string duplicatesDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
         string duplicatesNotDuplicateSample1Directory =
@@ -675,13 +675,13 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(duplicatedAssets, Has.Count.EqualTo(5));
 
         List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s =>
-            s.Any(a => a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG)));
+            s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG)));
         List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s =>
-            s.Any(a => a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)));
+            s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)));
         List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s =>
-            s.Any(a => a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG)));
+            s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG)));
         List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets.First(s =>
-            s.Any(a => a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC)));
+            s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC)));
         List<Asset> fifthDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)));
 
@@ -692,7 +692,7 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(fifthDuplicatedAssetsSet, Has.Count.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG)), Is.True);
+            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG)), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
             && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
@@ -700,12 +700,12 @@ public class ApplicationGetDuplicatedAssetsTests
             Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_2_DUPLICATED_JPG
-            && a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)), Is.True);
+            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_2_JPG
-            && a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_2_JPG)), Is.True);
+            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_JPG)), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG)), Is.True);
+            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG)), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
             && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
@@ -713,7 +713,7 @@ public class ApplicationGetDuplicatedAssetsTests
             Is.True);
 
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_11_HEIC
-            && a.FullPath == Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC)), Is.True);
+            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC)), Is.True);
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_11_HEIC
             && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_11_HEIC)), Is.True);
 
@@ -733,10 +733,10 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string sourcePath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string sourcePath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string sourcePath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
@@ -787,10 +787,10 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         const string hash = Hashes.IMAGE_9_PNG;
-        string sourcePath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
@@ -834,10 +834,10 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_DuplicatesButOneFileDoesNotExist_ReturnsEmptyList()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -858,10 +858,10 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_FilesDoNotExist_ReturnsEmptyList()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-        string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_1);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -889,7 +889,7 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_NoAssets_ReturnsEmptyList()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -899,9 +899,9 @@ public class ApplicationGetDuplicatedAssetsTests
     [Test]
     public void GetDuplicatedAssets_NoDuplicatedAssets_ReturnsEmptyList()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 

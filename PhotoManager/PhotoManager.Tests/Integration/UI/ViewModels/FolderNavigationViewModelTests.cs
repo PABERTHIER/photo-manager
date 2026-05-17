@@ -18,7 +18,7 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels;
 [TestFixture]
 public class FolderNavigationViewModelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
@@ -33,8 +33,8 @@ public class FolderNavigationViewModelTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -187,7 +187,7 @@ public class FolderNavigationViewModelTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -224,7 +224,7 @@ public class FolderNavigationViewModelTests
     public async Task
         Constructor_CataloguedAssetsAndSourceFolderAndLastSelectedFolderAndRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -318,7 +318,7 @@ public class FolderNavigationViewModelTests
     public void
         Constructor_NoCataloguedAssetsAndSourceFolderIsNotNullAndLastSelectedFolderIsSourceAndRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -351,7 +351,7 @@ public class FolderNavigationViewModelTests
     public void
         Constructor_NoCataloguedAssetsAndSourceFolderIsNotNullAndLastSelectedFolderIsSourceAndNoRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -383,8 +383,8 @@ public class FolderNavigationViewModelTests
     public void
         Constructor_NoCataloguedAssetsAndSourceFolderIsNotNullAndLastSelectedFolderIsNotSourceAndNoRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -417,7 +417,7 @@ public class FolderNavigationViewModelTests
     public void
         Constructor_NoCataloguedAssetsAndSourceFolderIsNotNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -447,7 +447,7 @@ public class FolderNavigationViewModelTests
     public void
         Constructor_NoCataloguedAssetsAndSourceFolderIsNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsProperties()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

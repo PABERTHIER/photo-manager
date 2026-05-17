@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.FindDuplicatedAssetsVM;
 [TestFixture]
 public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
@@ -29,8 +29,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -188,7 +188,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -224,7 +224,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsAllAssetsAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -234,9 +234,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -341,13 +341,13 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsAllAssetsAndDuplicatedAssetsAndNoSubscribers_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -432,7 +432,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsAllAssetsAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -442,9 +442,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -562,7 +562,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsTwoAssetsOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -572,9 +572,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -683,7 +683,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsSecondAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -693,9 +693,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -801,7 +801,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsFirstAssetOfLastSetAndDuplicatedAssetSetsPositionIsOnLastSetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -811,9 +811,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -915,7 +915,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsAssetsInCurrentAndNotInCurrentSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -925,9 +925,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1028,7 +1028,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsAllAssetsInCurrentSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1038,9 +1038,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1142,7 +1142,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetWithTheCurrentDuplicatedAssetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1152,9 +1152,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash = Hashes.IMAGE_1_JPG;
@@ -1249,7 +1249,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsAllAssetsNotInCurrentSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1259,9 +1259,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1360,7 +1360,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsAssetsOfEachSetsAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1370,9 +1370,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1473,7 +1473,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsOneAssetAndDuplicatedAssetsHasOnlyOneSet_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1483,9 +1483,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1551,7 +1551,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsOnlyTheCurrentAssetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1561,9 +1561,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1659,7 +1659,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsTheCurrentAssetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1669,9 +1669,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1766,7 +1766,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsTwoAssetsInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1776,9 +1776,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -1908,7 +1908,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsOneAssetInCurrentSetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1918,9 +1918,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2013,7 +2013,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsOneAssetInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2023,9 +2023,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2142,7 +2142,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsTwoAssetsNotInCurrentSetAndDuplicatedAssets_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2152,9 +2152,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2251,7 +2251,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsOneAssetNotInCurrentSetAndDuplicatedAssets_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2261,9 +2261,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2356,7 +2356,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsTwoAssetsNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetsTwice_CollapsesAssets()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2366,9 +2366,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2491,7 +2491,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     public void
         CollapseAssets_DuplicatedAssetsContainsOneAssetNotInCurrentSetAndDuplicatedAssetsAndCollapseSameAssetTwice_CollapsesAsset()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2501,9 +2501,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2616,7 +2616,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsAndNotDuplicatedAssets_DoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2626,9 +2626,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2681,7 +2681,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsContainsOneAssetAndNotDuplicatedAssets_DoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2691,9 +2691,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2746,7 +2746,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsIsEmptyAndDuplicatedAssets_DoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -2756,9 +2756,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         CheckBeforeChanges();
 
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        Folder folder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
         Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
         const string hash1 = Hashes.IMAGE_1_JPG;
@@ -2847,7 +2847,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
     [Test]
     public void CollapseAssets_DuplicatedAssetsIsEmptyAndNotDuplicatedAssets_DoesNothing()
     {
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,

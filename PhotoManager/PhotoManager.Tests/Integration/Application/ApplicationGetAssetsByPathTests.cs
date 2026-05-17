@@ -14,7 +14,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetAssetsByPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -31,8 +31,8 @@ public class ApplicationGetAssetsByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -184,7 +184,7 @@ public class ApplicationGetAssetsByPathTests
         _userConfigurationService = new(configurationRootMock);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
@@ -219,7 +219,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExists_ReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -314,13 +314,13 @@ public class ApplicationGetAssetsByPathTests
         GetAssetsByPath_ValidDirectoryAndFolderExistsAndNavigateAmongDifferentDirectories_ReturnsAssetsArrays(
             bool analyseVideos)
     {
-        string rootDirectory = _dataDirectory!;
+        string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory =
-            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
         string duplicatesNewFolder2Directory =
-            Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
-        string testFolderDirectory = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string testFolderDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -526,7 +526,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderDoesNotExist_AddsFolderAndReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -602,7 +602,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExistsButNoAsset_ReturnsEmptyArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -659,7 +659,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailsAndFolderExist_ReturnsAssetsArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -667,7 +667,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -744,7 +744,7 @@ public class ApplicationGetAssetsByPathTests
 
         BitmapImage? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
@@ -786,7 +786,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -827,7 +827,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailsAndFolderExistDifferentDirectory_ReturnsAssetsArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -835,8 +835,8 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -875,7 +875,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_AssetFolderIsDefault_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -883,7 +883,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             string filePath = Path.Combine(folderPath, _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -912,7 +912,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_FolderDoesNotExist_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -920,12 +920,12 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
             Guid folderId = Guid.NewGuid();
             Folder folder = new() { Id = folderId, Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder);
-            string filePath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+            string filePath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
                 _asset1!.FileName);
             byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -960,7 +960,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailDoesNotExist_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -968,7 +968,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             _testableAssetRepository!.AddFolder(folderPath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -992,7 +992,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_FolderAndThumbnailsDoNotExist_ReturnsEmptyArray()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -1000,7 +1000,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1029,7 +1029,7 @@ public class ApplicationGetAssetsByPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
@@ -1071,7 +1071,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -1126,7 +1126,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ConcurrentAccess_AssetsAreHandledSafely()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -1134,7 +1134,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);

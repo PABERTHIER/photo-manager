@@ -5,7 +5,7 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetInitialFolderPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
 
     private PhotoManager.Application.Application? _application;
@@ -14,8 +14,8 @@ public class ApplicationGetInitialFolderPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
@@ -34,7 +34,7 @@ public class ApplicationGetInitialFolderPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -68,11 +68,11 @@ public class ApplicationGetInitialFolderPathTests
     [Test]
     public void GetInitialFolderPath_CorrectValue_ReturnsAssetsDirectoryValue()
     {
-        ConfigureApplication(_dataDirectory!);
+        ConfigureApplication(_assetsDirectory!);
 
         string assetsDirectory = _application!.GetInitialFolderPath();
 
         Assert.That(assetsDirectory, Is.Not.Null);
-        Assert.That(assetsDirectory, Is.EqualTo(_dataDirectory));
+        Assert.That(assetsDirectory, Is.EqualTo(_assetsDirectory));
     }
 }
