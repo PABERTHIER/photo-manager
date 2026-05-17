@@ -12,9 +12,9 @@ applyTo: "**/PhotoManager.Tests/**/*.cs"
 ## Structure (Follow Exactly)
 
 - `[TestFixture]` on class
-- `[OneTimeSetUp]` to initialize `_dataDirectory`
+- `[OneTimeSetUp]` to initialize `_assetsDirectory` and `_databaseDirectory`
 - `[SetUp]` to create fresh `TestLogger<T>` instance
-- `[TearDown]` to call `_testLogger.LoggingAssertTearDown()`
+- `[TearDown]` to call `_testableAssetRepository?.Dispose()`, `TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!)` and `_testLogger.LoggingAssertTearDown()`
 - For static methods being tested, use `TestLogger<ClassNameTests>` instead
 
 ## Naming (NON-NEGOTIABLE)

@@ -20,7 +20,6 @@ public static class UserConfigurationKeys
     public const string USING_PHASH = "appsettings:Hash:UsingPHash";
 
     public const string ASSETS_DIRECTORY = "appsettings:Paths:AssetsDirectory";
-    public const string DATABASE_PATH = "appsettings:Paths:DatabasePath";
     public const string EXEMPTED_FOLDER_PATH = "appsettings:Paths:ExemptedFolderPath";
     public const string FIRST_FRAME_VIDEOS_FOLDER_NAME = "appsettings:Paths:FirstFrameVideosFolderName";
 

@@ -34,7 +34,6 @@ public static class ConfigurationMockExtensions
                 .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, "false")
                 .MockGetValue(UserConfigurationKeys.USING_PHASH, "false")
                 .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "C:\\Path")
-                .MockGetValue(UserConfigurationKeys.DATABASE_PATH, "C:\\Path\\To\\Database")
                 .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "C:\\Path\\To\\FolderExempted")
                 .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME,
                     Directories.OUTPUT_VIDEO_FIRST_FRAME)

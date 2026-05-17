@@ -172,9 +172,9 @@ In `App.xaml.cs`, the call chain remains
 `AddInfrastructure().AddDomain().AddApplication().AddUi()` — `AddPersistence()`
 is wired transitively through `AddInfrastructure`.
 
-The `SqlitePersistenceContext` calls `Initialize(dataDirectory)` lazily on
-first repository read; data goes to
-`<dataDirectory>/photomanager.db` and backups to `<dataDirectory>_Backups/`.
+The `SqlitePersistenceContext` calls `Initialize(databaseDirectory)` lazily on first repository read;
+`databaseDirectory` is resolved by `PathProviderService` as`AppContext.BaseDirectory + "Database"` (always next to the executable).
+Data goes to `<databaseDirectory>/photomanager.db` and backups to `<databaseDirectory>/Backups/`.
 
 ---
 

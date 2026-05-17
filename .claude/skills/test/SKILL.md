@@ -21,15 +21,15 @@ Follow this workflow in order:
    [TestFixture]
    public class ClassNameTests
    {
-       private string? _dataDirectory;
+       private string? _assetsDirectory;
+       private string? _databaseDirectory;
        private TestLogger<ClassName> _testLogger = new();
 
        [OneTimeSetUp]
        public void OneTimeSetUp()
        {
-           _dataDirectory = Path.Combine(
-               TestContext.CurrentContext.TestDirectory,
-               Directories.TEST_FILES);
+           _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+           _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
        }
 
        [SetUp]
@@ -41,6 +41,8 @@ Follow this workflow in order:
        [TearDown]
        public void TearDown()
        {
+            _testableAssetRepository?.Dispose();
+            TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
            _testLogger.LoggingAssertTearDown();
        }
 

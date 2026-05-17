@@ -31,8 +31,6 @@ public class ConfigurationMockExtensionsTests
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_MD5_HASH), Is.False);
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_PHASH), Is.False);
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY), Is.EqualTo("C:\\Path"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.DATABASE_PATH),
-            Is.EqualTo("C:\\Path\\To\\Database"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH),
             Is.EqualTo("C:\\Path\\To\\FolderExempted"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),

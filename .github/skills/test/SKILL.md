@@ -17,22 +17,31 @@ Follow this workflow in order:
    [TestFixture]
    public class ClassNameTests
    {
-       private string? _dataDirectory;
+       private string? _assetsDirectory;
+       private string? _databaseDirectory;
+
        private TestLogger<ClassName> _testLogger = new();
 
        [OneTimeSetUp]
        public void OneTimeSetUp()
        {
-           _dataDirectory = Path.Combine(
-               TestContext.CurrentContext.TestDirectory,
-               Directories.TEST_FILES);
+           _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+           _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
        }
 
        [SetUp]
-       public void SetUp() { _testLogger = new TestLogger<ClassName>(); }
+       public void SetUp()
+       {
+            _testLogger = new TestLogger<ClassName>();
+       }
 
        [TearDown]
-       public void TearDown() { _testLogger.LoggingAssertTearDown(); }
+       public void TearDown()
+       {
+            _testableAssetRepository?.Dispose();
+            TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+            _testLogger.LoggingAssertTearDown();
+       }
 
        [Test]
        public void MethodName_Situation_ExpectedResult()

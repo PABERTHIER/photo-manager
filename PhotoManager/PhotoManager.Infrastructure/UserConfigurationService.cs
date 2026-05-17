@@ -87,14 +87,13 @@ public class UserConfigurationService : IUserConfigurationService
         HashSettings = new(pHashThreshold, usingDHash, usingMD5Hash, usingPHash);
 
         string? assetsDirectory = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY);
-        string? databasePath = _configuration.GetValue<string>(UserConfigurationKeys.DATABASE_PATH);
         string? exemptedFolderPath = _configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH);
         string? firstFrameVideosFolderName =
             _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
 
         string firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
 
-        PathSettings = new(assetsDirectory!, databasePath!, exemptedFolderPath!, firstFrameVideosPath);
+        PathSettings = new(assetsDirectory!, exemptedFolderPath!, firstFrameVideosPath);
 
         string? projectName = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME);
         string? projectOwner = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER);

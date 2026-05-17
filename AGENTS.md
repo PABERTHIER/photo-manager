@@ -166,7 +166,7 @@ UI → Application → Domain ← Infrastructure ← Persistence
 
 4. **Microsoft Extensions Logging**: The application uses `ILogger<T>` throughout. The UI layer configures Serilog for file logging and console output in `App.xaml.cs`.
 
-5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings).
+5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings). The database directory is **not** configurable — it is always resolved at runtime as `AppContext.BaseDirectory + "Database"` by `PathProviderService`.
 
 ## Important Files
 
@@ -198,14 +198,16 @@ UI → Application → Domain ← Infrastructure ← Persistence
 [TestFixture]
 public class ClassNameTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
+    private string? _databaseDirectory;
 
     private TestLogger<ClassName> _testLogger = new(); // That would be ClassNameTests for static method only
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -217,6 +219,8 @@ public class ClassNameTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger.LoggingAssertTearDown();
     }
 
@@ -252,7 +256,7 @@ public class ClassNameTests
 ### Resource Cleanup Pattern
 
 ```csharp
-string testDirectory = Path.Combine(_dataDirectory!, Directories.TEST_DIR);
+string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_DIR);
 try
 {
     Directory.CreateDirectory(testDirectory);
@@ -297,8 +301,8 @@ finally
 
 The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a single database file:
 
-- Database file: `<dataDirectory>/photomanager.db`
-- Backups: `<dataDirectory>_Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
+- Database file: `<AppContext.BaseDirectory>/Database/photomanager.db` (auto-created on first run, always next to the executable)
+- Backups: `<AppContext.BaseDirectory>/Database/Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
 - Connection model: one connection per operation, WAL journal mode, `busy_timeout = 5000`
 
 ### Schema (v1 — defined in `SqliteSchema.cs`)

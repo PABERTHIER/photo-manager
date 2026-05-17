@@ -33,7 +33,7 @@ When adding tables:
 
 - Filename: `yyyyMMdd.zip` containing a single `photomanager.db` entry
 - Created via SQLite online-backup API (`SqliteConnection.BackupDatabase`)
-- Stored in `<dataDirectory>_Backups/`
+- Stored in `<AppContext.BaseDirectory>/Database/Backups/`
 
 ## Testing the Persistence Layer
 
@@ -45,7 +45,7 @@ When adding tables:
 
 ## Key Patterns
 
-- `IPersistenceContext.Initialize(dataDirectory)` must be called before any repository access
+- `IPersistenceContext.Initialize(databaseDirectory)` must be called before any repository access
 - Repository methods open their own connection via `ISqliteConnectionFactory`
 - `LruCache<TKey, TValue>` is thread-safe and bounded by configurable capacity
 - `SqliteBackupService.WriteBackup` handles IOException retry for locked snapshot files

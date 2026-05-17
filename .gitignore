@@ -262,5 +262,8 @@ PhotoManager/tools
 # SQLite files
 PhotoManager/identifier.sqlite
 
+# Database folder (auto-created at runtime next to the executable)
+Database/
+
 # Claude Code local settings (personal, not shared)
 .claude/settings.local.json

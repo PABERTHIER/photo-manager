@@ -61,7 +61,6 @@ public class FileOperationsServiceBenchmarks
             ["appsettings:Hash:UsingMD5Hash"] = "false",
             ["appsettings:Hash:UsingPHash"] = "false",
             ["appsettings:Paths:AssetsDirectory"] = _testDirectory,
-            ["appsettings:Paths:DatabasePath"] = Path.Combine(_testDirectory, "Database"),
             ["appsettings:Paths:ExemptedFolderPath"] = Path.Combine(_testDirectory, "Exempted"),
             ["appsettings:Paths:FirstFrameVideosFolderName"] = "VideoFirstFrame",
             ["appsettings:Project:Name"] = "PhotoManager",

@@ -193,15 +193,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void DatabasePath_CorrectValue_ReturnsDatabasePathValue()
-    {
-        string databasePath = _userConfigurationService!.PathSettings.DatabasePath;
-
-        Assert.That(databasePath, Is.Not.Null);
-        Assert.That(databasePath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Database"));
-    }
-
-    [Test]
     public void ExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue()
     {
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
