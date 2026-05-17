@@ -1347,8 +1347,7 @@ public class MainWindowFindDuplicatesTests
         {
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
-                AssertDuplicatedAssetsSet(
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets[i],
+                AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets[i],
                     expectedDuplicatedAssetSets[i]);
             }
         }
@@ -1367,7 +1366,9 @@ public class MainWindowFindDuplicatesTests
 
             for (int i = 0; i < expectedDuplicatedAssetSet.Count; i++)
             {
-                AssertDuplicatedAsset(duplicatedAssetSet[i], expectedDuplicatedAssetSet[i]);
+                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(
+                    a => a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
+                AssertDuplicatedAsset(actualAsset, expectedDuplicatedAssetSet[i]);
             }
         }
         else
@@ -1376,8 +1377,7 @@ public class MainWindowFindDuplicatesTests
         }
     }
 
-    private static void AssertDuplicatedSet(
-        DuplicatedSetViewModel duplicatedSetViewModel,
+    private static void AssertDuplicatedSet(DuplicatedSetViewModel duplicatedSetViewModel,
         DuplicatedSetViewModel expectedDuplicatedSetViewModel)
     {
         Assert.That(duplicatedSetViewModel.FileName, Is.EqualTo(expectedDuplicatedSetViewModel.FileName));
@@ -1403,11 +1403,13 @@ public class MainWindowFindDuplicatesTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
-                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    DuplicatedAssetViewModel actualSibling =
+                        duplicatedAsset.ParentViewModel.First(
+                            a => a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
-                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+
+                    AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

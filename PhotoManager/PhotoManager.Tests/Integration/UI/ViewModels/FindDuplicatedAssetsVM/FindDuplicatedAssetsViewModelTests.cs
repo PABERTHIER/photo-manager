@@ -1688,9 +1688,8 @@ public class FindDuplicatedAssetsViewModelTests
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(1));
             Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset2Temp!.FileName));
+            Assert.That(duplicatedAssetsSets[0].Select(a => a.FileName),
+                Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName, _asset2Temp!.FileName }));
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
@@ -1833,13 +1832,18 @@ public class FindDuplicatedAssetsViewModelTests
             List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset1Temp!.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset3Temp!.FileName));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3!.FileName));
+
+            List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
+               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+            Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
+                Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName, _asset3Temp!.FileName }));
+
+            List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
+               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+            Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
+                Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
@@ -1852,6 +1856,8 @@ public class FindDuplicatedAssetsViewModelTests
             _asset3 = _asset3.WithFolder(folder!);
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
+            // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
+            _asset1Temp.ImageData = new();
             _asset3Temp = _asset3Temp.WithFolder(exemptedFolder!);
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
@@ -1864,7 +1870,6 @@ public class FindDuplicatedAssetsViewModelTests
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
@@ -1872,6 +1877,7 @@ public class FindDuplicatedAssetsViewModelTests
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
@@ -1910,7 +1916,7 @@ public class FindDuplicatedAssetsViewModelTests
                 0,
                 0,
                 expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
 
             Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(21));
             // CatalogAssets + NotifyCatalogChange
@@ -1953,7 +1959,7 @@ public class FindDuplicatedAssetsViewModelTests
                 0,
                 0,
                 expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
         }
         finally
         {
@@ -1996,12 +2002,18 @@ public class FindDuplicatedAssetsViewModelTests
             List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1!.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset1Temp!.FileName));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3!.FileName));
+
+            List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
+               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+            Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
+                Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName }));
+
+            List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
+               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+            Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
+                Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
@@ -2014,6 +2026,8 @@ public class FindDuplicatedAssetsViewModelTests
             _asset3 = _asset3.WithFolder(folder!);
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
+            // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
+            _asset1Temp.ImageData = new();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -2025,7 +2039,6 @@ public class FindDuplicatedAssetsViewModelTests
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
@@ -2033,6 +2046,7 @@ public class FindDuplicatedAssetsViewModelTests
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
@@ -2064,7 +2078,7 @@ public class FindDuplicatedAssetsViewModelTests
                 0,
                 0,
                 expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
 
             Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(20));
             // CatalogAssets + NotifyCatalogChange
@@ -2106,7 +2120,7 @@ public class FindDuplicatedAssetsViewModelTests
                 0,
                 0,
                 expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
         }
         finally
         {
@@ -2574,17 +2588,21 @@ public class FindDuplicatedAssetsViewModelTests
             expectedCurrentDuplicatedAsset);
     }
 
-    private static void AssertDuplicatedAssetSets(
-        FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModelInstance,
+    private static void AssertDuplicatedAssetSets(FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModelInstance,
         List<DuplicatedSetViewModel> expectedDuplicatedAssetSets)
     {
         if (expectedDuplicatedAssetSets.Count > 0)
         {
+            Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets,
+                Has.Count.EqualTo(expectedDuplicatedAssetSets.Count));
+
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
-                AssertDuplicatedAssetsSet(
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets[i],
-                    expectedDuplicatedAssetSets[i]);
+                DuplicatedSetViewModel actualSet =
+                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(
+                        x => x[0].Asset.Hash == expectedDuplicatedAssetSets[i][0].Asset.Hash);
+
+                AssertDuplicatedAssetsSet(actualSet, expectedDuplicatedAssetSets[i]);
             }
         }
         else
@@ -2593,16 +2611,22 @@ public class FindDuplicatedAssetsViewModelTests
         }
     }
 
-    private static void AssertDuplicatedAssetsSet(DuplicatedSetViewModel duplicatedAssetSet,
+    private static void AssertDuplicatedAssetsSet(
+        DuplicatedSetViewModel duplicatedAssetSet,
         DuplicatedSetViewModel expectedDuplicatedAssetSet)
     {
         if (expectedDuplicatedAssetSet.Count > 0)
         {
             AssertDuplicatedSet(duplicatedAssetSet, expectedDuplicatedAssetSet);
 
+            Assert.That(duplicatedAssetSet, Has.Count.EqualTo(expectedDuplicatedAssetSet.Count));
+
             for (int i = 0; i < expectedDuplicatedAssetSet.Count; i++)
             {
-                AssertDuplicatedAsset(duplicatedAssetSet[i], expectedDuplicatedAssetSet[i]);
+                DuplicatedAssetViewModel actualAsset =
+                    duplicatedAssetSet.First(x => x.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
+
+                AssertDuplicatedAsset(actualAsset, expectedDuplicatedAssetSet[i]);
             }
         }
         else
@@ -2611,8 +2635,7 @@ public class FindDuplicatedAssetsViewModelTests
         }
     }
 
-    private static void AssertDuplicatedSet(
-        DuplicatedSetViewModel duplicatedSetViewModel,
+    private static void AssertDuplicatedSet(DuplicatedSetViewModel duplicatedSetViewModel,
         DuplicatedSetViewModel expectedDuplicatedSetViewModel)
     {
         Assert.That(duplicatedSetViewModel.FileName, Is.EqualTo(expectedDuplicatedSetViewModel.FileName));
@@ -2636,13 +2659,18 @@ public class FindDuplicatedAssetsViewModelTests
             {
                 AssertDuplicatedSet(duplicatedAsset.ParentViewModel, expectedDuplicatedAsset.ParentViewModel);
 
+                Assert.That(duplicatedAsset.ParentViewModel,
+                    Has.Count.EqualTo(expectedDuplicatedAsset.ParentViewModel.Count));
+
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
-                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    DuplicatedAssetViewModel actualSibling =
+                        duplicatedAsset.ParentViewModel.First(
+                            x => x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
-                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+
+                    AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

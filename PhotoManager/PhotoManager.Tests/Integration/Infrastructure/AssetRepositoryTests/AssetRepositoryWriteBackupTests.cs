@@ -174,30 +174,44 @@ public class AssetRepositoryWriteBackupTests
     [Test]
     public void WriteBackup_DatabaseThrowsException_LogsItAndThrowsSqliteException()
     {
+        SqliteException expectedException = new("SQLite Error 14: 'unable to open database file'.", 14);
+
+        ISqliteBackupService backupServiceMock = Substitute.For<ISqliteBackupService>();
+        backupServiceMock.WriteBackup(Arg.Any<string>()).Throws(expectedException);
+
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, backupServiceMock, new TestLogger<SqlitePersistenceContext>());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+        TestLogger<AssetRepository> testLogger = new();
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, testLogger);
+
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            SqliteException expectedException = new("SQLite Error 14: 'unable to open database file'.", 14);
-
-            SqliteConnection.ClearAllPools();
-            Directory.Delete(_databaseDirectory!, true);
-
             using (Assert.EnterMultipleScope())
             {
-                SqliteException? exception = Assert.Throws<SqliteException>(() => _assetRepository!.WriteBackup());
-
-                Assert.That(assetsUpdatedEvents, Is.Empty);
+                SqliteException? exception = Assert.Throws<SqliteException>(assetRepository.WriteBackup);
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 
-                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+
+                testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }
         finally
         {
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
+            testLogger.LoggingAssertTearDown();
         }
     }
 
