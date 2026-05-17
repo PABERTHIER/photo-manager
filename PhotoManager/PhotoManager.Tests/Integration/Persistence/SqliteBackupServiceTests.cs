@@ -1,6 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.IO.Compression;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Persistence;
 
@@ -127,12 +133,102 @@ public class SqliteBackupServiceTests
     [Test]
     public void WriteBackup_BackupContainsValidSqliteDatabase()
     {
-        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Vacation");
+        // ─── Folders ───────────────────────────────────────────────────────────
+        Folder vacationFolder = _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Vacation");
+        Folder archiveFolder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos\Archive");
+        Folder tempFolder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos\Temp");
+        _sqlitePersistenceContext.Folders.Delete(tempFolder.Id);
 
+        // ─── Assets ────────────────────────────────────────────────────────────
+        // JPG: insert, then update via upsert (simulate rotation correction)
+        _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
+            vacationFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
+            PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+            ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
+            Rotation.Rotate0, false, null, false, null));
+        _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
+            vacationFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_90_DEG_JPG,
+            PixelWidthAsset.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
+            ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG,
+            Rotation.Rotate90, false, null, true, "The asset has been rotated"));
+
+        // PNG in Vacation folder
+        _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
+            vacationFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
+            PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+            ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
+            Rotation.Rotate0, false, null, false, null));
+
+        // GIF in Vacation folder
+        _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
+            vacationFolder.Id, FileNames.HOMER_GIF, Hashes.HOMER_GIF,
+            PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
+            ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF,
+            Rotation.Rotate0, false, null, false, null));
+
+        // HEIC in Archive folder
+        _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
+            archiveFolder.Id, FileNames.IMAGE_11_HEIC, Hashes.IMAGE_11_HEIC,
+            PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+            ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
+            Rotation.Rotate0, false, null, false, null));
+
+        // ─── Thumbnails ────────────────────────────────────────────────────────
+        byte[] jpgThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG));
+        byte[] pngThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG));
+        byte[] gifThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.HOMER_GIF));
+        byte[] heicThumbnailData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC));
+
+        // Upsert one thumbnail then replace all Vacation thumbnails (simulates a full folder sync)
+        _sqlitePersistenceContext.Thumbnails.Upsert(vacationFolder.Id, FileNames.IMAGE_1_JPG, jpgThumbnailData);
+        _sqlitePersistenceContext.Thumbnails.ReplaceForFolder(vacationFolder.Id, new Dictionary<string, byte[]>
+        {
+            [FileNames.IMAGE_1_JPG] = jpgThumbnailData,
+            [FileNames.IMAGE_9_PNG] = pngThumbnailData,
+            [FileNames.HOMER_GIF] = gifThumbnailData
+        });
+
+        // HEIC thumbnail in Archive folder
+        _sqlitePersistenceContext.Thumbnails.Upsert(archiveFolder.Id, FileNames.IMAGE_11_HEIC, heicThumbnailData);
+
+        // ─── Recent Paths ──────────────────────────────────────────────────────
+        _sqlitePersistenceContext.RecentPaths.Replace([@"C:\Photos\Old1", @"C:\Photos\Old2"]);
+        _sqlitePersistenceContext.RecentPaths.Replace([@"C:\Photos\Vacation", @"C:\Photos\Archive"]);
+
+        // ─── Sync Definitions ──────────────────────────────────────────────────
+        _sqlitePersistenceContext.SyncDefinitions.Replace(
+        [
+            new()
+            {
+                SourceDirectory = @"C:\Source",
+                DestinationDirectory = @"D:\OldBackup",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = false
+            }
+        ]);
+        _sqlitePersistenceContext.SyncDefinitions.Replace(
+        [
+            new()
+            {
+                SourceDirectory = @"C:\Photos\Vacation",
+                DestinationDirectory = @"D:\Backup\Vacation",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = false
+            },
+            new()
+            {
+                SourceDirectory = @"C:\Photos\Archive",
+                DestinationDirectory = @"D:\Backup\Archive",
+                IncludeSubFolders = false,
+                DeleteAssetsNotInSource = true
+            }
+        ]);
+
+        // ─── Backup ────────────────────────────────────────────────────────────
         string backupFilePath = Path.Combine(_backupsDirectory!, "20240106.zip");
-
         _backupService!.WriteBackup(backupFilePath);
 
+        // ─── Verify extracted database ─────────────────────────────────────────
         string extractDirectory = Path.Combine(_databaseDirectory!, "extract_test");
         ZipFile.ExtractToDirectory(backupFilePath, extractDirectory);
 
@@ -150,16 +246,329 @@ public class SqliteBackupServiceTests
         {
             extractedConnection.Open();
 
+            string vacationFolderId = vacationFolder.Id.ToString().ToUpperInvariant();
+            string archiveFolderId = archiveFolder.Id.ToString().ToUpperInvariant();
+            long expectedTicks = Constants.ModificationDate.Default.Ticks;
+
+            // ─── Folders: 2 remain (Temp was deleted) ─────────────────────────
             using (SqliteCommand command = extractedConnection.CreateCommand())
             {
-                command.CommandText = "SELECT Path FROM Folders WHERE Path = 'C:\\Photos\\Vacation';";
-                string? path = command.ExecuteScalar()?.ToString();
-
-                Assert.That(path, Is.EqualTo(@"C:\Photos\Vacation"));
+                command.CommandText = "SELECT COUNT(*) FROM Folders;";
+                Assert.That((long)command.ExecuteScalar()!, Is.EqualTo(2));
             }
-        }
 
-        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = @"SELECT * FROM Folders WHERE Path = 'C:\Photos\Vacation';";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["Id"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["Path"].ToString(), Is.EqualTo(vacationFolder.Path));
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = @"SELECT * FROM Folders WHERE Path = 'C:\Photos\Archive';";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["Id"].ToString(), Is.EqualTo(archiveFolderId));
+                    Assert.That(reader["Path"].ToString(), Is.EqualTo(archiveFolder.Path));
+                }
+            }
+
+            // ─── Assets: 4 total (JPG updated, PNG, GIF in Vacation; HEIC in Archive) ─────
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Assets;";
+                Assert.That((long)command.ExecuteScalar()!, Is.EqualTo(4));
+            }
+
+            // JPG – updated to Rotate90 via second upsert
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Assets WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_1_JPG);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_1_JPG));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate90));
+                    Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_1_90_DEG_JPG));
+                    Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_1_90_DEG_JPG));
+                    Assert.That((long)reader["ThumbnailPixelWidth"],
+                        Is.EqualTo(ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG));
+                    Assert.That((long)reader["ThumbnailPixelHeight"],
+                        Is.EqualTo(ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG));
+                    Assert.That((long)reader["ThumbnailCreationDateTime"], Is.EqualTo(expectedTicks));
+                    Assert.That(reader["Hash"].ToString(), Is.EqualTo(Hashes.IMAGE_1_90_DEG_JPG));
+                    Assert.That(reader["CorruptedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsCorrupted"], Is.Zero);
+                    Assert.That(reader["RotatedMessage"].ToString(), Is.EqualTo("The asset has been rotated"));
+                    Assert.That((long)reader["IsRotated"], Is.EqualTo(1));
+                }
+            }
+
+            // PNG
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Assets WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_9_PNG);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_9_PNG));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_9_PNG));
+                    Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_9_PNG));
+                    Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.IMAGE_9_PNG));
+                    Assert.That((long)reader["ThumbnailPixelHeight"], Is.EqualTo(ThumbnailHeightAsset.IMAGE_9_PNG));
+                    Assert.That((long)reader["ThumbnailCreationDateTime"], Is.EqualTo(expectedTicks));
+                    Assert.That(reader["Hash"].ToString(), Is.EqualTo(Hashes.IMAGE_9_PNG));
+                    Assert.That(reader["CorruptedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsCorrupted"], Is.Zero);
+                    Assert.That(reader["RotatedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsRotated"], Is.Zero);
+                }
+            }
+
+            // GIF
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Assets WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.HOMER_GIF);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.HOMER_GIF));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.HOMER_GIF));
+                    Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.HOMER_GIF));
+                    Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.HOMER_GIF));
+                    Assert.That((long)reader["ThumbnailPixelHeight"], Is.EqualTo(ThumbnailHeightAsset.HOMER_GIF));
+                    Assert.That((long)reader["ThumbnailCreationDateTime"], Is.EqualTo(expectedTicks));
+                    Assert.That(reader["Hash"].ToString(), Is.EqualTo(Hashes.HOMER_GIF));
+                    Assert.That(reader["CorruptedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsCorrupted"], Is.Zero);
+                    Assert.That(reader["RotatedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsRotated"], Is.Zero);
+                }
+            }
+
+            // HEIC
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Assets WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_11_HEIC);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(archiveFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_11_HEIC));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+                    Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+                    Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.IMAGE_11_HEIC));
+                    Assert.That((long)reader["ThumbnailPixelHeight"], Is.EqualTo(ThumbnailHeightAsset.IMAGE_11_HEIC));
+                    Assert.That((long)reader["ThumbnailCreationDateTime"], Is.EqualTo(expectedTicks));
+                    Assert.That(reader["Hash"].ToString(), Is.EqualTo(Hashes.IMAGE_11_HEIC));
+                    Assert.That(reader["CorruptedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsCorrupted"], Is.Zero);
+                    Assert.That(reader["RotatedMessage"], Is.EqualTo(DBNull.Value));
+                    Assert.That((long)reader["IsRotated"], Is.Zero);
+                }
+            }
+
+            // ─── Thumbnails: 4 total (3 in Vacation after ReplaceForFolder, 1 in Archive) ─
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Thumbnails;";
+                Assert.That((long)command.ExecuteScalar()!, Is.EqualTo(4));
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Thumbnails WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_1_JPG);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_1_JPG));
+
+                    using (Stream stream = reader.GetStream(reader.GetOrdinal("Data")))
+                    {
+                        using (MemoryStream ms = new())
+                        {
+                            stream.CopyTo(ms);
+                            Assert.That(ms.ToArray(), Is.EqualTo(jpgThumbnailData));
+                        }
+                    }
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Thumbnails WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_9_PNG);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_9_PNG));
+
+                    using (Stream stream = reader.GetStream(reader.GetOrdinal("Data")))
+                    {
+                        using (MemoryStream ms = new())
+                        {
+                            stream.CopyTo(ms);
+                            Assert.That(ms.ToArray(), Is.EqualTo(pngThumbnailData));
+                        }
+                    }
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Thumbnails WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.HOMER_GIF);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.HOMER_GIF));
+
+                    using (Stream stream = reader.GetStream(reader.GetOrdinal("Data")))
+                    {
+                        using (MemoryStream ms = new())
+                        {
+                            stream.CopyTo(ms);
+                            Assert.That(ms.ToArray(), Is.EqualTo(gifThumbnailData));
+                        }
+                    }
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM Thumbnails WHERE FileName = @fileName;";
+                command.Parameters.AddWithValue("@fileName", FileNames.IMAGE_11_HEIC);
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That(reader["FolderId"].ToString(), Is.EqualTo(archiveFolderId));
+                    Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_11_HEIC));
+
+                    using (Stream stream = reader.GetStream(reader.GetOrdinal("Data")))
+                    {
+                        using (MemoryStream ms = new())
+                        {
+                            stream.CopyTo(ms);
+                            Assert.That(ms.ToArray(), Is.EqualTo(heicThumbnailData));
+                        }
+                    }
+                }
+            }
+
+            // ─── Recent Paths: 2 final entries after the second Replace ───────
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM RecentPaths;";
+                Assert.That((long)command.ExecuteScalar()!, Is.EqualTo(2));
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM RecentPaths WHERE Position = 0;";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That((long)reader["Position"], Is.Zero);
+                    Assert.That(reader["Path"].ToString(), Is.EqualTo(@"C:\Photos\Vacation"));
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM RecentPaths WHERE Position = 1;";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That((long)reader["Position"], Is.EqualTo(1));
+                    Assert.That(reader["Path"].ToString(), Is.EqualTo(@"C:\Photos\Archive"));
+                }
+            }
+
+            // ─── Sync Definitions: 2 final entries after the second Replace ───
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM SyncDefinitions;";
+                Assert.That((long)command.ExecuteScalar()!, Is.EqualTo(2));
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM SyncDefinitions WHERE Position = 0;";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That((long)reader["Position"], Is.Zero);
+                    Assert.That(reader["SourceDirectory"].ToString(), Is.EqualTo(@"C:\Photos\Vacation"));
+                    Assert.That(reader["DestinationDirectory"].ToString(), Is.EqualTo(@"D:\Backup\Vacation"));
+                    Assert.That((long)reader["IncludeSubFolders"], Is.EqualTo(1));
+                    Assert.That((long)reader["DeleteAssetsNotInSource"], Is.Zero);
+                }
+            }
+
+            using (SqliteCommand command = extractedConnection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM SyncDefinitions WHERE Position = 1;";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    Assert.That(reader.Read(), Is.True);
+
+                    Assert.That((long)reader["Position"], Is.EqualTo(1));
+                    Assert.That(reader["SourceDirectory"].ToString(), Is.EqualTo(@"C:\Photos\Archive"));
+                    Assert.That(reader["DestinationDirectory"].ToString(), Is.EqualTo(@"D:\Backup\Archive"));
+                    Assert.That((long)reader["IncludeSubFolders"], Is.Zero);
+                    Assert.That((long)reader["DeleteAssetsNotInSource"], Is.EqualTo(1));
+                }
+            }
+
+            _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+        }
     }
 
     [Test]
@@ -244,5 +653,30 @@ public class SqliteBackupServiceTests
         Assert.DoesNotThrow(() => _backupService!.DeleteBackupFile(nonExistentFile));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    private static Asset CreateAsset(Guid folderId, string fileName, string hash, int pixelWidth, int pixelHeight,
+        int thumbnailWidth, int thumbnailHeight, Rotation rotation, bool isCorrupted, string? corruptedMessage,
+        bool isRotated, string? rotatedMessage)
+    {
+        return new()
+        {
+            FolderId = folderId,
+            Folder = new() { Id = Guid.Empty, Path = string.Empty },
+            FileName = fileName,
+            ImageRotation = rotation,
+            Pixel = new()
+            {
+                Asset = new() { Width = pixelWidth, Height = pixelHeight },
+                Thumbnail = new() { Width = thumbnailWidth, Height = thumbnailHeight }
+            },
+            ThumbnailCreationDateTime = new(2024, 6, 7, 8, 54, 37),
+            Hash = hash,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = isCorrupted, Message = corruptedMessage },
+                Rotated = new() { IsTrue = isRotated, Message = rotatedMessage }
+            }
+        };
     }
 }

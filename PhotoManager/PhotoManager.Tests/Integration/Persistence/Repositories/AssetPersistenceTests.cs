@@ -122,7 +122,7 @@ public class AssetPersistenceTests
                 _testFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
                 PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
                 ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-                Rotation.Rotate0, false, null, false, null)
+                Rotation.Rotate0, true, "The asset is corrupted", false, null)
         ];
 
         _sqlitePersistenceContext!.Assets.UpsertMany(assets);
