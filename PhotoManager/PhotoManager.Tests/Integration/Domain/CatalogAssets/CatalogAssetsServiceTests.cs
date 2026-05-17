@@ -15,7 +15,6 @@ public class CatalogAssetsServiceTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
 
@@ -43,12 +42,11 @@ public class CatalogAssetsServiceTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
         _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]

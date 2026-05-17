@@ -18,7 +18,6 @@ public class ApplicationGetDuplicatedAssetsTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
@@ -36,7 +35,6 @@ public class ApplicationGetDuplicatedAssetsTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -212,7 +210,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
@@ -554,7 +552,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath!);
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory!);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,

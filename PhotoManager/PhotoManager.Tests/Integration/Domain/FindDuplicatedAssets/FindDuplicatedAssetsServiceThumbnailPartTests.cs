@@ -18,7 +18,6 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private TestableAssetRepository? _testableAssetRepository;
     private FileOperationsService? _fileOperationsService;
@@ -87,7 +86,6 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -95,7 +93,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
