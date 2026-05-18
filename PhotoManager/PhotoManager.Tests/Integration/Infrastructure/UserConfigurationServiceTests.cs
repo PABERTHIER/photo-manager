@@ -8,14 +8,14 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class UserConfigurationServiceTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        string configFilePath = Path.Combine(_dataDirectory, "appsettings.json");
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        string configFilePath = Path.Combine(_assetsDirectory, "appsettings.json");
 
         IConfigurationBuilder builder =
             new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
@@ -193,15 +193,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void BackupPath_CorrectValue_ReturnsBackupPathValue()
-    {
-        string backupPath = _userConfigurationService!.PathSettings.BackupPath;
-
-        Assert.That(backupPath, Is.Not.Null);
-        Assert.That(backupPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Backup"));
-    }
-
-    [Test]
     public void ExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue()
     {
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
@@ -249,84 +240,6 @@ public class UserConfigurationServiceTests
         ushort backupsToKeep = _userConfigurationService!.StorageSettings.BackupsToKeep;
 
         Assert.That(backupsToKeep, Is.EqualTo(2));
-    }
-
-    [Test]
-    public void FoldersNameBlobs_CorrectValue_ReturnsFoldersNameBlobsValue()
-    {
-        string folderNameBlobs = _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs;
-
-        Assert.That(folderNameBlobs, Is.Not.Null);
-        Assert.That(folderNameBlobs, Is.EqualTo(Directories.BLOBS));
-    }
-
-    [Test]
-    public void FoldersNameTables_CorrectValue_ReturnsFoldersNameTablesValue()
-    {
-        string foldersNameTables = _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables;
-
-        Assert.That(foldersNameTables, Is.Not.Null);
-        Assert.That(foldersNameTables, Is.EqualTo(Directories.TABLES));
-    }
-
-    [Test]
-    public void Separator_CorrectValue_ReturnsSeparatorValue()
-    {
-        char separator = _userConfigurationService!.StorageSettings.Separator;
-
-        Assert.That(separator, Is.EqualTo('|'));
-    }
-
-    [Test]
-    public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
-    {
-        string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
-
-        Assert.That(storageVersion, Is.Not.Null);
-        Assert.That(storageVersion, Is.EqualTo("1.0"));
-    }
-
-    [Test]
-    public void TablesSettingsAssetsTableName_CorrectValue_ReturnsTablesSettingsAssetsTableNameValue()
-    {
-        string tablesSettingsAssetsTableName =
-            _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
-
-        Assert.That(tablesSettingsAssetsTableName, Is.Not.Null);
-        Assert.That(tablesSettingsAssetsTableName, Is.EqualTo("Assets"));
-    }
-
-    [Test]
-    public void TablesSettingsFoldersTableName_CorrectValue_ReturnsTablesSettingsFoldersTableNameValue()
-    {
-        string tablesSettingsFoldersTableName =
-            _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
-
-        Assert.That(tablesSettingsFoldersTableName, Is.Not.Null);
-        Assert.That(tablesSettingsFoldersTableName, Is.EqualTo("Folders"));
-    }
-
-    [Test]
-    public void
-        TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
-    {
-        string tablesSettingsRecentTargetPathsTableName =
-            _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
-
-        Assert.That(tablesSettingsRecentTargetPathsTableName, Is.Not.Null);
-        Assert.That(tablesSettingsRecentTargetPathsTableName, Is.EqualTo("RecentTargetPaths"));
-    }
-
-    [Test]
-    public void
-        TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
-    {
-        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings
-            .TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
-
-        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.Not.Null);
-        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName,
-            Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
     }
 
     [Test]

@@ -6,9 +6,8 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryUpdateTargetPathToRecentTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
@@ -19,35 +18,38 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -68,14 +70,12 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             _assetRepository!.UpdateTargetPathToRecent(folder3);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder3.Path));
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -83,7 +83,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -105,14 +104,12 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
                 });
             }
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(20));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(20));
             Assert.That(recentTargetPaths[0], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder29"));
             Assert.That(recentTargetPaths[1], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder28"));
             Assert.That(recentTargetPaths[19], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder10"));
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -120,13 +117,12 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void UpdateTargetPathToRecent_PathIsNull_UpdateRecentPathsAndSave()
+    public void UpdateTargetPathToRecent_PathIsNull_ThrowsInvalidOperationException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -141,16 +137,11 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
-            _assetRepository!.UpdateTargetPathToRecent(folder3);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(
+                () => _assetRepository!.UpdateTargetPathToRecent(folder3));
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
-            Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
-            Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
-            Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
+            Assert.That(exception?.Message, Is.EqualTo("Value must be set."));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -158,7 +149,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -181,14 +171,12 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             _assetRepository!.UpdateTargetPathToRecent(folder2);
             _assetRepository!.UpdateTargetPathToRecent(folder3);
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -196,7 +184,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -221,13 +208,11 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(2));
             Assert.That(recentTargetPaths[1], Is.EqualTo(folder1.Path));
             Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -235,7 +220,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -260,14 +244,12 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
                 () => _assetRepository!.UpdateTargetPathToRecent(folder3)
             );
 
-            List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
+            string[] recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths, Has.Length.EqualTo(3));
             Assert.That(recentTargetPaths.Any(x => x == folder1.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder2.Path), Is.True);
             Assert.That(recentTargetPaths.Any(x => x == folder3.Path), Is.True);
-
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -275,7 +257,6 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

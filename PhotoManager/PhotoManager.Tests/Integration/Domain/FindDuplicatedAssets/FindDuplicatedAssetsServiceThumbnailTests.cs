@@ -14,12 +14,11 @@ namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private IPathProviderService? _pathProviderServiceMock;
     private IConfigurationRoot? _configurationRootMock;
@@ -33,9 +32,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -43,22 +41,24 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
-        _findDuplicatedAssetsService = new(_assetRepository!, fileOperationsService, userConfigurationService,
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        _findDuplicatedAssetsService = new(_testableAssetRepository!, fileOperationsService, userConfigurationService,
             new TestLogger<FindDuplicatedAssetsService>());
 
         _asset1 = new()
@@ -207,237 +207,202 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
     {
-        try
-        {
-            string sourcePath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-            string sourcePath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string sourcePath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
 
-            const string hash1 = PHashes.IMAGE_1_JPG;
-            const string hash2 = PHashes.IMAGE_9_PNG;
-            const string hash3 = PHashes.IMAGE_11_HEIC;
+        const string hash1 = PHashes.IMAGE_1_JPG;
+        const string hash2 = PHashes.IMAGE_9_PNG;
+        const string hash3 = PHashes.IMAGE_11_HEIC;
 
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
-            _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+        _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [];
+        byte[] assetData1 = [1, 2, 3];
+        byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
-            _assetRepository.AddAsset(_asset3!, assetData1);
-            _assetRepository.AddAsset(_asset4!, assetData2);
-            _assetRepository.AddAsset(_asset5!, assetData1);
+        _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+        _testableAssetRepository.AddAsset(_asset2!, assetData2);
+        _testableAssetRepository.AddAsset(_asset3!, assetData1);
+        _testableAssetRepository.AddAsset(_asset4!, assetData2);
+        _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Not.Empty);
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(duplicatedAssets, Is.Not.Empty);
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
 
-            List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
-            List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
+        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
+        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
 
-            Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-            Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
+        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
 
-            Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
-            Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
+        Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
+        Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
 
-            Assert.That(duplicatedAsset1, Is.Not.Null);
-            Assert.That(duplicatedAsset3, Is.Not.Null);
-            Assert.That(duplicatedAsset1!.FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
+        Assert.That(duplicatedAsset1, Is.Not.Null);
+        Assert.That(duplicatedAsset3, Is.Not.Null);
+        Assert.That(duplicatedAsset1!.FileName, Is.EqualTo(_asset1.FileName));
+        Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
 
-            Asset? duplicatedAsset2 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
-            Asset? duplicatedAsset4 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
+        Asset? duplicatedAsset2 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
+        Asset? duplicatedAsset4 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
 
-            Assert.That(duplicatedAsset2, Is.Not.Null);
-            Assert.That(duplicatedAsset4, Is.Not.Null);
-            Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAsset2, Is.Not.Null);
+        Assert.That(duplicatedAsset4, Is.Not.Null);
+        Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
+        Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
     {
-        try
-        {
-            const string hash = Hashes.IMAGE_9_PNG;
+        const string hash = Hashes.IMAGE_9_PNG;
 
-            string sourcePath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
-            Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
-            _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
-            _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
-            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
+        _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
+        _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
+        _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
 
-            byte[] assetData = [1, 2, 3];
+        byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1!, assetData);
-            _assetRepository.AddAsset(_asset2!, assetData);
-            _assetRepository.AddAsset(_asset3!, assetData);
-            _assetRepository.AddAsset(_asset4!, assetData);
-            _assetRepository.AddAsset(_asset5!, assetData);
+        _testableAssetRepository!.AddAsset(_asset1!, assetData);
+        _testableAssetRepository.AddAsset(_asset2!, assetData);
+        _testableAssetRepository.AddAsset(_asset3!, assetData);
+        _testableAssetRepository.AddAsset(_asset4!, assetData);
+        _testableAssetRepository.AddAsset(_asset5!, assetData);
 
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Not.Empty);
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(duplicatedAssets, Is.Not.Empty);
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
 
-            List<Asset> duplicatedAssetsSet = duplicatedAssets[0];
+        List<Asset> duplicatedAssetsSet = duplicatedAssets[0];
 
-            Assert.That(duplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(duplicatedAssetsSet, Has.Count.EqualTo(4));
 
-            Asset? duplicatedAsset2 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
-            Asset? duplicatedAsset3 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
-            Asset? duplicatedAsset4 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
-            Asset? duplicatedAsset5 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset5.FileName);
+        Asset? duplicatedAsset2 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
+        Asset? duplicatedAsset3 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
+        Asset? duplicatedAsset4 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
+        Asset? duplicatedAsset5 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset5.FileName);
 
-            Assert.That(duplicatedAsset2, Is.Not.Null);
-            Assert.That(duplicatedAsset3, Is.Not.Null);
-            Assert.That(duplicatedAsset4, Is.Not.Null);
-            Assert.That(duplicatedAsset5, Is.Not.Null);
+        Assert.That(duplicatedAsset2, Is.Not.Null);
+        Assert.That(duplicatedAsset3, Is.Not.Null);
+        Assert.That(duplicatedAsset4, Is.Not.Null);
+        Assert.That(duplicatedAsset5, Is.Not.Null);
 
-            Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
-            Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
-            Assert.That(duplicatedAsset5!.FileName, Is.EqualTo(_asset5.FileName));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
+        Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
+        Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
+        Assert.That(duplicatedAsset5!.FileName, Is.EqualTo(_asset5.FileName));
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatesButOneFileDoesNotExist_ReturnsEmptyList()
     {
-        try
-        {
-            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            const string hash = PHashes.IMAGE_1_JPG;
+        const string hash = PHashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
-            byte[] assetData = [1, 2, 3];
+        byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1!, assetData);
-            _assetRepository.AddAsset(_asset3!, assetData);
+        _testableAssetRepository!.AddAsset(_asset1!, assetData);
+        _testableAssetRepository.AddAsset(_asset3!, assetData);
 
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAssets, Is.Empty);
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_FilesDoNotExist_ReturnsEmptyList()
     {
-        try
-        {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_1);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
-            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
-            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+        Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+        Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            const string hash1 = PHashes.IMAGE_1_JPG;
-            const string hash2 = PHashes.IMAGE_9_PNG;
-            const string hash3 = PHashes.IMAGE_11_HEIC;
+        const string hash1 = PHashes.IMAGE_1_JPG;
+        const string hash2 = PHashes.IMAGE_9_PNG;
+        const string hash3 = PHashes.IMAGE_11_HEIC;
 
-            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
-            _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
-            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+        _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [];
+        byte[] assetData1 = [1, 2, 3];
+        byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
-            _assetRepository.AddAsset(_asset3!, assetData1);
-            _assetRepository.AddAsset(_asset4!, assetData2);
-            _assetRepository.AddAsset(_asset5!, assetData1);
+        _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+        _testableAssetRepository.AddAsset(_asset2!, assetData2);
+        _testableAssetRepository.AddAsset(_asset3!, assetData1);
+        _testableAssetRepository.AddAsset(_asset4!, assetData2);
+        _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAssets, Is.Empty);
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_NoAssets_ReturnsEmptyList()
     {
-        try
-        {
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAssets, Is.Empty);
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_NoDuplicatedAssets_ReturnsEmptyList()
     {
-        try
-        {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
-            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
-            const string hash1 = PHashes.IMAGE_1_JPG;
-            const string hash2 = PHashes.IMAGE_9_PNG;
+        const string hash1 = PHashes.IMAGE_1_JPG;
+        const string hash2 = PHashes.IMAGE_9_PNG;
 
-            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
-            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
+        _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+        _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
 
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [];
+        byte[] assetData1 = [1, 2, 3];
+        byte[] assetData2 = [];
 
-            _assetRepository!.AddAsset(_asset1!, assetData1);
-            _assetRepository.AddAsset(_asset2!, assetData2);
+        _testableAssetRepository!.AddAsset(_asset1!, assetData1);
+        _testableAssetRepository.AddAsset(_asset2!, assetData2);
 
-            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(duplicatedAssets, Is.Empty);
     }
 }

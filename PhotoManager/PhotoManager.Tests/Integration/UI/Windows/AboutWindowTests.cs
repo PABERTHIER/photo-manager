@@ -10,18 +10,24 @@ namespace PhotoManager.Tests.Integration.UI.Windows;
 [TestFixture]
 public class AboutWindowTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureApplication(string assetsDirectory, string projectName, string projectOwner)
@@ -35,31 +41,34 @@ public class AboutWindowTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -72,52 +81,38 @@ public class AboutWindowTests
         string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, projectName, projectOwner);
+        ConfigureApplication(_assetsDirectory!, projectName, projectOwner);
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
 
-            Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
-            Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
-            Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
-            Assert.That(aboutInformation.Version, Does.StartWith("v"));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
+        Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
+        Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
+        Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
+        Assert.That(aboutInformation.Version, Does.StartWith("v"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
+        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
-            Assert.That(title, Is.EqualTo(expectedTitle));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(title, Is.EqualTo(expectedTitle));
     }
 
     [Test]
     public void Constructor_WithDifferentAssembly_SetsTitle()
     {
-        ConfigureApplication(_dataDirectory!, "PhotoManager", "Toto");
+        ConfigureApplication(_assetsDirectory!, "PhotoManager", "Toto");
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(int).Assembly);
 
-            Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
-            Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
-            Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
+        Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
+        Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            const string expectedTitle = $"About Microsoft® .NET {Constants.VERSION}";
+        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        const string expectedTitle = $"About Microsoft® .NET {Constants.VERSION}";
 
-            Assert.That(title, Is.EqualTo(expectedTitle));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(title, Is.EqualTo(expectedTitle));
     }
 
     [Test]
@@ -126,28 +121,21 @@ public class AboutWindowTests
     public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName,
         string expectedProjectOwner)
     {
-        ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
+        ConfigureApplication(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
 
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
         AssemblyBuilder assemblyBuilder =
             AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
-        try
-        {
-            AboutInformation aboutInformation = _application!.GetAboutInformation(assemblyBuilder);
+        AboutInformation aboutInformation = _application!.GetAboutInformation(assemblyBuilder);
 
-            Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
-            Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
-            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
+        Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
+        Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
+        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
-            Assert.That(title, Is.EqualTo(expectedTitle));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(title, Is.EqualTo(expectedTitle));
     }
 }

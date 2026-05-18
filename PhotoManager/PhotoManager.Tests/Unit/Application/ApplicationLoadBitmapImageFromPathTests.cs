@@ -8,18 +8,24 @@ namespace PhotoManager.Tests.Unit.Application;
 [TestFixture]
 public class ApplicationLoadBitmapImageFromPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -39,31 +45,34 @@ public class ApplicationLoadBitmapImageFromPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -76,129 +85,94 @@ public class ApplicationLoadBitmapImageFromPathTests
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith,
         int expectedHeight)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        try
-        {
-            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
-            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(rotation));
-            Assert.That(image.Width, Is.EqualTo(expectedWith));
-            Assert.That(image.Height, Is.EqualTo(expectedHeight));
-            Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
-            Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width, Is.EqualTo(expectedWith));
+        Assert.That(image.Height, Is.EqualTo(expectedHeight));
+        Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
+        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
     public void LoadBitmapImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        try
-        {
-            string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
-            const Rotation rotation = Rotation.Rotate90;
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
+        const Rotation rotation = Rotation.Rotate90;
 
-            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
     public void LoadBitmapImageFromPath_FilePathIsNull_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        try
-        {
-            string? filePath = null;
-            const Rotation rotation = Rotation.Rotate90;
+        string? filePath = null;
+        const Rotation rotation = Rotation.Rotate90;
 
-            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath!, rotation);
+        BitmapImage image = _application!.LoadBitmapImageFromPath(filePath!, rotation);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
     public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        try
-        {
-            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            const Rotation rotation = (Rotation)999;
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+        const Rotation rotation = (Rotation)999;
 
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
 
-            Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        try
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+        const Rotation rotation = Rotation.Rotate0;
+
+        BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+
+        using (Assert.EnterMultipleScope())
         {
-            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            const Rotation rotation = Rotation.Rotate0;
-
-            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(image, Is.Not.Null);
-                Assert.That(image.StreamSource, Is.Null);
-                Assert.That(image.Rotation, Is.EqualTo(rotation));
-                Assert.That(image.Width,
-                    Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-                Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
-                Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-                Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-                Assert.That(image.DecodePixelWidth, Is.Zero);
-                Assert.That(image.DecodePixelHeight, Is.Zero);
-            }
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width,
+                Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 }

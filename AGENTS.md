@@ -14,6 +14,15 @@ This file provides shared guidance for AI coding agents (Claude Code, GitHub Cop
 - If a line exceeds 120 chars, wrap it appropriately (except unsplittable strings/URLs)
 - When editing files, preserve existing formatting style
 
+## File Encoding (NON-NEGOTIABLE)
+
+- **All files MUST use UTF-8 encoding with BOM** (Byte Order Mark: `EF BB BF`)
+- This is the .NET standard as specified in `.editorconfig` (`charset = utf-8`)
+- When creating or editing files, ALWAYS ensure the BOM is present
+- **Never strip the BOM** when modifying files — preserve the original encoding
+- The BOM is critical for proper file encoding detection by .NET tooling and CI/CD pipelines
+- If you edit a file and the BOM is lost, re-add it before completing the task
+
 ## Performance Optimization Workflow
 
 When optimizing performance:
@@ -45,6 +54,24 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
   - By project: `dotnet test --filter "FullyQualifiedName~PhotoManager.Common"`
 - Always explain which tests are being run and why
 
+## Test File Date Assertions — Stale Build Failure
+
+Some integration tests assert that `asset.FileProperties.Creation.Date` equals `DateTime.Now.Date`. These tests will **fail with a date mismatch** if the test project was last built on a previous day:
+
+```
+Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate))
+Expected: 2026-05-15 00:00:00
+But was: 2026-05-14 00:00:00
+```
+
+**Root cause:** `PhotoManager.Tests.csproj` defines a custom MSBuild task `SetFileDates` (from `MSBuildTask\FileDateTask.dll`) that runs `AfterTargets="PreBuildEvent"` on every build.
+It copies all test files under `TestFiles\` to the output directory, and their filesystem creation date is set to the time of that build.
+When a day passes without rebuilding, the creation dates of the copied files become yesterday's date, causing assertions against `DateTime.Now.Date` to fail.
+
+**Fix:** Run `dotnet build PhotoManager/PhotoManager.slnx` to trigger the `SetFixedDate` target and refresh the test files in the output directory. Then re-run the failing tests — they will pass.
+
+**This is not a regression introduced by code changes.** If you see only date assertion failures and your code changes are unrelated to file date handling, rebuild first before investigating further.
+
 ## TODO Comments (NON-NEGOTIABLE)
 
 - **Never remove a `// TODO` comment** unless the issue it describes has been fully fixed in the same change
@@ -54,15 +81,16 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
 
 1. Verify no compiler warnings (run `dotnet build` and check output)
 2. Verify no line exceeds 120 characters (use `dotnet format` to check)
-3. Run only relevant tests for changes made
-4. If code was modified, ensure tests pass
-5. Verify all `// TODO` comments in modified files are still present (do not silently remove them)
+3. Verify all modified files have UTF-8 BOM encoding (first 3 bytes should be `EF BB BF`)
+4. Run only relevant tests for changes made
+5. If code was modified, ensure tests pass
+6. Verify all `// TODO` comments in modified files are still present (do not silently remove them)
 
 ---
 
 ## Project Overview
 
-PhotoManager is a WPF desktop application for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a custom file-based database for local persistence.
+PhotoManager is a WPF desktop application for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a SQLite database for local persistence.
 
 ## Build and Test Commands
 
@@ -134,7 +162,8 @@ The solution follows Clean Architecture with the following layers:
 PhotoManager.slnx
 ├── PhotoManager.Domain/        # Core domain logic, entities, service interfaces
 ├── PhotoManager.Application/   # Application orchestration (IApplication facade)
-├── PhotoManager.Infrastructure/# External concerns (file system, image processing, database)
+├── PhotoManager.Infrastructure/# External concerns (file system, image processing)
+├── PhotoManager.Persistence/   # SQLite database, repositories, backup service
 ├── PhotoManager.Common/        # Shared utilities (hashing, image/video helpers)
 ├── PhotoManager.UI/            # WPF presentation layer (ViewModels, Views)
 ├── PhotoManager.Tests/         # NUnit tests with NSubstitute
@@ -143,26 +172,29 @@ PhotoManager.slnx
 
 ### Dependency Flow
 
-UI → Application → Domain ← Infrastructure
+UI → Application → Domain ← Infrastructure ← Persistence
 
 ### Key Architectural Patterns
 
-1. **Custom File-Based Database**: The project uses a custom database implementation (`PhotoManager.Infrastructure.Database`) that stores data in CSV-like `.db` files with blobs in a separate folder. Configuration is in `TablesConfig/`.
+1. **SQLite Persistence**: The project uses SQLite (`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`) in the `PhotoManager.Persistence` project. The database is a single `photomanager.db` file with WAL mode for concurrent reads. Schema is defined in `SqliteSchema.cs` with tables: Folders, Assets, Thumbnails, RecentPaths, SyncDefinitions.
 
-2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.xaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`.
+2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.xaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`. `AddInfrastructure()` calls `AddPersistence()` internally.
 
 3. **Hash-Based Duplicate Detection**: The `HashingHelper` supports multiple algorithms (PHash, DHash, MD5, SHA512). PHash is the most advanced and can detect duplicates between rotated images, thumbnails, and different resolutions. Controlled by `HashSettings` in `appsettings.json`.
 
 4. **Microsoft Extensions Logging**: The application uses `ILogger<T>` throughout. The UI layer configures Serilog for file logging and console output in `App.xaml.cs`.
 
-5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings).
+5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings). The database directory is **not** configurable — it is always resolved at runtime as `AppContext.BaseDirectory + "Database"` by `PathProviderService`.
 
 ## Important Files
 
 - `PhotoManager/PhotoManager.UI/App.xaml.cs` - Application startup, DI container setup
 - `PhotoManager/PhotoManager.Application/Application.cs` - Main application facade
 - `PhotoManager/PhotoManager.Domain/Asset.cs` - Core domain entity
-- `PhotoManager/PhotoManager.Infrastructure/Database/Database.cs` - Custom database implementation
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqlitePersistenceContext.cs` - Database initialization, backup, dispose
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteSchema.cs` - DDL schema definition
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteConnectionFactory.cs` - Connection creation with PRAGMAs
+- `PhotoManager/PhotoManager.Persistence/Sqlite/SqliteBackupService.cs` - Online backup + zip archive
 - `PhotoManager/PhotoManager.Common/HashingHelper.cs` - Hash algorithms for duplicate detection
 - `PhotoManager/PhotoManager.slnx` - Solution file
 
@@ -171,6 +203,7 @@ UI → Application → Domain ← Infrastructure
 - **Indent**: 4 spaces
 - **Max line length**: 120
 - **End of line**: CRLF
+- **File encoding**: UTF-8 with BOM for all files
 - Treat warnings as errors is enabled in builds
 - Run `dotnet format` to apply right file encoding, and code style
 - Global usings are defined in each project's `GlobalUsings.cs`
@@ -183,14 +216,16 @@ UI → Application → Domain ← Infrastructure
 [TestFixture]
 public class ClassNameTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
+    private string? _databaseDirectory;
 
     private TestLogger<ClassName> _testLogger = new(); // That would be ClassNameTests for static method only
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -202,6 +237,8 @@ public class ClassNameTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger.LoggingAssertTearDown();
     }
 
@@ -237,7 +274,7 @@ public class ClassNameTests
 ### Resource Cleanup Pattern
 
 ```csharp
-string testDirectory = Path.Combine(_dataDirectory!, Directories.TEST_DIR);
+string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_DIR);
 try
 {
     Directory.CreateDirectory(testDirectory);
@@ -269,6 +306,7 @@ finally
 
 ## External Dependencies
 
+- **Microsoft.Data.Sqlite** + **SQLitePCLRaw.bundle_e_sqlite3** - SQLite database
 - **Magick.NET** (ImageMagick) - Image processing
 - **FFMpegCore** - Video processing (FFmpeg executables are extracted from `.rar` files on build via `FileExtractionTask.dll`)
 - **Serilog** - File logging
@@ -279,13 +317,40 @@ finally
 
 ## Working with the Database
 
-The custom database stores:
+The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a single database file:
 
-- Tables as `.db` files in `{BackupPath}/{StorageVersion}/{TablesFolderName}/`
-- Blobs in `{BackupPath}/{StorageVersion}/{BlobsFolderName}/`
-- Backups in `{BackupPath}/{StorageVersion}_Backups/`
+- Database file: `<AppContext.BaseDirectory>/Database/photomanager.db` (auto-created on first run, always next to the executable)
+- Backups: `<AppContext.BaseDirectory>/Database/Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
+- Connection model: one connection per operation, WAL journal mode, `busy_timeout = 5000`
 
-To add a new table, create a `DataTableProperties` in `TablesConfig/` and register it with `Database.SetDataTableProperties()`.
+### Schema (v1 — defined in `SqliteSchema.cs`)
+
+| Table              | Primary key              | Notes                                |
+|--------------------|--------------------------|--------------------------------------|
+| `Folders`          | `Id` (TEXT, GUID)        | Index on `Path`                      |
+| `Assets`           | (`FolderId`, `FileName`) | Index on `Hash`. FK → `Folders(Id)`  |
+| `Thumbnails`       | (`FolderId`, `FileName`) | `Data BLOB`. FK → `Folders(Id)`      |
+| `RecentPaths`      | `Position` (INTEGER)     | Single ordered list                  |
+| `SyncDefinitions`  | `Position` (INTEGER)     | Single ordered list                  |
+
+### Key classes (all in `PhotoManager.Persistence`)
+
+- `IPersistenceContext` / `SqlitePersistenceContext` — facade: Initialize, WriteBackup, DeleteOldBackups, Dispose
+- `ISqliteConnectionFactory` / `SqliteConnectionFactory` — opens connections with PRAGMAs applied
+- `ISqliteBackupService` / `SqliteBackupService` — online backup API + zip compression
+- `IAssetPersistence` / `AssetPersistence` — CRUD for Assets table
+- `IThumbnailPersistence` / `ThumbnailPersistence` — CRUD for Thumbnails table
+- `IFolderPersistence` / `FolderPersistence` — CRUD for Folders table
+- `IRecentPathsPersistence` / `RecentPathsPersistence` — Replace-all semantics
+- `ISyncDefinitionsPersistence` / `SyncDefinitionsPersistence` — Replace-all semantics
+- `ILruCache<TKey, TValue>` / `LruCache<TKey, TValue>` — thread-safe bounded cache
+
+### Adding a new table
+
+1. Add the DDL to `SqliteSchema.cs` `CREATE_SCRIPT`
+2. Bump `SCHEMA_VERSION` and add migration logic in `EnsureCreated()`
+3. Create a repository interface + implementation in `Repositories/`
+4. Register in `PersistenceServiceCollectionExtensions.cs`
 
 ## HEIC/HEVC Support
 

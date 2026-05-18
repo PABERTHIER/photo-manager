@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
@@ -24,13 +24,12 @@ public class MainWindowLoadedAndClosingTests
 {
     private static readonly ILogger Log = new TestLogger<MainWindowLoadedAndClosingTests>();
 
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
 
     private Asset? _asset1;
@@ -47,9 +46,8 @@ public class MainWindowLoadedAndClosingTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -186,6 +184,8 @@ public class MainWindowLoadedAndClosingTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
 
@@ -226,31 +226,34 @@ public class MainWindowLoadedAndClosingTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -262,7 +265,7 @@ public class MainWindowLoadedAndClosingTests
     public async Task
         WindowLoaded_CataloguedAssetsAndSyncAssetsEveryXMinutesAndIsCancellationRequestedAndWindowClosing_CatalogsAssetsThreeTimesAndClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 1, assetsDirectory, 200, 150, true, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -287,7 +290,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -402,7 +405,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -410,7 +412,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_CataloguedAssetsAndIsCancellationRequestedAndWindowClosing_ClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -435,7 +437,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
             string expectedAppTitle =
@@ -513,7 +515,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -521,7 +522,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_CataloguedAssetsAndWindowClosing_CatalogsAssetsAndClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -544,7 +545,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -644,7 +645,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -652,7 +652,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowLoaded_NoCataloguedAssetsAndWindowClosing_ClosesWindowSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -756,7 +756,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }
@@ -765,7 +764,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsCompleted_CancelsTaskAndCancellationToken()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -851,7 +850,6 @@ public class MainWindowLoadedAndClosingTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }
@@ -860,7 +858,7 @@ public class MainWindowLoadedAndClosingTests
     [Test]
     public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsNotCompleted_CancelsTaskAndCancellationToken()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
         TestLogger<MainWindowLoadedAndClosingTests> logger = new();
@@ -945,7 +943,6 @@ public class MainWindowLoadedAndClosingTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }

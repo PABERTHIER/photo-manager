@@ -20,15 +20,14 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 public class MainWindowFindDuplicatesTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private event GetExemptedFolderPathEventHandler? GetExemptedFolderPathEvent;
     private event DeleteDuplicatedAssetsEventHandler? DeleteDuplicatedAssetsEvent;
@@ -52,9 +51,8 @@ public class MainWindowFindDuplicatesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -216,6 +214,8 @@ public class MainWindowFindDuplicatesTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
         _findDuplicatedAssetsViewModel = null;
@@ -254,31 +254,34 @@ public class MainWindowFindDuplicatesTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
 
@@ -289,7 +292,7 @@ public class MainWindowFindDuplicatesTests
     public async Task
         FindDuplicates_CataloguedAssetsAndRefreshAndDeleteNotExempted_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -313,7 +316,7 @@ public class MainWindowFindDuplicatesTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
             string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_9_PNG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
@@ -324,10 +327,10 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -449,7 +452,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -457,7 +459,7 @@ public class MainWindowFindDuplicatesTests
     [Test]
     public async Task FindDuplicates_CataloguedAssetsAndDeleteAll_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -485,10 +487,10 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -597,7 +599,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -605,7 +606,7 @@ public class MainWindowFindDuplicatesTests
     [Test]
     public async Task FindDuplicates_CataloguedAssetsAndRefreshAndDelete_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -633,10 +634,10 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -747,7 +748,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -755,7 +755,7 @@ public class MainWindowFindDuplicatesTests
     [Test]
     public async Task FindDuplicates_CataloguedAssetsAndDelete_ShowsDuplicatesHaveBeenFoundAndSendsEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -783,10 +783,10 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
@@ -895,7 +895,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(exemptedFolderPath, true);
         }
     }
@@ -904,7 +903,7 @@ public class MainWindowFindDuplicatesTests
     public async Task
         FindDuplicates_NoCataloguedAssetsAndRefreshAndDelete_ShowsNoDuplicatesHaveBeenFoundAndDoesNotSendEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -933,7 +932,7 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             string expectedAppTitle =
@@ -1006,7 +1005,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -1014,7 +1012,7 @@ public class MainWindowFindDuplicatesTests
     [Test]
     public async Task FindDuplicates_NoCataloguedAssets_ShowsNoDuplicatesHaveBeenFound()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
         string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
@@ -1043,7 +1041,7 @@ public class MainWindowFindDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
+            Folder? exemptedFolder = _testableAssetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
             string expectedAppTitle =
@@ -1101,7 +1099,6 @@ public class MainWindowFindDuplicatesTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -1348,8 +1345,7 @@ public class MainWindowFindDuplicatesTests
         {
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
-                AssertDuplicatedAssetsSet(
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets[i],
+                AssertDuplicatedAssetsSet(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets[i],
                     expectedDuplicatedAssetSets[i]);
             }
         }
@@ -1368,7 +1364,9 @@ public class MainWindowFindDuplicatesTests
 
             for (int i = 0; i < expectedDuplicatedAssetSet.Count; i++)
             {
-                AssertDuplicatedAsset(duplicatedAssetSet[i], expectedDuplicatedAssetSet[i]);
+                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(
+                    a => a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
+                AssertDuplicatedAsset(actualAsset, expectedDuplicatedAssetSet[i]);
             }
         }
         else
@@ -1377,8 +1375,7 @@ public class MainWindowFindDuplicatesTests
         }
     }
 
-    private static void AssertDuplicatedSet(
-        DuplicatedSetViewModel duplicatedSetViewModel,
+    private static void AssertDuplicatedSet(DuplicatedSetViewModel duplicatedSetViewModel,
         DuplicatedSetViewModel expectedDuplicatedSetViewModel)
     {
         Assert.That(duplicatedSetViewModel.FileName, Is.EqualTo(expectedDuplicatedSetViewModel.FileName));
@@ -1404,11 +1401,13 @@ public class MainWindowFindDuplicatesTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
-                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    DuplicatedAssetViewModel actualSibling =
+                        duplicatedAsset.ParentViewModel.First(
+                            a => a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
-                        expectedDuplicatedAsset.ParentViewModel[i].Asset);
+                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+
+                    AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }
             }
             else

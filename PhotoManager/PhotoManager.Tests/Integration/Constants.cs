@@ -2,14 +2,12 @@
 
 public static class Constants
 {
-    public const string DATABASE_END_PATH = "v1.0";
-    public const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
-    public const string VERSION = "v1.9.0";
+    public const string DATABASE_BACKUP_END_PATH = "Backups";
+    public const string DATABASE_FILE_NAME = "photomanager.db";
+    public const string VERSION = "v2.0.0";
 
     public static class Directories
     {
-        public const string BLOBS = "Blobs";
-        public const string TABLES = "Tables";
         public const string TEST_FILES = "TestFiles";
         public const string TEST_FOLDER = "TestFolder";
         public const string TEST_FOLDER_1 = "TestFolder1";
@@ -68,27 +66,9 @@ public static class Constants
         public const string SAMPLE_3 = "Sample3";
         public const string THUMBNAIL = "Thumbnail";
         public const string DATABASE_TESTS = "DatabaseTests";
-        public const string DATABASE_TESTS_BACKUPS = "DatabaseTests_Backups";
-        public const string TEST_BACKUP = "TestBackup";
         public const string FAKE = "fake";
 
         public const string NON_EXISTENT_FOLDER = "NonExistentFolder";
-        public const string NON_EXISTENT_FOLDER_1 = "NonExistentFolder1";
-    }
-
-    public static class Tables
-    {
-        public const string ASSETS_DB = "assets.db";
-        public const string FOLDERS_DB = "folders.db";
-        public const string RECENT_TARGET_PATHS_DB = "recenttargetpaths.db";
-        public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB = "syncassetsdirectoriesdefinitions.db";
-        public const string SYNC_ASSETS_DIRECTORIES_DEFINITIONS_EMPTY_DB = "syncassetsdirectoriesdefinitions_empty.db";
-    }
-
-    public static class Blobs
-    {
-        public const string BLOB_18033543 = "18033543-defb-4d37-837b-d8063eda3a25.bin";
-        public const string BLOB_F1F00403 = "f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin";
     }
 
     public static class FileNames
@@ -110,7 +90,6 @@ public static class Constants
         public const string IMAGE_1_TEMP_JPG = "Image 1_Temp.jpg";
         public const string IMAGE_2_JPG = "Image 2.jpg";
         public const string IMAGE_2_DUPLICATED_JPG = "Image 2 duplicated.jpg";
-        public const string IMAGE_2_PNG = "Image2.png";
         public const string IMAGE_3_JPG = "Image 3.jpg";
         public const string IMAGE_4_JPG = "Image 4.jpg";
         public const string IMAGE_5_JPG = "Image 5.jpg";
@@ -454,31 +433,28 @@ public static class Constants
 
     public static class ImageByteSizes
     {
-        public const int HOMER_GIF = 8594;
-        public const int HOMER_JPG = 4819;
-        public const int HOMER_DUPLICATED_JPG = 4819;
-        public const int IMAGE_1_JPG = 2100;
-        public const int IMAGE_1_90_DEG_JPG = 1737;
-        public const int IMAGE_1_180_DEG_JPG = 2102;
-        public const int IMAGE_1_270_DEG_JPG = 1716;
-        public const int IMAGE_1_DUPLICATE_JPG = 2100;
-        public const int IMAGE_1_DUPLICATE_COPIED_JPG = 2100;
-        public const int IMAGE_2_JPG = 2109;
-        public const int IMAGE_2_DUPLICATED_JPG = 2109;
-        public const int IMAGE_3_JPG = 2111;
-        public const int IMAGE_4_JPG = 2108;
-        public const int IMAGE_5_JPG = 2107;
-        public const int IMAGE_6_JPG = 2110;
-        public const int IMAGE_7_JPG = 2105;
-        public const int IMAGE_8_JPEG = 2115;
-        public const int IMAGE_9_PNG = 10583;
-        public const int IMAGE_9_DUPLICATE_PNG = 10583;
-        public const int IMAGE_10_PORTRAIT_PNG = 5852;
-        public const int IMAGE_11_HEIC = 5851;
+        public const int HOMER_GIF = 10300;
+        public const int IMAGE_1_JPG = 2534;
+        public const int IMAGE_1_90_DEG_JPG = 2551;
+        public const int IMAGE_1_180_DEG_JPG = 2534;
+        public const int IMAGE_1_270_DEG_JPG = 2561;
+        public const int IMAGE_1_DUPLICATE_JPG = 2534;
+        public const int IMAGE_2_JPG = 2545;
+        public const int IMAGE_2_DUPLICATED_JPG = 2545;
+        public const int IMAGE_3_JPG = 2546;
+        public const int IMAGE_4_JPG = 2541;
+        public const int IMAGE_5_JPG = 2544;
+        public const int IMAGE_6_JPG = 2549;
+        public const int IMAGE_7_JPG = 2532;
+        public const int IMAGE_8_JPEG = 2548;
+        public const int IMAGE_9_PNG = 15026;
+        public const int IMAGE_9_DUPLICATE_PNG = 15026;
+        public const int IMAGE_10_PORTRAIT_PNG = 14420;
+        public const int IMAGE_11_HEIC = 6043;
         public const int IMAGE_11_90_DEG_HEIC = 5921;
-        public const int IMAGE_11_180_DEG_HEIC = 5713;
+        public const int IMAGE_11_180_DEG_HEIC = 6032;
         public const int IMAGE_11_270_DEG_HEIC = 6070;
-        public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3019;
+        public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3531;
         public const int _1336_ORIGINAL_JPG = 10753;
         public const int _1336_1_K_JPG = 10312;
         public const int _1336_2_K_JPG = 10226;
@@ -487,23 +463,23 @@ public static class Constants
         public const int _1336_8_K_JPG = 10836;
         public const int _1336_THUMBNAIL_JPG = 10880;
         public const int IMAGE_1336_ORIGINAL_JPG = 10753;
-        public const int IMAGE_1336_MINI_JPG = 4769;
+        public const int IMAGE_1336_MINI_JPG = 4816;
         public const int IMAGE_1336_SHIT_QUALITY_JPG = 11304;
         public const int IMAGE_1336_SMALL_JPG = 10592;
         public const int _1336_BOTTOM_LEFT_PART_JPG = 13128;
-        public const int _1336_BOTTOM_PART_JPG = 7563;
+        public const int _1336_BOTTOM_PART_JPG = 13756;
         public const int _1336_BOTTOM_RIGHT_PART_JPG = 13254;
-        public const int _1336_LEFT_PART_JPG = 5817;
-        public const int _1336_RIGHT_PART_JPG = 5911;
+        public const int _1336_LEFT_PART_JPG = 9878;
+        public const int _1336_RIGHT_PART_JPG = 10001;
         public const int _1336_TOP_LEFT_PART_JPG = 5752;
-        public const int _1336_TOP_PART_JPG = 4147;
+        public const int _1336_TOP_PART_JPG = 6558;
         public const int _1336_TOP_RIGHT_PART_JPG = 6045;
         public const int _1337_JPG = 8467;
         public const int _1349_JPG = 7834;
         public const int _1350_JPG = 8921;
         public const int _1413_JPG = 8733;
         public const int _1414_JPG = 8567;
-        public const int _1415_JPG = 5055;
+        public const int _1415_JPG = 8031;
     }
 
     public static class ModificationDate

@@ -9,18 +9,24 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels;
 [TestFixture]
 public class SyncAssetsViewModelTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -40,1780 +46,1573 @@ public class SyncAssetsViewModelTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
-            moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
-            imageProcessingService);
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
         _syncAssetsViewModel = new(application);
     }
 
     [Test]
     public void Description_CorrectValue_ReturnsDescription()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            const string description = """
-                                       This process allows to sync new assets to the catalog.
-                                       You can configure one or multiple sync operations by entering a source path and a destination path.
-                                       You can specify if the sync operation should also include sub-folders.
-                                       There is also the option to delete from the destination path the assets not present in the source path.
-                                       """;
+        const string description = """
+                                   This process allows to sync new assets to the catalog.
+                                   You can configure one or multiple sync operations by entering a source path and a destination path.
+                                   You can specify if the sync operation should also include sub-folders.
+                                   There is also the option to delete from the destination path the assets not present in the source path.
+                                   """;
 
-            string expectedDescription = description.Replace(Environment.NewLine, " ");
+        string expectedDescription = description.Replace(Environment.NewLine, " ");
 
-            Assert.That(_syncAssetsViewModel!.Description, Is.EqualTo(expectedDescription));
+        Assert.That(_syncAssetsViewModel!.Description, Is.EqualTo(expectedDescription));
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
     public void Definitions_HasDefinitions_NotifiesChangesAndReturnsDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"\\MyServer\Images", DestinationDirectory = @"C:\Images" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"\\MyServer\Images", DestinationDirectory = @"C:\Images" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"\\MyServer\Images"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"\\MyServer\Images"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void Definitions_SameDefinitions_NotifiesChangesAndReturnsDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void Definitions_EmptyDefinitions_NotifiesChangesAndReturnsEmptyCollection()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions = [];
+        List<SyncAssetsDirectoriesDefinition> definitions = [];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
     public void Definitions_NoDefinitions_DoesNotNotifyChangesAndReturnsEmptyCollection()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
     public void Definitions_DefinitionsIsNull_NotifiesChangesAndReturnsNull()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
+        ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
 
-            _syncAssetsViewModel!.Definitions = definitions;
+        _syncAssetsViewModel!.Definitions = definitions;
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
     }
 
     [Test]
     public void DeleteDefinition_HasDefinitions_NotifiesChangesAndDeletesDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterFirstDeletion =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterFirstDeletion =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterSecondDeletion =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterSecondDeletion =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterThirdDeletion = [];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterThirdDeletion = [];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            // First deletion
-            _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[1]);
+        // First deletion
+        _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
-            Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterFirstDeletion);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterFirstDeletion);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterFirstDeletion);
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterFirstDeletion);
 
-            // Second deletion
-            _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[1]);
+        // Second deletion
+        _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
-            Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterSecondDeletion);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterSecondDeletion);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterSecondDeletion);
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterSecondDeletion);
 
-            // Third deletion
-            _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[0]);
+        // Third deletion
+        _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[0]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
+        Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterThirdDeletion);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterThirdDeletion);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterThirdDeletion);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterThirdDeletion);
     }
 
     [Test]
     public void DeleteDefinition_DuplicateDefinitionsInTheCollection_NotifiesChangesAndDeletesGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterFirstDeletion =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterFirstDeletion =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[2]);
+        _syncAssetsViewModel.DeleteDefinition(_syncAssetsViewModel.Definitions[2]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
-            Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterFirstDeletion);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterFirstDeletion);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterFirstDeletion);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterFirstDeletion);
     }
 
     [Test]
     public void DeleteDefinition_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+
+        _syncAssetsViewModel.DeleteDefinition(new()
         {
-            CheckBeforeChanges();
+            SourceDirectory = @"C:\Toto\Screenshots",
+            DestinationDirectory = @"C:\Images\Screenshots"
+        });
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
-            _syncAssetsViewModel.DeleteDefinition(new()
-            {
-                SourceDirectory = @"C:\Toto\Screenshots",
-                DestinationDirectory = @"C:\Images\Screenshots"
-            });
+        CheckAfterChanges(_syncAssetsViewModel, []);
 
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckAfterChanges(_syncAssetsViewModel, []);
-
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-            CheckInstance(syncAssetsViewModelInstances, []);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, []);
     }
 
     [Test]
     public void DeleteDefinition_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
-
-            _syncAssetsViewModel!.Definitions = [.. definitions];
-
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
-
-            _syncAssetsViewModel.DeleteDefinition(new()
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
             {
-                SourceDirectory = @"C:\Toto\Screenshots",
-                DestinationDirectory = @"C:\Images\Screenshots"
-            });
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
-
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
+        _syncAssetsViewModel.DeleteDefinition(new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            SourceDirectory = @"C:\Toto\Screenshots",
+            DestinationDirectory = @"C:\Images\Screenshots"
+        });
+
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
+
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
+
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void DeleteDefinition_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel.DeleteDefinition(null!);
+        _syncAssetsViewModel.DeleteDefinition(null!);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveUpAndMoveDown_HasDefinitions_UpdatesDefinitions()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUpAndDown =
-            [
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUpAndDown =
+        [
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[1]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUpAndDown);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUpAndDown);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUpAndDown);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUpAndDown);
     }
 
     [Test]
     public void MoveUp_FirstDefinition_DoesNotMoveUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[0]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[0]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveUp_NotFirstAndNotLastDefinition_MovesUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
-            [
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
+        [
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[1]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
     }
 
     [Test]
     public void MoveUp_LastDefinition_MovesUpDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[2]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[2]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
     }
 
     [Test]
     public void MoveUp_DuplicateDefinitionsInTheCollection_MovesUpGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedUp =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[2]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[2]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedUp);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedUp);
     }
 
     [Test]
     public void MoveUp_OnlyOneDefinition_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
-            _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[0]);
+        _syncAssetsViewModel!.MoveUpDefinition(_syncAssetsViewModel.Definitions[0]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveUp_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
-
-            _syncAssetsViewModel!.Definitions = [.. definitions];
-
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
-
-            _syncAssetsViewModel!.MoveUpDefinition(new()
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
             {
-                SourceDirectory = @"C:\Toto\Screenshots1",
-                DestinationDirectory = @"C:\Toto\Screenshots2"
-            });
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
-
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
-
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
+        _syncAssetsViewModel!.MoveUpDefinition(new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            SourceDirectory = @"C:\Toto\Screenshots1",
+            DestinationDirectory = @"C:\Toto\Screenshots2"
+        });
+
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveUp_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        List<SyncAssetsDirectoriesDefinition> definitions = [];
+
+        _syncAssetsViewModel!.Definitions = [.. definitions];
+
+        Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
+
+        _syncAssetsViewModel!.MoveUpDefinition(new()
         {
-            CheckBeforeChanges();
+            SourceDirectory = @"C:\Toto\Screenshots1",
+            DestinationDirectory = @"C:\Toto\Screenshots2"
+        });
 
-            List<SyncAssetsDirectoriesDefinition> definitions = [];
+        Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            _syncAssetsViewModel!.MoveUpDefinition(new()
-            {
-                SourceDirectory = @"C:\Toto\Screenshots1",
-                DestinationDirectory = @"C:\Toto\Screenshots2"
-            });
-
-            Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
-
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveUp_DefinitionsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
+
+        _syncAssetsViewModel!.Definitions = definitions;
+
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
+
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
         {
-            CheckBeforeChanges();
+            _syncAssetsViewModel!.MoveUpDefinition(
+                new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" }
+            );
+        });
 
-            ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            _syncAssetsViewModel!.Definitions = definitions;
-
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
-
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
-            {
-                _syncAssetsViewModel!.MoveUpDefinition(
-                    new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" }
-                );
-            });
-
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
     }
 
     [Test]
     public void MoveUp_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(null!);
+        _syncAssetsViewModel!.MoveUpDefinition(null!);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveDown_FirstAndNotLastDefinition_MovesDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
-            [
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
+        [
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[0]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[0]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
     }
 
     [Test]
     public void MoveDown_NotFirstAndNotLastDefinition_MovesDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
     }
 
     [Test]
     public void MoveDown_LastDefinition_DoesNotMoveDownDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[2]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[2]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
     }
 
     [Test]
     public void MoveDown_DuplicateDefinitionsInTheCollection_MovesDownGivenDefinition()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                },
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitionsAfterMovedDown =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            },
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[1]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
+        CheckAfterChanges(_syncAssetsViewModel, definitionsAfterMovedDown);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitionsAfterMovedDown);
     }
 
     [Test]
     public void MoveDown_OnlyOneDefinition_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
-            _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[0]);
+        _syncAssetsViewModel!.MoveDownDefinition(_syncAssetsViewModel.Definitions[0]);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveDown_DefinitionIsNotFound_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
-
-            _syncAssetsViewModel!.Definitions = [.. definitions];
-
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
-
-            _syncAssetsViewModel!.MoveDownDefinition(new()
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
             {
-                SourceDirectory = @"C:\Toto\Screenshots1",
-                DestinationDirectory = @"C:\Toto\Screenshots2"
-            });
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
-
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
-
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
+        _syncAssetsViewModel!.MoveDownDefinition(new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            SourceDirectory = @"C:\Toto\Screenshots1",
+            DestinationDirectory = @"C:\Toto\Screenshots2"
+        });
+
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveDown_NoDefinitions_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        List<SyncAssetsDirectoriesDefinition> definitions = [];
+
+        _syncAssetsViewModel!.Definitions = [.. definitions];
+
+        Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
+
+        _syncAssetsViewModel!.MoveDownDefinition(new()
         {
-            CheckBeforeChanges();
+            SourceDirectory = @"C:\Toto\Screenshots1",
+            DestinationDirectory = @"C:\Toto\Screenshots2"
+        });
 
-            List<SyncAssetsDirectoriesDefinition> definitions = [];
+        Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            _syncAssetsViewModel!.MoveDownDefinition(new()
-            {
-                SourceDirectory = @"C:\Toto\Screenshots1",
-                DestinationDirectory = @"C:\Toto\Screenshots2"
-            });
-
-            Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
-
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     [Test]
     public void MoveDown_DefinitionsIsNull_ThrowsNullReferenceException()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> _) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges();
+
+        ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
+
+        _syncAssetsViewModel!.Definitions = definitions;
+
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
+
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
         {
-            CheckBeforeChanges();
+            _syncAssetsViewModel!.MoveDownDefinition(
+                new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" }
+            );
+        });
 
-            ObservableCollection<SyncAssetsDirectoriesDefinition> definitions = null!;
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            _syncAssetsViewModel!.Definitions = definitions;
-
-            Assert.That(_syncAssetsViewModel!.Definitions, Is.Null);
-
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
-            {
-                _syncAssetsViewModel!.MoveDownDefinition(
-                    new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" }
-                );
-            });
-
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
     }
 
     [Test]
     public void MoveDown_DefinitionIsNull_DoesNothing()
     {
-        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
             NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
+        CheckBeforeChanges();
 
-            List<SyncAssetsDirectoriesDefinition> definitions =
-            [
-                new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
-                new()
-                {
-                    SourceDirectory = @"C:\Folder\Screenshots",
-                    DestinationDirectory = @"C:\Images\Folder3",
-                    IncludeSubFolders = true,
-                    DeleteAssetsNotInSource = true
-                }
-            ];
+        List<SyncAssetsDirectoriesDefinition> definitions =
+        [
+            new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
+            new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" },
+            new()
+            {
+                SourceDirectory = @"C:\Folder\Screenshots",
+                DestinationDirectory = @"C:\Images\Folder3",
+                IncludeSubFolders = true,
+                DeleteAssetsNotInSource = true
+            }
+        ];
 
-            _syncAssetsViewModel!.Definitions = [.. definitions];
+        _syncAssetsViewModel!.Definitions = [.. definitions];
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(null!);
+        _syncAssetsViewModel!.MoveDownDefinition(null!);
 
-            Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
+        Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
-                Is.EqualTo(@"C:\Images\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(@"C:\Toto\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory,
+            Is.EqualTo(@"C:\Images\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
-            Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
-            Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].SourceDirectory, Is.EqualTo(@"C:\Tutu\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DestinationDirectory, Is.EqualTo(@"C:\Images\Tutu"));
+        Assert.That(_syncAssetsViewModel!.Definitions[1].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
-            Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
-            Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].SourceDirectory, Is.EqualTo(@"C:\Folder\Screenshots"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DestinationDirectory, Is.EqualTo(@"C:\Images\Folder3"));
+        Assert.That(_syncAssetsViewModel!.Definitions[2].IncludeSubFolders, Is.True);
+        Assert.That(_syncAssetsViewModel!.Definitions[2].DeleteAssetsNotInSource, Is.True);
 
-            CheckAfterChanges(_syncAssetsViewModel, definitions);
+        CheckAfterChanges(_syncAssetsViewModel, definitions);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
 
-            CheckInstance(syncAssetsViewModelInstances, definitions);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        CheckInstance(syncAssetsViewModelInstances, definitions);
     }
 
     private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances)

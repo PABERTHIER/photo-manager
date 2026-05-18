@@ -287,7 +287,13 @@ public class AssetCreationService(
         };
 
         imageMetadataService.UpdateAssetFileProperties(asset);
-        assetRepository.AddAsset(asset, thumbnailBuffer);
+
+        bool result = assetRepository.AddAsset(asset, thumbnailBuffer);
+
+        if (!result)
+        {
+            logger.LogError("The asset {AssetPath} could not be added.", asset.FullPath);
+        }
 
         return asset;
     }

@@ -64,7 +64,7 @@ public class Application(
 
     public Folder[] GetSubFolders(Folder parentFolder) => assetRepository.GetSubFolders(parentFolder);
 
-    public List<string> GetRecentTargetPaths() => assetRepository.GetRecentTargetPaths();
+    public List<string> GetRecentTargetPaths() => [.. assetRepository.GetRecentTargetPaths()];
 
     public int GetAssetsCounter() => assetRepository.GetAssetsCounter();
 
@@ -105,7 +105,6 @@ public class Application(
     {
         syncConfiguration.Validate().Normalize();
         assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
-        assetRepository.SaveCatalog(null);
     }
 
     public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) =>

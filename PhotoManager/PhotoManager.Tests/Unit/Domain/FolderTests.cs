@@ -5,12 +5,12 @@ namespace PhotoManager.Tests.Unit.Domain;
 [TestFixture]
 public class FolderTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [Test]
@@ -52,9 +52,9 @@ public class FolderTests
         Folder parentFolder = new()
         {
             Id = Guid.NewGuid(),
-            Path = Path.Combine(_dataDirectory!, parentFolderSubPath)
+            Path = Path.Combine(_assetsDirectory!, parentFolderSubPath)
         };
-        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, childFolderSubPath) };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_assetsDirectory!, childFolderSubPath) };
 
         bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
 
@@ -92,7 +92,7 @@ public class FolderTests
     public void IsParentOf_PathIsNull_ReturnsFalse()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = null! };
-        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, "TestFolder") };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_assetsDirectory!, "TestFolder") };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 
@@ -102,7 +102,7 @@ public class FolderTests
     [Test]
     public void IsParentOf_ChildPathIsNull_ReturnsFalse()
     {
-        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
         Folder childFolder = new() { Id = Guid.NewGuid(), Path = null! };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);

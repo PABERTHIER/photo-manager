@@ -14,12 +14,10 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryDeleteAssetTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
-    private TestableAssetRepository? _testableAssetRepository;
-    private PhotoManager.Infrastructure.Database.Database? _database;
+    private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
 
     private IPathProviderService? _pathProviderServiceMock;
@@ -30,30 +28,31 @@ public class AssetRepositoryDeleteAssetTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, _testLogger);
 
         _asset1 = new()
         {
@@ -85,6 +84,8 @@ public class AssetRepositoryDeleteAssetTests
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -94,37 +95,30 @@ public class AssetRepositoryDeleteAssetTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
-            _testableAssetRepository!.AddFolder(folderPath2);
+            Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
+            _assetRepository!.AddFolder(folderPath2);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.False);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
-
-            Asset? assetDeleted1 = _testableAssetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
-            Asset? assetDeleted2 = _testableAssetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG);
+            Asset? assetDeleted1 = _assetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
+            Asset? assetDeleted2 = _assetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(assetDeleted1, Is.Not.Null);
             Assert.That(assetDeleted1!.FileName, Is.EqualTo(_asset1!.FileName));
@@ -133,12 +127,9 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetDeleted2, Is.Null);
 
-            Assert.That(thumbnails, Is.Empty);
-
-            assets = _testableAssetRepository!.GetCataloguedAssets();
+            assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -148,7 +139,6 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -161,47 +151,44 @@ public class AssetRepositoryDeleteAssetTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!,
-            imageProcessingService, imageMetadataService, userConfigurationService, _testLogger!);
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
-            testableAssetRepository.AddFolder(folderPath);
+            assetRepository.AddFolder(folderPath);
 
-            List<Asset> assets = testableAssetRepository.GetCataloguedAssets();
+            Asset[] assets = assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            Asset? assetDeleted = testableAssetRepository.DeleteAsset(folderPath, FileNames.NON_EXISTENT_FILE_JPG);
+            Asset? assetDeleted = assetRepository.DeleteAsset(folderPath, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(assetDeleted, Is.Null);
 
-            Assert.That(thumbnails, Is.Empty);
-
-            assets = testableAssetRepository.GetCataloguedAssets();
+            assets = assetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
-            Assert.That(testableAssetRepository.HasChanges(), Is.True);
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -211,48 +198,36 @@ public class AssetRepositoryDeleteAssetTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
+            Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
-
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset? assetDeleted = _testableAssetRepository!.DeleteAsset("non_existent_path", _asset1.FileName);
+            Asset? assetDeleted = _assetRepository!.DeleteAsset("non_existent_path", _asset1.FileName);
 
             Assert.That(assetDeleted, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
-
-            assets = _testableAssetRepository!.GetCataloguedAssets();
+            assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Not.Empty);
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -261,62 +236,6 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
-            assetsUpdatedSubscription.Dispose();
-        }
-    }
-
-    [Test]
-    public void
-        DeleteAsset_ThumbnailsDoNotExistInRepositoryButBinExists_ReturnsDeletedAssetAndThumbnailsAndAssetAreDeletedAndAssetsUpdatedIsNotUpdated()
-    {
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        try
-        {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
-            const string fileName = FileNames.NON_EXISTENT_IMAGE_PNG;
-            Dictionary<string, byte[]> blobToWrite = new()
-            {
-                { _asset1!.FileName, [1, 2, 3] },
-                { fileName, [4, 5, 6] }
-            };
-
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath);
-
-            _asset1 = _asset1!.WithFolder(addedFolder1);
-
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            _database!.WriteBlob(blobToWrite, _asset1!.Folder.BlobFileName);
-
-            Asset? assetDeleted = _testableAssetRepository!.DeleteAsset(folderPath, _asset1!.FileName);
-
-            Assert.That(assetDeleted, Is.Null);
-
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath].ContainsKey(fileName), Is.True);
-            Assert.That(thumbnails[folderPath][fileName], Is.EqualTo(blobToWrite[fileName]));
-
-            assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Is.Empty);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            Assert.That(assetsUpdatedEvents, Is.Empty);
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -326,52 +245,40 @@ public class AssetRepositoryDeleteAssetTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
 
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
             string? folderPath2 = null;
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
+            Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                _testableAssetRepository!.DeleteAsset(folderPath2!, _asset1.FileName));
+                _assetRepository!.DeleteAsset(folderPath2!, _asset1.FileName));
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
-
-            assets = _testableAssetRepository!.GetCataloguedAssets();
+            assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Not.Empty);
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -380,7 +287,6 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -390,53 +296,41 @@ public class AssetRepositoryDeleteAssetTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
 
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
             string? assetFileName = null;
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
+            Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-                List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-                Assert.That(assets, Has.Count.EqualTo(1));
+                Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+                Asset[] assets = _assetRepository!.GetCataloguedAssets();
+                Assert.That(assets, Has.Length.EqualTo(1));
                 Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
-
-                Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-                Assert.That(thumbnails, Has.Count.EqualTo(1));
-                Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-                Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-                Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-                Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
                 ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-                    _testableAssetRepository!.DeleteAsset(folderPath1, assetFileName!));
+                    _assetRepository!.DeleteAsset(folderPath1, assetFileName!));
 
                 Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
-                Assert.That(thumbnails, Has.Count.EqualTo(1));
-                Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-                Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-                Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-                Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
-                assets = _testableAssetRepository!.GetCataloguedAssets();
+                assets = _assetRepository!.GetCataloguedAssets();
                 Assert.That(assets, Is.Not.Empty);
-                Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+                Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -447,30 +341,28 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void DeleteAsset_FolderAndAssetDoNotExist_ReturnsNullAndHasChangesIsFalseAndAssetsUpdatedIsNotUpdated()
+    public void DeleteAsset_FolderAndAssetDoNotExist_ReturnsNullAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
 
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            Asset? assetDeleted = _testableAssetRepository!.DeleteAsset(folderPath1, FileNames.NON_EXISTENT_FILE_JPG);
+            Asset? assetDeleted = _assetRepository!.DeleteAsset(folderPath1, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(assetDeleted, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -478,7 +370,6 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -488,34 +379,26 @@ public class AssetRepositoryDeleteAssetTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
-            _testableAssetRepository!.AddFolder(folderPath2);
+            Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
+            _assetRepository!.AddFolder(folderPath2);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
-            List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.True);
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+            Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets.FirstOrDefault()?.FileName, Is.EqualTo(_asset1.FileName));
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.False);
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData));
 
             Asset? assetDeleted1 = null;
             Asset? assetDeleted2 = null;
@@ -524,11 +407,11 @@ public class AssetRepositoryDeleteAssetTests
             Parallel.Invoke(
                 () =>
                 {
-                    assetDeleted1 = _testableAssetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
+                    assetDeleted1 = _assetRepository!.DeleteAsset(folderPath1, _asset1.FileName);
                 },
                 () =>
                 {
-                    assetDeleted2 = _testableAssetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG);
+                    assetDeleted2 = _assetRepository!.DeleteAsset(folderPath2, FileNames.NON_EXISTENT_FILE_JPG);
                 }
             );
 
@@ -539,12 +422,9 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetDeleted2, Is.Null);
 
-            Assert.That(thumbnails, Is.Empty);
-
-            assets = _testableAssetRepository!.GetCataloguedAssets();
+            assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
-            Assert.That(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
+            Assert.That(_assetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -554,7 +434,6 @@ public class AssetRepositoryDeleteAssetTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

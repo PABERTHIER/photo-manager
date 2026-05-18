@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels;

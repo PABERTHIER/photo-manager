@@ -14,12 +14,10 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryDeleteFolderTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
-    private TestableAssetRepository? _testableAssetRepository;
-    private PhotoManager.Infrastructure.Database.Database? _database;
+    private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
     private TestLogger<AssetRepository>? _testLogger;
 
@@ -31,30 +29,31 @@ public class AssetRepositoryDeleteFolderTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService, imageMetadataService,
+            _userConfigurationService, sqlitePersistenceContext, _testLogger);
 
         _asset1 = new()
         {
@@ -86,6 +85,8 @@ public class AssetRepositoryDeleteFolderTests
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -94,69 +95,37 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         try
         {
             Directory.CreateDirectory(folderPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            bool isContainingThumbnail =
-                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
-
-            Assert.That(isContainingThumbnail, Is.True);
-
-            _testableAssetRepository
-                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
+            _assetRepository!.DeleteFolder(_asset1!.Folder);
 
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.True);
+            Folder[] folders = _assetRepository!.GetFolders();
 
-            _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
-
-            Folder[] folders = _testableAssetRepository!.GetFolders();
-
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -167,55 +136,31 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         try
         {
             Directory.CreateDirectory(folderPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            _testableAssetRepository
-                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
+            _assetRepository!.DeleteFolder(_asset1!.Folder);
 
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
+            Folder[] folders = _assetRepository!.GetFolders();
 
-            _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
-
-            Folder[] folders = _testableAssetRepository!.GetFolders();
-
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -226,114 +171,24 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
-
-        try
-        {
-            Directory.CreateDirectory(folderPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-
-            _asset1 = _asset1!.WithFolder(folder);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            bool isContainingThumbnail =
-                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
-
-            Assert.That(isContainingThumbnail, Is.False);
-
-            _testableAssetRepository
-                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            Assert.That(assetsUpdatedEvents, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path], Is.Empty);
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.True);
-
-            _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
-
-            Folder[] folders = _testableAssetRepository!.GetFolders();
-
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
-            Assert.That(folders.Contains(_asset1!.Folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            Assert.That(assetsUpdatedEvents, Is.Empty);
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
-
-            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            Directory.Delete(folderPath, true);
-            assetsUpdatedSubscription.Dispose();
-        }
-    }
-
-    [Test]
-    public void DeleteFolder_FolderExistsNoThumbnailsButBinExists_RemovesFolderAndBinFile()
-    {
-        List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
-
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         try
         {
             Directory.CreateDirectory(folderPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            _testableAssetRepository
-                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
+            _assetRepository!.DeleteFolder(_asset1!.Folder);
 
-            _database!.WriteBlob([], _asset1!.Folder.BlobFileName);
+            Folder[] folders = _assetRepository!.GetFolders();
 
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.True);
-
-            _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
-
-            Folder[] folders = _testableAssetRepository!.GetFolders();
-
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -341,7 +196,6 @@ public class AssetRepositoryDeleteFolderTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -352,9 +206,9 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         try
         {
@@ -366,30 +220,18 @@ public class AssetRepositoryDeleteFolderTests
                 Id = Guid.NewGuid(),
             };
 
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
+            _assetRepository!.DeleteFolder(folder);
 
-            _testableAssetRepository!.DeleteFolder(folder);
-
-            Folder[] folders = _testableAssetRepository!.GetFolders();
+            Folder[] folders = _assetRepository!.GetFolders();
 
             Assert.That(folders.Contains(folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -400,7 +242,7 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -410,7 +252,7 @@ public class AssetRepositoryDeleteFolderTests
             using (Assert.EnterMultipleScope())
             {
                 NullReferenceException? exception =
-                    Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
+                    Assert.Throws<NullReferenceException>(() => _assetRepository!.DeleteFolder(folder!));
 
                 Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
 
@@ -422,7 +264,6 @@ public class AssetRepositoryDeleteFolderTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -432,74 +273,42 @@ public class AssetRepositoryDeleteFolderTests
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
-            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
-        string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
 
         try
         {
             Directory.CreateDirectory(folderPath);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
 
             byte[] assetData = [];
 
-            _testableAssetRepository!.AddAsset(_asset1!, assetData);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
-
-            bool isContainingThumbnail =
-                _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
-
-            Assert.That(isContainingThumbnail, Is.True);
-
-            _testableAssetRepository
-                .SaveCatalog(_asset1!.Folder); // SaveThumbnails, write blob file, reset hasChanges to false
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.True);
 
             // Simulate concurrent access
             Parallel.Invoke(
-                () => _testableAssetRepository!.DeleteFolder(_asset1!.Folder),
-                () => _testableAssetRepository!.DeleteFolder(_asset1!.Folder),
-                () => _testableAssetRepository!.DeleteFolder(_asset1!.Folder)
+                () => _assetRepository!.DeleteFolder(_asset1!.Folder),
+                () => _assetRepository!.DeleteFolder(_asset1!.Folder),
+                () => _assetRepository!.DeleteFolder(_asset1!.Folder)
             );
 
-            Folder[] folders = _testableAssetRepository!.GetFolders();
+            Folder[] folders = _assetRepository!.GetFolders();
 
-            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            Assert.That(
-                File.Exists(Path.Combine(_databasePath!,
-                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
-                    folder.BlobFileName)), Is.False);
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(folderPath, true);
             assetsUpdatedSubscription.Dispose();
         }

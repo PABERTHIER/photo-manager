@@ -1,4 +1,4 @@
-using ImageMagick;
+﻿using ImageMagick;
 using Microsoft.Extensions.Logging;
 
 namespace PhotoManager.Common;

@@ -12,7 +12,7 @@ You are tasked with refactoring: $ARGUMENTS
 Follow this workflow in order:
 
 1. **Understand current state**: Read all code involved in the refactoring. Map dependencies
-   and understand the call chain across layers (UI → Application → Domain ← Infrastructure).
+   and understand the call chain across layers (UI → Application → Domain ← Infrastructure ← Persistence).
 
 2. **Verify test coverage**: Before changing anything, check that tests exist for the code
    being refactored. If tests are missing, write them first to lock in current behavior.

@@ -1,37 +1,16 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
-
-namespace PhotoManager.Tests.Unit.Infrastructure;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure;
 
 [TestFixture]
 public class PathProviderServiceTests
 {
-    private string? _dataDirectory;
-
-    [OneTimeSetUp]
-    public void OneTimeSetUp()
-    {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-    }
-
     [Test]
-    [TestCase("1.0", "v1.0")]
-    [TestCase("1.1", "v1.1")]
-    [TestCase("2.0", "v2.0")]
-    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion,
-        string storageVersionPath)
+    public void ResolveDatabaseDirectory_ReturnsPathRelativeToBaseDirectory()
     {
-        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
-        configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.STORAGE_VERSION, storageVersion);
+        PathProviderService pathProviderService = new();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
-        PathProviderService pathProviderService = new(userConfigurationService);
+        string result = pathProviderService.ResolveDatabaseDirectory();
 
-        string expected = Path.Combine(userConfigurationService.PathSettings.BackupPath, storageVersionPath);
-
-        string result = pathProviderService.ResolveDataDirectory();
-
+        string expected = Path.Combine(AppContext.BaseDirectory, "Database");
         Assert.That(string.IsNullOrWhiteSpace(result), Is.False);
         Assert.That(result, Is.EqualTo(expected));
     }

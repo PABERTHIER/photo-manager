@@ -61,21 +61,11 @@ public class FileOperationsServiceBenchmarks
             ["appsettings:Hash:UsingMD5Hash"] = "false",
             ["appsettings:Hash:UsingPHash"] = "false",
             ["appsettings:Paths:AssetsDirectory"] = _testDirectory,
-            ["appsettings:Paths:BackupPath"] = Path.Combine(_testDirectory, "Backup"),
             ["appsettings:Paths:ExemptedFolderPath"] = Path.Combine(_testDirectory, "Exempted"),
             ["appsettings:Paths:FirstFrameVideosFolderName"] = "VideoFirstFrame",
             ["appsettings:Project:Name"] = "PhotoManager",
             ["appsettings:Project:Owner"] = "Test",
             ["appsettings:Storage:BackupsToKeep"] = "2",
-            ["appsettings:Storage:FoldersName:Blobs"] = "blobs",
-            ["appsettings:Storage:FoldersName:Tables"] = "tables",
-            ["appsettings:Storage:Separator"] = "|",
-            ["appsettings:Storage:StorageVersion"] = "1.0",
-            ["appsettings:Storage:Tables:AssetsTableName"] = "Assets",
-            ["appsettings:Storage:Tables:FoldersTableName"] = "Folders",
-            ["appsettings:Storage:Tables:RecentTargetPathsTableName"] = "RecentTargetPaths",
-            ["appsettings:Storage:Tables:SyncAssetsDirectoriesDefinitionsTableName"] =
-                "SyncAssetsDirectoriesDefinitions",
             ["appsettings:Storage:ThumbnailsDictionaryEntriesToKeep"] = "5"
         };
 

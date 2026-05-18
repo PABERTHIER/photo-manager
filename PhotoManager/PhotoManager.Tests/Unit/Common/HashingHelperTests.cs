@@ -11,14 +11,14 @@ namespace PhotoManager.Tests.Unit.Common;
 [TestFixture]
 public class HashingHelperTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     private TestLogger<HashingHelperTests>? _testLogger;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [SetUp]
@@ -44,7 +44,7 @@ public class HashingHelperTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC)]
     public void CalculateHash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = HashingHelper.CalculateHash(imageBytes);
@@ -95,7 +95,7 @@ public class HashingHelperTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, PHashes.IMAGE_11_90_DEG_HEIC)]
     public void CalculatePHash_ValidImagePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
 
         string? phash = HashingHelper.CalculatePHash(filePath, _testLogger!);
 
@@ -109,7 +109,7 @@ public class HashingHelperTests
     [Test]
     public void CalculatePHash_ImageDoesNotExist_LogsItAndReturnsNull()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
         string? phash = HashingHelper.CalculatePHash(filePath, _testLogger!);
 
@@ -123,12 +123,12 @@ public class HashingHelperTests
     [Test]
     public void CalculatePHash_ImagePathIsInvalid_ReturnsNull()
     {
-        string? phash = HashingHelper.CalculatePHash(_dataDirectory!, _testLogger!);
+        string? phash = HashingHelper.CalculatePHash(_assetsDirectory!, _testLogger!);
 
         Assert.That(phash, Is.Null);
 
         _testLogger!.AssertLogExceptions(
-            [new MagickBlobErrorException($"MagickImage is unable to open image {_dataDirectory}.")],
+            [new MagickBlobErrorException($"MagickImage is unable to open image {_assetsDirectory}.")],
             typeof(HashingHelperTests));
     }
 
@@ -172,7 +172,7 @@ public class HashingHelperTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, DHashes.IMAGE_11_90_DEG_HEIC)]
     public void CalculateDHash_ValidImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
 
         string dHash = HashingHelper.CalculateDHash(filePath);
 
@@ -188,7 +188,7 @@ public class HashingHelperTests
     [TestCase(FileNames.IMAGE_11_HEIC, DHashes.IMAGE_11_HEIC)]
     public void CalculateDHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
 
         string dHash = HashingHelper.CalculateDHash(filePath);
 
@@ -202,7 +202,7 @@ public class HashingHelperTests
     [Test]
     public void CalculateDHash_HeicImageDoesNotExist_ReturnsDefaultDHash()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
 
         string dHash = HashingHelper.CalculateDHash(filePath);
 
@@ -216,7 +216,7 @@ public class HashingHelperTests
     [Test]
     public void CalculateDHash_ImageDoesNotExist_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
 
@@ -229,7 +229,7 @@ public class HashingHelperTests
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory));
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_assetsDirectory));
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
 
@@ -260,7 +260,7 @@ public class HashingHelperTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, MD5Hashes.IMAGE_11_90_DEG_HEIC)]
     public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(_dataDirectory!, fileName);
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string md5Hash = HashingHelper.CalculateMD5Hash(imageBytes);

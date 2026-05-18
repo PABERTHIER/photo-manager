@@ -6,7 +6,7 @@ Refactor the following: ${input:target:What to refactor}
 
 Follow this workflow:
 
-1. **Understand**: Read all code involved. Map dependencies across layers (UI → Application → Domain ← Infrastructure).
+1. **Understand**: Read all code involved. Map dependencies across layers (UI → Application → Domain ← Infrastructure ← Persistence).
 2. **Verify test coverage**: If tests are missing for the code being changed, write them first.
 3. **Plan**: Identify changes needed while respecting Clean Architecture boundaries and dependency flow.
 4. **Apply changes incrementally**: After each change, build (`dotnet build PhotoManager/PhotoManager.slnx`) and run tests.

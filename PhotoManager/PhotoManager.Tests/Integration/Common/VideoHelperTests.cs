@@ -6,19 +6,19 @@ namespace PhotoManager.Tests.Integration.Common;
 [TestFixture]
 public class VideoHelperTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [Test]
     public void GetFirstFramePath_ExistingFile_ReturnsPathAndLogsItAndExtractsFirstFrame()
     {
         const string fileName = FileNames.HOMER_MP4;
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
         string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
@@ -29,12 +29,12 @@ public class VideoHelperTests
         {
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_assetsDirectory!, fileName, destinationPath,
                 logger);
 
             string[] messages =
             [
-                $"First frame extracted successfully for: {Path.Combine(_dataDirectory!, fileName)}",
+                $"First frame extracted successfully for: {Path.Combine(_assetsDirectory!, fileName)}",
                 $"First frame saved at: {firstFrameVideoPath}"
             ];
 
@@ -60,7 +60,7 @@ public class VideoHelperTests
         const string videoFileName = FileNames.HOMER_MP4;
         const string expectedFirstFrameVideoName = FileNames.HOMER_JPG;
 
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         TestLogger<VideoHelperTests> logger = new();
 
@@ -68,20 +68,20 @@ public class VideoHelperTests
         {
             Directory.CreateDirectory(destinationPath);
 
-            string sourceImagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string sourceImagePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
             File.Copy(sourceImagePath, expectedFirstFrameVideoPath);
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
 
-            string videoPath = Path.Combine(_dataDirectory!, videoFileName);
+            string videoPath = Path.Combine(_assetsDirectory!, videoFileName);
             Assert.That(File.Exists(videoPath), Is.True);
 
             string? firstFrameVideoPath =
-                VideoHelper.GetFirstFramePath(_dataDirectory!, videoFileName, destinationPath, logger);
+                VideoHelper.GetFirstFramePath(_assetsDirectory!, videoFileName, destinationPath, logger);
 
             Exception exception =
                 new(
-                    $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, videoFileName)}, Message: Output file already exists and overwrite is disabled");
+                    $"Failed to extract the first frame for: {Path.Combine(_assetsDirectory!, videoFileName)}, Message: Output file already exists and overwrite is disabled");
             Exception[] expectedExceptions = [exception];
 
             logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));
@@ -100,7 +100,7 @@ public class VideoHelperTests
     public void GetFirstFramePath_ExistingFileButLessThanOneSecond_ReturnsNullAndLogsItAndDoesNotExtractFirstFrame()
     {
         const string fileName = FileNames.HOMER_1_S_MP4; // Video that has less than 1 second
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         TestLogger<VideoHelperTests> logger = new();
 
@@ -109,12 +109,12 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_assetsDirectory!, fileName, destinationPath,
                 logger);
 
             Exception exception =
                 new(
-                    $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: FFmpeg failed to generate the first frame file due to its format or content.");
+                    $"Failed to extract the first frame for: {Path.Combine(_assetsDirectory!, fileName)}, Message: FFmpeg failed to generate the first frame file due to its format or content.");
             Exception[] expectedExceptions = [exception];
 
             logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));
@@ -133,7 +133,7 @@ public class VideoHelperTests
     public void GetFirstFramePath_NonExistingFile_ReturnsNullAndLogsItAndDoesNotExtractFirstFrame()
     {
         const string fileName = FileNames.NON_EXISTENT_VIDEO_MP4;
-        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
+        string destinationPath = Path.Combine(_assetsDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         TestLogger<VideoHelperTests> logger = new();
 
@@ -142,12 +142,12 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath,
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_assetsDirectory!, fileName, destinationPath,
                 logger);
 
             Exception exception =
                 new(
-                    $"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: Input file not found");
+                    $"Failed to extract the first frame for: {Path.Combine(_assetsDirectory!, fileName)}, Message: Input file not found");
             Exception[] expectedExceptions = [exception];
 
             logger.AssertLogExceptions(expectedExceptions, typeof(VideoHelperTests));

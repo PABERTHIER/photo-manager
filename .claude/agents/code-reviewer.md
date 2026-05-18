@@ -14,8 +14,8 @@ When reviewing code, check for:
 
 ## Architecture
 
-- Clean Architecture boundaries: Domain must NOT depend on Infrastructure or UI
-- Dependency flow: UI → Application → Domain ← Infrastructure
+- Clean Architecture boundaries: Domain must NOT depend on Infrastructure, Persistence, or UI
+- Dependency flow: UI → Application → Domain ← Infrastructure ← Persistence
 - Services registered in `{Layer}ServiceCollectionExtensions.cs`
 
 ## Code Quality

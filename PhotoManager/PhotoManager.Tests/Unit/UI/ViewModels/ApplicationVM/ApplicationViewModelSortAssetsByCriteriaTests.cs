@@ -15,11 +15,11 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelSortAssetsByCriteriaTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private ApplicationViewModel? _applicationViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -30,16 +30,15 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         Guid folderId = Guid.NewGuid();
 
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
@@ -64,7 +63,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
@@ -89,7 +88,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
@@ -114,7 +113,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
@@ -139,7 +138,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _assetsDirectory },
             FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
@@ -163,6 +162,13 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -180,33 +186,36 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
-            moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
-            imageProcessingService);
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
     }
 
@@ -218,7 +227,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     [TestCase(SortCriteria.ThumbnailCreationDateTime, true)]
     public void SortAssetsByCriteria_OneAsset_SortsByCriteria(SortCriteria sortCriteria, bool expectedSortAscending)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -226,73 +235,66 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset1!];
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+
+        string expectedAppTitle = sortCriteria switch
         {
-            CheckBeforeChanges(_dataDirectory!);
+            SortCriteria.FileName =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by file name descending",
+            SortCriteria.FileSize =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by file size ascending",
+            SortCriteria.FileCreationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by file creation ascending",
+            SortCriteria.FileModificationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by file modification ascending",
+            SortCriteria.ThumbnailCreationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by thumbnail creation ascending",
+            _ => $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by  ascending"
+        };
 
-            Asset[] assets = [_asset1!];
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            expectedSortAscending,
+            sortCriteria,
+            expectedAppTitle,
+            assets,
+            assets[0],
+            assets[0].Folder,
+            false);
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            string expectedAppTitle = sortCriteria switch
-            {
-                SortCriteria.FileName =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file name descending",
-                SortCriteria.FileSize =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file size ascending",
-                SortCriteria.FileCreationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file creation ascending",
-                SortCriteria.FileModificationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file modification ascending",
-                SortCriteria.ThumbnailCreationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by thumbnail creation ascending",
-                _ => $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by  ascending"
-            };
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            expectedSortAscending,
+            sortCriteria,
+            expectedAppTitle,
+            assets,
+            assets[0],
+            assets[0].Folder,
+            false);
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                expectedSortAscending,
-                sortCriteria,
-                expectedAppTitle,
-                assets,
-                assets[0],
-                assets[0].Folder,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedSortAscending,
-                sortCriteria,
-                expectedAppTitle,
-                assets,
-                assets[0],
-                assets[0].Folder,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SortAssetsByCriteria_MultiplesAssetsAndSortByFileName_SortsByFileName()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -300,95 +302,88 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
 
-            const SortCriteria sortCriteria = SortCriteria.FileName;
+        const SortCriteria sortCriteria = SortCriteria.FileName;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
-            Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+        Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Asset[] expectedAssetsUpdated = [_asset5!, _asset4!, _asset3!, _asset2!, _asset1!];
-            string expectedAppTitleUpdated =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
+        Asset[] expectedAssetsUpdated = [_asset5!, _asset4!, _asset3!, _asset2!, _asset1!];
+        string expectedAppTitleUpdated =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name descending";
 
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedAppTitleUpdated,
-                expectedAssetsUpdated,
-                expectedAssetsUpdated[0],
-                expectedAssetsUpdated[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedAppTitleUpdated,
+            expectedAssetsUpdated,
+            expectedAssetsUpdated[0],
+            expectedAssetsUpdated[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedAppTitleUpdated,
-                expectedAssetsUpdated,
-                expectedAssetsUpdated[0],
-                expectedAssetsUpdated[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedAppTitleUpdated,
+            expectedAssetsUpdated,
+            expectedAssetsUpdated[0],
+            expectedAssetsUpdated[0].Folder,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SortAssetsByCriteria_MultiplesAssetsAndMultiplesSortsByFileName_SortsByFileNameAscendingOrDescending()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -396,115 +391,108 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+
+        const SortCriteria sortCriteria = SortCriteria.FileName;
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+
+        Asset[] expectedAscendingAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
+        string expectedAscendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name ascending";
+
+        Asset[] expectedDescendingAssets = [_asset5!, _asset4!, _asset3!, _asset2!, _asset1!];
+        string expectedDescendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file name descending";
+
+        for (int i = 0; i < 10; i++)
         {
-            CheckBeforeChanges(_dataDirectory!);
+            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
-
-            const SortCriteria sortCriteria = SortCriteria.FileName;
-
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-
-            Asset[] expectedAscendingAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
-            string expectedAscendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
-
-            Asset[] expectedDescendingAssets = [_asset5!, _asset4!, _asset3!, _asset2!, _asset1!];
-            string expectedDescendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
-
-            for (int i = 0; i < 10; i++)
+            if (i % 2 == 0) // Descending
             {
-                _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
-
-                if (i % 2 == 0) // Descending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        false,
-                        sortCriteria,
-                        expectedDescendingAppTitle,
-                        expectedDescendingAssets,
-                        expectedDescendingAssets[0],
-                        expectedDescendingAssets[0].Folder,
-                        true);
-                }
-                else // Ascending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        true,
-                        sortCriteria,
-                        expectedAscendingAppTitle,
-                        expectedAscendingAssets,
-                        expectedAscendingAssets[0],
-                        expectedAscendingAssets[0].Folder,
-                        true);
-                }
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    false,
+                    sortCriteria,
+                    expectedDescendingAppTitle,
+                    expectedDescendingAssets,
+                    expectedDescendingAssets[0],
+                    expectedDescendingAssets[0].Folder,
+                    true);
             }
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAscendingAppTitle,
-                expectedAscendingAssets,
-                expectedAscendingAssets[0],
-                expectedAscendingAssets[0].Folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            else // Ascending
+            {
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    true,
+                    sortCriteria,
+                    expectedAscendingAppTitle,
+                    expectedAscendingAssets,
+                    expectedAscendingAssets[0],
+                    expectedAscendingAssets[0].Folder,
+                    true);
+            }
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAscendingAppTitle,
+            expectedAscendingAssets,
+            expectedAscendingAssets[0],
+            expectedAscendingAssets[0].Folder,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SortAssetsByCriteria_MultiplesAssetsAndSortByFileSize_SortsByFileSizeAndThenByFileName()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -512,64 +500,57 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
 
-            const SortCriteria sortCriteria = SortCriteria.FileSize;
+        const SortCriteria sortCriteria = SortCriteria.FileSize;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
+        Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file size ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SortAssetsByCriteria_MultiplesAssetsAndMultiplesSortsByFileSize_SortsByFileSizeAscendingOrDescending()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -577,116 +558,109 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+
+        const SortCriteria sortCriteria = SortCriteria.FileSize;
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+
+        Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAscendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file size ascending";
+
+        Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
+        string expectedDescendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file size descending";
+
+        for (int i = 0; i < 10; i++)
         {
-            CheckBeforeChanges(_dataDirectory!);
+            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
-
-            const SortCriteria sortCriteria = SortCriteria.FileSize;
-
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-
-            Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAscendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
-
-            Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
-            string expectedDescendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file size descending";
-
-            for (int i = 0; i < 10; i++)
+            if (i % 2 == 0) // Ascending
             {
-                _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
-
-                if (i % 2 == 0) // Ascending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        true,
-                        sortCriteria,
-                        expectedAscendingAppTitle,
-                        expectedAscendingAssets,
-                        expectedAscendingAssets[0],
-                        expectedAscendingAssets[0].Folder,
-                        true);
-                }
-                else // Descending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        false,
-                        sortCriteria,
-                        expectedDescendingAppTitle,
-                        expectedDescendingAssets,
-                        expectedDescendingAssets[0],
-                        expectedDescendingAssets[0].Folder,
-                        true);
-                }
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    true,
+                    sortCriteria,
+                    expectedAscendingAppTitle,
+                    expectedAscendingAssets,
+                    expectedAscendingAssets[0],
+                    expectedAscendingAssets[0].Folder,
+                    true);
             }
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedDescendingAppTitle,
-                expectedDescendingAssets,
-                expectedDescendingAssets[0],
-                expectedDescendingAssets[0].Folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            else // Descending
+            {
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    false,
+                    sortCriteria,
+                    expectedDescendingAppTitle,
+                    expectedDescendingAssets,
+                    expectedDescendingAssets[0],
+                    expectedDescendingAssets[0].Folder,
+                    true);
+            }
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedDescendingAppTitle,
+            expectedDescendingAssets,
+            expectedDescendingAssets[0],
+            expectedDescendingAssets[0].Folder,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndSortByFileCreationDateTime_SortsByFileCreationDateTimeAndThenByFileName()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -694,65 +668,58 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
 
-            const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
+        const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
+        Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file creation ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndMultiplesSortsByFileCreationDateTime_SortsByFileCreationDateTimeAscendingOrDescending()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -760,116 +727,109 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+
+        const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+
+        Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAscendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file creation ascending";
+
+        Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
+        string expectedDescendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file creation descending";
+
+        for (int i = 0; i < 10; i++)
         {
-            CheckBeforeChanges(_dataDirectory!);
+            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
-
-            const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
-
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-
-            Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAscendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
-
-            Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
-            string expectedDescendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file creation descending";
-
-            for (int i = 0; i < 10; i++)
+            if (i % 2 == 0) // Ascending
             {
-                _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
-
-                if (i % 2 == 0) // Ascending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        true,
-                        sortCriteria,
-                        expectedAscendingAppTitle,
-                        expectedAscendingAssets,
-                        expectedAscendingAssets[0],
-                        expectedAscendingAssets[0].Folder,
-                        true);
-                }
-                else // Descending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        false,
-                        sortCriteria,
-                        expectedDescendingAppTitle,
-                        expectedDescendingAssets,
-                        expectedDescendingAssets[0],
-                        expectedDescendingAssets[0].Folder,
-                        true);
-                }
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    true,
+                    sortCriteria,
+                    expectedAscendingAppTitle,
+                    expectedAscendingAssets,
+                    expectedAscendingAssets[0],
+                    expectedAscendingAssets[0].Folder,
+                    true);
             }
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedDescendingAppTitle,
-                expectedDescendingAssets,
-                expectedDescendingAssets[0],
-                expectedDescendingAssets[0].Folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            else // Descending
+            {
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    false,
+                    sortCriteria,
+                    expectedDescendingAppTitle,
+                    expectedDescendingAssets,
+                    expectedDescendingAssets[0],
+                    expectedDescendingAssets[0].Folder,
+                    true);
+            }
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedDescendingAppTitle,
+            expectedDescendingAssets,
+            expectedDescendingAssets[0],
+            expectedDescendingAssets[0].Folder,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndSortByFileModificationDateTime_SortsByFileModificationDateTimeAndThenByFileName()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -877,65 +837,58 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
 
-            const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
+        const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
+        Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file modification ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndMultiplesSortsByFileModificationDateTime_SortsByFileModificationDateTimeAscendingOrDescending()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -943,116 +896,109 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+
+        const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+
+        Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAscendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file modification ascending";
+
+        Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
+        string expectedDescendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by file modification descending";
+
+        for (int i = 0; i < 10; i++)
         {
-            CheckBeforeChanges(_dataDirectory!);
+            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
-
-            const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
-
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-
-            Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAscendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
-
-            Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
-            string expectedDescendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file modification descending";
-
-            for (int i = 0; i < 10; i++)
+            if (i % 2 == 0) // Ascending
             {
-                _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
-
-                if (i % 2 == 0) // Ascending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        true,
-                        sortCriteria,
-                        expectedAscendingAppTitle,
-                        expectedAscendingAssets,
-                        expectedAscendingAssets[0],
-                        expectedAscendingAssets[0].Folder,
-                        true);
-                }
-                else // Descending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        false,
-                        sortCriteria,
-                        expectedDescendingAppTitle,
-                        expectedDescendingAssets,
-                        expectedDescendingAssets[0],
-                        expectedDescendingAssets[0].Folder,
-                        true);
-                }
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    true,
+                    sortCriteria,
+                    expectedAscendingAppTitle,
+                    expectedAscendingAssets,
+                    expectedAscendingAssets[0],
+                    expectedAscendingAssets[0].Folder,
+                    true);
             }
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedDescendingAppTitle,
-                expectedDescendingAssets,
-                expectedDescendingAssets[0],
-                expectedDescendingAssets[0].Folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            else // Descending
+            {
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    false,
+                    sortCriteria,
+                    expectedDescendingAppTitle,
+                    expectedDescendingAssets,
+                    expectedDescendingAssets[0],
+                    expectedDescendingAssets[0].Folder,
+                    true);
+            }
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedDescendingAppTitle,
+            expectedDescendingAssets,
+            expectedDescendingAssets[0],
+            expectedDescendingAssets[0].Folder,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndSortByThumbnailCreationDateTime_SortsByThumbnailCreationDateTimeAndThenByFileName()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1060,65 +1006,58 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
 
-            const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
+        const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
+        Asset[] expectedAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                sortCriteria,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            sortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedAssets[0],
+            expectedAssets[0].Folder,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void
         SortAssetsByCriteria_MultiplesAssetsAndMultiplesSortsByThumbnailCreationDateTime_SortsByThumbnailCreationDateTimeAscendingOrDescending()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1126,109 +1065,102 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
+
+        const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+
+        Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
+        string expectedAscendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
+
+        Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
+        string expectedDescendingAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 5 - sorted by thumbnail creation descending";
+
+        for (int i = 0; i < 10; i++)
         {
-            CheckBeforeChanges(_dataDirectory!);
+            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Asset[] assets = [_asset5!, _asset2!, _asset1!, _asset3!, _asset4!];
-
-            const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
-
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-
-            Asset[] expectedAscendingAssets = [_asset3!, _asset1!, _asset4!, _asset2!, _asset5!];
-            string expectedAscendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
-
-            Asset[] expectedDescendingAssets = [_asset5!, _asset2!, _asset4!, _asset1!, _asset3!];
-            string expectedDescendingAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation descending";
-
-            for (int i = 0; i < 10; i++)
+            if (i % 2 == 0) // Ascending
             {
-                _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
-
-                if (i % 2 == 0) // Ascending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        true,
-                        sortCriteria,
-                        expectedAscendingAppTitle,
-                        expectedAscendingAssets,
-                        expectedAscendingAssets[0],
-                        expectedAscendingAssets[0].Folder,
-                        true);
-                }
-                else // Descending
-                {
-                    CheckAfterChanges(
-                        _applicationViewModel!,
-                        _dataDirectory!,
-                        false,
-                        sortCriteria,
-                        expectedDescendingAppTitle,
-                        expectedDescendingAssets,
-                        expectedDescendingAssets[0],
-                        expectedDescendingAssets[0].Folder,
-                        true);
-                }
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    true,
+                    sortCriteria,
+                    expectedAscendingAppTitle,
+                    expectedAscendingAssets,
+                    expectedAscendingAssets[0],
+                    expectedAscendingAssets[0].Folder,
+                    true);
             }
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                false,
-                sortCriteria,
-                expectedDescendingAppTitle,
-                expectedDescendingAssets,
-                expectedDescendingAssets[0],
-                expectedDescendingAssets[0].Folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            else // Descending
+            {
+                CheckAfterChanges(
+                    _applicationViewModel!,
+                    _assetsDirectory!,
+                    false,
+                    sortCriteria,
+                    expectedDescendingAppTitle,
+                    expectedDescendingAssets,
+                    expectedDescendingAssets[0],
+                    expectedDescendingAssets[0].Folder,
+                    true);
+            }
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            false,
+            sortCriteria,
+            expectedDescendingAppTitle,
+            expectedDescendingAssets,
+            expectedDescendingAssets[0],
+            expectedDescendingAssets[0].Folder,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1240,7 +1172,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     public void SortAssetsByCriteria_NoCataloguedAssets_DoesNothing(SortCriteria sortCriteria,
         bool expectedSortAscending)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1248,74 +1180,67 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        Asset[] assets = [];
+
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
+        _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+
+        string expectedAppTitle = sortCriteria switch
         {
-            CheckBeforeChanges(_dataDirectory!);
+            SortCriteria.FileName =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file name descending",
+            SortCriteria.FileSize =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file size ascending",
+            SortCriteria.FileCreationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file creation ascending",
+            SortCriteria.FileModificationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by file modification ascending",
+            SortCriteria.ThumbnailCreationDateTime =>
+                $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by thumbnail creation ascending",
+            _ => $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 0 of 0 - sorted by  ascending"
+        };
 
-            Asset[] assets = [];
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            expectedSortAscending,
+            sortCriteria,
+            expectedAppTitle,
+            [],
+            null,
+            null!,
+            false);
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
-            _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+        // SetAssets
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        // SortAssetsByCriteria
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
-            string expectedAppTitle = sortCriteria switch
-            {
-                SortCriteria.FileName =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name descending",
-                SortCriteria.FileSize =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file size ascending",
-                SortCriteria.FileCreationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file creation ascending",
-                SortCriteria.FileModificationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file modification ascending",
-                SortCriteria.ThumbnailCreationDateTime =>
-                    $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by thumbnail creation ascending",
-                _ => $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by  ascending"
-            };
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            expectedSortAscending,
+            sortCriteria,
+            expectedAppTitle,
+            [],
+            null,
+            null!,
+            false);
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                expectedSortAscending,
-                sortCriteria,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // SortAssetsByCriteria
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedSortAscending,
-                sortCriteria,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SortAssetsByCriteria_InvalidSortCriteria_ThrowsArgumentOutOfRangeException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -1323,59 +1248,52 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            Asset[] assets = [_asset1!];
-            const SortCriteria invalidSortCriteria = (SortCriteria)999;
+        Asset[] assets = [_asset1!];
+        const SortCriteria invalidSortCriteria = (SortCriteria)999;
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+        _applicationViewModel!.SetAssets(_assetsDirectory!, assets);
 
-            ArgumentOutOfRangeException? exception =
-                Assert.Throws<ArgumentOutOfRangeException>(() =>
-                    _applicationViewModel!.SortAssetsByCriteria(invalidSortCriteria));
+        ArgumentOutOfRangeException? exception =
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                _applicationViewModel!.SortAssetsByCriteria(invalidSortCriteria));
 
-            Assert.That(exception?.Message, Is.EqualTo($"Unknown sort criteria (Parameter '{nameof(SortCriteria)}')"));
+        Assert.That(exception?.Message, Is.EqualTo($"Unknown sort criteria (Parameter '{nameof(SortCriteria)}')"));
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {_assetsDirectory} - image 1 of 1 - sorted by file name ascending";
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                true,
-                invalidSortCriteria,
-                expectedAppTitle,
-                assets,
-                assets[0],
-                assets[0].Folder,
-                false);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            _assetsDirectory!,
+            true,
+            invalidSortCriteria,
+            expectedAppTitle,
+            assets,
+            assets[0],
+            assets[0].Folder,
+            false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                true,
-                invalidSortCriteria,
-                expectedAppTitle,
-                assets,
-                assets[0],
-                assets[0].Folder,
-                false);
+        CheckInstance(
+            applicationViewModelInstances,
+            _assetsDirectory!,
+            true,
+            invalidSortCriteria,
+            expectedAppTitle,
+            assets,
+            assets[0],
+            assets[0].Folder,
+            false);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

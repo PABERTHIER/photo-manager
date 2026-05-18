@@ -2,14 +2,11 @@
 
 public static class Constants
 {
-    public const string DATABASE_END_PATH = "v1.0";
-    public const char SEMICOLON_SEPARATOR = ';';
-    public const string VERSION = "v1.9.0";
+    public const string DATABASE_BACKUP_END_PATH = "Backups";
+    public const string VERSION = "v2.0.0";
 
     public static class Directories
     {
-        public const string BLOBS = "Blobs";
-        public const string TABLES = "Tables";
         public const string TEST_FILES = "TestFiles";
         public const string TEST_FOLDER = "TestFolder";
         public const string IMAGE_CONVERTED = "ImageConverted";
@@ -19,8 +16,6 @@ public static class Constants
         public const string FOLDER_2 = "Folder2";
         public const string NEW_FOLDER_2 = "NewFolder2";
         public const string DATABASE_TESTS = "DatabaseTests";
-        public const string DATABASE_TESTS_BACKUPS = "DatabaseTests_Backups";
-        public const string TEST_BACKUP = "TestBackup";
 
         public const string NON_EXISTENT_FOLDER = "NonExistentFolder";
     }
@@ -34,9 +29,7 @@ public static class Constants
         public const string IMAGE_1_90_DEG_JPG = "Image 1_90_deg.jpg";
         public const string IMAGE_1_180_DEG_JPG = "Image 1_180_deg.jpg";
         public const string IMAGE_1_270_DEG_JPG = "Image 1_270_deg.jpg";
-        public const string IMAGE1_JPG = "Image1.jpg";
         public const string IMAGE_2_JPG = "Image 2.jpg";
-        public const string IMAGE_2_PNG = "Image2.png";
         public const string IMAGE_3_JPG = "Image 3.jpg";
         public const string IMAGE_4_JPG = "Image 4.jpg";
         public const string IMAGE_5_JPG = "Image 5.jpg";

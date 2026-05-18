@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Microsoft.Data.Sqlite;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using Reactive = System.Reactive;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
@@ -6,9 +7,9 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryWriteBackupTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
+    private string? _backupsDirectory;
 
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
@@ -19,35 +20,39 @@ public class AssetRepositoryWriteBackupTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+        _backupsDirectory = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -60,7 +65,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupsDirectory!, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -70,7 +75,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupsDirectory!).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -79,7 +84,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -89,18 +93,20 @@ public class AssetRepositoryWriteBackupTests
     {
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP,
-            "0"); // 0 backups, so that, the new created is directly deleted
+        // 0 backups, so that, the new created is directly deleted
+        configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0");
 
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(configurationRootMock);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger!);
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -108,7 +114,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupsDirectory!, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(assetRepository.BackupExists(), Is.False);
@@ -118,7 +124,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(assetRepository.BackupExists(), Is.False);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupsDirectory!).Length;
             Assert.That(filesInBackupDirectory, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -127,7 +133,7 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -141,7 +147,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupsDirectory!, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -152,7 +158,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupsDirectory!).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -161,45 +167,51 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void WriteBackup_DatabaseThrowsException_LogsItAndThrowsException()
+    public void WriteBackup_DatabaseThrowsException_LogsItAndThrowsSqliteException()
     {
+        SqliteException expectedException = new("SQLite Error 14: 'unable to open database file'.", 14);
+
+        ISqliteBackupService backupServiceMock = Substitute.For<ISqliteBackupService>();
+        backupServiceMock.WriteBackup(Arg.Any<string>()).Throws(expectedException);
+
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, backupServiceMock, new TestLogger<SqlitePersistenceContext>());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        FileOperationsService fileOperationsService = new(userConfigurationService,
+            new TestLogger<FileOperationsService>());
+        ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
+        TestLogger<AssetRepository> testLogger = new();
+        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, testLogger);
+
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
-            DirectoryNotFoundException expectedException =
-                new($"Could not find a part of the path '{backupFilePath}'.");
-
-            Directory.Delete(_databaseDirectory!, true);
-
             using (Assert.EnterMultipleScope())
             {
-                DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
-                    _assetRepository!.WriteBackup());
+                SqliteException? exception = Assert.Throws<SqliteException>(assetRepository.WriteBackup);
+
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
 
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
-                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
-                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+                testLogger.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }
         finally
         {
-            if (Directory.Exists(_databaseDirectory!))
-            {
-                Directory.Delete(_databaseDirectory!, true);
-            }
-
+            assetRepository.Dispose();
             assetsUpdatedSubscription.Dispose();
+            testLogger.LoggingAssertTearDown();
         }
     }
 
@@ -212,7 +224,7 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(_databasePath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupsDirectory!, backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.That(File.Exists(backupFilePath), Is.False);
             Assert.That(_assetRepository!.BackupExists(), Is.False);
@@ -227,7 +239,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(File.Exists(backupFilePath), Is.True);
             Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupsDirectory!).Length;
             Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
@@ -236,7 +248,6 @@ public class AssetRepositoryWriteBackupTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

@@ -10,7 +10,7 @@ You are refactoring PhotoManager code. Preserve all existing behavior.
 Follow this workflow in order:
 
 1. **Understand**: Read all code involved. Map dependencies across layers
-   (UI → Application → Domain ← Infrastructure).
+   (UI → Application → Domain ← Infrastructure ← Persistence).
 
 2. **Verify coverage**: Before changing anything, check that tests exist for the code being
    refactored. Write missing tests first to lock in current behavior.

@@ -20,13 +20,12 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 public class MainWindowRefreshAssetsCounterTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -38,9 +37,8 @@ public class MainWindowRefreshAssetsCounterTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -177,6 +175,8 @@ public class MainWindowRefreshAssetsCounterTests
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
     }
@@ -205,31 +205,34 @@ public class MainWindowRefreshAssetsCounterTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -240,7 +243,7 @@ public class MainWindowRefreshAssetsCounterTests
     [Test]
     public async Task RefreshAssetsCounter_CataloguedAssets_RefreshesAssetsCounter()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -250,93 +253,86 @@ public class MainWindowRefreshAssetsCounterTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
+        CheckBeforeChanges(assetsDirectory);
 
-            MainWindowsInit();
+        MainWindowsInit();
 
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+        await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
-            const string expectedGlobalAssetsCounterWording = "Total number of assets: 4";
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+        const string expectedGlobalAssetsCounterWording = "Total number of assets: 4";
+        Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            RefreshAssetsCounter();
+        RefreshAssetsCounter();
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                _asset1,
-                true);
+        CheckAfterChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            expectedAssets,
+            expectedGlobalAssetsCounterWording,
+            _asset1,
+            true);
 
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                _asset1,
-                true,
-                _sourceFolder!);
+        CheckFolderNavigationViewModel(
+            _folderNavigationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            expectedAssets,
+            expectedGlobalAssetsCounterWording,
+            _asset1,
+            true,
+            _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            // CalculateGlobalAssetsCounter
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
+        // CatalogAssets + NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        // CalculateGlobalAssetsCounter
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("GlobalAssetsCounterWording"));
 
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                _asset1,
-                true);
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            expectedAssets,
+            expectedGlobalAssetsCounterWording,
+            _asset1,
+            true);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public async Task RefreshAssetsCounter_NoCataloguedAssets_RefreshesAssetsCounter()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -406,7 +402,6 @@ public class MainWindowRefreshAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }

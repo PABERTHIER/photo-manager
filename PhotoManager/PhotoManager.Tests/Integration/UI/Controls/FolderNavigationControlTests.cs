@@ -12,27 +12,27 @@ namespace PhotoManager.Tests.Integration.UI.Controls;
 [TestFixture]
 public class FolderNavigationControlTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     private event EventHandler? FolderSelected;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _folderNavigationViewModel = null;
     }
 
@@ -53,31 +53,34 @@ public class FolderNavigationControlTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -86,8 +89,8 @@ public class FolderNavigationControlTests
     [Test]
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsNotSameAsSource_UpdatesSelectedPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
             Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -100,52 +103,45 @@ public class FolderNavigationControlTests
 
         List<EventArgs> notifyFolderSelectedEvents = NotifyFolderSelected();
 
-        try
-        {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
 
-            CheckBeforeChanges(assetsDirectory, null, folder1, []);
+        CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
-            // First SelectedItemChanged
-            string newSelectedPath = SelectedItemChanged(folder2);
+        // First SelectedItemChanged
+        string newSelectedPath = SelectedItemChanged(folder2);
 
-            Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            // Second SelectedItemChanged
-            newSelectedPath = SelectedItemChanged(folder1);
+        // Second SelectedItemChanged
+        newSelectedPath = SelectedItemChanged(folder1);
 
-            Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            Assert.That(applicationViewModelInstances, Is.Empty);
+        Assert.That(applicationViewModelInstances, Is.Empty);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
 
-            Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
-            Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
+        Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
     }
 
     [Test]
     public void FoldersTreeViewSelectedItemChanged_SelectedPathIsSameAsSource_UpdatesSelectedPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
             Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -158,44 +154,37 @@ public class FolderNavigationControlTests
 
         List<EventArgs> notifyFolderSelectedEvents = NotifyFolderSelected();
 
-        try
-        {
-            Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+        Folder folder1 = _testableAssetRepository!.AddFolder(assetsDirectory);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, folder1, []);
 
-            CheckBeforeChanges(assetsDirectory, null, folder1, []);
+        CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
-            // First SelectedItemChanged
-            string newSelectedPath = SelectedItemChanged(folder2);
+        // First SelectedItemChanged
+        string newSelectedPath = SelectedItemChanged(folder2);
 
-            Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            // Second SelectedItemChanged
-            newSelectedPath = SelectedItemChanged(folder1);
+        // Second SelectedItemChanged
+        newSelectedPath = SelectedItemChanged(folder1);
 
-            Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
-            CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
+        CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
-            Assert.That(applicationViewModelInstances, Is.Empty);
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(applicationViewModelInstances, Is.Empty);
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
 
-            Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
-            Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
-            Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(notifyFolderSelectedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyFolderSelectedEvents[0], Is.EqualTo(EventArgs.Empty));
+        Assert.That(notifyFolderSelectedEvents[1], Is.EqualTo(EventArgs.Empty));
     }
 
     private

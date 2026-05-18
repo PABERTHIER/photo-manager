@@ -6,9 +6,8 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetFoldersTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
@@ -19,35 +18,38 @@ public class AssetRepositoryGetFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
     }
 
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -59,8 +61,8 @@ public class AssetRepositoryGetFoldersTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
@@ -68,10 +70,8 @@ public class AssetRepositoryGetFoldersTests
             Folder[] folders = _assetRepository!.GetFolders();
 
             Assert.That(folders, Has.Length.EqualTo(2));
-            Assert.That(folders[0].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders[1].Path, Is.EqualTo(folderPath2));
-            Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
+            Assert.That(folders.Any(x => x.Path == folderPath1 && x.Id == addedFolder1.Id), Is.True);
+            Assert.That(folders.Any(x => x.Path == folderPath2 && x.Id == addedFolder2.Id), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -79,7 +79,6 @@ public class AssetRepositoryGetFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -102,7 +101,6 @@ public class AssetRepositoryGetFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -115,8 +113,8 @@ public class AssetRepositoryGetFoldersTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
@@ -133,22 +131,28 @@ public class AssetRepositoryGetFoldersTests
             );
 
             Assert.That(folders1, Has.Length.EqualTo(2));
-            Assert.That(folders1[0].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders1[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders1[1].Path, Is.EqualTo(folderPath2));
-            Assert.That(folders1[1].Id, Is.EqualTo(addedFolder2.Id));
+            Folder? firstFolder1 = folders1.FirstOrDefault(x => x.Path == folderPath1);
+            Folder? secondFolder1 = folders1.FirstOrDefault(x => x.Path == folderPath2);
+            Assert.That(firstFolder1, Is.Not.Null);
+            Assert.That(secondFolder1, Is.Not.Null);
+            Assert.That(firstFolder1!.Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(secondFolder1!.Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(folders2, Has.Length.EqualTo(2));
-            Assert.That(folders2[0].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders2[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders2[1].Path, Is.EqualTo(folderPath2));
-            Assert.That(folders2[1].Id, Is.EqualTo(addedFolder2.Id));
+            Folder? firstFolder2 = folders2.FirstOrDefault(x => x.Path == folderPath1);
+            Folder? secondFolder2 = folders2.FirstOrDefault(x => x.Path == folderPath2);
+            Assert.That(firstFolder2, Is.Not.Null);
+            Assert.That(secondFolder2, Is.Not.Null);
+            Assert.That(firstFolder2!.Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(secondFolder2!.Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(folders3, Has.Length.EqualTo(2));
-            Assert.That(folders3[0].Path, Is.EqualTo(folderPath1));
-            Assert.That(folders3[0].Id, Is.EqualTo(addedFolder1.Id));
-            Assert.That(folders3[1].Path, Is.EqualTo(folderPath2));
-            Assert.That(folders3[1].Id, Is.EqualTo(addedFolder2.Id));
+            Folder? firstFolder3 = folders3.FirstOrDefault(x => x.Path == folderPath1);
+            Folder? secondFolder3 = folders3.FirstOrDefault(x => x.Path == folderPath2);
+            Assert.That(firstFolder3, Is.Not.Null);
+            Assert.That(secondFolder3, Is.Not.Null);
+            Assert.That(firstFolder3!.Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(secondFolder3!.Id, Is.EqualTo(addedFolder2.Id));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -156,7 +160,6 @@ public class AssetRepositoryGetFoldersTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

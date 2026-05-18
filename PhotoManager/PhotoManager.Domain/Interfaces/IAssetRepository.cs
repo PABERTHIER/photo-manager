@@ -2,33 +2,56 @@
 
 namespace PhotoManager.Domain.Interfaces;
 
+/// <summary>
+/// High-performance asset repository backed by SQLite with immediate persistence.
+/// All return types are concrete (arrays, HashSet) for maximum throughput
+/// and zero virtual-dispatch overhead.
+/// </summary>
 public interface IAssetRepository
 {
+    // ----------------------------------------------------------------- Events
+
+    /// <summary>
+    /// Emits after any asset mutation (add / delete) completes and all
+    /// internal state has been committed to SQLite.
+    /// </summary>
     IObservable<Unit> AssetsUpdated { get; }
-    Asset[] GetAssetsByPath(string directory);
-    void AddAsset(Asset asset, byte[] thumbnailData);
+
+    // ----------------------------------------------------------------- Folders
+
     Folder AddFolder(string path);
     bool FolderExists(string path);
     Folder[] GetFolders();
     HashSet<string> GetFoldersPath();
     Folder[] GetSubFolders(Folder parentFolder);
     Folder? GetFolderByPath(string path);
-    void SaveCatalog(Folder? folder);
+    void DeleteFolder(Folder folder);
+
+    // ----------------------------------------------------------------- Assets
+
+    Asset[] GetAssetsByPath(string directory);
+    bool AddAsset(Asset asset, byte[] thumbnailData);
+    Asset? DeleteAsset(string directory, string deletedFileName);
+    Asset[] GetCataloguedAssets();
+    Asset[] GetCataloguedAssetsByPath(string directory);
+    bool IsAssetCatalogued(string directoryName, string fileName);
+    int GetAssetsCounter();
+
+    // -------------------------------------------------------------- Thumbnails
+
+    BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height);
+
+    // ----------------------------------------------------------------- Backups
+
     bool BackupExists();
     void WriteBackup();
-    List<Asset> GetCataloguedAssets();
-    List<Asset> GetCataloguedAssetsByPath(string directory);
-    bool IsAssetCatalogued(string directoryName, string fileName);
-    Asset? DeleteAsset(string directory, string deletedFileName);
-    void DeleteFolder(Folder folder);
-    bool HasChanges();
-    bool ContainsThumbnail(string directoryName, string fileName);
-    BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height);
-    bool IsBlobFileExists(string blobName);
+
+    // ----------------------------------------------------------------- Config
+
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration);
-    List<string> GetRecentTargetPaths();
-    void SaveRecentTargetPaths(List<string> recentTargetPaths);
+
+    string[] GetRecentTargetPaths();
+    void SaveRecentTargetPaths(string[] recentTargetPaths);
     void UpdateTargetPathToRecent(Folder destinationFolder);
-    int GetAssetsCounter();
 }

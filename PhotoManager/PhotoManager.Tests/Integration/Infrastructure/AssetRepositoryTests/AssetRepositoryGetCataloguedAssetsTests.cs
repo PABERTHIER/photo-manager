@@ -14,9 +14,8 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetCataloguedAssetsTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private AssetRepository? _assetRepository;
     private TestLogger<AssetRepository>? _testLogger;
@@ -30,30 +29,31 @@ public class AssetRepositoryGetCataloguedAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
 
         _configurationRootMock = Substitute.For<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
     public void SetUp()
     {
         _testLogger = new();
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(),
-            new BackupStorage(), new TestLogger<PhotoManager.Infrastructure.Database.Database>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, _testLogger);
+        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
 
         _asset1 = new()
         {
@@ -110,6 +110,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
     [TearDown]
     public void TearDown()
     {
+        _assetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
     }
 
@@ -121,8 +123,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
             _asset1 = _asset1!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath1 });
             _asset2 = _asset2!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath2 });
@@ -130,16 +132,15 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(assets, Is.Not.Empty);
-            Assert.That(assets, Has.Count.EqualTo(2));
+            Assert.That(assets, Has.Length.EqualTo(2));
             Assert.That(assets.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
@@ -151,7 +152,6 @@ public class AssetRepositoryGetCataloguedAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -164,7 +164,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
         try
         {
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(assets, Is.Empty);
 
@@ -174,7 +174,6 @@ public class AssetRepositoryGetCataloguedAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -187,8 +186,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
             _asset1 = _asset1!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath1 });
             _asset2 = _asset2!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath2 });
@@ -196,15 +195,14 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
 
-            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            List<Asset> assets1 = [];
-            List<Asset> assets2 = [];
-            List<Asset> assets3 = [];
+            Asset[] assets1 = [];
+            Asset[] assets2 = [];
+            Asset[] assets3 = [];
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -214,17 +212,17 @@ public class AssetRepositoryGetCataloguedAssetsTests
             );
 
             Assert.That(assets1, Is.Not.Empty);
-            Assert.That(assets1, Has.Count.EqualTo(2));
+            Assert.That(assets1, Has.Length.EqualTo(2));
             Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets2, Is.Not.Empty);
-            Assert.That(assets2, Has.Count.EqualTo(2));
+            Assert.That(assets2, Has.Length.EqualTo(2));
             Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets3, Is.Not.Empty);
-            Assert.That(assets3, Has.Count.EqualTo(2));
+            Assert.That(assets3, Has.Length.EqualTo(2));
             Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
@@ -236,7 +234,6 @@ public class AssetRepositoryGetCataloguedAssetsTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

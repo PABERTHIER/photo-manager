@@ -1,4 +1,4 @@
-using PhotoManager.UI.Models;
+﻿using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,7 +7,6 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
 using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
@@ -19,9 +18,8 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelNotifyCatalogChangeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
 
@@ -29,8 +27,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
-    private BlobStorage? _blobStorage;
-    private Database? _database;
 
     private IPathProviderService? _pathProviderServiceMock;
 
@@ -45,31 +41,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private Asset? _asset4Temp;
     private Asset? _asset5Temp;
 
-    private const int ASSET1_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_JPG;
-    private const int ASSET2_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_9_PNG;
-    private const int ASSET3_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_9_DUPLICATE_PNG;
-    private const int ASSET4_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_11_HEIC;
-
-    private const int ASSET1_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_COPIED_JPG;
-    private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_JPG;
-    private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_GIF;
-    private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_JPG;
-    private const int ASSET5_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_DUPLICATED_JPG;
-
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
+        _defaultAssetsDirectory = Path.Combine(_assetsDirectory, Directories.DEFAULT_ASSETS);
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        _pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
-
-        _blobStorage = new();
-        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage(), new TestLogger<Database>());
+        _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
     }
 
     [SetUp]
@@ -338,6 +319,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -357,8 +345,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _testableAssetRepository = new(_database!, _pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -386,7 +378,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExists_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -396,200 +388,143 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+        string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+
+        List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+            Assert.That(File.Exists(assetPath), Is.True);
+        }
 
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        string expectedAppTitle =
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+        List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        for (int i = 0; i < assetsFromRepository.Count; i++)
+        {
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
+                expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
+        }
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+        Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
+        int increment = 0;
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
+        NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+            ref increment);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(catalogChanges, Has.Count.EqualTo(9));
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+        for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
+        {
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                folderToAssetsMapping[folder!][..(i + 1)],
+                folderToAssetsMapping[folder!][i],
+                folder!,
                 ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                NotifyCatalogChangeAssetCreated(
-                    catalogChanges,
-                    assetsDirectory,
-                    assetsDirectory,
-                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            expectedAppTitle,
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            expectedAppTitle,
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -605,10 +540,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -625,8 +560,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy, videoPath2ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy, firstFramePath1];
-            List<int> assetsImageByteSize =
-                [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
@@ -644,11 +577,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -663,13 +591,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -706,11 +627,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
@@ -718,43 +636,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { folder!, [_asset3Temp!, _asset2Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -875,7 +758,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -884,7 +766,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -900,10 +782,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
-            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_1_S_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -920,7 +802,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy, videoPath2ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
@@ -938,11 +819,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -957,13 +833,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -1004,42 +873,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
@@ -1141,7 +976,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -1152,7 +986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -1162,179 +996,125 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+
+        List<string> assetPaths = [imagePath1, imagePath2];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+            Assert.That(File.Exists(assetPath), Is.True);
+        }
 
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<string> assetPaths = [imagePath1, imagePath2];
-            List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> expectedAssets = [_asset1!, _asset2!];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        for (int i = 0; i < assetsFromRepository.Count; i++)
+        {
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
+                expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
+        }
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
+        Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
-            List<Asset> expectedAssets = [_asset1!, _asset2!];
+        int increment = 0;
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
+        NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+            ref increment);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(catalogChanges, Has.Count.EqualTo(7));
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+        for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
+        {
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                folderToAssetsMapping[folder!][..(i + 1)],
+                folderToAssetsMapping[folder!][i],
+                folder!,
                 ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                NotifyCatalogChangeAssetCreated(
-                    catalogChanges,
-                    assetsDirectory,
-                    assetsDirectory,
-                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -1344,7 +1124,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_NotifiesChangesButNotTheCorruptedImage(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1361,8 +1141,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -1371,7 +1151,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             List<string> assetPaths = [imagePath2ToCopy];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE];
 
             // Corrupt image
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
@@ -1390,11 +1169,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -1405,13 +1179,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -1439,39 +1206,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping =
-                new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
@@ -1542,7 +1278,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath1ToCopyTemp))
@@ -1556,7 +1291,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsEqualTo0_NotifiesNoAssetChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(0, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1566,124 +1301,87 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+        string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+
+        List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
-
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
-
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
-
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, false, false, folder!);
-
-            Assert.That(_testableAssetRepository.HasChanges(),
-                Is.True); // SaveCatalog has not been done due to the batch size limit
-
-            CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                false,
-                false,
-                folder!);
-
-            Assert.That(catalogChanges, Has.Count.EqualTo(4));
-
-            int increment = 0;
-
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
+            Assert.That(File.Exists(assetPath), Is.True);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
+
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
+
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+        Assert.That(catalogChanges, Has.Count.EqualTo(4));
+
+        int increment = 0;
+
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
     // ADD SECTION (End) ------------------------------------------------------------------------------------------------
 
@@ -1694,7 +1392,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1716,11 +1414,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -1733,11 +1426,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -1748,13 +1436,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -1779,52 +1460,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -1911,11 +1552,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssetsUpdated.Remove(_asset1Temp);
             expectedAssetsUpdated.Add(_asset1Temp);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-            assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
@@ -1932,58 +1568,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset1Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -2053,7 +1658,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             File.Delete(destinationFilePathToCopy);
         }
     }
@@ -2062,7 +1666,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -2078,9 +1682,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2095,8 +1699,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy, firstFramePath1];
-            List<int> assetsImageByteSize =
-                [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
@@ -2114,11 +1716,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -2133,13 +1730,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -2176,11 +1766,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
@@ -2188,43 +1775,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { folder!, [_asset3Temp!, _asset2Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -2339,46 +1891,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i],
-                    assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssets, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset4Temp!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Null);
 
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -2480,7 +2005,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -2489,7 +2013,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -2505,9 +2029,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2522,7 +2046,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
@@ -2540,11 +2063,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -2559,13 +2077,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -2606,42 +2117,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
@@ -2743,36 +2220,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
             Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(11));
 
@@ -2862,7 +2310,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -2874,7 +2321,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -2890,8 +2337,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -2899,7 +2346,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, imagePath1ToCopy);
 
             List<string> assetPaths = [imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
@@ -2912,11 +2358,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -2927,13 +2368,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -2954,46 +2388,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping =
-                new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(6));
 
@@ -3058,7 +2458,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             List<string> assetPathsUpdated = [imagePath1ToCopy, imagePath2ToCopy];
-            List<int> assetsImageByteSizeUpdated = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET3_TEMP_IMAGE_BYTE_SIZE];
 
             _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileProperties.Modification);
@@ -3078,11 +2477,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             {
                 { folder!, [_asset2Temp!, _asset3Temp!] },
             };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
@@ -3092,45 +2486,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
@@ -3193,7 +2558,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
@@ -3204,7 +2568,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3221,8 +2585,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -3231,7 +2595,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
@@ -3244,11 +2607,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -3259,13 +2617,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -3294,42 +2645,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
@@ -3413,10 +2730,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset2Temp);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
@@ -3442,39 +2755,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated =
-                new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(13));
 
@@ -3541,7 +2823,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath1ToCopyTemp))
@@ -3558,7 +2839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3580,11 +2861,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -3597,11 +2873,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -3612,13 +2883,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -3643,52 +2907,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -3762,7 +2986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Second sync
 
-            CatalogAssetsAsyncAsserts.RemoveDatabaseBackup([folder!], blobsPath, tablesPath, backupFilePath);
+            CatalogAssetsAsyncAsserts.RemoveDatabaseBackup(backupFilePath);
 
             _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
@@ -3776,11 +3000,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
             expectedAssetsUpdated.Add(_asset1Temp);
-
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-            assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -3798,58 +3017,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset1Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -3919,7 +3107,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             File.Delete(destinationFilePathToCopy);
         }
     }
@@ -3932,7 +3119,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3954,11 +3141,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -3971,11 +3153,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -3986,13 +3163,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -4017,52 +3187,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -4146,10 +3276,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
@@ -4168,51 +3294,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssetsUpdated, assetPathsUpdated,
+                assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -4288,7 +3375,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             // If failing, just in case
             if (File.Exists(destinationFilePathToCopy))
             {
@@ -4300,7 +3386,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
@@ -4317,9 +3403,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -4333,8 +3419,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy, firstFramePath1];
-            List<int> assetsImageByteSize =
-                [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
@@ -4352,11 +3436,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -4371,13 +3450,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -4414,11 +3486,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
@@ -4426,43 +3495,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { folder!, [_asset3Temp!, _asset2Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -4574,46 +3608,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i],
-                    assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssets, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset4Temp!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Null);
 
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -4715,7 +3722,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(videoPath1ToCopy))
@@ -4729,7 +3735,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -4746,9 +3752,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
@@ -4762,7 +3768,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy];
             List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
@@ -4780,11 +3785,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -4799,13 +3799,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -4846,42 +3839,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
@@ -4982,36 +3941,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
             Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(11));
 
@@ -5101,7 +4031,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(videoPath1ToCopy))
@@ -5117,7 +4046,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -5143,19 +4072,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<string> assetPathsAfterSecondSync =
                 [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePathToCopy];
 
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
-            List<int> assetsImageByteSizeSecondSync =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeThirdSync =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE,
-                ASSET1_TEMP_IMAGE_BYTE_SIZE
-            ];
-
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
@@ -5167,11 +4083,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -5182,13 +4093,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -5215,53 +4119,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssetsFirstSync[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssetsFirstSync, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync =
                 new() { { folder!, expectedAssetsFirstSync } };
-            Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync,
-                [folder!], thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -5355,52 +4219,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i],
-                    assetPathsAfterFirstSync[i], assetsDirectory, folder!);
-            }
+            AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssetsSecondSync, assetPathsAfterFirstSync,
+                assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync =
                 new() { { folder!, expectedAssetsSecondSync } };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
-                [folder!], thumbnails, assetsImageByteSizeSecondSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -5496,59 +4321,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i],
-                    expectedAssetsThirdSync[i], assetPathsAfterSecondSync[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsThirdSync, assetPathsAfterSecondSync, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset1Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync =
                 new() { { folder!, expectedAssetsThirdSync } };
-            Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync,
-                [folder!], thumbnails, assetsImageByteSizeThirdSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingThirdSync,
-                assetNameToByteSizeMappingThirdSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingThirdSync,
-                assetNameToByteSizeMappingThirdSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(22));
 
@@ -5631,7 +4425,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             if (File.Exists(destinationFilePathToCopy))
             {
                 File.Delete(destinationFilePathToCopy);
@@ -5646,7 +4439,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -5663,14 +4456,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
             string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
             List<string> assetPaths = [imagePath1ToCopy];
-            List<int> assetsImageByteSize = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
@@ -5683,11 +4475,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -5698,13 +4485,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -5725,46 +4505,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping =
-                new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(6));
 
@@ -5827,7 +4573,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Second sync
 
             List<string> assetPathsUpdated = [imagePath1ToCopy, imagePath2ToCopy];
-            List<int> assetsImageByteSizeUpdated = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET3_TEMP_IMAGE_BYTE_SIZE];
 
             File.Delete(imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -5847,11 +4592,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             {
                 { folder!, [_asset2Temp!, _asset3Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE }
-            };
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
@@ -5861,45 +4601,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
@@ -5962,7 +4673,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath1ToCopy))
@@ -5979,7 +4689,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -6001,11 +4711,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -6018,11 +4723,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -6033,13 +4733,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -6064,52 +4757,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -6183,7 +4836,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Second sync
 
-            CatalogAssetsAsyncAsserts.RemoveDatabaseBackup([folder!], blobsPath, tablesPath, backupFilePath);
+            CatalogAssetsAsyncAsserts.RemoveDatabaseBackup(backupFilePath);
 
             File.Delete(destinationFilePathToCopy);
 
@@ -6194,10 +4847,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
-
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
@@ -6217,51 +4866,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssetsUpdated, assetPathsUpdated,
+                assetsDirectory, folder!);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
@@ -6337,7 +4945,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             // If failing, just in case
             if (File.Exists(destinationFilePathToCopy))
             {
@@ -6353,7 +4960,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_NotifiesNoAssetChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -6375,11 +4982,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE,
-                ASSET4_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
@@ -6392,11 +4994,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -6407,13 +5004,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -6445,45 +5035,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -6506,7 +5059,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     folder!,
                     ref increment);
             }
-
 
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
@@ -6568,10 +5120,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
@@ -6593,42 +5141,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i],
-                    assetsDirectory, folder!);
-            }
+            AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssets, assetPaths,
+                assetsDirectory, folder!);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping,
-                [folder!], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
@@ -6678,7 +5194,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             // If failing, just in case
             if (File.Exists(destinationFilePathToCopy))
             {
@@ -6693,7 +5208,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -6719,14 +5234,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePathToCopy];
 
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE,
-                ASSET1_TEMP_IMAGE_BYTE_SIZE
-            ];
-            List<int> assetsImageByteSizeSecondSync =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
-
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory1, Has.Length.EqualTo(4));
 
@@ -6744,11 +5251,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(folder2, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -6762,13 +5264,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -6803,54 +5298,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 [assetsDirectory, assetsDirectory, assetsDirectory, assetsDirectory, tempDirectory];
             List<Folder> expectedFolders = [folder1!, folder1!, folder1!, folder1!, folder2!];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder1!, folder2!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
                 { { folder1!, [_asset1, _asset2, _asset3, _asset4] }, { folder2!, [_asset1Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
@@ -6977,52 +5432,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder1!);
-            }
+            AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssetsUpdated, assetPathsUpdated,
+                assetsDirectory, folder1!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated =
                 new() { { folder1!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder1!], thumbnails, assetsImageByteSizeSecondSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder1!],
-                [folder1!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder1!],
-                [folder1!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
@@ -7103,7 +5519,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             // If failing, just in case
             if (Directory.Exists(tempDirectory))
             {
@@ -7119,7 +5534,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_TO_DELETE);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -7137,18 +5552,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
             string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
             File.Copy(imagePath2, destinationFilePathToCopy2);
 
             List<string> assetPaths = [destinationFilePathToCopy1, destinationFilePathToCopy2];
-
-            List<int> assetsImageByteSizeFirstSync = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeSecondSync = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeThirdSync = [ASSET2_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory1, Is.Empty);
@@ -7167,11 +5578,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(folder2, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -7185,13 +5591,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -7207,8 +5606,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Folder> folders = [folder1!, folder2!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new() { { folder2!, [_asset2Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMappingFirstSync =
-                new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
@@ -7223,36 +5620,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0], _asset2Temp,
                 destinationFilePathToCopy1, tempDirectory, folder2!);
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync,
-                [folder2!], thumbnails, assetsImageByteSizeFirstSync); // Only folder2 contains assets
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(8));
 
@@ -7327,11 +5696,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync =
                 new() { { folder2!, [_asset2Temp, _asset2] } };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE }
-            };
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
@@ -7344,54 +5708,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                // Assets are not in the current folder, so ImageData stays null
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    folderToAssetsMappingSecondSync[folder2!][i], assetPaths[i], tempDirectory, folder2!);
-            }
+            // Assets are not in the current folder, so ImageData stays null
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                folderToAssetsMappingSecondSync[folder2!], assetPaths, tempDirectory, folder2!);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
-                [folder2!], thumbnails, assetsImageByteSizeSecondSync); // Only folder2 contains assets
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                assetsDirectory,
-                ref increment); // Keep the previous events + new sync but same content so no new asset added
+                assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
-                tempDirectory, ref increment);
-            NotifyCatalogChangeAssetCreated(
-                catalogChanges,
+                tempDirectory,
+                ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(catalogChanges,
                 tempDirectory,
                 assetsDirectory,
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
@@ -7460,10 +5791,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(folder2, Is.Not.Null);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder2!, [_asset2] } };
-            Dictionary<string, int> assetNameToByteSizeMappingThirdSync =
-                new() { { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE } };
-
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
@@ -7475,54 +5802,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0], _asset2,
-                destinationFilePathToCopy2, tempDirectory, folder2!);
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync,
-                [folder2!], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingThirdSync,
-                assetNameToByteSizeMappingThirdSync);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0], _asset2Temp!,
+                destinationFilePathToCopy1, tempDirectory, folder2);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                [folder2!],
-                assetsFromRepository,
-                folderToAssetsMappingThirdSync,
-                assetNameToByteSizeMappingThirdSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(23));
 
-            foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 2, foldersInRepository, assetsDirectory,
-                ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository,
+                assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(
-                catalogChanges,
+            NotifyCatalogChangeAssetDeleted(catalogChanges,
                 tempDirectory,
                 assetsDirectory,
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [_asset2],
-                _asset2Temp,
-                folder2!,
+                [_asset2Temp],
+                _asset2,
+                folder2,
                 false,
                 ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
@@ -7591,9 +5887,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder2Updated = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(folder2Updated, Is.Null);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = [];
-            Dictionary<string, int> assetNameToByteSizeMappingFourthSync = [];
-
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
@@ -7605,52 +5898,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, [], [], thumbnails,
-                []); // No Folders and assets anymore
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder1!],
-                [],
-                assetsFromRepository,
-                folderToAssetsMappingFourthSync,
-                assetNameToByteSizeMappingFourthSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder1!],
-                [],
-                assetsFromRepository,
-                folderToAssetsMappingFourthSync,
-                assetNameToByteSizeMappingFourthSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(31));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
-                ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, folders,
+                assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(
-                catalogChanges,
+            NotifyCatalogChangeAssetDeleted(catalogChanges,
                 tempDirectory,
                 assetsDirectory,
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                _asset2,
-                folder2!,
+                _asset2Temp,
+                folder2,
                 false,
                 ref increment);
             NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory,
@@ -7719,7 +5982,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (Directory.Exists(tempDirectory))
@@ -7735,7 +5997,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -7762,11 +6024,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -7793,24 +6055,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<string> assetPathsAfterSync =
             [
                 imagePath1ToCopy, imagePath2ToCopy, imagePath3ToCopy, imagePath4ToCopy, firstFramePath1, firstFramePath2
-            ];
-
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET2_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE,
-                ASSET5_TEMP_IMAGE_BYTE_SIZE
-            ];
-            List<int> assetsImageByteSizeSecondSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE,
-                ASSET5_TEMP_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE
             ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -7850,11 +6094,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -7885,13 +6124,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -7969,19 +6201,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory, firstFrameVideosDirectory
             ];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssetsFirstSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssetsFirstSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders =
             [
                 rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!,
                 videoFirstFrameFolder!
             ];
-            List<Folder> foldersContainingAssetsFirstSync =
-                [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!] },
@@ -7990,46 +6217,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { subDirFolder!, [_asset3Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!, _asset5Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
-                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync,
-                foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(21));
 
@@ -8178,22 +6367,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
-            List<Folder> foldersContainingAssetsSecondSync =
-                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!] },
                 { subDirFolder!, [_asset3Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!, _asset5Temp!] },
                 { imageUpdatedFolder!, [_asset2Temp!] }
-            };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
-                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -8280,48 +6459,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 imageUpdatedDirectory
             ];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i],
-                    expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsSecondSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
-                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset4Temp!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Null);
 
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset5Temp!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
+
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(38));
 
@@ -8555,7 +6711,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath2ToCopy))
@@ -8570,7 +6725,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -8597,11 +6752,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -8626,22 +6781,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             ];
             List<string> assetPathsAfterSync =
                 [imagePath1ToCopy, imagePath2ToCopy, imagePath3ToCopy, imagePath4ToCopy, firstFramePath1];
-
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET2_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE
-            ];
-            List<int> assetsImageByteSizeSecondSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
@@ -8679,11 +6818,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -8714,13 +6848,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -8792,19 +6919,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory
             ];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssetsFirstSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssetsFirstSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders =
             [
                 rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!,
                 videoFirstFrameFolder!
             ];
-            List<Folder> foldersContainingAssetsFirstSync =
-                [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!] },
@@ -8813,45 +6935,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { subDirFolder!, [_asset3Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync,
-                foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
@@ -8995,21 +7080,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
-            List<Folder> foldersContainingAssetsSecondSync =
-                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!] },
                 { subDirFolder!, [_asset3Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] },
                 { imageUpdatedFolder!, [_asset2Temp!] }
-            };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -9088,47 +7164,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedFolders = [rootFolder!, subDirFolder!, videoFirstFrameFolder!, imageUpdatedFolder!];
             expectedDirectories = [assetsDirectory, subDirDirectory, firstFrameVideosDirectory, imageUpdatedDirectory];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i],
-                    expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsSecondSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
-                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Null);
 
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4Temp!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Null);
+
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(37));
 
@@ -9361,7 +7412,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath2ToCopy))
@@ -9376,7 +7426,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
         string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
@@ -9403,11 +7453,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
-            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
-            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string imagePath1 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_assetsDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_assetsDirectory!, FileNames.HOMER_MP4);
 
             string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
@@ -9433,23 +7483,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             ];
             List<string> assetPathsAfterSync =
                 [imagePath1ToCopy, imagePath2ToCopy, imagePath3ToCopy, firstFramePath1, imagePath4ToCopy];
-
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET2_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE
-            ];
-            List<int> assetsImageByteSizeSecondSync =
-            [
-                ASSET4_IMAGE_BYTE_SIZE,
-                ASSET4_TEMP_IMAGE_BYTE_SIZE,
-                ASSET3_TEMP_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE,
-                ASSET5_TEMP_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
@@ -9487,11 +7520,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFrameFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -9522,13 +7550,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -9601,19 +7622,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 subDirDirectory
             ];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssetsFirstSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssetsFirstSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
             List<Folder> folders =
             [
                 rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!,
                 videoFirstFrameFolder!
             ];
-            List<Folder> foldersContainingAssetsFirstSync =
-                [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!] },
@@ -9622,45 +7638,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { subDirFolder!, [_asset3Temp!] },
                 { videoFirstFrameFolder!, [_asset4Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync,
-                foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsFirstSync,
-                assetsFromRepository,
-                folderToAssetsMappingFirstSync,
-                assetNameToByteSizeMappingFirstSync);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
@@ -9849,22 +7828,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset5Temp = _asset5Temp!.WithFolder(videoFirstFrameFolder!);
 
             List<Asset> expectedAssetsSecondSync = [_asset4!, _asset4Temp!, _asset3Temp!, _asset2Temp!, _asset5Temp!];
-            List<Folder> foldersContainingAssetsSecondSync =
-                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!] },
                 { videoFirstFrameFolder!, [_asset4Temp!, _asset5Temp!] },
                 { subDirFolder!, [_asset3Temp!] },
                 { imageUpdatedFolder!, [_asset2Temp!] }
-            };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE }
             };
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
@@ -9905,47 +7874,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory
             ];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i],
-                    expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsSecondSync, assetPathsAfterSync, expectedDirectories, expectedFolders);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
-                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset4Temp!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset5Temp!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Null);
 
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                foldersContainingAssetsSecondSync,
-                assetsFromRepository,
-                folderToAssetsMappingSecondSync,
-                assetNameToByteSizeMappingSecondSync);
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset3Temp!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset2Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
+
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(38));
 
@@ -10188,7 +8135,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             // If failing, just in case
             if (File.Exists(imagePath2ToCopy))
@@ -10203,7 +8149,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public void
         NotifyCatalogChange_AssetsAndCancellationDuringAssetCreation_SavesCatalogAndThrowsOperationCanceledException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -10213,135 +8159,95 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+        string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+
+        List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+            Assert.That(File.Exists(assetPath), Is.True);
+        }
 
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            foreach (string assetPath in assetPaths)
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
+
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
+
+
+        CancellationTokenSource cancellationTokenSource = new();
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+        Assert.CatchAsync<OperationCanceledException>(async () =>
+            await _applicationViewModel!.CatalogAssets(e =>
             {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
+                catalogChanges.Add(e);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
-
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CancellationTokenSource cancellationTokenSource = new();
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-
-            Assert.CatchAsync<OperationCanceledException>(async () =>
-                await _applicationViewModel!.CatalogAssets(e =>
+                if (e.Reason == CatalogChangeReason.AssetCreated)
                 {
-                    catalogChanges.Add(e);
+                    cancellationTokenSource.Cancel();
+                }
+            }, cancellationTokenSource.Token));
 
-                    if (e.Reason == CatalogChangeReason.AssetCreated)
-                    {
-                        cancellationTokenSource.Cancel();
-                    }
-                }, cancellationTokenSource.Token));
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        _asset1 = _asset1!.WithFolder(folder!);
 
-            _asset1 = _asset1!.WithFolder(folder!);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
+        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0],
+            _asset1!, imagePath1, assetsDirectory, folder!);
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0],
-                _asset1!, imagePath1, assetsDirectory, folder!);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset1!] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE }
-            };
+        Assert.That(catalogChanges, Has.Count.EqualTo(4));
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping,
-                [folder!], thumbnails, [ASSET1_IMAGE_BYTE_SIZE]);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+        int increment = 0;
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
+            assetsDirectory, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory,
+            [_asset1], _asset1, folder!, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(4));
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
-                assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory,
-                [_asset1], _asset1, folder!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            // Because the root folder is already added
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public async Task
         NotifyCatalogChange_AssetsAlreadyCataloguedAndCancellationDuringInspection_ThrowsOperationCanceledExceptionWithoutSaving()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -10351,204 +8257,146 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+        string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+
+        List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+            Assert.That(File.Exists(assetPath), Is.True);
+        }
 
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+        for (int i = 0; i < assetsFromRepository.Count; i++)
+        {
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
+                expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
+        }
 
-            await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
+        Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+        Assert.That(firstSyncChanges, Has.Count.EqualTo(9));
 
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
+        int increment = 0;
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(firstSyncChanges, 1, foldersInRepository,
+            assetsDirectory, ref increment);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(firstSyncChanges, Has.Count.EqualTo(9));
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(firstSyncChanges, 1, foldersInRepository,
-                assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    firstSyncChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(firstSyncChanges, assetsDirectory,
+        for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
+        {
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                firstSyncChanges,
+                assetsDirectory,
+                folderToAssetsMapping[folder!][..(i + 1)],
+                folderToAssetsMapping[folder!][i],
+                folder!,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(firstSyncChanges,
-                CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(firstSyncChanges, ref increment);
+        }
 
-            // Second sync (cancelled)
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(firstSyncChanges, assetsDirectory,
+            ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(firstSyncChanges,
+            CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(firstSyncChanges, ref increment);
 
-            CancellationTokenSource cancellationTokenSource = new();
-            List<CatalogChangeCallbackEventArgs> cancelledChanges = [];
+        // Second sync (cancelled)
 
-            Assert.CatchAsync<OperationCanceledException>(async () =>
-                await _applicationViewModel!.CatalogAssets(e =>
+        CancellationTokenSource cancellationTokenSource = new();
+        List<CatalogChangeCallbackEventArgs> cancelledChanges = [];
+
+        Assert.CatchAsync<OperationCanceledException>(async () =>
+            await _applicationViewModel!.CatalogAssets(e =>
+            {
+                cancelledChanges.Add(e);
+
+                if (e.Reason == CatalogChangeReason.FolderInspectionInProgress)
                 {
-                    cancelledChanges.Add(e);
+                    cancellationTokenSource.Cancel();
+                }
+            }, cancellationTokenSource.Token));
 
-                    if (e.Reason == CatalogChangeReason.FolderInspectionInProgress)
-                    {
-                        cancellationTokenSource.Cancel();
-                    }
-                }, cancellationTokenSource.Token));
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(cancelledChanges, Has.Count.EqualTo(3));
 
-            Assert.That(cancelledChanges, Has.Count.EqualTo(3));
+        increment = 0;
 
-            increment = 0;
+        foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            foldersInRepository = _testableAssetRepository!.GetFolders();
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(cancelledChanges, 1, foldersInRepository,
+            assetsDirectory, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(cancelledChanges, ref increment);
+        CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(cancelledChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(cancelledChanges, 1, foldersInRepository,
-                assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(cancelledChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(cancelledChanges, ref increment);
-
-            // Because the root folder is already added
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public async Task
         NotifyCatalogChange_DeletedSubfolderAndCatalogBatchSizeIsEqualTo0_StopsWithoutProcessingDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
@@ -10568,12 +8416,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePathToCopy];
 
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE,
-                ASSET1_TEMP_IMAGE_BYTE_SIZE
-            ];
-
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory1, Has.Length.EqualTo(4));
 
@@ -10591,11 +8433,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? tempFolder = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(tempFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
@@ -10610,13 +8447,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
 
@@ -10651,54 +8481,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 [assetsDirectory, assetsDirectory, assetsDirectory, assetsDirectory, tempDirectory];
             List<Folder> expectedFolders = [folder!, folder!, folder!, folder!, tempFolder!];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder!, tempFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
                 { { folder!, [_asset1, _asset2, _asset3, _asset4] }, { tempFolder!, [_asset1Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(firstSyncChanges, Has.Count.EqualTo(12));
 
@@ -10775,34 +8565,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(secondSyncChanges, Has.Count.EqualTo(4));
 
@@ -10822,8 +8585,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
-
             // If failing, just in case
             if (Directory.Exists(tempDirectory))
             {
@@ -10836,7 +8597,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task
         NotifyCatalogChange_DeletedSubfolderWithMultipleAssetsAndSmallBatchSize_DeletesOnlyFirstAssetFromDeletedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePath1 = Path.Combine(tempDirectory, _asset1Temp!.FileName);
         string destinationFilePath2 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
@@ -10854,19 +8615,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
             string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             string imagePath5 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath6 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath6 = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath5, destinationFilePath1);
             File.Copy(imagePath6, destinationFilePath2);
 
             List<string> assetPaths =
                 [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePath2, destinationFilePath1];
-
-            List<int> assetsImageByteSizeFirstSync =
-            [
-                ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE,
-                ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE
-            ];
 
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory1, Has.Length.EqualTo(4));
@@ -10885,11 +8640,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? tempFolder = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.That(tempFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
@@ -10904,13 +8654,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
 
@@ -10949,55 +8692,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> expectedFolders =
                 [folder!, folder!, folder!, folder!, tempFolder!, tempFolder!];
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], expectedDirectories[i], expectedFolders[i]);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, expectedDirectories, expectedFolders);
 
             List<Folder> folders = [folder!, tempFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
                 { { folder!, [_asset1, _asset2, _asset3, _asset4] }, { tempFolder!, [_asset2Temp, _asset1Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders,
-                thumbnails, assetsImageByteSizeFirstSync);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(firstSyncChanges, Has.Count.EqualTo(13));
 
@@ -11078,45 +8780,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new()
-                { { folder!, [_asset1, _asset2, _asset3, _asset4] }, { tempFolder!, [_asset1Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                folders,
-                folders,
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(secondSyncChanges, Has.Count.EqualTo(7));
 
@@ -11143,7 +8807,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             // If failing, just in case
             if (Directory.Exists(tempDirectory))
@@ -11180,11 +8843,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -11195,13 +8853,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -11218,22 +8869,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, true, true, folder!);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                true,
-                true,
-                folder!);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
@@ -11278,7 +8913,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(_defaultAssetsDirectory!, true);
         }
     }
@@ -11297,115 +8931,79 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
+        CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.That(folder, Is.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
+        Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository!.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository!.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
+        Assert.That(folder, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.That(folder, Is.Null);
+        Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        int increment = 0;
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, _defaultAssetsDirectory!,
+            ref increment);
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, _defaultAssetsDirectory!, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, true, false, folder!);
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            _defaultAssetsDirectory!,
+            $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
 
-            CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                true,
-                false,
-                folder!);
+        CheckInstance(
+            applicationViewModelInstances,
+            _defaultAssetsDirectory!,
+            $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(5));
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
 
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, _defaultAssetsDirectory!,
-                ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, _defaultAssetsDirectory!, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                _defaultAssetsDirectory!,
-                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _defaultAssetsDirectory!,
-                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-
-            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
-            Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(_defaultAssetsDirectory));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+        Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(_defaultAssetsDirectory));
     }
 
     [Test]
@@ -11413,7 +9011,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_RootCatalogFolderPointsToAFile_NotifiesNoAssetChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -11423,115 +9021,79 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        int increment = 0;
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, assetsDirectory,
+            ref increment);
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, true, false, folder!);
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
 
-            CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                true,
-                false,
-                folder!);
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(5));
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
 
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, assetsDirectory,
-                ref increment);
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-
-            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
-            Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(assetsDirectory));
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+        Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(assetsDirectory));
     }
 
     [Test]
@@ -11547,96 +9109,72 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        Assert.That(catalogChanges, Has.Count.EqualTo(4));
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        int increment = 0;
 
-            assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, false, false, folder!);
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
+            [],
+            null,
+            folder!,
+            false);
 
-            Assert.That(catalogChanges, Has.Count.EqualTo(4));
-
-            int increment = 0;
-
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} -  - image 0 of 0 - sorted by file name ascending",
-                [],
-                null,
-                folder!,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -11673,11 +9211,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -11688,13 +9221,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new(true);
@@ -11709,7 +9235,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(assetsFromRepository, Is.Empty);
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             Assert.That(catalogChanges, Is.Empty);
 
@@ -11720,7 +9245,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (folderExists)
             {
@@ -11737,7 +9261,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -11747,300 +9271,211 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
+        string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+        string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+        string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+        string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+
+        List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+
+        string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+        Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+
+        foreach (string assetPath in assetPaths)
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+            Assert.That(File.Exists(assetPath), Is.True);
+        }
 
-            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
-            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
-            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
-            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
+        string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+        string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+        CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
+        List<Asset> assetsFromRepositoryByPath =
+            _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.That(File.Exists(assetPath), Is.True);
-            }
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
 
-            List<Asset> assetsFromRepositoryByPath =
-                _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Is.Empty);
+        _asset1 = _asset1!.WithFolder(folder!);
+        _asset1Temp = _asset1Temp!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        for (int i = 0; i < assetsFromRepository.Count; i++)
+        {
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
+                expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
+        }
 
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+        Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
+        CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset1Temp = _asset1Temp!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
+        Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
+        int increment = 0;
 
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+        Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
+        NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+            ref increment);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(catalogChanges, Has.Count.EqualTo(9));
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+        for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
+        {
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                folderToAssetsMapping[folder!][..(i + 1)],
+                folderToAssetsMapping[folder!][i],
+                folder!,
                 ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                NotifyCatalogChangeAssetCreated(
-                    catalogChanges,
-                    assetsDirectory,
-                    assetsDirectory,
-                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-
-            // Second sync
-
-            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i],
-                    assetsDirectory, folder!);
-            }
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(catalogChanges, Has.Count.EqualTo(13));
-
-            foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
-                ref increment); // Keep the previous events + new sync but same content so no new asset added
-            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            NotifyCatalogChangeEnd(catalogChanges, ref increment);
-
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
-                folder!,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
         }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
+
+        // Second sync
+
+        await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
+
+        folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
+
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
+
+        assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
+
+        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
+
+        AssertCurrentAssetPropertyValidity(assetsFromRepository, expectedAssets, assetPaths,
+            assetsDirectory, folder!);
+
+        CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
+
+        Assert.That(catalogChanges, Has.Count.EqualTo(13));
+
+        foldersInRepository = _testableAssetRepository!.GetFolders();
+
+        NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory,
+            ref increment); // Keep the previous events + new sync but same content so no new asset added
+        NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+        NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+        NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+        CheckAfterNotifyCatalogChanges(
+            _applicationViewModel!,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+
+        CheckInstance(
+            applicationViewModelInstances,
+            assetsDirectory,
+            $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+            folderToAssetsMapping[folder!],
+            folderToAssetsMapping[folder!][0],
+            folder!,
+            true);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -12049,7 +9484,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_NotifiesChanges(
         bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -12070,8 +9505,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
@@ -12084,11 +9517,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -12099,13 +9527,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -12129,51 +9550,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
@@ -12250,10 +9632,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetPaths.ForEach(assetPathsUpdated.Add);
             assetPathsUpdated.Add(destinationFilePathToCopy);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
             Assert.That(File.Exists(destinationFilePathToCopy), Is.True);
@@ -12277,58 +9655,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset1Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(15));
 
@@ -12400,7 +9747,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             File.Delete(destinationFilePathToCopy);
         }
     }
@@ -12412,7 +9758,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_NotifiesChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
@@ -12435,8 +9781,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<int> assetsImageByteSize =
-                [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
@@ -12449,11 +9793,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath =
@@ -12462,13 +9801,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
@@ -12492,51 +9824,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i],
-                    expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+                expectedAssets, assetPaths, assetsDirectory, folder!);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!],
-                thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
@@ -12620,10 +9913,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetPaths.ForEach(assetPathsUpdated.Add);
             assetPathsUpdated.Add(destinationFilePathToCopy);
 
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
-
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
             Assert.That(File.Exists(destinationFilePathToCopy), Is.True);
@@ -12647,58 +9936,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i],
-                    assetPathsUpdated[i], assetsDirectory, folder!);
-            }
+            CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidity(assetsFromRepository,
+                expectedAssetsUpdated, assetPathsUpdated, assetsDirectory, folder!);
 
-            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
-            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
+            Asset assetsFromRepository1 = assetsFromRepository.First(x => x.FileName == _asset1!.FileName);
+            Assert.That(assetsFromRepository1.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository2 = assetsFromRepository.First(x => x.FileName == _asset2!.FileName);
+            Assert.That(assetsFromRepository2.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository3 = assetsFromRepository.First(x => x.FileName == _asset3!.FileName);
+            Assert.That(assetsFromRepository3.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository4 = assetsFromRepository.First(x => x.FileName == _asset4!.FileName);
+            Assert.That(assetsFromRepository4.ImageData, Is.Not.Null);
+
+            Asset assetsFromRepository5 = assetsFromRepository.First(x => x.FileName == _asset1Temp!.FileName);
+            Assert.That(assetsFromRepository5.ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
-            };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated,
-                [folder!], thumbnails, assetsImageByteSizeUpdated);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
+            CatalogAssetsAsyncAsserts.CheckBackupAfter(_databaseBackupPath!, backupFilePath);
 
             Assert.That(catalogChanges, Has.Count.EqualTo(15));
 
@@ -12773,7 +10031,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             File.Delete(destinationFilePathToCopy);
             // If failing, just in case
             if (File.Exists(backupFilePath))
@@ -12800,43 +10057,35 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(rootFolder, Is.Null);
+        Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(rootFolder, Is.Null);
 
-            CancellationTokenSource cancellationTokenSource = new();
-            cancellationTokenSource.Cancel();
+        CancellationTokenSource cancellationTokenSource = new();
+        cancellationTokenSource.Cancel();
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            Assert.CatchAsync<OperationCanceledException>(async () =>
-                await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationTokenSource.Token));
+        Assert.CatchAsync<OperationCanceledException>(async () =>
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationTokenSource.Token));
 
-            Assert.That(_testableAssetRepository!.HasChanges(), Is.False);
-            Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
+        Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Null);
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Null);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assetsFromRepository, Is.Empty);
+        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+        Assert.That(assetsFromRepository, Is.Empty);
 
-            Assert.That(catalogChanges, Is.Empty);
+        Assert.That(catalogChanges, Is.Empty);
 
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+        CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            // Because the root folder is already added
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(notifyPropertyChangedEvents, Is.Empty);
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
@@ -12846,7 +10095,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         NotifyCatalogChange_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_NotifiesNoAssetChanges(
             bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -12862,7 +10111,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
             string imagePathToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath, imagePathToCopy);
@@ -12874,11 +10123,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(rootFolder, Is.Null);
 
-            string blobsPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!,
-                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
@@ -12889,13 +10133,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.That(thumbnails, Is.Empty);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             DirectoryHelper.DenyAccess(assetsDirectory);
 
@@ -12917,12 +10154,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(assetsFromRepository, Is.Empty);
 
             List<Folder> folders = [rootFolder!];
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService,
-                blobsPath, tablesPath, false, false, rootFolder!);
-
-            // SaveCatalog has not been done due to the exception
-            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
@@ -12969,7 +10200,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             DirectoryHelper.AllowAccess(assetsDirectory);
             Directory.Delete(assetsDirectory, true);
         }
@@ -13175,7 +10405,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAsset.FullPath, assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
-        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange,
             cataloguedAssetsByPathCount);
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetCreated));
@@ -13228,7 +10458,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(catalogChange.Asset, Is.Null);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(cataloguedAssetsByPathCount, Is.EqualTo(expectedAssets.Count));
-        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange);
         Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null), Is.True);
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetNotCreated));
         Assert.That(catalogChange.Message, Is.EqualTo($"Image {expectedAssetPath} not added to catalog (corrupted)."));
@@ -13261,7 +10491,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAsset.FullPath, assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
-        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange,
             cataloguedAssetsByPathCount);
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetUpdated));
@@ -13325,7 +10555,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAsset.FullPath, assetsDirectory, folder);
         Assert.That(catalogChange.Folder, Is.Null);
         Assert.That(cataloguedAssetsByPathCount, Is.EqualTo(expectedAssets.Count));
-        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange);
         AssertCataloguedAssetsByPathImageDataAssetDeleted(currentDirectory, catalogChange, cataloguedAssetsByPathCount);
         Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetDeleted));
         Assert.That(catalogChange.Message, Is.EqualTo(expectedStatusMessage));
@@ -13435,17 +10665,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private static void AssertCataloguedAssetsByPathPropertyValidity(List<Asset> expectedAssets,
-        CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
+        CatalogChangeCallbackEventArgs catalogChange)
     {
-        for (int i = 0; i < cataloguedAssetsByPathCount; i++)
+        foreach (Asset cataloguedAssetByPath in catalogChange.CataloguedAssetsByPath)
         {
-            Asset currentExpectedAsset = expectedAssets[i];
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(
-                catalogChange.CataloguedAssetsByPath[i],
-                currentExpectedAsset,
-                currentExpectedAsset.FullPath,
-                currentExpectedAsset.Folder.Path,
-                currentExpectedAsset.Folder);
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == cataloguedAssetByPath.FileName);
+
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(cataloguedAssetByPath, expectedAsset,
+                expectedAsset.FullPath, expectedAsset.Folder.Path, expectedAsset.Folder);
         }
     }
 
@@ -13496,6 +10723,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         else
         {
             Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null), Is.True);
+        }
+    }
+
+    private static void AssertCurrentAssetPropertyValidity(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, string folderPath, Folder folder)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+            AssertCurrentAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
         }
     }
 

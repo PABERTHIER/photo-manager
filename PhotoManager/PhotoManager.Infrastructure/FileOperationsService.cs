@@ -10,12 +10,14 @@ public class FileOperationsService(
 {
     public DirectoryInfo[] GetSubDirectories(string directoryPath)
     {
-        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()];
+        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()
+            .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)];
     }
 
     public DirectoryInfo[] GetRecursiveSubDirectories(string directoryPath)
     {
-        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories("*", SearchOption.AllDirectories)];
+        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories("*", SearchOption.AllDirectories)
+            .OrderBy(d => d.FullName, StringComparer.OrdinalIgnoreCase)];
     }
 
     public void CreateDirectory(string directory)

@@ -24,7 +24,7 @@ PhotoManager is a desktop application that allows:
 
 **It is a local tool, that does not require an Internet connection to work.
 Your data stay on your computer and nothing is collected from you.
-Even the database is stored in your computer.**
+The SQLite database is stored locally on your computer.**
 
 ## Upcoming :next_track_button:
 
@@ -47,7 +47,7 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 - Unzip the content of the zip file to a new folder.
 - [Configure the appsettings.json file](#config-file-card_file_box)
 - Run `PhotoManager.UI.exe`.
-- The application saves the cataloged files in the following path: `BackupPath` (Path settings).
+- The application automatically creates a `Database/` folder next to the `.exe` to store the database and backups.
 
 ## Config file :card_file_box:
 
@@ -103,7 +103,6 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Paths` part is about settings of paths:** :open_file_folder:
 
 - `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
-- `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database and backup will be stored.
 - `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
 - `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 
@@ -115,14 +114,6 @@ The lower the value of `PHashThreshold`, the more precise it is.
 **The `Storage` part is about settings of storage (update it only for a certain purpose):** :floppy_disk:
 
 - `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
-- `FoldersName.Blobs = "Blobs"`: The name of the folder to store the blobs (in the `BackupPath`).
-- `FoldersName.Tables = "Tables"`: The name of the folder to store the tables (in the `BackupPath`).
-- `Separator = "|"`: The separator used to delimit each column (data).
-- `StorageVersion = "1.0"`: The version of the local database.
-- `Tables.AssetsTableName = "Assets"`: The table's name that stores assets data (a `.db` file in `FoldersName.Tables`).
-- `Tables.FoldersTableName = "Folders"`: The table's name that stores folders data (a `.db` file in `FoldersName.Tables`).
-- `Tables.RecentTargetPathsTableName = "RecentTargetPaths"`: The table's name that stores recentTargetPaths data (a `.db` file in `FoldersName.Tables`).
-- `Tables.SyncAssetsDirectoriesDefinitionsTableName = "SyncAssetsDirectoriesDefinitions"`: The table's name that stores syncAssetsDirectoriesDefinitions data (a `.db` file in `FoldersName.Tables`).
 - `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
 
 ## Compatible picture formats :camera:
@@ -178,6 +169,7 @@ Improvements **WIP**.
 
 - [.NET 10.0][dotnet]
 - [Windows Presentation Foundation][wpf]
+- [SQLite][sqlite] (via [Microsoft.Data.Sqlite][ms-data-sqlite])
 - [NUnit][nunit]
 - [NSubstitute][nsubstitute]
 - [MagickImage][magickimage]
@@ -234,6 +226,8 @@ I've made a specific repo for the two customs dll, injected in the project: [pho
 
 [dotnet]: https://dotnet.microsoft.com/
 [wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
+[sqlite]: https://www.sqlite.org/
+[ms-data-sqlite]: https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/
 [nunit]: https://nunit.org/
 [nsubstitute]: https://github.com/nsubstitute/NSubstitute
 [magickimage]: https://github.com/dlemstra/Magick.NET

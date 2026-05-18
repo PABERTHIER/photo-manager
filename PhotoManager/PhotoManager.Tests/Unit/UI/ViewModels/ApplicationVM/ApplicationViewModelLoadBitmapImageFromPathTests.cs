@@ -18,19 +18,24 @@ namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelLoadBitmapImageFromPathTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private ApplicationViewModel? _applicationViewModel;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -50,31 +55,34 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
@@ -97,7 +105,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         int expectedThumbnailPixelWidth,
         int expectedThumbnailPixelHeight)
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -105,93 +113,86 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        const string fileName = FileNames.IMAGE_1_JPG;
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+
+        Asset asset = new()
         {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const string fileName = FileNames.IMAGE_1_JPG;
-            string filePath = Path.Combine(_dataDirectory!, fileName);
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            Asset asset = new()
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = expectedWith, Height = expectedHeight },
-                    Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = rotation,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            };
-
-            byte[] assetData = File.ReadAllBytes(filePath);
-
-            _assetRepository.AddAsset(asset, assetData);
-
-            CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
+                Asset = new() { Width = expectedWith, Height = expectedHeight },
+                Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
+            },
+            FileProperties = new()
             {
-                Asset = asset,
-                CataloguedAssetsByPath = [asset],
-                Reason = CatalogChangeReason.AssetCreated,
-                Message = $"Image {filePath} added to catalog."
-            };
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = rotation,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
 
-            _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+        byte[] assetData = File.ReadAllBytes(filePath);
 
-            BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        _testableAssetRepository.AddAsset(asset, assetData);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(rotation));
-            Assert.That(image.Width, Is.EqualTo(expectedWith));
-            Assert.That(image.Height, Is.EqualTo(expectedHeight));
-            Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
-            Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-
-            string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
-
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
+        CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = asset,
+            CataloguedAssetsByPath = [asset],
+            Reason = CatalogChangeReason.AssetCreated,
+            Message = $"Image {filePath} added to catalog."
+        };
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width, Is.EqualTo(expectedWith));
+        Assert.That(image.Height, Is.EqualTo(expectedHeight));
+        Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
+        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
+
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
+            false);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void LoadBitmapImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -199,98 +200,91 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        const string fileName = FileNames.NON_EXISTENT_IMAGE_JPG;
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        const Rotation rotation = Rotation.Rotate90;
+
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+
+        Asset asset = new()
         {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const string fileName = FileNames.NON_EXISTENT_IMAGE_JPG;
-            string filePath = Path.Combine(_dataDirectory!, fileName);
-            const Rotation rotation = Rotation.Rotate90;
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            Asset asset = new()
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
+                Asset = new()
                 {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    }
+                    Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                    Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
                 },
-                FileProperties = new()
+                Thumbnail = new()
                 {
-                    Size = FileSize.NON_EXISTENT_IMAGE_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = rotation,
-                Hash = Hashes.NON_EXISTENT_IMAGE_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
+                    Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
+                    Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
                 }
-            };
-
-            byte[] assetData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG));
-
-            _assetRepository.AddAsset(asset, assetData);
-
-            CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
+            },
+            FileProperties = new()
             {
-                Asset = asset,
-                CataloguedAssetsByPath = [asset],
-                Reason = CatalogChangeReason.AssetCreated,
-                Message = $"Image {filePath} added to catalog."
-            };
+                Size = FileSize.NON_EXISTENT_IMAGE_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = rotation,
+            Hash = Hashes.NON_EXISTENT_IMAGE_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
 
-            _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+        byte[] assetData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG));
 
-            BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        _testableAssetRepository.AddAsset(asset, assetData);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-
-            string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
-
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
+        CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = asset,
+            CataloguedAssetsByPath = [asset],
+            Reason = CatalogChangeReason.AssetCreated,
+            Message = $"Image {filePath} added to catalog."
+        };
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
+
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
+            false);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -298,92 +292,85 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        const string fileName = FileNames.IMAGE_1_JPG;
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        const Rotation rotation = (Rotation)999;
+
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+
+        Asset asset = new()
         {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const string fileName = FileNames.IMAGE_1_JPG;
-            string filePath = Path.Combine(_dataDirectory!, fileName);
-            const Rotation rotation = (Rotation)999;
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            Asset asset = new()
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = rotation,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
                 }
-            };
-
-            byte[] assetData = File.ReadAllBytes(filePath);
-
-            _assetRepository.AddAsset(asset, assetData);
-
-            CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
+            },
+            FileProperties = new()
             {
-                Asset = asset,
-                CataloguedAssetsByPath = [asset],
-                Reason = CatalogChangeReason.AssetCreated,
-                Message = $"Image {filePath} added to catalog."
-            };
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = rotation,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
 
-            _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+        byte[] assetData = File.ReadAllBytes(filePath);
 
-            ArgumentException? exception =
-                Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+        _testableAssetRepository.AddAsset(asset, assetData);
 
-            Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
-
-            string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
-
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
+        CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = asset,
+            CataloguedAssetsByPath = [asset],
+            Reason = CatalogChangeReason.AssetCreated,
+            Message = $"Image {filePath} added to catalog."
+        };
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+
+        Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+
+        string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
+
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
+            false);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -391,93 +378,86 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
+        CheckBeforeChanges(_assetsDirectory!);
+
+        const string fileName = FileNames.IMAGE_11_HEIC;
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        const Rotation rotation = Rotation.Rotate0;
+
+        Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+
+        Asset asset = new()
         {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const string fileName = FileNames.IMAGE_11_HEIC;
-            string filePath = Path.Combine(_dataDirectory!, fileName);
-            const Rotation rotation = Rotation.Rotate0;
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            Asset asset = new()
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
             {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new()
                 {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_11_HEIC,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = rotation,
-                Hash = Hashes.IMAGE_11_HEIC,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
+                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
                 }
-            };
-
-            byte[] assetData = File.ReadAllBytes(filePath);
-
-            _assetRepository.AddAsset(asset, assetData);
-
-            CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
+            },
+            FileProperties = new()
             {
-                Asset = asset,
-                CataloguedAssetsByPath = [asset],
-                Reason = CatalogChangeReason.AssetCreated,
-                Message = $"Image {filePath} added to catalog."
-            };
+                Size = FileSize.IMAGE_11_HEIC,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = rotation,
+            Hash = Hashes.IMAGE_11_HEIC,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
 
-            _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+        byte[] assetData = File.ReadAllBytes(filePath);
 
-            BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        _testableAssetRepository.AddAsset(asset, assetData);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(rotation));
-            Assert.That(image.Width,
-                Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
-            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-            Assert.That(image.DecodePixelWidth, Is.Zero);
-            Assert.That(image.DecodePixelHeight, Is.Zero);
-
-            string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
-
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, 1, [asset], expectedStatusMessage, asset, false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, 1, [asset], expectedStatusMessage, asset,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
+        CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            Asset = asset,
+            CataloguedAssetsByPath = [asset],
+            Reason = CatalogChangeReason.AssetCreated,
+            Message = $"Image {filePath} added to catalog."
+        };
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
+
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width,
+            Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
+
+        string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
+
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset, false);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, 1, [asset], expectedStatusMessage, asset,
+            false);
+
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

@@ -9,18 +9,24 @@ namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 [TestFixture]
 public class ApplicationViewModelSetExecutionTimeTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private ApplicationViewModel? _applicationViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
     }
 
     private void ConfigureApplicationViewModel(string assetsDirectory)
@@ -32,31 +38,35 @@ public class ApplicationViewModelSetExecutionTimeTests
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(),
-            new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        AssetRepository assetRepository = new(database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService,
+        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+            catalogAssetsService,
             moveAssetsService, findDuplicatedAssetsService, userConfigurationService, fileOperationsService,
             imageProcessingService);
         _applicationViewModel = new(application);
@@ -69,7 +79,7 @@ public class ApplicationViewModelSetExecutionTimeTests
     [TestCase(1000)]
     public void SetExecutionTime_CorrectTimeSpan_SetsExecutionTimeWording(long ticks)
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -77,35 +87,28 @@ public class ApplicationViewModelSetExecutionTimeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            TimeSpan executionTime = new(ticks);
+        TimeSpan executionTime = new(ticks);
 
-            _applicationViewModel!.SetExecutionTime(executionTime);
+        _applicationViewModel!.SetExecutionTime(executionTime);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, $"Execution time: {executionTime}");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, $"Execution time: {executionTime}");
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     [Test]
     public void SetExecutionTime_IncorrectTimeSpan_SetsExecutionTimeWording()
     {
-        ConfigureApplicationViewModel(_dataDirectory!);
+        ConfigureApplicationViewModel(_assetsDirectory!);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -113,29 +116,22 @@ public class ApplicationViewModelSetExecutionTimeTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
+        CheckBeforeChanges(_assetsDirectory!);
 
-            TimeSpan executionTime = new(-1000);
+        TimeSpan executionTime = new(-1000);
 
-            _applicationViewModel!.SetExecutionTime(executionTime);
+        _applicationViewModel!.SetExecutionTime(executionTime);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, $"Execution time: {executionTime}");
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ExecutionTimeWording"));
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, $"Execution time: {executionTime}");
+        CheckInstance(applicationViewModelInstances, _assetsDirectory!, $"Execution time: {executionTime}");
 
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+        // Because the root folder is already added
+        Assert.That(folderAddedEvents, Is.Empty);
+        Assert.That(folderRemovedEvents, Is.Empty);
     }
 
     private

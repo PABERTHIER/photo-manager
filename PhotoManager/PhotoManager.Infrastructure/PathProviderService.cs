@@ -1,13 +1,11 @@
 ﻿namespace PhotoManager.Infrastructure;
 
-public class PathProviderService(IUserConfigurationService userConfigurationService) : IPathProviderService
+public class PathProviderService : IPathProviderService
 {
-    private readonly string _dataDirectory = Path.Combine(
-        userConfigurationService.PathSettings.BackupPath,
-        $"v{userConfigurationService.StorageSettings.StorageVersion}");
+    private static readonly string DatabaseDirectory = Path.Combine(AppContext.BaseDirectory, "Database");
 
-    public string ResolveDataDirectory()
+    public string ResolveDatabaseDirectory()
     {
-        return _dataDirectory;
+        return DatabaseDirectory;
     }
 }

@@ -14,14 +14,12 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetAssetsCounterTests
 {
-    private string? _dataDirectory;
+    private string? _assetsDirectory;
     private string? _databaseDirectory;
-    private string? _databasePath;
 
     private PhotoManager.Application.Application? _application;
-    private AssetRepository? _assetRepository;
+    private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
-    private Database? _database;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -31,9 +29,8 @@ public class ApplicationGetAssetsCounterTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
-        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
 
     [SetUp]
@@ -161,6 +158,13 @@ public class ApplicationGetAssetsCounterTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _testableAssetRepository?.Dispose();
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
         int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
@@ -178,30 +182,34 @@ public class ApplicationGetAssetsCounterTests
         _userConfigurationService = new(configurationRootMock);
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
-        pathProviderServiceMock.ResolveDataDirectory().Returns(_databasePath);
+        pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
 
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage(), new TestLogger<Database>());
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_database, pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, new TestLogger<AssetRepository>());
+        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
+        SqlitePersistenceContext sqlitePersistenceContext = new(
+            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
-        SyncAssetsService syncAssetsService = new(_assetRepository, fileOperationsService, assetsComparator,
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, fileOperationsService,
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
             findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
@@ -210,12 +218,13 @@ public class ApplicationGetAssetsCounterTests
     [TestCase(true)]
     public async Task GetAssetsCounter_CataloguedAssets_ReturnsNumberOfAssets(bool analyseVideos)
     {
-        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, analyseVideos);
 
         string outputVideoFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -232,7 +241,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
 
             if (analyseVideos)
             {
@@ -246,16 +254,17 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_AssetsExist_ReturnsNumberOfAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -269,7 +278,7 @@ public class ApplicationGetAssetsCounterTests
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
-            _assetRepository.AddAsset(_asset1!, []);
+            _testableAssetRepository.AddAsset(_asset1!, []);
 
             assetsCounter = _application!.GetAssetsCounter();
             Assert.That(assetsCounter, Is.EqualTo(1));
@@ -277,7 +286,7 @@ public class ApplicationGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            _assetRepository.AddAsset(_asset2!, []);
+            _testableAssetRepository.AddAsset(_asset2!, []);
 
             assetsCounter = _application!.GetAssetsCounter();
             Assert.That(assetsCounter, Is.EqualTo(2));
@@ -286,7 +295,7 @@ public class ApplicationGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            _assetRepository.AddAsset(_asset3!, []);
+            _testableAssetRepository.AddAsset(_asset3!, []);
 
             assetsCounter = _application!.GetAssetsCounter();
             Assert.That(assetsCounter, Is.EqualTo(3));
@@ -296,7 +305,7 @@ public class ApplicationGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
-            _assetRepository.DeleteAsset(assetsDirectory, _asset3.FileName);
+            _testableAssetRepository.DeleteAsset(assetsDirectory, _asset3.FileName);
 
             assetsCounter = _application!.GetAssetsCounter();
 
@@ -308,7 +317,7 @@ public class ApplicationGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
 
-            _assetRepository.AddAsset(_asset4!, []);
+            _testableAssetRepository.AddAsset(_asset4!, []);
 
             assetsCounter = _application!.GetAssetsCounter();
             Assert.That(assetsCounter, Is.EqualTo(3));
@@ -322,7 +331,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -330,12 +338,13 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_NoAsset_Returns0()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -349,7 +358,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
             assetsUpdatedSubscription.Dispose();
         }
@@ -358,26 +366,27 @@ public class ApplicationGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_ConcurrentAccess_AssetsAreHandledSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            Folder folder = _assetRepository!.AddFolder(assetsDirectory);
+            Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
             _asset3 = _asset3!.WithFolder(folder);
             _asset4 = _asset4!.WithFolder(folder);
 
-            _assetRepository.AddAsset(_asset1!, []);
-            _assetRepository.AddAsset(_asset2!, []);
-            _assetRepository.AddAsset(_asset3!, []);
-            _assetRepository.AddAsset(_asset4!, []);
+            _testableAssetRepository.AddAsset(_asset1!, []);
+            _testableAssetRepository.AddAsset(_asset2!, []);
+            _testableAssetRepository.AddAsset(_asset3!, []);
+            _testableAssetRepository.AddAsset(_asset4!, []);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -408,7 +417,6 @@ public class ApplicationGetAssetsCounterTests
         }
         finally
         {
-            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

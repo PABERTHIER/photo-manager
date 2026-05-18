@@ -1,5 +1,5 @@
-﻿using System.IO.Compression;
-using Tables = PhotoManager.Tests.Integration.Constants.Tables;
+﻿using PhotoManager.Tests.Integration;
+using System.IO.Compression;
 
 namespace PhotoManager.Tests;
 
@@ -8,295 +8,49 @@ public static class CatalogAssetsAsyncAsserts
     public const string CREATING_BACKUP_MESSAGE = "Creating catalog backup...";
     public const string UPDATING_BACKUP_MESSAGE = "Updating catalog backup...";
 
-    public static void CheckBlobsAndTablesBeforeSaveCatalog(string blobsPath, string tablesPath)
-    {
-        string[] blobFiles = Directory.GetFiles(blobsPath);
-        string[] tableFiles = Directory.GetFiles(tablesPath);
-
-        Assert.That(blobFiles, Is.Empty);
-        Assert.That(tableFiles, Is.Empty);
-
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
-    }
-
-    public static void CheckBlobsAndTablesAfterSaveCatalog(
-        IBlobStorage blobStorage,
-        IDatabase database,
-        IUserConfigurationService userConfigurationService,
-        string blobsPath,
-        string tablesPath,
-        IReadOnlyCollection<Folder> folders,
-        IReadOnlyCollection<Folder> foldersContainingAssets,
-        IReadOnlyCollection<Asset> assetsFromRepository,
-        Dictionary<Folder, List<Asset>> folderToAssetsMapping,
-        Dictionary<string, int> assetNameToByteSizeMapping)
-    {
-        string[] blobFiles = Directory.GetFiles(blobsPath);
-        string[] tableFiles = Directory.GetFiles(tablesPath);
-
-        Assert.That(blobFiles, Has.Length.EqualTo(foldersContainingAssets.Count));
-
-        foreach (Folder folder in foldersContainingAssets)
-        {
-            string blobFileName = $"{folder.Id}.bin";
-            string blobFilePath = Path.Combine(blobsPath, blobFileName);
-
-            Assert.That(File.Exists(blobFilePath), Is.True);
-
-            List<Asset> assetsFromRepositoryByFolder = [.. assetsFromRepository.Where(x => x.FolderId == folder.Id)];
-
-            Dictionary<string, byte[]>? dataRead = blobStorage.ReadFromBinaryFile(blobFilePath);
-            Assert.That(dataRead, Is.Not.Null);
-            Assert.That(dataRead!, Has.Count.EqualTo(assetsFromRepositoryByFolder.Count));
-
-            for (int i = 0; i < dataRead.Count; i++)
-            {
-                Assert.That(dataRead.ContainsKey(assetsFromRepositoryByFolder[i].FileName), Is.True);
-                Assert.That(assetNameToByteSizeMapping.ContainsKey(assetsFromRepositoryByFolder[i].FileName), Is.True);
-                Assert.That(dataRead[assetsFromRepositoryByFolder[i].FileName],
-                    Has.Length.EqualTo(assetNameToByteSizeMapping[assetsFromRepositoryByFolder[i].FileName]));
-            }
-        }
-
-        Assert.That(tableFiles, Has.Length.EqualTo(4));
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
-
-        List<Asset> assetsFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
-                AssetConfigs.ReadFunc);
-        List<Folder> foldersFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
-                FolderConfigs.ReadFunc);
-        List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitionsFromDatabase =
-            database.ReadObjectList(
-                userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
-        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(
-            userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
-            RecentPathsConfigs.ReadFunc);
-
-        Assert.That(assetsFromDatabase, Has.Count.EqualTo(assetsFromRepository.Count));
-
-        Dictionary<Asset, Folder> assetToFolderMapping = folderToAssetsMapping.SelectMany(kv =>
-            kv.Value.Select(a => (Asset: a, Folder: kv.Key))).ToDictionary(x => x.Asset, x => x.Folder);
-
-        foreach (Asset assetFromDatabase in assetsFromDatabase)
-        {
-            Asset expectedAsset = assetToFolderMapping.Keys.First(a =>
-                a.FileName == assetFromDatabase.FileName && a.FolderId == assetFromDatabase.FolderId);
-            Folder expectedFolder = assetToFolderMapping[expectedAsset];
-
-            AssertAssetFromDatabaseValidity(assetFromDatabase, expectedAsset, expectedFolder.Id);
-        }
-
-        Assert.That(foldersFromDatabase, Has.Count.EqualTo(folders.Count));
-
-        Dictionary<Guid, Folder> foldersById = folders.ToDictionary(f => f.Id, f => f);
-        Dictionary<Guid, Folder> foldersFromDatabaseById = foldersFromDatabase.ToDictionary(f => f.Id, f => f);
-
-        foreach ((Guid folderId, Folder expectedFolder) in foldersById)
-        {
-            Folder actualFolder = foldersFromDatabaseById[folderId];
-
-            Assert.That(actualFolder.Id, Is.EqualTo(expectedFolder.Id));
-            Assert.That(actualFolder.Path, Is.EqualTo(expectedFolder.Path));
-        }
-
-        Assert.That(syncAssetsDirectoriesDefinitionsFromDatabase, Is.Empty);
-        Assert.That(recentTargetPathsFromDatabase, Is.Empty);
-    }
-
-    public static void CheckBlobsAndTablesAfterSaveCatalogEmpty(
-        IDatabase database,
-        IUserConfigurationService userConfigurationService,
-        string blobsPath,
-        string tablesPath,
-        bool hasEmptyTables,
-        bool hasOneFolder,
-        Folder folder)
-    {
-        string[] blobFiles = Directory.GetFiles(blobsPath);
-        string[] tableFiles = Directory.GetFiles(tablesPath);
-
-        Assert.That(blobFiles, Is.Empty);
-
-        if (hasEmptyTables)
-        {
-            Assert.That(tableFiles, Has.Length.EqualTo(4));
-            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
-        }
-        else
-        {
-            Assert.That(tableFiles, Is.Empty);
-        }
-
-        List<Asset> assetsFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
-                AssetConfigs.ReadFunc);
-        List<Folder> foldersFromDatabase =
-            database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
-                FolderConfigs.ReadFunc);
-        List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitionsFromDatabase =
-            database.ReadObjectList(
-                userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
-                SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
-        List<string> recentTargetPathsFromDatabase = database.ReadObjectList(
-            userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
-            RecentPathsConfigs.ReadFunc);
-
-        Assert.That(assetsFromDatabase, Is.Empty);
-
-        if (hasOneFolder)
-        {
-            Assert.That(foldersFromDatabase, Has.Count.EqualTo(1));
-            Assert.That(foldersFromDatabase[0].Id, Is.EqualTo(folder.Id));
-            Assert.That(foldersFromDatabase[0].Path, Is.EqualTo(folder.Path));
-        }
-        else
-        {
-            Assert.That(foldersFromDatabase, Is.Empty);
-        }
-
-        Assert.That(syncAssetsDirectoriesDefinitionsFromDatabase, Is.Empty);
-        Assert.That(recentTargetPathsFromDatabase, Is.Empty);
-    }
-
     public static void CheckBackupBefore(IAssetRepository testableAssetRepository, string backupFilePath)
     {
         Assert.That(File.Exists(backupFilePath), Is.False);
         Assert.That(testableAssetRepository.BackupExists(), Is.False);
     }
 
-    public static void CheckBackupAfter(
-        IBlobStorage blobStorage,
-        IDatabase database,
-        IUserConfigurationService userConfigurationService,
-        string databasePath,
-        string databaseBackupPath,
-        string backupFilePath,
-        string blobsPath,
-        string tablesPath,
-        IReadOnlyCollection<Folder> folders,
-        IReadOnlyCollection<Folder> foldersContainingAssets,
-        IReadOnlyCollection<Asset> assetsFromRepository,
-        Dictionary<Folder, List<Asset>> folderToAssetsMapping,
-        Dictionary<string, int> assetNameToByteSizeMapping)
+    public static void CheckBackupAfter(string databaseBackupPath, string backupFilePath)
     {
-        string backupBlobsDirectory = Path.Combine(databaseBackupPath,
-            userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
-        string backupTablesDirectory = Path.Combine(databaseBackupPath,
-            userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
+        string databaseBackupFilePath = Path.Combine(databaseBackupPath, Constants.DATABASE_FILE_NAME);
 
-        Assert.That(Directory.Exists(backupBlobsDirectory), Is.False);
-        Assert.That(Directory.Exists(backupTablesDirectory), Is.False);
-
-        ZipFile.ExtractToDirectory(backupFilePath, databaseBackupPath);
         Assert.That(File.Exists(backupFilePath), Is.True);
+        ZipFile.ExtractToDirectory(backupFilePath, databaseBackupPath);
 
-        Assert.That(Directory.Exists(backupBlobsDirectory), Is.True);
-        Assert.That(Directory.Exists(backupTablesDirectory), Is.True);
-
-        string[] sourceDirectories = Directory.GetDirectories(databasePath);
-        string[] backupDirectories = Directory.GetDirectories(databaseBackupPath);
-
-        Assert.That(backupDirectories, Has.Length.EqualTo(sourceDirectories.Length));
-
-        Assert.That(blobsPath, Is.EqualTo(sourceDirectories[0]));
-        string[] blobs = Directory.GetFiles(blobsPath);
-        Assert.That(blobs, Has.Length.EqualTo(foldersContainingAssets.Count));
-
-        Assert.That(tablesPath, Is.EqualTo(sourceDirectories[1]));
-        string[] tables = Directory.GetFiles(tablesPath);
-        Assert.That(tables, Has.Length.EqualTo(4));
-
-        Assert.That(backupBlobsDirectory, Is.EqualTo(backupDirectories[0]));
-        string[] blobsBackup = Directory.GetFiles(backupBlobsDirectory);
-        Assert.That(blobsBackup, Has.Length.EqualTo(foldersContainingAssets.Count));
-
-        Assert.That(backupTablesDirectory, Is.EqualTo(backupDirectories[1]));
-        string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
-        Assert.That(tablesBackup, Has.Length.EqualTo(4));
-
-        CheckBlobsAndTablesAfterSaveCatalog(
-            blobStorage,
-            database,
-            userConfigurationService,
-            backupBlobsDirectory,
-            backupTablesDirectory,
-            folders,
-            foldersContainingAssets,
-            assetsFromRepository,
-            folderToAssetsMapping,
-            assetNameToByteSizeMapping);
-
-        Directory.Delete(backupBlobsDirectory, true);
-        Directory.Delete(backupTablesDirectory, true);
-
-        Assert.That(Directory.Exists(backupBlobsDirectory), Is.False);
-        Assert.That(Directory.Exists(backupTablesDirectory), Is.False);
+        Assert.That(File.Exists(databaseBackupFilePath), Is.True);
+        File.Delete(databaseBackupFilePath);
     }
 
-    public static void CheckDefaultEmptyBackup(
-        IDatabase database,
-        IUserConfigurationService userConfigurationService,
-        string databasePath,
-        string databaseBackupPath,
-        string backupFilePath,
-        string blobsPath,
-        string tablesPath,
-        bool hasEmptyTables,
-        bool hasOneFolder,
-        Folder folder)
+    public static void AssertAssetsPropertyValidityAndImageData(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, string folderPath, Folder folder)
     {
-        int expectedTablesCount = hasEmptyTables ? 4 : 0;
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
 
-        string backupBlobsDirectory = Path.Combine(databaseBackupPath,
-            userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
-        string backupTablesDirectory = Path.Combine(databaseBackupPath,
-            userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+            Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
+        }
+    }
 
-        Assert.That(Directory.Exists(backupBlobsDirectory), Is.False);
-        Assert.That(Directory.Exists(backupTablesDirectory), Is.False);
+    public static void AssertAssetsPropertyValidityAndImageData(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, List<string> folderPath, List<Folder> folders)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+            string expectedFolderPath = folderPath.First(x => x == expectedAsset.Folder.Path);
+            Folder expectedFolder = folders.First(x => x.Path == expectedAsset.Folder.Path);
 
-        ZipFile.ExtractToDirectory(backupFilePath, databaseBackupPath);
-        File.Delete(backupFilePath);
-        Assert.That(File.Exists(backupFilePath), Is.False);
-
-        Assert.That(Directory.Exists(backupBlobsDirectory), Is.True);
-        Assert.That(Directory.Exists(backupTablesDirectory), Is.True);
-
-        string[] sourceDirectories = Directory.GetDirectories(databasePath);
-        string[] backupDirectories = Directory.GetDirectories(databaseBackupPath);
-
-        Assert.That(backupDirectories, Has.Length.EqualTo(sourceDirectories.Length));
-
-        Assert.That(blobsPath, Is.EqualTo(sourceDirectories[0]));
-        string[] blobs = Directory.GetFiles(blobsPath);
-        Assert.That(blobs, Is.Empty);
-
-        Assert.That(tablesPath, Is.EqualTo(sourceDirectories[1]));
-        string[] tables = Directory.GetFiles(tablesPath);
-        Assert.That(tables, Has.Length.EqualTo(expectedTablesCount));
-
-        Assert.That(backupBlobsDirectory, Is.EqualTo(backupDirectories[0]));
-        string[] blobsBackup = Directory.GetFiles(backupBlobsDirectory);
-        Assert.That(blobsBackup, Is.Empty);
-
-        Assert.That(backupTablesDirectory, Is.EqualTo(backupDirectories[1]));
-        string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
-        Assert.That(tablesBackup, Has.Length.EqualTo(expectedTablesCount));
-
-        CheckBlobsAndTablesAfterSaveCatalogEmpty(database, userConfigurationService, backupBlobsDirectory,
-            backupTablesDirectory, hasEmptyTables, hasOneFolder, folder);
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, expectedFolderPath, expectedFolder);
+            Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
+        }
     }
 
     public static void AssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath,
@@ -306,9 +60,34 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
     }
 
+    public static void AssertAssetsPropertyValidity(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, string folderPath, Folder folder)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+        }
+    }
+
+    public static void AssertAssetsPropertyValidity(List<Asset> assets, List<Asset> expectedAssets,
+        List<string> assetPaths, List<string> folderPaths, List<Folder> folders)
+    {
+        foreach (Asset asset in assets)
+        {
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == asset.FileName);
+            string assetPath = assetPaths.First(x => x == asset.FullPath);
+            string folderPath = folderPaths.First(x => x == expectedAsset.Folder.Path);
+            Folder folder = folders.First(x => x.Path == expectedAsset.Folder.Path);
+
+            AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+        }
+    }
+
     public static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath,
-        string folderPath,
-        Folder folder)
+        string folderPath, Folder folder)
     {
         DateTime actualDate = DateTime.Now.Date;
 
@@ -332,74 +111,6 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(asset.FileProperties.Creation.Date,
             Is.EqualTo(actualDate)); // Because files are generated by tests (ThumbnailCreationDateTime and FileModificationDateTime have the same value)
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
-    }
-
-    public static void AssertThumbnailsValidity(
-        IReadOnlyList<Asset> assetsFromRepository,
-        Dictionary<Folder, List<Asset>> folderToAssetsMapping,
-        IReadOnlyList<Folder> folders,
-        Dictionary<string, Dictionary<string, byte[]>> thumbnails,
-        IReadOnlyList<int> assetsImageByteSize)
-    {
-        Assert.That(thumbnails, Has.Count.EqualTo(folders.Count));
-
-        int thumbnailsTotalCount = 0;
-
-        for (int i = 0; i < thumbnails.Count; i++)
-        {
-            Assert.That(thumbnails.ContainsKey(folders[i].Path), Is.True);
-            thumbnailsTotalCount += thumbnails[folders[i].Path].Count;
-        }
-
-        Assert.That(thumbnailsTotalCount, Is.EqualTo(assetsFromRepository.Count));
-
-        Dictionary<Asset, Folder> assetToFolderMapping = folderToAssetsMapping.SelectMany(kv =>
-            kv.Value.Select(a => (Asset: a, Folder: kv.Key))).ToDictionary(x => x.Asset, x => x.Folder);
-
-        for (int i = 0; i < assetsFromRepository.Count; i++)
-        {
-            Asset currentAsset = assetsFromRepository[i];
-
-            Asset expectedAsset = assetToFolderMapping.Keys.First(a =>
-                a.FileName == currentAsset.FileName && a.FolderId == currentAsset.FolderId);
-            Folder expectedFolder = assetToFolderMapping[expectedAsset];
-
-            Assert.That(thumbnails[expectedFolder.Path].ContainsKey(currentAsset.FileName), Is.True);
-
-            byte[] assetImageByteSize = thumbnails[expectedFolder.Path][currentAsset.FileName];
-
-            Assert.That(assetImageByteSize, Is.Not.Null);
-            Assert.That(assetImageByteSize, Has.Length.EqualTo(assetsImageByteSize[i]));
-        }
-    }
-
-    private static void AssertAssetFromDatabaseValidity(Asset assetFromDatabase, Asset expectedAsset, Guid folderId)
-    {
-        DateTime actualDate = DateTime.Now.Date;
-        DateTime minDate = DateTime.MinValue.Date;
-
-        Assert.That(assetFromDatabase.FileName, Is.EqualTo(expectedAsset.FileName));
-        Assert.That(assetFromDatabase.FolderId, Is.EqualTo(folderId));
-        Assert.That(assetFromDatabase.Folder.Path, Is.EqualTo(string.Empty)); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Size, Is.Zero); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.Pixel.Asset.Width, Is.EqualTo(expectedAsset.Pixel.Asset.Width));
-        Assert.That(assetFromDatabase.Pixel.Asset.Height, Is.EqualTo(expectedAsset.Pixel.Asset.Height));
-        Assert.That(assetFromDatabase.Pixel.Thumbnail.Width, Is.EqualTo(expectedAsset.Pixel.Thumbnail.Width));
-        Assert.That(assetFromDatabase.Pixel.Thumbnail.Height, Is.EqualTo(expectedAsset.Pixel.Thumbnail.Height));
-        Assert.That(assetFromDatabase.ImageRotation, Is.EqualTo(expectedAsset.ImageRotation));
-        Assert.That(assetFromDatabase.ThumbnailCreationDateTime.Date, Is.EqualTo(actualDate));
-        Assert.That(assetFromDatabase.Hash, Is.EqualTo(expectedAsset.Hash));
-        Assert.That(assetFromDatabase.Metadata.Corrupted.IsTrue, Is.EqualTo(expectedAsset.Metadata.Corrupted.IsTrue));
-        Assert.That(assetFromDatabase.Metadata.Corrupted.Message, Is.EqualTo(string.Empty));
-        Assert.That(assetFromDatabase.Metadata.Rotated.IsTrue, Is.EqualTo(expectedAsset.Metadata.Rotated.IsTrue));
-        Assert.That(assetFromDatabase.Metadata.Rotated.Message, Is.EqualTo(string.Empty));
-        Assert.That(assetFromDatabase.FullPath,
-            Is.EqualTo(expectedAsset.FileName)); // Folder is not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.ImageData, Is.Null); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Creation.Date,
-            Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Modification.Date,
-            Is.EqualTo(minDate)); // Not saved in Db, loaded at the runtime
     }
 
     public static void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
@@ -552,11 +263,11 @@ public static class CatalogAssetsAsyncAsserts
     private static void AssertCataloguedAssetsByPath(IReadOnlyList<Asset> expectedAssets,
         CatalogChangeCallbackEventArgs catalogChange)
     {
-        for (int i = 0; i < catalogChange.CataloguedAssetsByPath.Count; i++)
+        foreach (Asset cataloguedAssetByPath in catalogChange.CataloguedAssetsByPath)
         {
-            Asset currentExpectedAsset = expectedAssets[i];
-            AssertAssetPropertyValidityAndImageData(catalogChange.CataloguedAssetsByPath[i], currentExpectedAsset,
-                currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            Asset expectedAsset = expectedAssets.First(x => x.FileName == cataloguedAssetByPath.FileName);
+            AssertAssetPropertyValidityAndImageData(cataloguedAssetByPath, expectedAsset,
+                expectedAsset.FullPath, expectedAsset.Folder.Path, expectedAsset.Folder);
         }
     }
 
@@ -640,40 +351,8 @@ public static class CatalogAssetsAsyncAsserts
         increment++;
     }
 
-    public static void RemoveDatabaseBackup(
-        List<Folder> folders,
-        string blobsPath,
-        string tablesPath,
-        string backupFilePath)
+    public static void RemoveDatabaseBackup(string backupFilePath)
     {
-
-        // Delete all blobs in Blobs directory
-        foreach (Folder folder in folders)
-        {
-            string blobFileName = $"{folder.Id}.bin";
-            string blobFilePath = Path.Combine(blobsPath, blobFileName);
-
-            File.Delete(blobFilePath);
-            Assert.That(File.Exists(blobFilePath), Is.False);
-        }
-
-        // Delete all tables in Tables directory
-        string assetsTablePath = Path.Combine(tablesPath, Tables.ASSETS_DB);
-        string foldersTablePath = Path.Combine(tablesPath, Tables.FOLDERS_DB);
-        string syncAssetsDirectoriesDefinitionsTablePath =
-            Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB);
-        string recentTargetPathsTablePath = Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB);
-
-        File.Delete(assetsTablePath);
-        File.Delete(foldersTablePath);
-        File.Delete(syncAssetsDirectoriesDefinitionsTablePath);
-        File.Delete(recentTargetPathsTablePath);
-
-        Assert.That(File.Exists(assetsTablePath), Is.False);
-        Assert.That(File.Exists(foldersTablePath), Is.False);
-        Assert.That(File.Exists(syncAssetsDirectoriesDefinitionsTablePath), Is.False);
-        Assert.That(File.Exists(recentTargetPathsTablePath), Is.False);
-
         // Delete ZIP file in backup
         File.Delete(backupFilePath);
         Assert.That(File.Exists(backupFilePath), Is.False);
