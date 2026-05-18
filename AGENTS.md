@@ -54,6 +54,24 @@ Example: `PhotoManager/Benchmarks/PhotoManager.Benchmarks/Common/HashingHelperCa
   - By project: `dotnet test --filter "FullyQualifiedName~PhotoManager.Common"`
 - Always explain which tests are being run and why
 
+## Test File Date Assertions — Stale Build Failure
+
+Some integration tests assert that `asset.FileProperties.Creation.Date` equals `DateTime.Now.Date`. These tests will **fail with a date mismatch** if the test project was last built on a previous day:
+
+```
+Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate))
+Expected: 2026-05-15 00:00:00
+But was: 2026-05-14 00:00:00
+```
+
+**Root cause:** `PhotoManager.Tests.csproj` defines a custom MSBuild task `SetFileDates` (from `MSBuildTask\FileDateTask.dll`) that runs `AfterTargets="PreBuildEvent"` on every build.
+It copies all test files under `TestFiles\` to the output directory, and their filesystem creation date is set to the time of that build.
+When a day passes without rebuilding, the creation dates of the copied files become yesterday's date, causing assertions against `DateTime.Now.Date` to fail.
+
+**Fix:** Run `dotnet build PhotoManager/PhotoManager.slnx` to trigger the `SetFixedDate` target and refresh the test files in the output directory. Then re-run the failing tests — they will pass.
+
+**This is not a regression introduced by code changes.** If you see only date assertion failures and your code changes are unrelated to file date handling, rebuild first before investigating further.
+
 ## TODO Comments (NON-NEGOTIABLE)
 
 - **Never remove a `// TODO` comment** unless the issue it describes has been fully fixed in the same change

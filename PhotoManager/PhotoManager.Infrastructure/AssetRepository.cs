@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhotoManager.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence;
 using PhotoManager.Persistence.Cache;
 using System.Collections.Concurrent;
 using System.Reactive;

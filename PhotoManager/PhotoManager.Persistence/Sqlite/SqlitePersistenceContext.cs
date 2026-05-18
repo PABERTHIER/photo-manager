@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using PhotoManager.Domain.Interfaces.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence.Repositories;
 using PhotoManager.Persistence.Repositories;
 
 namespace PhotoManager.Persistence.Sqlite;

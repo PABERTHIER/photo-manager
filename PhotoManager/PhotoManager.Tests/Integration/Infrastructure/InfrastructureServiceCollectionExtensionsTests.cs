@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PhotoManager.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 

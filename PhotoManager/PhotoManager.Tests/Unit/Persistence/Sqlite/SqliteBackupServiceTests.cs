@@ -35,11 +35,11 @@ public class SqliteBackupServiceTests
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandText = """
-                                     CREATE TABLE IF NOT EXISTS Folders (
-                                         Id   TEXT PRIMARY KEY NOT NULL,
-                                         Path TEXT NOT NULL
-                                     );
-                                     """;
+                                      CREATE TABLE IF NOT EXISTS Folders (
+                                          Id   TEXT PRIMARY KEY NOT NULL,
+                                          Path TEXT NOT NULL
+                                      );
+                                      """;
                 command.ExecuteNonQuery();
             }
         }

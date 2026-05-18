@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using System.Data;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Persistence;
@@ -78,7 +79,7 @@ public class SqliteConnectionFactoryTests
 
         using (SqliteConnection connection = _sqliteConnectionFactory!.Open())
         {
-            Assert.That(connection.State, Is.EqualTo(System.Data.ConnectionState.Open));
+            Assert.That(connection.State, Is.EqualTo(ConnectionState.Open));
             Assert.That(connection.DataSource, Is.EqualTo(databasePath));
         }
 
@@ -188,8 +189,8 @@ public class SqliteConnectionFactoryTests
             using (SqliteConnection connection2 = _sqliteConnectionFactory!.Open())
             {
                 Assert.That(connection1, Is.Not.SameAs(connection2));
-                Assert.That(connection1.State, Is.EqualTo(System.Data.ConnectionState.Open));
-                Assert.That(connection2.State, Is.EqualTo(System.Data.ConnectionState.Open));
+                Assert.That(connection1.State, Is.EqualTo(ConnectionState.Open));
+                Assert.That(connection2.State, Is.EqualTo(ConnectionState.Open));
             }
         }
 

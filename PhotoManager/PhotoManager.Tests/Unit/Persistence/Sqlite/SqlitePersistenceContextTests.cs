@@ -45,8 +45,8 @@ public class SqlitePersistenceContextTests
         _factory!.DatabasePath.Returns(Path.Combine(_databaseDirectory!, "photomanager.db"));
         _factory!.Open().Throws(thrownException);
 
-        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(
-            () => _sqlitePersistenceContext!.Initialize(_databaseDirectory!));
+        InvalidOperationException? exception =
+            Assert.Throws<InvalidOperationException>(() => _sqlitePersistenceContext!.Initialize(_databaseDirectory!));
 
         Assert.That(exception, Is.SameAs(thrownException));
 
@@ -65,8 +65,8 @@ public class SqlitePersistenceContextTests
         IOException thrownException = new("Disk full");
         _backupService!.WriteBackup(Arg.Any<string>()).Throws(thrownException);
 
-        IOException? exception = Assert.Throws<IOException>(
-            () => _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 5, 1)));
+        IOException? exception =
+            Assert.Throws<IOException>(() => _sqlitePersistenceContext!.WriteBackup(new DateTime(2024, 5, 1)));
 
         Assert.That(exception, Is.SameAs(thrownException));
 
@@ -84,8 +84,8 @@ public class SqlitePersistenceContextTests
         UnauthorizedAccessException thrownException = new("Access denied");
         _backupService!.GetBackupFilesPaths(Arg.Any<string>()).Throws(thrownException);
 
-        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(
-            () => _sqlitePersistenceContext!.DeleteOldBackups(2));
+        UnauthorizedAccessException? exception =
+            Assert.Throws<UnauthorizedAccessException>(() => _sqlitePersistenceContext!.DeleteOldBackups(2));
 
         Assert.That(exception, Is.SameAs(thrownException));
 
@@ -107,8 +107,7 @@ public class SqlitePersistenceContextTests
         _backupService!.When(x => x.DeleteBackupFile(Arg.Any<string>()))
             .Do(_ => throw thrownException);
 
-        IOException? exception = Assert.Throws<IOException>(
-            () => _sqlitePersistenceContext!.DeleteOldBackups(1));
+        IOException? exception = Assert.Throws<IOException>(() => _sqlitePersistenceContext!.DeleteOldBackups(1));
 
         Assert.That(exception, Is.SameAs(thrownException));
 

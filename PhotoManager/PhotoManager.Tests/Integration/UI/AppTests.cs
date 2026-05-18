@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PhotoManager.Application;
-using PhotoManager.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence;
 using PhotoManager.UI;
 using PhotoManager.UI.Windows;
 

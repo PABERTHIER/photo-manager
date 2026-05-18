@@ -1,4 +1,5 @@
-﻿using PhotoManager.Persistence.Sqlite;
+﻿using PhotoManager.Domain.Interfaces.Persistence.Repositories;
+using PhotoManager.Persistence.Sqlite;
 
 namespace PhotoManager.Persistence.Repositories;
 

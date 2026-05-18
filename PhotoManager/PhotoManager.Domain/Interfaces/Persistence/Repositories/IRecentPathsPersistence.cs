@@ -1,4 +1,4 @@
-﻿namespace PhotoManager.Persistence.Repositories;
+﻿namespace PhotoManager.Domain.Interfaces.Persistence.Repositories;
 
 public interface IRecentPathsPersistence
 {

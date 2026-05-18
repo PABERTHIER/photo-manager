@@ -8,8 +8,8 @@ public class LruCacheTests
     [Test]
     public void Constructor_InvalidCapacity_ThrowsArgumentOutOfRangeException([Values(0, -1, -10)] int capacity)
     {
-        ArgumentOutOfRangeException ex = Assert.Throws<ArgumentOutOfRangeException>(
-            () => _ = new LruCache<string, int>(capacity))!;
+        ArgumentOutOfRangeException ex =
+            Assert.Throws<ArgumentOutOfRangeException>(() => _ = new LruCache<string, int>(capacity))!;
 
         Assert.That(ex.ParamName, Is.EqualTo("capacity"));
     }

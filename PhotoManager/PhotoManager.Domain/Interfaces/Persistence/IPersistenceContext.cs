@@ -1,6 +1,6 @@
-﻿using PhotoManager.Persistence.Repositories;
+﻿using PhotoManager.Domain.Interfaces.Persistence.Repositories;
 
-namespace PhotoManager.Persistence;
+namespace PhotoManager.Domain.Interfaces.Persistence;
 
 /// <summary>
 /// High-level facade for the new SQLite-backed persistence engine.

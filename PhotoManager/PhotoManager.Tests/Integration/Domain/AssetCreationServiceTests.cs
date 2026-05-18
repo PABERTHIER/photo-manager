@@ -1817,6 +1817,87 @@ public class AssetCreationServiceTests
     }
 
     [Test]
+    public void CreateAsset_PictureAndBasicHashTypeAndAddAssetReturnsFalse_LogsItAndReturnsAssetAndAssetIsNotCreated()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        const string assetName = FileNames.IMAGE_1_JPG;
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
+
+        Asset expectedAsset = new()
+        {
+            FolderId = folder.Id,
+            Folder = new() { Id = folder.Id, Path = folder.Path },
+            FileName = assetName,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_1_JPG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
+
+        string imagePath = Path.Combine(_assetsDirectory!, assetName);
+
+        Assert.That(File.Exists(imagePath), Is.True);
+
+        IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
+        assetRepositoryMock.IsAssetCatalogued(_assetsDirectory!, assetName).Returns(false);
+        assetRepositoryMock.GetFolderByPath(_assetsDirectory!).Returns(folder);
+        assetRepositoryMock.AddAsset(Arg.Any<Asset>(), Arg.Any<byte[]>()).Returns(false);
+
+        ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
+        FileOperationsService fileOperationsService = new(_userConfigurationService!,
+            new TestLogger<FileOperationsService>());
+        ImageMetadataService imageMetadataService = new(fileOperationsService,
+            new TestLogger<ImageMetadataService>());
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService!,
+            new TestLogger<AssetHashCalculatorService>());
+
+        AssetCreationService assetCreationService = new(assetRepositoryMock, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            _userConfigurationService!, _testLogger!);
+
+        Asset? asset = assetCreationService.CreateAsset(_assetsDirectory!, assetName);
+
+        Assert.That(asset, Is.Not.Null);
+
+        AssertAssetPropertyValidity(
+            asset!,
+            expectedAsset.FileName,
+            imagePath,
+            _assetsDirectory!,
+            folder,
+            expectedAsset.FileProperties.Size,
+            expectedAsset.Pixel.Asset.Width,
+            expectedAsset.Pixel.Asset.Height,
+            expectedAsset.Pixel.Thumbnail.Width,
+            expectedAsset.Pixel.Thumbnail.Height,
+            expectedAsset.FileProperties.Modification,
+            expectedAsset.ImageRotation,
+            expectedAsset.Hash,
+            expectedAsset.Metadata.Corrupted.IsTrue,
+            expectedAsset.Metadata.Corrupted.Message,
+            expectedAsset.Metadata.Rotated.IsTrue,
+            expectedAsset.Metadata.Rotated.Message);
+
+        _testLogger!.AssertLogErrors([$"The asset {imagePath} could not be added."], typeof(AssetCreationService));
+    }
+
+    [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFolderNotAdded_LogsItAndReturnsNullAndAssetIsNotCreated()
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);

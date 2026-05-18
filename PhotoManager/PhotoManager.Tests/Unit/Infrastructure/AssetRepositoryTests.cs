@@ -1,5 +1,5 @@
-﻿using PhotoManager.Persistence;
-using PhotoManager.Persistence.Repositories;
+﻿using PhotoManager.Domain.Interfaces.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence.Repositories;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -150,7 +150,8 @@ public class AssetRepositoryTests
 
                 _folderPersistenceMock!.Received(1).Insert(Arg.Any<string>());
                 _assetPersistenceMock!.DidNotReceive().Upsert(Arg.Any<Asset>());
-                _thumbnailPersistenceMock!.DidNotReceive().Upsert(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<byte[]>());
+                _thumbnailPersistenceMock!.DidNotReceive()
+                    .Upsert(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<byte[]>());
                 _imageProcessingServiceMock!.DidNotReceive()
                     .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
 
@@ -415,7 +416,7 @@ public class AssetRepositoryTests
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-                                  .Returns(new BitmapImage());
+            .Returns(new BitmapImage());
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
@@ -463,7 +464,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "photo.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-                                        .Returns(new BitmapImage());
+            .Returns(new BitmapImage());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();
@@ -586,7 +587,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "sunset.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-                                        .Returns(new BitmapImage());
+            .Returns(new BitmapImage());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhotoManager.Persistence;
+using PhotoManager.Domain.Interfaces.Persistence;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -31,7 +31,9 @@ public class TestableAssetRepository(
     public new bool BackupExists() => base.BackupExists();
     public new void WriteBackup() => base.WriteBackup();
     public new List<Asset> GetCataloguedAssets() => [.. base.GetCataloguedAssets()];
-    public new List<Asset> GetCataloguedAssetsByPath(string directory) => [.. base.GetCataloguedAssetsByPath(directory)];
+
+    public new List<Asset> GetCataloguedAssetsByPath(string directory) =>
+        [.. base.GetCataloguedAssetsByPath(directory)];
 
     public new bool IsAssetCatalogued(string directoryName, string fileName) => base.IsAssetCatalogued(
         directoryName, fileName);

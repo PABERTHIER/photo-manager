@@ -39,7 +39,8 @@ public class SyncDefinitionsPersistenceTests
     [Test]
     public void GetAll_EmptyTable_ReturnsEmptyList()
     {
-        IReadOnlyList<SyncAssetsDirectoriesDefinition> definitions = _sqlitePersistenceContext!.SyncDefinitions.GetAll();
+        IReadOnlyList<SyncAssetsDirectoriesDefinition> definitions =
+            _sqlitePersistenceContext!.SyncDefinitions.GetAll();
 
         Assert.That(definitions, Is.Empty);
 
