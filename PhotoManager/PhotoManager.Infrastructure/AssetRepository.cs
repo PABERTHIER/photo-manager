@@ -428,6 +428,53 @@ public class AssetRepository : IAssetRepository, IDisposable
         }
     }
 
+    // ----------------------------------------------------------- Stored state
+
+    public string? GetStoredAssetsDirectory()
+    {
+        try
+        {
+            ThrowIfDisposed();
+
+            return _persistenceContext.Configuration.GetValue(ConfigurationKeys.ASSETS_DIRECTORY);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting stored assets directory");
+            throw;
+        }
+    }
+
+    public void StoreAssetsDirectory(string path)
+    {
+        try
+        {
+            ThrowIfDisposed();
+
+            _persistenceContext.Configuration.SetValue(ConfigurationKeys.ASSETS_DIRECTORY, path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error storing assets directory: {Path}", path);
+            throw;
+        }
+    }
+
+    public void Vacuum()
+    {
+        try
+        {
+            ThrowIfDisposed();
+
+            _persistenceContext.Vacuum();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error vacuuming the database");
+            throw;
+        }
+    }
+
     // -------------------------------------------------------------- Dispose
 
     public void Dispose()

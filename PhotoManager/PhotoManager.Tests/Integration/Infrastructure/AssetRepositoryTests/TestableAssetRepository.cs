@@ -60,4 +60,10 @@ public class TestableAssetRepository(
         destinationFolder);
 
     public new int GetAssetsCounter() => base.GetAssetsCounter();
+
+    public new string? GetStoredAssetsDirectory() => base.GetStoredAssetsDirectory();
+
+    public new void StoreAssetsDirectory(string path) => base.StoreAssetsDirectory(path);
+
+    public new void Vacuum() => base.Vacuum();
 }

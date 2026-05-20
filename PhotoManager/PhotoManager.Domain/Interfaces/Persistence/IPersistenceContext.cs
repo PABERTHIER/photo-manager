@@ -23,6 +23,13 @@ public interface IPersistenceContext
     IThumbnailPersistence Thumbnails { get; }
     IRecentPathsPersistence RecentPaths { get; }
     ISyncDefinitionsPersistence SyncDefinitions { get; }
+    IConfigurationPersistence Configuration { get; }
+
+    /// <summary>
+    /// Reclaims free pages in the database file, reducing its on-disk footprint.
+    /// Must not be called inside a transaction.
+    /// </summary>
+    void Vacuum();
 
     /// <summary>
     /// Writes a backup snapshot for <paramref name="backupDate"/>.

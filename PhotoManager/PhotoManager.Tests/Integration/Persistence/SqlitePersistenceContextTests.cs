@@ -347,7 +347,57 @@ public class SqlitePersistenceContextTests
                 command.CommandText = "PRAGMA user_version;";
                 long version = Convert.ToInt64(command.ExecuteScalar());
 
-                Assert.That(version, Is.EqualTo(1));
+                Assert.That(version, Is.EqualTo(2));
+            }
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Initialize_ExistingV1Schema_MigratesToV2AndCreatesConfigurationTable()
+    {
+        // Arrange: manually create a v1 database (no Configuration table)
+        string databasePath = Path.Combine(_databaseDirectory!, SqlitePersistenceContext.DATABASE_FILE_NAME);
+        Directory.CreateDirectory(_databaseDirectory!);
+
+        using (SqliteConnection connection = new($"Data Source={databasePath}"))
+        {
+            connection.Open();
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText =
+                    "CREATE TABLE IF NOT EXISTS Folders (Id TEXT PRIMARY KEY NOT NULL, Path TEXT NOT NULL);";
+                command.ExecuteNonQuery();
+            }
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA user_version = 1;";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        // Act: Initialize detects v1 and migrates to v2
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        // Assert: schema version bumped to 2 and Configuration table created
+        using (SqliteConnection connection = _factory!.Open())
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA user_version;";
+                long version = Convert.ToInt64(command.ExecuteScalar());
+                Assert.That(version, Is.EqualTo(2));
+            }
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'Configuration';";
+                object? tableName = command.ExecuteScalar();
+                Assert.That(tableName, Is.EqualTo("Configuration"),
+                    "The Configuration table must be created during migration from schema v1 to v2.");
             }
         }
 
@@ -371,5 +421,75 @@ public class SqlitePersistenceContextTests
         Assert.That(files[0], Does.Contain("20240303"));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Vacuum_EmptyDatabase_CompletesWithoutError()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Assert.DoesNotThrow(() => _sqlitePersistenceContext!.Vacuum());
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Vacuum_DatabaseWithData_CompletesWithoutError()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Family");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Travel");
+        _sqlitePersistenceContext!.Folders.Insert(@"C:\Photos\Work");
+
+        Assert.DoesNotThrow(() => _sqlitePersistenceContext!.Vacuum());
+
+        // Folders must still be intact after VACUUM
+        Assert.That(_sqlitePersistenceContext!.Folders.Count(), Is.EqualTo(3));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Vacuum_NotInitialized_ThrowsInvalidOperationException()
+    {
+        const string expectedMessage = "Db context has not been initialized.";
+
+        InvalidOperationException? exception =
+            Assert.Throws<InvalidOperationException>(() => _sqlitePersistenceContext!.Vacuum());
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger.AssertLogExceptions([new InvalidOperationException(expectedMessage)],
+            typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Vacuum_FactoryThrowsDuringOpen_LogsErrorAndRethrows()
+    {
+        const string expectedMessage = "disk I/O error during VACUUM";
+
+        ISqliteConnectionFactory factoryMock = Substitute.For<ISqliteConnectionFactory>();
+        factoryMock.DatabasePath.Returns(Path.Combine(_databaseDirectory!,
+            SqlitePersistenceContext.DATABASE_FILE_NAME));
+        factoryMock.Open().Throws(new InvalidOperationException(expectedMessage));
+
+        TestLogger<SqlitePersistenceContext> testLogger = new();
+        SqlitePersistenceContext context = new(factoryMock, Substitute.For<ISqliteBackupService>(), testLogger);
+
+        try
+        {
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(context.Vacuum);
+
+            Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+            testLogger.AssertLogExceptions([new InvalidOperationException(expectedMessage)],
+                typeof(SqlitePersistenceContext));
+        }
+        finally
+        {
+            context.Dispose();
+            testLogger.LoggingAssertTearDown();
+        }
     }
 }
