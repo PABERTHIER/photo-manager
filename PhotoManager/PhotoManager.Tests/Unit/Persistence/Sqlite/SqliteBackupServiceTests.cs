@@ -72,6 +72,33 @@ public class SqliteBackupServiceTests
     }
 
     [Test]
+    public void WriteBackup_BackupFilePathHasNoDirectoryComponent_SkipsDirectoryCreationAndCreatesBackup()
+    {
+        const string backupFilePath = "test_no_dir_backup.zip";
+        const string snapshotPath = backupFilePath + ".tmp.db";
+
+        try
+        {
+            bool result = _backupService!.WriteBackup(backupFilePath);
+
+            Assert.That(result, Is.True);
+            Assert.That(File.Exists(backupFilePath), Is.True);
+        }
+        finally
+        {
+            if (File.Exists(backupFilePath))
+            {
+                File.Delete(backupFilePath);
+            }
+
+            if (File.Exists(snapshotPath))
+            {
+                File.Delete(snapshotPath);
+            }
+        }
+    }
+
+    [Test]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetriesAndSucceeds()
     {
         string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
