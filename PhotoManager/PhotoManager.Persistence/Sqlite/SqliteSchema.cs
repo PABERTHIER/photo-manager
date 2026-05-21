@@ -6,7 +6,7 @@ internal static class SqliteSchema
     /// Current logical schema version. Stored in <c>PRAGMA user_version</c>
     /// so future migrations can branch on it.
     /// </summary>
-    private const int SCHEMA_VERSION = 1;
+    private const int SCHEMA_VERSION = 2;
 
     private const string CREATE_SCRIPT = """
                                          CREATE TABLE IF NOT EXISTS Folders (
@@ -53,6 +53,11 @@ internal static class SqliteSchema
                                              DestinationDirectory    TEXT    NOT NULL,
                                              IncludeSubFolders       INTEGER NOT NULL,
                                              DeleteAssetsNotInSource INTEGER NOT NULL
+                                         );
+
+                                         CREATE TABLE IF NOT EXISTS Configuration (
+                                             Key   TEXT PRIMARY KEY NOT NULL,
+                                             Value TEXT             NOT NULL
                                          );
                                          """;
 

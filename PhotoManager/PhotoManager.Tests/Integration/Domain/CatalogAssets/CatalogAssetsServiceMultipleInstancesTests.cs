@@ -1,4 +1,6 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Microsoft.Data.Sqlite;
+using System.Reactive.Linq;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
@@ -23,6 +25,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
     private TestableAssetRepository? _testableAssetRepository;
 
     private IPathProviderService? _pathProviderServiceMock;
+
+    private TestLogger<CatalogAssetsService> _testLogger = new();
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -50,6 +54,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
     [SetUp]
     public void SetUp()
     {
+        _testLogger = new TestLogger<CatalogAssetsService>();
+
         _asset1 = new()
         {
             FolderId = Guid.Empty, // Initialised later
@@ -309,6 +315,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     {
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+        _testLogger.LoggingAssertTearDown();
     }
 
     private void ConfigureCatalogAssetService(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -335,7 +342,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -343,10 +351,216 @@ public class CatalogAssetsServiceMultipleInstancesTests
             new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, new TestLogger<CatalogAssetsService>());
+            assetCreationService, _userConfigurationService, assetsComparator, _testLogger);
     }
 
-    // TODO: Do same tests as CatalogAssetsServiceTests but with multiple instances instead of one
+    [Test]
+    public async Task CatalogAssetsAsync_AssetsDirectoryChangedBetweenRuns_PreviousAssetsCleanedFromDb()
+    {
+        // Run 1: catalog NewFolder2 (4 images)
+        string assetsDirectoryFirstRun =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+
+        ConfigureCatalogAssetService(100, assetsDirectoryFirstRun, 200, 150, false, false, false, false);
+
+        Folder? folderFirstRun = _testableAssetRepository!.GetFolderByPath(assetsDirectoryFirstRun);
+        Assert.That(folderFirstRun, Is.Null);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges1 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges1.Add);
+
+        folderFirstRun = _testableAssetRepository!.GetFolderByPath(assetsDirectoryFirstRun);
+        Assert.That(folderFirstRun, Is.Not.Null);
+
+        List<Asset> assetsAfterFirstRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsAfterFirstRun, Has.Count.EqualTo(4));
+        Assert.That(_testableAssetRepository!.GetAssetsCounter(), Is.EqualTo(4));
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+
+        // Dispose first run's repository: simulates the app being relaunched
+        _testableAssetRepository!.Dispose();
+
+        // Run 2: catalog NewFolder1 (1 image) using the same DB
+        string assetsDirectorySecondRun =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+
+        _testLogger.LoggingAssertTearDown();
+        _testLogger = new TestLogger<CatalogAssetsService>();
+        ConfigureCatalogAssetService(100, assetsDirectorySecondRun, 200, 150, false, false, false, false);
+
+        // The new repository loaded the DB: it still has the 4 assets from the previous run
+        List<Asset> assetsBeforeSecondRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsBeforeSecondRun, Has.Count.EqualTo(4));
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges2 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges2.Add);
+
+        // After switching to a new AssetsDirectory, the previous folder and all its assets must
+        // be removed from the DB and only the new directory's assets must remain.
+        Folder? folderFirstRunAfterSecondCatalog = _testableAssetRepository!.GetFolderByPath(assetsDirectoryFirstRun);
+        Assert.That(folderFirstRunAfterSecondCatalog, Is.Null);
+
+        List<Asset> assetsFirstRunAfterSecondCatalog =
+            _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectoryFirstRun);
+        Assert.That(assetsFirstRunAfterSecondCatalog, Is.Empty);
+
+        Folder? folderSecondRun = _testableAssetRepository!.GetFolderByPath(assetsDirectorySecondRun);
+        Assert.That(folderSecondRun, Is.Not.Null);
+
+        List<Asset> assetsAfterSecondRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsAfterSecondRun, Has.Count.EqualTo(1));
+        Assert.That(_testableAssetRepository!.GetAssetsCounter(), Is.EqualTo(1));
+        Assert.That(assetsAfterSecondRun[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
+        Assert.That(assetsAfterSecondRun[0].Folder.Path, Is.EqualTo(assetsDirectorySecondRun));
+
+        // Verify the SQLite DB itself is clean: Folders, Assets and Thumbnails rows must reflect
+        // only the new AssetsDirectory. We read the DB file directly via a separate read-only
+        // connection to confirm that DeleteFolder() actually persisted the cleanup.
+        string databaseFilePath = Path.Combine(_databaseDirectory!, SqlitePersistenceContext.DATABASE_FILE_NAME);
+        AssertDatabaseRowCounts(databaseFilePath, expectedFolders: 1, expectedAssets: 1, expectedThumbnails: 1);
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_SameAssetsDirectoryBetweenRuns_FastPathTakenOnSecondRun()
+    {
+        // Run 1: catalog NewFolder2 (4 images) – slow path (no stored key yet)
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges1 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges1.Add);
+
+        List<Asset> assetsAfterFirstRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsAfterFirstRun, Has.Count.EqualTo(4));
+        Assert.That(_testableAssetRepository!.GetAssetsCounter(), Is.EqualTo(4));
+
+        string? storedKeyAfterFirstRun = _testableAssetRepository!.GetStoredAssetsDirectory();
+        Assert.That(storedKeyAfterFirstRun, Is.EqualTo(assetsDirectory));
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+
+        // Dispose first run's repository: simulates the app being relaunched
+        _testableAssetRepository!.Dispose();
+
+        // Run 2: same AssetsDirectory → stored key matches → fast path taken
+        _testLogger.LoggingAssertTearDown();
+        _testLogger = new TestLogger<CatalogAssetsService>();
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges2 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges2.Add);
+
+        // All 4 assets must still be cataloged correctly after the fast-path run
+        List<Asset> assetsAfterSecondRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsAfterSecondRun, Has.Count.EqualTo(4));
+        Assert.That(_testableAssetRepository!.GetAssetsCounter(), Is.EqualTo(4));
+
+        Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+        Assert.That(folder, Is.Not.Null);
+
+        // Verify the SQLite DB itself still holds the expected 4 rows
+        string databaseFilePath = Path.Combine(_databaseDirectory!, SqlitePersistenceContext.DATABASE_FILE_NAME);
+        AssertDatabaseRowCounts(databaseFilePath, expectedFolders: 1, expectedAssets: 4, expectedThumbnails: 4);
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_StaleFolderNotFoundInRepository_DeleteSkippedGracefully()
+    {
+        // When a folder path is in GetFoldersPath() but GetFolderByPath() returns null for it,
+        // DeleteStaleFolderFromCatalog must return early without calling DeleteFolder.
+        // VACUUM must still be called since hasStaleToClean was set before the null check.
+        const string stalePath = @"C:\OldPhotos";
+        const string newRoot = @"C:\NewPhotos";
+
+        IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
+        assetRepositoryMock.AssetsUpdated.Returns(Observable.Empty<System.Reactive.Unit>());
+        assetRepositoryMock.FolderExists(Arg.Any<string>()).Returns(true);
+        assetRepositoryMock.GetStoredAssetsDirectory().Returns(stalePath);
+        assetRepositoryMock.GetFoldersPath().Returns([stalePath]);
+        assetRepositoryMock.GetFolderByPath(stalePath).Returns((Folder?)null);
+        assetRepositoryMock.BackupExists().Returns(true);
+
+        IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
+        userConfigurationServiceMock.GetRootCatalogFolderPaths().Returns([newRoot]);
+
+        IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
+        IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
+        IAssetCreationService assetCreationServiceMock = Substitute.For<IAssetCreationService>();
+        IAssetsComparator assetsComparatorMock = Substitute.For<IAssetsComparator>();
+
+        using (CatalogAssetsService catalogService = new(assetRepositoryMock, fileOperationsServiceMock,
+                   imageMetadataServiceMock, assetCreationServiceMock, userConfigurationServiceMock,
+                   assetsComparatorMock, _testLogger))
+        {
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            await catalogService.CatalogAssetsAsync(catalogChanges.Add);
+        }
+
+        assetRepositoryMock.DidNotReceive().DeleteFolder(Arg.Any<Folder>());
+        assetRepositoryMock.Received(1).Vacuum();
+        assetRepositoryMock.Received(1).StoreAssetsDirectory(newRoot);
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_NewRootIsParentOfPreviousRoot_SubfolderKeptViaStartsWith()
+    {
+        // Run 1: catalog the child directory (NewFolder2). Stored key = NewFolder2 path.
+        string assetsDirectoryFirstRun =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+
+        ConfigureCatalogAssetService(100, assetsDirectoryFirstRun, 200, 150, false, false, false, false);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges1 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges1.Add);
+
+        List<Asset> assetsAfterFirstRun = _testableAssetRepository!.GetCataloguedAssets();
+        Assert.That(assetsAfterFirstRun, Has.Count.EqualTo(4));
+
+        string? storedKeyAfterFirstRun = _testableAssetRepository!.GetStoredAssetsDirectory();
+        Assert.That(storedKeyAfterFirstRun, Is.EqualTo(assetsDirectoryFirstRun));
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+
+        // Dispose first run's repository: simulates the app being relaunched
+        _testableAssetRepository!.Dispose();
+
+        // Run 2: catalog the parent directory (Duplicates).
+        // Since storedKey = NewFolder2 ≠ currentKey = Duplicates, the slow path is taken.
+        // IsUnderAnyRoot("Duplicates\NewFolder2", ["Duplicates"]) → StartsWith branch → folder KEPT.
+        // IsUnderAnyRoot("Duplicates", ["Duplicates"]) → Equals branch → folder KEPT.
+        // No stale cleanup should happen.
+        string assetsDirectorySecondRun = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
+
+        _testLogger.LoggingAssertTearDown();
+        _testLogger = new TestLogger<CatalogAssetsService>();
+        ConfigureCatalogAssetService(100, assetsDirectorySecondRun, 200, 150, false, false, false, false);
+
+        List<CatalogChangeCallbackEventArgs> catalogChanges2 = [];
+        await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges2.Add);
+
+        // Both the parent folder and the child (NewFolder2) must exist in the repository:
+        // the child was retained via the StartsWith branch, not deleted as stale.
+        Folder? parentFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectorySecondRun);
+        Assert.That(parentFolder, Is.Not.Null);
+
+        Folder? childFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectoryFirstRun);
+        Assert.That(childFolder, Is.Not.Null);
+
+        // Stored key is updated to the new root
+        string? storedKeyAfterSecondRun = _testableAssetRepository!.GetStoredAssetsDirectory();
+        Assert.That(storedKeyAfterSecondRun, Is.EqualTo(assetsDirectorySecondRun));
+
+        _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+    }
+
     [Test]
     [Ignore("Tests about two instances will be written later")]
     public async Task
@@ -1022,5 +1236,35 @@ public class CatalogAssetsServiceMultipleInstancesTests
         CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory,
             ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+    }
+
+    private static void AssertDatabaseRowCounts(string databaseFilePath, int expectedFolders, int expectedAssets,
+        int expectedThumbnails)
+    {
+        using (SqliteConnection connection = new($"Data Source={databaseFilePath};Mode=ReadOnly"))
+        {
+            connection.Open();
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Folders;";
+                int folderCount = Convert.ToInt32(command.ExecuteScalar());
+                Assert.That(folderCount, Is.EqualTo(expectedFolders));
+            }
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Assets;";
+                int assetCount = Convert.ToInt32(command.ExecuteScalar());
+                Assert.That(assetCount, Is.EqualTo(expectedAssets));
+            }
+
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Thumbnails;";
+                int thumbnailCount = Convert.ToInt32(command.ExecuteScalar());
+                Assert.That(thumbnailCount, Is.EqualTo(expectedThumbnails));
+            }
+        }
     }
 }

@@ -163,7 +163,68 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
         }
 
-        return _assetRepository.GetFoldersPath();
+        // Fast path: AssetsDirectory has not changed since the last catalog run
+        string currentRootKey = string.Join("|", rootPaths);
+        string? storedRootKey = _assetRepository.GetStoredAssetsDirectory();
+
+        if (string.Equals(storedRootKey, currentRootKey, StringComparison.OrdinalIgnoreCase))
+        {
+            return _assetRepository.GetFoldersPath();
+        }
+
+        // Path changed (or first run): remove stale folders and store the new root
+        HashSet<string> allFolderPaths = _assetRepository.GetFoldersPath();
+        HashSet<string> foldersToProcess = new(StringComparer.Ordinal);
+        bool hasStaleToClean = false;
+
+        foreach (string path in allFolderPaths)
+        {
+            if (IsUnderAnyRoot(path, rootPaths))
+            {
+                foldersToProcess.Add(path);
+            }
+            else
+            {
+                hasStaleToClean = true;
+                DeleteStaleFolderFromCatalog(path);
+            }
+        }
+
+        if (hasStaleToClean)
+        {
+            _assetRepository.Vacuum();
+        }
+
+        _assetRepository.StoreAssetsDirectory(currentRootKey);
+
+        return foldersToProcess;
+    }
+
+    private void DeleteStaleFolderFromCatalog(string path)
+    {
+        Folder? folder = _assetRepository.GetFolderByPath(path);
+
+        if (folder == null)
+        {
+            return;
+        }
+
+        _assetRepository.DeleteFolder(folder);
+        _backupHasSameContent = false;
+    }
+
+    private static bool IsUnderAnyRoot(string path, string[] rootPaths)
+    {
+        foreach (string root in rootPaths)
+        {
+            if (string.Equals(path, root, StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith($"{root}{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void CatalogFolders(string directory, CatalogChangeCallback callback, ref int cataloguedAssetsBatchCount,

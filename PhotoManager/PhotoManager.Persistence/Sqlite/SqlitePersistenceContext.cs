@@ -26,6 +26,7 @@ public sealed class SqlitePersistenceContext(
     public IThumbnailPersistence Thumbnails { get; private set; } = null!;
     public IRecentPathsPersistence RecentPaths { get; private set; } = null!;
     public ISyncDefinitionsPersistence SyncDefinitions { get; private set; } = null!;
+    public IConfigurationPersistence Configuration { get; private set; } = null!;
 
     public string DatabaseFilePath => factory.DatabasePath;
 
@@ -64,6 +65,7 @@ public sealed class SqlitePersistenceContext(
         Thumbnails = new ThumbnailPersistence(factory);
         RecentPaths = new RecentPathsPersistence(factory);
         SyncDefinitions = new SyncDefinitionsPersistence(factory);
+        Configuration = new ConfigurationPersistence(factory);
     }
 
     public bool WriteBackup(DateTime backupDate)
@@ -107,6 +109,31 @@ public sealed class SqlitePersistenceContext(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error while deleting old backups (keep {BackupsToKeep})", backupsToKeep);
+            throw;
+        }
+    }
+
+    public void Vacuum()
+    {
+        EnsureInitialized();
+
+        try
+        {
+            // Close all pooled connections before VACUUM to obtain exclusive access.
+            SqliteConnection.ClearAllPools();
+
+            using (SqliteConnection connection = factory.Open())
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "VACUUM;";
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error vacuuming the SQLite database at {DatabaseFilePath}", DatabaseFilePath);
             throw;
         }
     }

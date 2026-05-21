@@ -54,4 +54,13 @@ public interface IAssetRepository
     string[] GetRecentTargetPaths();
     void SaveRecentTargetPaths(string[] recentTargetPaths);
     void UpdateTargetPathToRecent(Folder destinationFolder);
+
+    // ----------------------------------------------------------- Stored state
+
+    string? GetStoredAssetsDirectory();
+    void StoreAssetsDirectory(string path);
+
+    // --------------------------------------------------------------- Vacuum
+
+    void Vacuum();
 }
