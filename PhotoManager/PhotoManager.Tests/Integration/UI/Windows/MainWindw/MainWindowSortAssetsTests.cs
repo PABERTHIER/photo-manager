@@ -72,9 +72,9 @@ public class MainWindowSortAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -98,9 +98,9 @@ public class MainWindowSortAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -132,9 +132,9 @@ public class MainWindowSortAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -162,9 +162,9 @@ public class MainWindowSortAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },

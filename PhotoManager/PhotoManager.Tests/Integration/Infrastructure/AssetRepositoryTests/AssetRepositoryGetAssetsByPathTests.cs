@@ -62,7 +62,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -87,7 +87,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
@@ -128,7 +128,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -227,7 +227,7 @@ public class AssetRepositoryGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailsAndFolderExistButLoadBitmapThumbnailImageReturnsNull_ReturnsEmptyArray()
     {
-        BitmapImage? bitmapImage = null;
+        IImageData? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 

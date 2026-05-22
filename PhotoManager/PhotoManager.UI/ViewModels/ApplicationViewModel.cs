@@ -1,4 +1,6 @@
 ﻿using PhotoManager.Application;
+using PhotoManager.Common;
+using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
 using PhotoManager.UI.Models;
@@ -380,7 +382,8 @@ public class ApplicationViewModel : BaseViewModel
             throw new NullReferenceException("CurrentAsset is null");
         }
 
-        return _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+        IImageData imageData = _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+        return ((BitmapImageData)imageData).BitmapImage;
     }
 
     public BitmapImage LoadBitmapHeicImageFromPath()
@@ -390,7 +393,9 @@ public class ApplicationViewModel : BaseViewModel
             throw new NullReferenceException("CurrentAsset is null");
         }
 
-        return _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+        IImageData imageData = _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath,
+            CurrentAsset.ImageRotation);
+        return ((BitmapImageData)imageData).BitmapImage;
     }
 
     public void CalculateGlobalAssetsCounter()

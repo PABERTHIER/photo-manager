@@ -64,9 +64,9 @@ public class MainWindowMoveAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -90,9 +90,9 @@ public class MainWindowMoveAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },

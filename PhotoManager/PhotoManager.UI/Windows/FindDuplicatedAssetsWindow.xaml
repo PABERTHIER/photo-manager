@@ -15,6 +15,7 @@
     <Window.Resources>
         <c:FileSizeConverter x:Key="FileSizeConverter" />
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
+        <c:ImageDataConverter x:Key="ImageDataConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -82,7 +83,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <!-- Displaying the pictures in thumbnails mode, at the bottom of the page, FindDuplicatedAssets page -->
-        <Image Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Source="{ Binding CurrentDuplicatedAsset.Asset.ImageData }" Width="200" Height="150">
+        <Image Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Source="{ Binding CurrentDuplicatedAsset.Asset.ImageData, Converter={StaticResource ImageDataConverter} }" Width="200" Height="150">
             <Image.Effect>
                 <DropShadowEffect/>
             </Image.Effect>

@@ -309,7 +309,7 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     // ----------------------------------------------------------- Thumbnails
 
-    public BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height)
+    public IImageData? LoadThumbnail(string directoryName, string fileName, int width, int height)
     {
         bool emitUpdate = false;
 

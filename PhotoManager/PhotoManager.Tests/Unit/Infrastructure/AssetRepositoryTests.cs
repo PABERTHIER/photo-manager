@@ -84,7 +84,7 @@ public class AssetRepositoryTests
             Folder = new() { Id = Guid.Empty, Path = "" },
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new()
@@ -345,7 +345,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "img1.jpg",
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = 100, Height = 100 },
@@ -370,7 +370,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "img2.jpg",
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = 100, Height = 100 },
@@ -416,7 +416,7 @@ public class AssetRepositoryTests
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImage());
+            .Returns(new BitmapImageData(new()));
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
@@ -464,7 +464,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "photo.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImage());
+            .Returns(new BitmapImageData(new()));
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();
@@ -474,7 +474,7 @@ public class AssetRepositoryTests
 
         try
         {
-            BitmapImage? result = assetRepository.LoadThumbnail(@"C:\Photos", "photo.jpg", 100, 100);
+            IImageData? result = assetRepository.LoadThumbnail(@"C:\Photos", "photo.jpg", 100, 100);
 
             using (Assert.EnterMultipleScope())
             {
@@ -511,7 +511,7 @@ public class AssetRepositoryTests
 
         try
         {
-            BitmapImage? result = assetRepository.LoadThumbnail(@"C:\Photos", "missing.jpg", 100, 100);
+            IImageData? result = assetRepository.LoadThumbnail(@"C:\Photos", "missing.jpg", 100, 100);
 
             using (Assert.EnterMultipleScope())
             {
@@ -533,7 +533,7 @@ public class AssetRepositoryTests
     [Test]
     public void LoadThumbnail_FolderNotFound_DoesNotCallLoadBitmapThumbnailImage()
     {
-        BitmapImage? result = _assetRepository!.LoadThumbnail(@"C:\NonExistent", "photo.jpg", 100, 100);
+        IImageData? result = _assetRepository!.LoadThumbnail(@"C:\NonExistent", "photo.jpg", 100, 100);
 
         using (Assert.EnterMultipleScope())
         {
@@ -559,7 +559,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "sunset.jpg",
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = 200, Height = 150 },
@@ -587,7 +587,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "sunset.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImage());
+            .Returns(new BitmapImageData(new()));
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();
@@ -628,7 +628,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "orphan.jpg",
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = 200, Height = 150 },

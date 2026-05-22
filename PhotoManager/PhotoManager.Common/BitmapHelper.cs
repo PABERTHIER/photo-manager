@@ -6,10 +6,11 @@ namespace PhotoManager.Common;
 public static class BitmapHelper
 {
     // From AssetCreationService for CreateAsset() to get the originalImage
-    public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
+    public static BitmapImageData LoadBitmapOriginalImage(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
         try
         {
+            Rotation wpfRotation = ToWpfRotation(rotation);
             BitmapImage image = new();
 
             using (MemoryStream stream = new(buffer))
@@ -18,12 +19,12 @@ public static class BitmapHelper
                 image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
                 image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                 image.StreamSource = stream;
-                image.Rotation = rotation;
+                image.Rotation = wpfRotation;
                 image.EndInit();
                 image.Freeze();
             }
 
-            return image;
+            return new BitmapImageData(image, rotation);
         }
         catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
@@ -35,11 +36,12 @@ public static class BitmapHelper
     }
 
     // From AssetCreationService for CreateAsset() to get the thumbnailImage
-    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
-        ILogger logger)
+    public static BitmapImageData LoadBitmapThumbnailImage(byte[] buffer, ImageRotation rotation, int width,
+        int height, ILogger logger)
     {
         try
         {
+            Rotation wpfRotation = ToWpfRotation(rotation);
             BitmapImage image = new();
 
             using (MemoryStream stream = new(buffer))
@@ -48,14 +50,14 @@ public static class BitmapHelper
                 image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
                 image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                 image.StreamSource = stream;
-                image.Rotation = rotation;
+                image.Rotation = wpfRotation;
                 image.DecodePixelWidth = width;
                 image.DecodePixelHeight = height;
                 image.EndInit();
                 image.Freeze();
             }
 
-            return image;
+            return new BitmapImageData(image, rotation);
         }
         catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
@@ -67,12 +69,14 @@ public static class BitmapHelper
     }
 
     // From AssetCreationService for CreateAsset() to get the originalImage for HEIC
-    public static BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation, ILogger logger)
+    public static BitmapImageData LoadBitmapHeicOriginalImage(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
         BitmapImage image = new();
 
         try
         {
+            Rotation wpfRotation = ToWpfRotation(rotation);
+
             using (MemoryStream stream = new(buffer))
             {
                 using (MagickImage magickImage = new(stream))
@@ -92,12 +96,12 @@ public static class BitmapHelper
                         bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
-                        bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
+                        bitmapImage.Rotation = wpfRotation; // Set the rotation value to save it into the BitmapImage
                         bitmapImage.EndInit();
                         bitmapImage.Freeze();
                         image = bitmapImage;
 
-                        return image;
+                        return new BitmapImageData(image, rotation);
                     }
                 }
             }
@@ -107,17 +111,19 @@ public static class BitmapHelper
             logger.LogError("The image is not valid or in an unsupported format");
         }
 
-        return image;
+        return new BitmapImageData(image, ImageRotation.Rotation0);
     }
 
     // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
-    public static BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height,
-        ILogger logger)
+    public static BitmapImageData LoadBitmapHeicThumbnailImage(byte[] buffer, ImageRotation rotation, int width,
+        int height, ILogger logger)
     {
         BitmapImage image = new();
 
         try
         {
+            Rotation wpfRotation = ToWpfRotation(rotation);
+
             using (MemoryStream stream = new(buffer))
             {
                 using (MagickImage magickImage = new(stream))
@@ -140,12 +146,12 @@ public static class BitmapHelper
                         bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
-                        bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
+                        bitmapImage.Rotation = wpfRotation; // Set the rotation value to save it into the BitmapImage
                         bitmapImage.EndInit();
                         bitmapImage.Freeze();
                         image = bitmapImage;
 
-                        return image;
+                        return new BitmapImageData(image, rotation);
                     }
                 }
             }
@@ -155,12 +161,13 @@ public static class BitmapHelper
             logger.LogError("The image is not valid or in an unsupported format");
         }
 
-        return image;
+        return new BitmapImageData(image, ImageRotation.Rotation0);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
-    public static BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation)
+    public static BitmapImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation)
     {
+        Rotation wpfRotation = ToWpfRotation(rotation);
         BitmapImage image = new();
 
         if (File.Exists(imagePath))
@@ -169,16 +176,18 @@ public static class BitmapHelper
             image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             image.UriSource = new(imagePath);
-            image.Rotation = rotation;
+            image.Rotation = wpfRotation;
             image.EndInit();
             image.Freeze();
+
+            return new BitmapImageData(image, rotation);
         }
 
-        return image;
+        return new BitmapImageData(image, ImageRotation.Rotation0);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public static BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation, ILogger logger)
+    public static BitmapImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation, ILogger logger)
     {
         BitmapImage image = new();
 
@@ -186,6 +195,8 @@ public static class BitmapHelper
         {
             try
             {
+                Rotation wpfRotation = ToWpfRotation(rotation);
+
                 using (MagickImage magickImage = new(imagePath))
                 {
                     // Apply Rotation because MagickImage does not rotate the image in-place
@@ -200,9 +211,11 @@ public static class BitmapHelper
                     image.CacheOption = BitmapCacheOption.OnLoad;
                     image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                     image.StreamSource = new MemoryStream(imageData);
-                    image.Rotation = rotation;
+                    image.Rotation = wpfRotation;
                     image.EndInit();
                     image.Freeze();
+
+                    return new BitmapImageData(image, rotation);
                 }
             }
             catch (MagickException)
@@ -211,11 +224,11 @@ public static class BitmapHelper
             }
         }
 
-        return image;
+        return new BitmapImageData(image, ImageRotation.Rotation0);
     }
 
     // From AssetRepository
-    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height, ILogger logger)
+    public static BitmapImageData LoadBitmapThumbnailImage(byte[] buffer, int width, int height, ILogger logger)
     {
         try
         {
@@ -233,7 +246,7 @@ public static class BitmapHelper
                 thumbnailImage.Freeze();
             }
 
-            return thumbnailImage;
+            return new BitmapImageData(thumbnailImage, ImageRotation.Rotation0);
         }
         catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
@@ -268,33 +281,41 @@ public static class BitmapHelper
         return image;
     }
 
-    public static byte[] GetJpegBitmapImage(BitmapImage image)
+    public static byte[] GetJpegBitmapImage(IImageData image)
     {
-        return GetBitmapImage(image, new JpegBitmapEncoder());
+        ArgumentNullException.ThrowIfNull(image);
+        BitmapImage bitmapImage = ((BitmapImageData)image).BitmapImage;
+        return GetBitmapImage(bitmapImage, new JpegBitmapEncoder());
     }
 
-    public static byte[] GetPngBitmapImage(BitmapImage image)
+    public static byte[] GetPngBitmapImage(IImageData image)
     {
-        return GetBitmapImage(image, new PngBitmapEncoder());
+        ArgumentNullException.ThrowIfNull(image);
+        BitmapImage bitmapImage = ((BitmapImageData)image).BitmapImage;
+        return GetBitmapImage(bitmapImage, new PngBitmapEncoder());
     }
 
-    public static byte[] GetGifBitmapImage(BitmapImage image)
+    public static byte[] GetGifBitmapImage(IImageData image)
     {
-        return GetBitmapImage(image, new GifBitmapEncoder());
+        ArgumentNullException.ThrowIfNull(image);
+        BitmapImage bitmapImage = ((BitmapImageData)image).BitmapImage;
+        return GetBitmapImage(bitmapImage, new GifBitmapEncoder());
     }
 
-    public static (int width, int height) GetImageDimensions(byte[] buffer, Rotation rotation, ILogger logger)
+    public static (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
         (int rawWidth, int rawHeight) = TryReadDimensionsFromHeader(buffer);
 
         if (rawWidth <= 0 || rawHeight <= 0)
         {
-            BitmapImage image = LoadBitmapOriginalImage(buffer, Rotation.Rotate0, logger);
-            rawWidth = image.PixelWidth;
-            rawHeight = image.PixelHeight;
+            BitmapImageData image = LoadBitmapOriginalImage(buffer, ImageRotation.Rotation0, logger);
+            rawWidth = image.Width;
+            rawHeight = image.Height;
         }
 
-        return rotation is Rotation.Rotate90 or Rotation.Rotate270 ? (rawHeight, rawWidth) : (rawWidth, rawHeight);
+        return rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270
+            ? (rawHeight, rawWidth)
+            : (rawWidth, rawHeight);
     }
 
     private static (int width, int height) TryReadDimensionsFromHeader(ReadOnlySpan<byte> buffer)
@@ -384,14 +405,14 @@ public static class BitmapHelper
         return imageBuffer;
     }
 
-    private static void MagickImageApplyRotation(MagickImage magickImage, Rotation rotation, bool isClockwise)
+    private static void MagickImageApplyRotation(MagickImage magickImage, ImageRotation rotation, bool isClockwise)
     {
 
         int rotationAngle = rotation switch
         {
-            Rotation.Rotate90 => isClockwise ? 90 : -90,
-            Rotation.Rotate180 => isClockwise ? 180 : -180,
-            Rotation.Rotate270 => isClockwise ? 270 : -270,
+            ImageRotation.Rotate90 => isClockwise ? 90 : -90,
+            ImageRotation.Rotate180 => isClockwise ? 180 : -180,
+            ImageRotation.Rotate270 => isClockwise ? 270 : -270,
             _ => 0
         };
 
@@ -399,5 +420,18 @@ public static class BitmapHelper
         {
             magickImage.Rotate(rotationAngle);
         }
+    }
+
+    private static Rotation ToWpfRotation(ImageRotation rotation)
+    {
+        return rotation switch
+        {
+            ImageRotation.Rotation0 => Rotation.Rotate0,
+            ImageRotation.Rotate90 => Rotation.Rotate90,
+            ImageRotation.Rotate180 => Rotation.Rotate180,
+            ImageRotation.Rotate270 => Rotation.Rotate270,
+            _ => throw new ArgumentException(
+                $"'{(int)rotation}' is not a valid value for property 'Rotation'.")
+        };
     }
 }

@@ -81,7 +81,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -106,7 +106,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -139,7 +139,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -168,7 +168,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -193,7 +193,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
         //         Modification = ModificationDate.Default
         //     },
         //     ThumbnailCreationDateTime = DateTime.Now,
-        //     ImageRotation = Rotation.Rotate0,
+        //     ImageRotation = ImageRotation.Rotation0,
         //     Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
         //     Metadata = new()
         //     {
@@ -218,7 +218,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -243,7 +243,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
@@ -268,7 +268,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
@@ -300,7 +300,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.HOMER_DUPLICATED_JPG,
             Metadata = new()
             {

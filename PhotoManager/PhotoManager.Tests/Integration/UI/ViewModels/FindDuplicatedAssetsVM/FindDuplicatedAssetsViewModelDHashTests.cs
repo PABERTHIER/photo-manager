@@ -90,9 +90,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.HOMER_GIF,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -116,9 +116,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -150,9 +150,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate180,
+            ImageRotation = ImageRotation.Rotate180,
             Hash = DHashes.IMAGE_1_180_DEG_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -184,9 +184,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate270,
+            ImageRotation = ImageRotation.Rotate270,
             Hash = DHashes.IMAGE_1_270_DEG_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -218,9 +218,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Hash = DHashes.IMAGE_1_90_DEG_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -252,9 +252,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -278,9 +278,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_2_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -304,9 +304,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_3_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -330,9 +330,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_4_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -356,9 +356,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_5_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -382,9 +382,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_6_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -408,9 +408,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_7_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -438,9 +438,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_8_JPEG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -464,9 +464,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -494,9 +494,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -528,9 +528,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate270,
+            ImageRotation = ImageRotation.Rotate270,
             Hash = DHashes.IMAGE_11_270_DEG_HEIC,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -562,9 +562,9 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_WITH_UPPERCASE_NAME_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -588,7 +588,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
@@ -622,7 +622,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
@@ -648,7 +648,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
@@ -682,7 +682,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
@@ -712,7 +712,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
@@ -738,7 +738,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_JPG,
             ImageData = null,
             Metadata = new()
@@ -764,7 +764,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1337_JPG,
             ImageData = null,
             Metadata = new()
@@ -798,7 +798,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_BOTTOM_LEFT_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -832,7 +832,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_BOTTOM_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -866,7 +866,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_LEFT_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -900,7 +900,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -934,7 +934,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_RIGHT_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -968,7 +968,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_TOP_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -1002,7 +1002,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_TOP_RIGHT_PART_JPG,
             ImageData = null,
             Metadata = new()
@@ -1036,7 +1036,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -1070,7 +1070,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -1104,7 +1104,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1336_SHIT_QUALITY_JPG,
             ImageData = null,
             Metadata = new()
@@ -1138,7 +1138,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.IMAGE_1336_SMALL_JPG,
             ImageData = null,
             Metadata = new()
@@ -1164,7 +1164,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 Modification = actualDate
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = DHashes.HOMER_JPG,
             ImageData = null,
             Metadata = new()
@@ -1363,7 +1363,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
             _asset36 = _asset36!.WithFolder(folder8!);
 
             // Because _asset23 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset23!.ImageData = new();
+            _asset23!.ImageData = new BitmapImageData(new());
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];

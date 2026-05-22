@@ -87,19 +87,19 @@ public static class ExifHelper
     // (ushort)6 <=> "Rotate 90 CW"
     // (ushort)7 <=> "Mirror horizontal and rotate 90 CW"
     // (ushort)8 <=> "Rotate 270 CW"
-    public static Rotation GetImageRotation(ushort exifOrientation)
+    public static ImageRotation GetImageRotation(ushort exifOrientation)
     {
-        Rotation rotation = exifOrientation switch
+        ImageRotation rotation = exifOrientation switch
         {
-            1 => Rotation.Rotate0,
-            2 => Rotation.Rotate0, // FlipX
-            3 => Rotation.Rotate180,
-            4 => Rotation.Rotate180, // FlipX
-            5 => Rotation.Rotate90, // FlipX
-            6 => Rotation.Rotate90,
-            7 => Rotation.Rotate270, // FlipX
-            8 => Rotation.Rotate270,
-            _ => Rotation.Rotate0
+            1 => ImageRotation.Rotation0,
+            2 => ImageRotation.Rotation0, // FlipX
+            3 => ImageRotation.Rotate180,
+            4 => ImageRotation.Rotate180, // FlipX
+            5 => ImageRotation.Rotate90, // FlipX
+            6 => ImageRotation.Rotate90,
+            7 => ImageRotation.Rotate270, // FlipX
+            8 => ImageRotation.Rotate270,
+            _ => ImageRotation.Rotation0
         };
 
         return rotation;

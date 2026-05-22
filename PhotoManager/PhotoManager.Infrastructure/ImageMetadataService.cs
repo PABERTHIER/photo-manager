@@ -15,7 +15,7 @@ public class ImageMetadataService(IFileOperationsService fileOperationsService, 
         return ExifHelper.GetHeicExifOrientation(buffer, corruptedImageOrientation, logger);
     }
 
-    public Rotation GetImageRotation(ushort exifOrientation)
+    public ImageRotation GetImageRotation(ushort exifOrientation)
     {
         return ExifHelper.GetImageRotation(exifOrientation);
     }

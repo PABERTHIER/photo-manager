@@ -70,7 +70,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -95,7 +95,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -128,7 +128,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -157,7 +157,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -471,7 +471,7 @@ public class ViewerUserControlTests
 
         Assert.That(bitmapImage, Is.Not.Null);
         Assert.That(bitmapImage.StreamSource, Is.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset1.ImageRotation));
+        Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
         Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
@@ -522,7 +522,7 @@ public class ViewerUserControlTests
 
         Assert.That(bitmapImage, Is.Not.Null);
         Assert.That(bitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset4.ImageRotation));
+        Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset4.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
         Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
@@ -622,7 +622,7 @@ public class ViewerUserControlTests
 
         Assert.That(bitmapImage, Is.Not.Null);
         Assert.That(bitmapImage.StreamSource, Is.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset1.ImageRotation));
+        Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
         Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));

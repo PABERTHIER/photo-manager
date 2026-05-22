@@ -5,6 +5,7 @@ global using NSubstitute.ExceptionExtensions;
 global using NUnit.Framework;
 // Projects
 global using PhotoManager.Common;
+global using PhotoManager.Common.Imaging;
 global using PhotoManager.Domain;
 global using PhotoManager.Domain.Interfaces;
 global using PhotoManager.Domain.UserConfigurationSettings;

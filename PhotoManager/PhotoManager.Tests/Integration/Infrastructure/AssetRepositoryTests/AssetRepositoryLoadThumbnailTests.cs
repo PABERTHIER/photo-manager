@@ -60,7 +60,7 @@ public class AssetRepositoryLoadThumbnailTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -112,7 +112,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            BitmapImage? bitmapImage = _assetRepository!.LoadThumbnail(
+            IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
                 folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
@@ -157,7 +157,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            BitmapImage? bitmapImage = _assetRepository!.LoadThumbnail(
+            IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
                 folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
@@ -188,7 +188,7 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            BitmapImage? bitmapImage = _assetRepository!.LoadThumbnail(
+            IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
                 _assetsDirectory!,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
@@ -344,7 +344,7 @@ public class AssetRepositoryLoadThumbnailTests
                 Folder = folder2,
                 FolderId = folder2.Id,
                 FileName = FileNames.IMAGE_9_PNG,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotation0,
                 Pixel = new()
                 {
                     Asset = new()
@@ -384,7 +384,7 @@ public class AssetRepositoryLoadThumbnailTests
 
             // asset1 still lives in _assetsByFolderId[folder1.Id],
             // but its thumbnail is now absent from both cache and DB
-            BitmapImage? result = assetRepository.LoadThumbnail(folderPath1,
+            IImageData? result = assetRepository.LoadThumbnail(folderPath1,
                 _asset1.FileName, _asset1.Pixel.Thumbnail.Width, _asset1.Pixel.Thumbnail.Height);
 
             Asset[] cataloguedAssets = assetRepository.GetCataloguedAssets();
@@ -437,9 +437,9 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            BitmapImage? bitmapImage1 = null;
-            BitmapImage? bitmapImage2 = null;
-            BitmapImage? bitmapImage3 = null;
+            IImageData? bitmapImage1 = null;
+            IImageData? bitmapImage2 = null;
+            IImageData? bitmapImage3 = null;
 
             // Simulate concurrent access
             Parallel.Invoke(

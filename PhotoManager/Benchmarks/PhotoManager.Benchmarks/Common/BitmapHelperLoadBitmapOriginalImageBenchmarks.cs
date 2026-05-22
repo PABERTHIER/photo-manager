@@ -43,8 +43,9 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], Rotation.Rotate0, _logger);
-                results[i] = (image.PixelWidth, image.PixelHeight);
+                BitmapImageData image =
+                    BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], ImageRotation.Rotation0, _logger);
+                results[i] = (image.BitmapImage.PixelWidth, image.BitmapImage.PixelHeight);
             }
 
             return results;
@@ -63,7 +64,7 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                results[i] = GetImageDimensionsViaDecoder(_imageBuffers[i], Rotation.Rotate0);
+                results[i] = GetImageDimensionsViaDecoder(_imageBuffers[i], ImageRotation.Rotation0);
             }
 
             return results;
@@ -81,33 +82,31 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], Rotation.Rotate0);
+                results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], ImageRotation.Rotation0);
             }
 
             return results;
         });
     }
 
-    private static (int width, int height) GetImageDimensionsViaDecoder(byte[] buffer, Rotation rotation)
+    private static (int width, int height) GetImageDimensionsViaDecoder(byte[] buffer, ImageRotation rotation)
     {
         using MemoryStream stream = new(buffer);
-        BitmapDecoder decoder = BitmapDecoder.Create(
-            stream,
-            BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
-            BitmapCacheOption.None);
+        BitmapDecoder decoder = BitmapDecoder.Create(stream,
+            BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
         int rawWidth = decoder.Frames[0].PixelWidth;
         int rawHeight = decoder.Frames[0].PixelHeight;
 
-        return rotation is Rotation.Rotate90 or Rotation.Rotate270
+        return rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270
             ? (rawHeight, rawWidth)
             : (rawWidth, rawHeight);
     }
 
-    private static (int width, int height) GetImageDimensionsFromHeader(byte[] buffer, Rotation rotation)
+    private static (int width, int height) GetImageDimensionsFromHeader(byte[] buffer, ImageRotation rotation)
     {
         (int rawWidth, int rawHeight) = TryReadDimensionsFromHeader(buffer);
 
-        return rotation is Rotation.Rotate90 or Rotation.Rotate270
+        return rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270
             ? (rawHeight, rawWidth)
             : (rawWidth, rawHeight);
     }

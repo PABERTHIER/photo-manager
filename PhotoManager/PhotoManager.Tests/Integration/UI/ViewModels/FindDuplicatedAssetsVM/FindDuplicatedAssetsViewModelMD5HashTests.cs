@@ -68,9 +68,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -102,9 +102,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -128,9 +128,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_2_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -154,9 +154,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -184,9 +184,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -210,7 +210,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
@@ -244,7 +244,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
@@ -270,7 +270,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
@@ -304,7 +304,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
@@ -334,7 +334,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
@@ -360,7 +360,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes._1336_JPG,
             ImageData = null,
             Metadata = new()
@@ -394,7 +394,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -428,7 +428,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -462,7 +462,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = MD5Hashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -624,7 +624,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11!.ImageData = new();
+            _asset11!.ImageData = new BitmapImageData(new());
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];

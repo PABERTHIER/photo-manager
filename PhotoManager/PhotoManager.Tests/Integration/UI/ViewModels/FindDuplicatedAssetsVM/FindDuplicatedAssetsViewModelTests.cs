@@ -68,9 +68,9 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -94,9 +94,9 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -128,9 +128,9 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -154,7 +154,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -179,7 +179,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -212,7 +212,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -1855,7 +1855,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new();
+            _asset1Temp.ImageData = new BitmapImageData(new());
             _asset3Temp = _asset3Temp.WithFolder(exemptedFolder!);
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
@@ -2025,7 +2025,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new();
+            _asset1Temp.ImageData = new BitmapImageData(new());
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 

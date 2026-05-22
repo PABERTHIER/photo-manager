@@ -39,7 +39,7 @@ public interface IAssetRepository
 
     // -------------------------------------------------------------- Thumbnails
 
-    BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height);
+    IImageData? LoadThumbnail(string directoryName, string fileName, int width, int height);
 
     // ----------------------------------------------------------------- Backups
 

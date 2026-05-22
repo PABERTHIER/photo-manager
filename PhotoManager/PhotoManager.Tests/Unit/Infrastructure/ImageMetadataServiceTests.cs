@@ -39,24 +39,24 @@ public class ImageMetadataServiceTests
     }
 
     [Test]
-    [TestCase((ushort)0, Rotation.Rotate0)]
-    [TestCase((ushort)1, Rotation.Rotate0)]
-    [TestCase((ushort)2, Rotation.Rotate0)]
-    [TestCase((ushort)3, Rotation.Rotate180)]
-    [TestCase((ushort)4, Rotation.Rotate180)]
-    [TestCase((ushort)5, Rotation.Rotate90)]
-    [TestCase((ushort)6, Rotation.Rotate90)]
-    [TestCase((ushort)7, Rotation.Rotate270)]
-    [TestCase((ushort)8, Rotation.Rotate270)]
-    [TestCase((ushort)9, Rotation.Rotate0)]
-    [TestCase((ushort)10, Rotation.Rotate0)]
-    [TestCase((ushort)10000, Rotation.Rotate0)]
-    [TestCase(ushort.MinValue, Rotation.Rotate0)]
-    [TestCase(ushort.MaxValue, Rotation.Rotate0)]
+    [TestCase((ushort)0, ImageRotation.Rotation0)]
+    [TestCase((ushort)1, ImageRotation.Rotation0)]
+    [TestCase((ushort)2, ImageRotation.Rotation0)]
+    [TestCase((ushort)3, ImageRotation.Rotate180)]
+    [TestCase((ushort)4, ImageRotation.Rotate180)]
+    [TestCase((ushort)5, ImageRotation.Rotate90)]
+    [TestCase((ushort)6, ImageRotation.Rotate90)]
+    [TestCase((ushort)7, ImageRotation.Rotate270)]
+    [TestCase((ushort)8, ImageRotation.Rotate270)]
+    [TestCase((ushort)9, ImageRotation.Rotation0)]
+    [TestCase((ushort)10, ImageRotation.Rotation0)]
+    [TestCase((ushort)10000, ImageRotation.Rotation0)]
+    [TestCase(ushort.MinValue, ImageRotation.Rotation0)]
+    [TestCase(ushort.MaxValue, ImageRotation.Rotation0)]
     public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
-        Rotation expectedRotation)
+        ImageRotation expectedRotation)
     {
-        Rotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
+        ImageRotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(expectedRotation));
 
@@ -68,9 +68,9 @@ public class ImageMetadataServiceTests
     {
         int exifOrientation = -10;
         // ReSharper disable once IntVariableOverflowInUncheckedContext
-        Rotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
+        ImageRotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
 
-        Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(rotation, Is.EqualTo(ImageRotation.Rotation0));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }

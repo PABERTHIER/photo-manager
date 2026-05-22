@@ -221,24 +221,24 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase((ushort)0, Rotation.Rotate0)]
-    [TestCase((ushort)1, Rotation.Rotate0)]
-    [TestCase((ushort)2, Rotation.Rotate0)]
-    [TestCase((ushort)3, Rotation.Rotate180)]
-    [TestCase((ushort)4, Rotation.Rotate180)]
-    [TestCase((ushort)5, Rotation.Rotate90)]
-    [TestCase((ushort)6, Rotation.Rotate90)]
-    [TestCase((ushort)7, Rotation.Rotate270)]
-    [TestCase((ushort)8, Rotation.Rotate270)]
-    [TestCase((ushort)9, Rotation.Rotate0)]
-    [TestCase((ushort)10, Rotation.Rotate0)]
-    [TestCase((ushort)10000, Rotation.Rotate0)]
-    [TestCase(ushort.MinValue, Rotation.Rotate0)]
-    [TestCase(ushort.MaxValue, Rotation.Rotate0)]
+    [TestCase((ushort)0, ImageRotation.Rotation0)]
+    [TestCase((ushort)1, ImageRotation.Rotation0)]
+    [TestCase((ushort)2, ImageRotation.Rotation0)]
+    [TestCase((ushort)3, ImageRotation.Rotate180)]
+    [TestCase((ushort)4, ImageRotation.Rotate180)]
+    [TestCase((ushort)5, ImageRotation.Rotate90)]
+    [TestCase((ushort)6, ImageRotation.Rotate90)]
+    [TestCase((ushort)7, ImageRotation.Rotate270)]
+    [TestCase((ushort)8, ImageRotation.Rotate270)]
+    [TestCase((ushort)9, ImageRotation.Rotation0)]
+    [TestCase((ushort)10, ImageRotation.Rotation0)]
+    [TestCase((ushort)10000, ImageRotation.Rotation0)]
+    [TestCase(ushort.MinValue, ImageRotation.Rotation0)]
+    [TestCase(ushort.MaxValue, ImageRotation.Rotation0)]
     public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
-        Rotation expectedRotation)
+        ImageRotation expectedRotation)
     {
-        Rotation rotation = ExifHelper.GetImageRotation(exifOrientation);
+        ImageRotation rotation = ExifHelper.GetImageRotation(exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(expectedRotation));
     }
@@ -247,9 +247,9 @@ public class ExifHelperTests
     public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
     {
         int exifOrientation = -10;
-        Rotation rotation = ExifHelper.GetImageRotation((ushort)(short)exifOrientation);
+        ImageRotation rotation = ExifHelper.GetImageRotation((ushort)(short)exifOrientation);
 
-        Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(rotation, Is.EqualTo(ImageRotation.Rotation0));
     }
 
     [Test]

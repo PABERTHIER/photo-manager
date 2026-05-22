@@ -43,7 +43,7 @@ public class TestableAssetRepository(
 
     public new void DeleteFolder(Folder folder) => base.DeleteFolder(folder);
 
-    public new BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height) =>
+    public new IImageData? LoadThumbnail(string directoryName, string fileName, int width, int height) =>
         base.LoadThumbnail(directoryName, fileName, width, height);
 
     public new SyncAssetsConfiguration GetSyncAssetsConfiguration() => base.GetSyncAssetsConfiguration();

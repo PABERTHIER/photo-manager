@@ -105,7 +105,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("db973547-ed18-4e7d-8dc8-ce441aabef80"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
@@ -130,7 +130,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("65a65540-586e-4b2e-a62a-ccdbd7d442f2"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1337_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1337_JPG, Height = PixelHeightAsset._1337_JPG },
@@ -155,7 +155,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("65ba6b40-dc3c-46b6-8508-135cb4e1f961"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1349_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1349_JPG, Height = PixelHeightAsset._1349_JPG },
@@ -180,7 +180,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("ee3dcc63-53d8-4937-a38a-45b3189118e6"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1350_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1350_JPG, Height = PixelHeightAsset._1350_JPG },
@@ -205,7 +205,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("044e3039-0b4b-4065-b215-9cf185d1f90f"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1413_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1413_JPG, Height = PixelHeightAsset._1413_JPG },
@@ -230,7 +230,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("80fa1201-1b9d-4d8e-8730-6efe8e46fcbd"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1414_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1414_JPG, Height = PixelHeightAsset._1414_JPG },
@@ -255,7 +255,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("4c0b2c7c-3159-4855-850b-27c7e737a96e"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1415_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1415_JPG, Height = PixelHeightAsset._1415_JPG },
@@ -280,7 +280,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },

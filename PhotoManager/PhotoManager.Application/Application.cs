@@ -1,7 +1,7 @@
-﻿using PhotoManager.Domain;
+﻿using PhotoManager.Common.Imaging;
+using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using System.Reflection;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Application;
 
@@ -81,10 +81,10 @@ public class Application(
         userConfigurationService.GetAboutInformation(assembly);
 
     // ImageProcessingService
-    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) =>
+    public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation) =>
         imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
 
-    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) =>
+    public IImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation) =>
         imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
     // FileOperationsService

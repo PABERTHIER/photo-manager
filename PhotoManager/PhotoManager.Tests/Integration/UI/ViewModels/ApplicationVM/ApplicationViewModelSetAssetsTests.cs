@@ -67,7 +67,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -92,7 +92,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -125,7 +125,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -154,7 +154,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -330,10 +330,10 @@ public class ApplicationViewModelSetAssetsTests
         _asset3 = _asset3!.WithFolder(folder);
         _asset4 = _asset4!.WithFolder(folder);
 
-        _asset1.ImageData = new();
-        _asset2.ImageData = new();
-        _asset3.ImageData = new();
-        _asset4.ImageData = new();
+        _asset1.ImageData = new BitmapImageData(new());
+        _asset2.ImageData = new BitmapImageData(new());
+        _asset3.ImageData = new BitmapImageData(new());
+        _asset4.ImageData = new BitmapImageData(new());
 
         const string expectedStatusMessage = "The catalog process has ended.";
         string expectedAppTitle =

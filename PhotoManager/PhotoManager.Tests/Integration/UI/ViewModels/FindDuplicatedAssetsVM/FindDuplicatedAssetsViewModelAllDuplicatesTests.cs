@@ -69,9 +69,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -103,9 +103,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -129,9 +129,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_2_JPG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -155,9 +155,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -185,9 +185,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = new BitmapImageData(new()),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -211,7 +211,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
@@ -245,7 +245,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
@@ -271,7 +271,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
@@ -305,7 +305,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
@@ -335,7 +335,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
@@ -361,7 +361,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes._1336_JPG,
             ImageData = null,
             Metadata = new()
@@ -395,7 +395,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -429,7 +429,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -463,7 +463,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotation0,
             Hash = Hashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -635,7 +635,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new();
+            _asset11.ImageData = new BitmapImageData(new());
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -1025,7 +1025,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new();
+            _asset11.ImageData = new BitmapImageData(new());
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -1052,7 +1052,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
 
             // Because _asset13 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset13.ImageData = new();
+            _asset13.ImageData = new BitmapImageData(new());
 
             // Image 1336
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
@@ -1367,7 +1367,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Fourth Collapse - collapse _asset13 (current in Image 1336 set)
             // Set still has 2 visible after this → stays in set, resets to _asset12
             // Because _asset12 will become the CurrentAsset so the ImageData will be loaded
-            _asset12.ImageData = new();
+            _asset12.ImageData = new BitmapImageData(new());
 
             DuplicatedAssetViewModel collapseAsset13 =
                 _findDuplicatedAssetsViewModel!.DuplicatedAssetSets
@@ -1580,7 +1580,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Sixth Collapse - collapse _asset1 (current in Image 1 set)
             // Set still has 2 visible after this → stays in set, resets to _asset6
             // Because _asset6 will become the CurrentAsset so the ImageData will be loaded
-            _asset6.ImageData = new();
+            _asset6.ImageData = new BitmapImageData(new());
 
             DuplicatedAssetViewModel collapseAsset1 =
                 _findDuplicatedAssetsViewModel!.DuplicatedAssetSets
@@ -2083,7 +2083,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
-            _asset11.ImageData = new();
+            _asset11.ImageData = new BitmapImageData(new());
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -2231,7 +2231,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             // Because _asset13 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset13.ImageData = new();
+            _asset13.ImageData = new BitmapImageData(new());
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2822,7 +2822,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
-            _asset11.ImageData = new();
+            _asset11.ImageData = new BitmapImageData(new());
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 

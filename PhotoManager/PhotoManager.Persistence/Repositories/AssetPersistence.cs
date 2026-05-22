@@ -245,7 +245,7 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
             FolderId = folderId,
             Folder = new Folder { Id = Guid.Empty, Path = string.Empty }, // hydrated by repository
             FileName = reader.GetString(1),
-            ImageRotation = (Rotation)reader.GetInt32(2),
+            ImageRotation = MapRotationFromDb(reader.GetInt32(2)),
             Pixel = new Pixel
             {
                 Asset = new Dimensions
@@ -274,6 +274,20 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
                     IsTrue = reader.GetInt32(12) != 0
                 }
             }
+        };
+    }
+
+    // TODO: To remove when v3 is out, would need to clean up DB
+    // Maps DB integer to ImageRotation, supporting both legacy (0-3) and new (0,90,180,270) formats
+    private static ImageRotation MapRotationFromDb(int value)
+    {
+        return value switch
+        {
+            0 => ImageRotation.Rotation0,
+            1 or 90 => ImageRotation.Rotate90,
+            2 or 180 => ImageRotation.Rotate180,
+            3 or 270 => ImageRotation.Rotate270,
+            _ => ImageRotation.Rotation0
         };
     }
 }

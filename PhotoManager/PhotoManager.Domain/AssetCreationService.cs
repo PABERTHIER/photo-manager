@@ -81,12 +81,13 @@ public class AssetCreationService(
 
         // GetExifOrientation is not handled by Png
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
-        (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
+        (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
+            GetRotationAndCorruptionInfo(exifOrientation);
         (int originalDecodeWidth, int originalDecodeHeight) =
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        BitmapImage thumbnailImage =
+        IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetPngBitmapImage(thumbnailImage);
@@ -114,12 +115,13 @@ public class AssetCreationService(
 
         // GetExifOrientation is not handled by GIF
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
-        (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
+        (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
+            GetRotationAndCorruptionInfo(exifOrientation);
         (int originalDecodeWidth, int originalDecodeHeight) =
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        BitmapImage thumbnailImage =
+        IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetGifBitmapImage(thumbnailImage);
@@ -147,12 +149,13 @@ public class AssetCreationService(
 
         ushort exifOrientation = imageMetadataService.GetHeicExifOrientation(imageBytes,
             userConfigurationService.AssetSettings.CorruptedImageOrientation);
-        (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
-        BitmapImage originalImage = imageProcessingService.LoadBitmapHeicOriginalImage(imageBytes, rotation);
-        (int originalDecodeWidth, int originalDecodeHeight) = GetOriginalDecodeLengths(originalImage);
+        (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
+            GetRotationAndCorruptionInfo(exifOrientation);
+        IImageData originalImage = imageProcessingService.LoadBitmapHeicOriginalImage(imageBytes, rotation);
+        (int originalDecodeWidth, int originalDecodeHeight) = (originalImage.Width, originalImage.Height);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        BitmapImage thumbnailImage =
+        IImageData thumbnailImage =
             imageProcessingService.LoadBitmapHeicThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);
@@ -182,12 +185,13 @@ public class AssetCreationService(
             imageBytes,
             userConfigurationService.AssetSettings.DefaultExifOrientation,
             userConfigurationService.AssetSettings.CorruptedImageOrientation);
-        (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
+        (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
+            GetRotationAndCorruptionInfo(exifOrientation);
         (int originalDecodeWidth, int originalDecodeHeight) =
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        BitmapImage thumbnailImage =
+        IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);
@@ -206,23 +210,14 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private (Rotation rotation, bool assetCorrupted, bool assetRotated) GetRotationAndCorruptionInfo(
+    private (ImageRotation rotation, bool assetCorrupted, bool assetRotated) GetRotationAndCorruptionInfo(
         ushort exifOrientation)
     {
-        Rotation rotation = imageMetadataService.GetImageRotation(exifOrientation);
+        ImageRotation rotation = imageMetadataService.GetImageRotation(exifOrientation);
         bool isAssetCorrupted = exifOrientation == userConfigurationService.AssetSettings.CorruptedImageOrientation;
-        bool isAssetRotated = rotation != Rotation.Rotate0;
+        bool isAssetRotated = rotation != ImageRotation.Rotation0;
 
         return (rotation, isAssetCorrupted, isAssetRotated);
-    }
-
-    private static (int originalDecodeWidth, int originalDecodeHeight) GetOriginalDecodeLengths(
-        BitmapImage originalImage)
-    {
-        int originalDecodeWidth = originalImage.PixelWidth;
-        int originalDecodeHeight = originalImage.PixelHeight;
-
-        return (originalDecodeWidth, originalDecodeHeight);
     }
 
     private (int thumbnailDecodeWidth, int thumbnailDecodeHeight) GetThumbnailDimensions(int originalDecodeWidth,
@@ -252,7 +247,7 @@ public class AssetCreationService(
     }
 
     private Asset CreateAssetWithProperties(string imagePath, string directoryName, byte[] imageBytes,
-        Rotation rotation, bool isAssetCorrupted, bool isAssetRotated, int originalDecodeWidth,
+        ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated, int originalDecodeWidth,
         int originalDecodeHeight, int thumbnailDecodeWidth, int thumbnailDecodeHeight, byte[] thumbnailBuffer)
     {
         // directoryName comes from folder in assetRepository or CatalogExistingFolder that registers the folder if not in assetRepository
