@@ -326,7 +326,7 @@ public class DuplicatedAssetViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances = [];
 
-        _duplicatedAssetViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _duplicatedAssetViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             duplicatedAssetViewModelInstances.Add((DuplicatedAssetViewModel)sender!);

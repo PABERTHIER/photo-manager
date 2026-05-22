@@ -1425,28 +1425,28 @@ public class FolderNavigationWindowTests
         List<string> notifyPropertyChangedEvents = [];
         List<FolderNavigationViewModel> folderNavigationViewModelInstances = [];
 
-        _folderNavigationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _folderNavigationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             folderNavigationViewModelInstances.Add((FolderNavigationViewModel)sender!);
         };
 
         List<string> notifyApplicationViewModelPropertyChangedEvents = [];
-        _applicationViewModel!.PropertyChanged += delegate(object? _, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? _, PropertyChangedEventArgs e)
         {
             notifyApplicationViewModelPropertyChangedEvents.Add(e.PropertyName!);
         };
 
         List<Folder> folderAddedEvents = [];
 
-        _folderNavigationViewModel!.ApplicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _folderNavigationViewModel!.ApplicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _folderNavigationViewModel!.ApplicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _folderNavigationViewModel!.ApplicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };

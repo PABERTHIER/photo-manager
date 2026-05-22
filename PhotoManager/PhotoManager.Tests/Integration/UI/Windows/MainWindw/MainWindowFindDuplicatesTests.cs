@@ -1114,7 +1114,7 @@ public class MainWindowFindDuplicatesTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -1122,14 +1122,14 @@ public class MainWindowFindDuplicatesTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -1152,7 +1152,7 @@ public class MainWindowFindDuplicatesTests
             getExemptedFolderPathEvents.Add(string.Empty);
         };
 
-        DeleteDuplicatedAssetsEventTriggered += delegate(object _, Asset[] assets)
+        DeleteDuplicatedAssetsEventTriggered += delegate (object _, Asset[] assets)
         {
             deleteDuplicatedAssetsEvents.Add(assets);
         };

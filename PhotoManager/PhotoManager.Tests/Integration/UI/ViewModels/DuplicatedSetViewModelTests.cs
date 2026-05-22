@@ -481,7 +481,7 @@ public class DuplicatedSetViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedSetViewModel> duplicatedSetViewModelInstances = [];
 
-        _duplicatedSetViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _duplicatedSetViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             duplicatedSetViewModelInstances.Add((DuplicatedSetViewModel)sender!);
