@@ -68,7 +68,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_1_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -102,7 +102,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_2_DUPLICATED_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -128,7 +128,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_2_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -154,7 +154,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_9_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -184,7 +184,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_11_HEIC,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -210,7 +210,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
@@ -244,7 +244,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
@@ -270,7 +270,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
@@ -304,7 +304,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
@@ -334,7 +334,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
@@ -360,7 +360,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes._1336_JPG,
             ImageData = null,
             Metadata = new()
@@ -394,7 +394,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -428,7 +428,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -462,7 +462,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = MD5Hashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -565,28 +565,28 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
 
             // Image 1 set (3 items)
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset1!.FileName));
+            List<Asset> image1DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
 
             // Image 2 set (2 items)
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset2!.FileName));
+            List<Asset> image2DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
 
             // Image 9 set (3 items)
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset4!.FileName));
+            List<Asset> image9DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
             Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
 
             // Image 11 set (2 items)
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset5!.FileName));
+            List<Asset> image11DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
             Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
 
             // Image 1336 set (4 items)
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset11!.FileName));
+            List<Asset> image1336DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
             Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
@@ -932,13 +932,13 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         List<string> notifyApplicationVmPropertyChangedEvents = [];
         List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances = [];
 
-        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyFindDuplicatedAssetsVmPropertyChangedEvents.Add(e.PropertyName!);
             findDuplicatedAssetsViewModelInstances.Add((FindDuplicatedAssetsViewModel)sender!);
         };
 
-        _applicationViewModel!.PropertyChanged += delegate (object? _, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate(object? _, PropertyChangedEventArgs e)
         {
             notifyApplicationVmPropertyChangedEvents.Add(e.PropertyName!);
         };
@@ -946,7 +946,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
         _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
-            delegate (object _, MessageBoxInformationSentEventArgs e)
+            delegate(object _, MessageBoxInformationSentEventArgs e)
             {
                 messagesInformationSent.Add(e);
             };
@@ -1001,8 +1001,8 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
                 DuplicatedSetViewModel actualSet =
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(
-                        s => s.Any(a => a.Asset.FullPath == expectedDuplicatedAssetSets[i][0].Asset.FullPath));
+                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(s =>
+                        s.Any(a => a.Asset.FullPath == expectedDuplicatedAssetSets[i][0].Asset.FullPath));
 
                 AssertDuplicatedAssetsSet(actualSet, expectedDuplicatedAssetSets[i]);
             }
@@ -1023,8 +1023,8 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
 
             for (int i = 0; i < expectedDuplicatedAssetSet.Count; i++)
             {
-                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(
-                    a => a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
+                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(a =>
+                    a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
 
                 AssertDuplicatedAsset(actualAsset, expectedDuplicatedAssetSet[i]);
             }
@@ -1062,8 +1062,8 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
                     DuplicatedAssetViewModel actualSibling =
-                        duplicatedAsset.ParentViewModel.First(
-                            a => a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
+                        duplicatedAsset.ParentViewModel.First(a =>
+                            a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
                     Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 

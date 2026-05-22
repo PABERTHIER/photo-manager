@@ -91,15 +91,15 @@ public static class ExifHelper
     {
         ImageRotation rotation = exifOrientation switch
         {
-            1 => ImageRotation.Rotation0,
-            2 => ImageRotation.Rotation0, // FlipX
+            1 => ImageRotation.Rotate0,
+            2 => ImageRotation.Rotate0, // FlipX
             3 => ImageRotation.Rotate180,
             4 => ImageRotation.Rotate180, // FlipX
             5 => ImageRotation.Rotate90, // FlipX
             6 => ImageRotation.Rotate90,
             7 => ImageRotation.Rotate270, // FlipX
             8 => ImageRotation.Rotate270,
-            _ => ImageRotation.Rotation0
+            _ => ImageRotation.Rotate0
         };
 
         return rotation;

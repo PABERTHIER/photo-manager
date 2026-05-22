@@ -15,7 +15,7 @@ internal static class BitmapHelperHeicBenchmarkHelper
 
     internal static readonly ImageRotation[] Rotations =
     [
-        ImageRotation.Rotation0,
+        ImageRotation.Rotate0,
         ImageRotation.Rotate90,
         ImageRotation.Rotate180,
         ImageRotation.Rotate270
@@ -170,7 +170,7 @@ public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
                 results[i] = BitmapHelper.LoadBitmapHeicThumbnailImage(_imageBuffers[i], rotations[i], widths[i],
-                        heights[i], _logger);
+                    heights[i], _logger);
             }
 
             return results;
@@ -190,7 +190,7 @@ public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
                 results[i] = BitmapHelper.LoadBitmapThumbnailImage(_imageBuffers[i], rotations[i], widths[i],
-                        heights[i], _logger);
+                    heights[i], _logger);
             }
 
             return results;

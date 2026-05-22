@@ -31,7 +31,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the originalImage")]
-    [TestCase(ImageRotation.Rotation0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
@@ -135,7 +135,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
 
         BitmapImageData image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation, _testLogger!);
 
@@ -157,7 +157,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
-    [TestCase(ImageRotation.Rotation0, 100, 100)]
+    [TestCase(ImageRotation.Rotate0, 100, 100)]
     [TestCase(ImageRotation.Rotate90, 100, 100)]
     [TestCase(ImageRotation.Rotate180, 100, 100)]
     [TestCase(ImageRotation.Rotate270, 100, 100)]
@@ -173,13 +173,13 @@ public class BitmapHelperTests
     [TestCase(ImageRotation.Rotate90, -100, 100)]
     [TestCase(ImageRotation.Rotate90, 100, -100)]
     [TestCase(ImageRotation.Rotate90, -100, -100)]
-    [TestCase(ImageRotation.Rotation0, 1000000, 100)]
-    [TestCase(ImageRotation.Rotation0, 100, 1000000)]
+    [TestCase(ImageRotation.Rotate0, 1000000, 100)]
+    [TestCase(ImageRotation.Rotate0, 100, 1000000)]
     // [TestCase(null, 100, null)]
     // [TestCase(null, null, 100)]
     // [TestCase(null, null, null)]
-    public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(ImageRotation rotation,
-        int width, int height)
+    public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(
+        ImageRotation rotation, int width, int height)
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -203,7 +203,7 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
 
         OverflowException? exception = Assert.Throws<OverflowException>(() =>
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotation0, 1000000, 1000000, _testLogger!));
+            BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 1000000, 1000000, _testLogger!));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
 
@@ -287,7 +287,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const int width = 100;
         const int height = 100;
 
@@ -309,7 +309,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the originalImage for HEIC")]
-    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotation0, ImageRotation.Rotation0, PixelWidthAsset.IMAGE_11_HEIC,
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotate0, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC,
         PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageRotation.Rotate90,
         PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
@@ -317,7 +317,7 @@ public class BitmapHelperTests
         PixelWidthAsset.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, ImageRotation.Rotate270,
         PixelWidthAsset.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
-    // [TestCase("FileNames.IMAGE_11_HEIC", null, ImageRotation.Rotation0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    // [TestCase("FileNames.IMAGE_11_HEIC", null, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(string fileName,
         ImageRotation rotation, ImageRotation expectedRotation, int expectedPixelWidth, int expectedPixelHeight)
     {
@@ -384,7 +384,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -410,7 +410,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(ImageRotation.Rotation0, 100, 100, ImageRotation.Rotation0, 75, 100)]
+    [TestCase(ImageRotation.Rotate0, 100, 100, ImageRotation.Rotate0, 75, 100)]
     [TestCase(ImageRotation.Rotate90, 100, 100, ImageRotation.Rotate90, 75, 100)]
     [TestCase(ImageRotation.Rotate180, 100, 100, ImageRotation.Rotate180, 75, 100)]
     [TestCase(ImageRotation.Rotate270, 100, 100, ImageRotation.Rotate270, 75, 100)]
@@ -419,17 +419,18 @@ public class BitmapHelperTests
     [TestCase(ImageRotation.Rotate90, 0, 10000, ImageRotation.Rotate90, 10000, 13333)]
     [TestCase(ImageRotation.Rotate90, 100, 0, ImageRotation.Rotate90, 75, 100)]
     [TestCase(ImageRotation.Rotate90, 0, 0, ImageRotation.Rotate90, 1, 1)]
-    // [TestCase(null, 100, 100, ImageRotation.Rotation0, 75, 100)]
+    // [TestCase(null, 100, 100, ImageRotation.Rotate0, 75, 100)]
     // [TestCase(ImageRotation.Rotate90, null, 100, ImageRotation.Rotate90, 100, 133)]
     // [TestCase(ImageRotation.Rotate90, 100, null, ImageRotation.Rotate90, 75, 100)]
     // [TestCase(ImageRotation.Rotate90, null, null, ImageRotation.Rotate90, 1, 1)]
-    [TestCase(ImageRotation.Rotation0, 1000000, 100, ImageRotation.Rotation0, 75, 100)]
-    [TestCase(ImageRotation.Rotation0, 100, 1000000, ImageRotation.Rotation0, 100, 133)]
-    // [TestCase(null, 100, null, ImageRotation.Rotation0, 100, 133)]
-    // [TestCase(null, null, 100, ImageRotation.Rotation0, 75, 100)]
-    // [TestCase(null, null, null, ImageRotation.Rotation0, 1, 1)]
+    [TestCase(ImageRotation.Rotate0, 1000000, 100, ImageRotation.Rotate0, 75, 100)]
+    [TestCase(ImageRotation.Rotate0, 100, 1000000, ImageRotation.Rotate0, 100, 133)]
+    // [TestCase(null, 100, null, ImageRotation.Rotate0, 100, 133)]
+    // [TestCase(null, null, 100, ImageRotation.Rotate0, 75, 100)]
+    // [TestCase(null, null, null, ImageRotation.Rotate0, 1, 1)]
     public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndNotRotatedImage_ReturnsBitmapImage(
-        ImageRotation rotation, int width, int height, ImageRotation expectedRotation, int expectedWidth, int expectedHeight)
+        ImageRotation rotation, int width, int height, ImageRotation expectedRotation, int expectedWidth,
+        int expectedHeight)
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -456,7 +457,8 @@ public class BitmapHelperTests
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, 100, 100, ImageRotation.Rotate180, 75, 100)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, 100, 100, ImageRotation.Rotate270, 100, 75)]
     public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName,
-        ImageRotation rotation, int width, int height, ImageRotation expectedRotation, int expectedWidth, int expectedHeight)
+        ImageRotation rotation, int width, int height, ImageRotation expectedRotation, int expectedWidth,
+        int expectedHeight)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -516,7 +518,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -536,7 +538,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -587,7 +589,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -613,13 +615,13 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    [TestCase(ImageRotation.Rotation0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(ImageRotation rotation, int expectedWith,
-        int expectedHeight)
+    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(ImageRotation rotation,
+        int expectedWith, int expectedHeight)
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
@@ -649,7 +651,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -667,7 +669,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -695,7 +697,7 @@ public class BitmapHelperTests
     public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
 
         BitmapImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -717,7 +719,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    [TestCase(ImageRotation.Rotation0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
@@ -789,7 +791,7 @@ public class BitmapHelperTests
         {
             Assert.That(image, Is.Not.Null);
             Assert.That(image.BitmapImage.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
             Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
         }
@@ -810,7 +812,7 @@ public class BitmapHelperTests
         {
             Assert.That(image, Is.Not.Null);
             Assert.That(image.BitmapImage.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
             Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
         }
@@ -840,7 +842,7 @@ public class BitmapHelperTests
             {
                 Assert.That(image, Is.Not.Null);
                 Assert.That(image.BitmapImage.StreamSource, Is.Null);
-                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
                 Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
                 Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
 
@@ -896,7 +898,7 @@ public class BitmapHelperTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.EqualTo(width));
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.EqualTo(height));
         Assert.That(image.BitmapImage.PixelWidth, Is.EqualTo(expectedWidth));
@@ -990,7 +992,7 @@ public class BitmapHelperTests
         {
             Assert.That(image, Is.Not.Null);
             Assert.That(image.BitmapImage.StreamSource, Is.Not.Null);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(image.BitmapImage.PixelWidth, Is.EqualTo(width));
             Assert.That(image.BitmapImage.PixelHeight, Is.EqualTo(height));
             Assert.That(image.BitmapImage.DecodePixelWidth, Is.EqualTo(width));
@@ -1100,7 +1102,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100,
+        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
             new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
@@ -1191,7 +1193,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100,
+        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
             new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
@@ -1282,7 +1284,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100,
+        BitmapImageData image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
             new TestLogger<BitmapHelperTests>());
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
@@ -1337,15 +1339,17 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotation0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
-    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotation0, PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG)]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG,
+        PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG,
+        PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG)]
     [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_9_PNG, PixelWidthAsset.IMAGE_9_PNG)]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotation0, PixelWidthAsset.IMAGE_10_PORTRAIT_PNG,
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_10_PORTRAIT_PNG,
         PixelHeightAsset.IMAGE_10_PORTRAIT_PNG)]
-    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotation0, PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF)]
+    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotate0, PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF)]
     public void GetImageDimensions_ValidBufferAndRotation_ReturnsDimensions(string fileName, ImageRotation rotation,
         int expectedWidth, int expectedHeight)
     {
@@ -1367,7 +1371,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
 
         (int width, int height) = BitmapHelper.GetImageDimensions(buffer, rotation, _testLogger!);
 
@@ -1398,7 +1402,7 @@ public class BitmapHelperTests
     public void GetImageDimensions_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1418,7 +1422,7 @@ public class BitmapHelperTests
     public void GetImageDimensions_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1439,7 +1443,7 @@ public class BitmapHelperTests
     {
         // JPEG signature detected, but buffer is too short for the while loop (offset=2, buffer.Length-3=1)
         byte[] buffer = [0xFF, 0xD8, 0xFF, 0xFF];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1460,7 +1464,7 @@ public class BitmapHelperTests
     {
         // JPEG signature valid, but byte at marker position is not 0xFF
         byte[] buffer = [0xFF, 0xD8, 0x00, 0x00, 0x00, 0x00];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1481,7 +1485,7 @@ public class BitmapHelperTests
     {
         // SOF0 marker found (0xC0) but not enough bytes after it to read the dimensions
         byte[] buffer = [0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x00];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1502,7 +1506,7 @@ public class BitmapHelperTests
     {
         // APP0 marker (0xE0) with segment length = 1, which is below the minimum of 2
         byte[] buffer = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x01, 0x00, 0x00, 0x00];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 
@@ -1523,7 +1527,7 @@ public class BitmapHelperTests
     {
         // APP0 marker (0xE0) with valid length=8 is skipped, then the while condition becomes false (no SOF found)
         byte[] buffer = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00];
-        const ImageRotation rotation = ImageRotation.Rotation0;
+        const ImageRotation rotation = ImageRotation.Rotate0;
         const string expectedExceptionMessage =
             "No imaging component suitable to complete this operation was found.";
 

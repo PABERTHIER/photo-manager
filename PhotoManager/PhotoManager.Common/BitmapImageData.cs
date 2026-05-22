@@ -64,7 +64,7 @@ public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotat
     {
         return rotation switch
         {
-            ImageRotation.Rotation0 => System.Windows.Media.Imaging.Rotation.Rotate0,
+            ImageRotation.Rotate0 => System.Windows.Media.Imaging.Rotation.Rotate0,
             ImageRotation.Rotate90 => System.Windows.Media.Imaging.Rotation.Rotate90,
             ImageRotation.Rotate180 => System.Windows.Media.Imaging.Rotation.Rotate180,
             ImageRotation.Rotate270 => System.Windows.Media.Imaging.Rotation.Rotate270,
@@ -73,15 +73,15 @@ public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotat
         };
     }
 
-    internal static ImageRotation MapFromWpfRotation(Rotation wpfRotation)
+    public static ImageRotation MapFromWpfRotation(Rotation wpfRotation)
     {
         return wpfRotation switch
         {
-            System.Windows.Media.Imaging.Rotation.Rotate0 => ImageRotation.Rotation0,
+            System.Windows.Media.Imaging.Rotation.Rotate0 => ImageRotation.Rotate0,
             System.Windows.Media.Imaging.Rotation.Rotate90 => ImageRotation.Rotate90,
             System.Windows.Media.Imaging.Rotation.Rotate180 => ImageRotation.Rotate180,
             System.Windows.Media.Imaging.Rotation.Rotate270 => ImageRotation.Rotate270,
-            _ => ImageRotation.Rotation0
+            _ => ImageRotation.Rotate0
         };
     }
 }

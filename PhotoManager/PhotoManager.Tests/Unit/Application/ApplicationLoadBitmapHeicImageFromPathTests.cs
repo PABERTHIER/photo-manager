@@ -56,7 +56,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -77,13 +78,13 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(ImageRotation.Rotation0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(ImageRotation rotation,
-        int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
+        ImageRotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -141,7 +142,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
     }
@@ -158,7 +159,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
         Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
     }

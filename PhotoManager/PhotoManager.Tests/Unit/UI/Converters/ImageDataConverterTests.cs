@@ -10,7 +10,7 @@ public class ImageDataConverterTests
     {
         ImageDataConverter converter = new();
         BitmapImage bitmapImage = new();
-        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotation0);
+        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotate0);
 
         object? result = converter.Convert(imageData, typeof(object), null, CultureInfo.InvariantCulture);
 

@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Windows;
+using System.Windows.Media;
 
 namespace PhotoManager.Tests.Unit.Common;
 
@@ -13,11 +14,21 @@ public class BitmapImageDataTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapImageData.ToWpfRotation(rotation));
 
-        Assert.That(exception?.Message, Does.Contain("'999' is not a valid value for property 'Rotation'."));
+        Assert.That(exception?.Message, Is.EqualTo("'999' is not a valid value for property 'Rotation'."));
     }
 
     [Test]
-    public void Constructor_BitmapImageWithRotate0_MapsToRotation0()
+    public void MapFromWpfRotation_InvalidRotation_ReturnsRotate0()
+    {
+        const Rotation rotation = (Rotation)999;
+
+        ImageRotation imageRotation = BitmapImageData.MapFromWpfRotation(rotation);
+
+        Assert.That(imageRotation, Is.EqualTo(ImageRotation.Rotate0));
+    }
+
+    [Test]
+    public void Constructor_BitmapImageWithRotate0_MapsToRotate0()
     {
         BitmapImage bitmapImage = CreateTestBitmapImage();
 
@@ -25,7 +36,7 @@ public class BitmapImageDataTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+            Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(imageData.BitmapImage, Is.SameAs(bitmapImage));
         }
     }
@@ -73,7 +84,7 @@ public class BitmapImageDataTests
     }
 
     [Test]
-    public void Constructor_BitmapImageWithInvalidRotation_DefaultsToRotation0()
+    public void Constructor_BitmapImageWithInvalidRotation_DefaultsToRotate0()
     {
         BitmapImage bitmapImage = CreateTestBitmapImage();
 
@@ -81,7 +92,7 @@ public class BitmapImageDataTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotation0));
+            Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(imageData.BitmapImage, Is.SameAs(bitmapImage));
         }
     }
@@ -105,7 +116,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToByteArray_PngFormat_ReturnsByteArray()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         byte[] result = imageData.ToByteArray(ImageEncodingFormat.Png);
 
@@ -115,7 +126,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToByteArray_GifFormat_ReturnsByteArray()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         byte[] result = imageData.ToByteArray(ImageEncodingFormat.Gif);
 
@@ -125,7 +136,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToByteArray_BmpFormat_ReturnsByteArray()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         byte[] result = imageData.ToByteArray(ImageEncodingFormat.Bmp);
 
@@ -135,7 +146,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToByteArray_InvalidFormat_ThrowsArgumentOutOfRangeException()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             imageData.ToByteArray((ImageEncodingFormat)999));
@@ -146,7 +157,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToStream_JpegFormat_ReturnsReadableStream()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         using Stream result = imageData.ToStream(ImageEncodingFormat.Jpeg);
 
@@ -162,7 +173,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToStream_PngFormat_ReturnsReadableStream()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         using Stream result = imageData.ToStream(ImageEncodingFormat.Png);
 
@@ -177,7 +188,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToStream_GifFormat_ReturnsReadableStream()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         using Stream result = imageData.ToStream(ImageEncodingFormat.Gif);
 
@@ -192,7 +203,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToStream_BmpFormat_ReturnsReadableStream()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         using Stream result = imageData.ToStream(ImageEncodingFormat.Bmp);
 
@@ -207,7 +218,7 @@ public class BitmapImageDataTests
     [Test]
     public void ToStream_InvalidFormat_ThrowsArgumentOutOfRangeException()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             imageData.ToStream((ImageEncodingFormat)999));
@@ -218,7 +229,7 @@ public class BitmapImageDataTests
     [Test]
     public void Dispose_DoesNotThrow()
     {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotation0);
+        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
 
         Assert.DoesNotThrow(imageData.Dispose);
     }
@@ -227,7 +238,7 @@ public class BitmapImageDataTests
     public void Width_ReturnsPixelWidth()
     {
         BitmapImage bitmapImage = CreateTestBitmapImage(pixelWidth: 2, pixelHeight: 3);
-        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotation0);
+        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotate0);
 
         Assert.That(imageData.Width, Is.EqualTo(bitmapImage.PixelWidth));
     }
@@ -236,7 +247,7 @@ public class BitmapImageDataTests
     public void Height_ReturnsPixelHeight()
     {
         BitmapImage bitmapImage = CreateTestBitmapImage(pixelWidth: 2, pixelHeight: 3);
-        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotation0);
+        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotate0);
 
         Assert.That(imageData.Height, Is.EqualTo(bitmapImage.PixelHeight));
     }
@@ -255,7 +266,7 @@ public class BitmapImageDataTests
             pixels[index + 3] = 255;
         }
 
-        writeableBitmap.WritePixels(new System.Windows.Int32Rect(0, 0, pixelWidth, pixelHeight), pixels,
+        writeableBitmap.WritePixels(new Int32Rect(0, 0, pixelWidth, pixelHeight), pixels,
             pixelWidth * 4, 0);
 
         PngBitmapEncoder encoder = new();

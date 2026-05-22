@@ -111,7 +111,7 @@ public static class BitmapHelper
             logger.LogError("The image is not valid or in an unsupported format");
         }
 
-        return new BitmapImageData(image, ImageRotation.Rotation0);
+        return new BitmapImageData(image, ImageRotation.Rotate0);
     }
 
     // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
@@ -161,7 +161,7 @@ public static class BitmapHelper
             logger.LogError("The image is not valid or in an unsupported format");
         }
 
-        return new BitmapImageData(image, ImageRotation.Rotation0);
+        return new BitmapImageData(image, ImageRotation.Rotate0);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
@@ -183,7 +183,7 @@ public static class BitmapHelper
             return new BitmapImageData(image, rotation);
         }
 
-        return new BitmapImageData(image, ImageRotation.Rotation0);
+        return new BitmapImageData(image, ImageRotation.Rotate0);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
@@ -224,7 +224,7 @@ public static class BitmapHelper
             }
         }
 
-        return new BitmapImageData(image, ImageRotation.Rotation0);
+        return new BitmapImageData(image, ImageRotation.Rotate0);
     }
 
     // From AssetRepository
@@ -246,7 +246,7 @@ public static class BitmapHelper
                 thumbnailImage.Freeze();
             }
 
-            return new BitmapImageData(thumbnailImage, ImageRotation.Rotation0);
+            return new BitmapImageData(thumbnailImage, ImageRotation.Rotate0);
         }
         catch (Exception ex) when (ex is not ArgumentException and not ArgumentNullException and not OverflowException)
         {
@@ -308,7 +308,7 @@ public static class BitmapHelper
 
         if (rawWidth <= 0 || rawHeight <= 0)
         {
-            BitmapImageData image = LoadBitmapOriginalImage(buffer, ImageRotation.Rotation0, logger);
+            BitmapImageData image = LoadBitmapOriginalImage(buffer, ImageRotation.Rotate0, logger);
             rawWidth = image.Width;
             rawHeight = image.Height;
         }
@@ -426,7 +426,7 @@ public static class BitmapHelper
     {
         return rotation switch
         {
-            ImageRotation.Rotation0 => Rotation.Rotate0,
+            ImageRotation.Rotate0 => Rotation.Rotate0,
             ImageRotation.Rotate90 => Rotation.Rotate90,
             ImageRotation.Rotate180 => Rotation.Rotate180,
             ImageRotation.Rotate270 => Rotation.Rotate270,

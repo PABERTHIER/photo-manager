@@ -51,7 +51,8 @@ public class DuplicatedSetViewModelTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
 
@@ -72,7 +73,7 @@ public class DuplicatedSetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -106,7 +107,7 @@ public class DuplicatedSetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -480,7 +481,7 @@ public class DuplicatedSetViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedSetViewModel> duplicatedSetViewModelInstances = [];
 
-        _duplicatedSetViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _duplicatedSetViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             duplicatedSetViewModelInstances.Add((DuplicatedSetViewModel)sender!);

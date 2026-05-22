@@ -108,14 +108,15 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_LEFT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -148,7 +149,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -181,7 +182,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_RIGHT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -214,7 +215,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_LEFT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -247,7 +248,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_ORIGINAL_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -280,7 +281,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_RIGHT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -313,7 +314,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_LEFT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -346,7 +347,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -379,7 +380,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_RIGHT_PART_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -412,7 +413,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },

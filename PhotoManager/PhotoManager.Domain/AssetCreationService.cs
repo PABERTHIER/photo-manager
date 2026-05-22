@@ -215,7 +215,7 @@ public class AssetCreationService(
     {
         ImageRotation rotation = imageMetadataService.GetImageRotation(exifOrientation);
         bool isAssetCorrupted = exifOrientation == userConfigurationService.AssetSettings.CorruptedImageOrientation;
-        bool isAssetRotated = rotation != ImageRotation.Rotation0;
+        bool isAssetRotated = rotation != ImageRotation.Rotate0;
 
         return (rotation, isAssetCorrupted, isAssetRotated);
     }

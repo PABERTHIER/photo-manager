@@ -53,7 +53,8 @@ public class DuplicatedAssetViewModelTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
 
@@ -82,7 +83,7 @@ public class DuplicatedAssetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -108,7 +109,7 @@ public class DuplicatedAssetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -142,7 +143,7 @@ public class DuplicatedAssetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -172,7 +173,7 @@ public class DuplicatedAssetViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -325,7 +326,7 @@ public class DuplicatedAssetViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances = [];
 
-        _duplicatedAssetViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _duplicatedAssetViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             duplicatedAssetViewModelInstances.Add((DuplicatedAssetViewModel)sender!);

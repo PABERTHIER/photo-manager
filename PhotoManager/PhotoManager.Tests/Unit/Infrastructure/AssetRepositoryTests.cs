@@ -84,7 +84,7 @@ public class AssetRepositoryTests
             Folder = new() { Id = Guid.Empty, Path = "" },
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -345,7 +345,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "img1.jpg",
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 100, Height = 100 },
@@ -370,7 +370,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "img2.jpg",
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 100, Height = 100 },
@@ -559,7 +559,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "sunset.jpg",
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 200, Height = 150 },
@@ -628,7 +628,7 @@ public class AssetRepositoryTests
             Folder = folder,
             FolderId = folderId,
             FileName = "orphan.jpg",
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 200, Height = 150 },

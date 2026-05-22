@@ -55,7 +55,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -80,7 +80,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -113,7 +113,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -142,7 +142,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -187,7 +187,8 @@ public class ApplicationLoadBitmapImageFromPathTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -225,10 +226,14 @@ public class ApplicationLoadBitmapImageFromPathTests
         Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
         Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
 
-        BitmapImageData image1 = (BitmapImageData)_application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
-        BitmapImageData image2 = (BitmapImageData)_application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
-        BitmapImageData image3 = (BitmapImageData)_application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
-        BitmapImageData image4 = (BitmapImageData)_application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
+        BitmapImageData image1 =
+            (BitmapImageData)_application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
+        BitmapImageData image2 =
+            (BitmapImageData)_application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
+        BitmapImageData image3 =
+            (BitmapImageData)_application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
+        BitmapImageData image4 =
+            (BitmapImageData)_application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
 
         using (Assert.EnterMultipleScope())
         {

@@ -75,7 +75,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -109,7 +109,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_DUPLICATED_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -135,7 +135,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -161,7 +161,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -191,7 +191,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -217,7 +217,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
@@ -251,7 +251,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
@@ -277,7 +277,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
@@ -311,7 +311,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
@@ -341,7 +341,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
@@ -367,7 +367,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes._1336_JPG,
             ImageData = null,
             Metadata = new()
@@ -401,7 +401,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -435,7 +435,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -469,7 +469,7 @@ public class FindDuplicatedAssetsWindowTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
@@ -524,7 +524,8 @@ public class FindDuplicatedAssetsWindowTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -587,24 +588,24 @@ public class FindDuplicatedAssetsWindowTests
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
 
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset1!.FileName));
+            List<Asset> image1DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset2!.FileName));
+            List<Asset> image2DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset4!.FileName));
+            List<Asset> image9DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
             Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset5!.FileName));
+            List<Asset> image11DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
             Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset11!.FileName));
+            List<Asset> image1336DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
             Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
@@ -1587,24 +1588,24 @@ public class FindDuplicatedAssetsWindowTests
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
 
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset1!.FileName));
+            List<Asset> image1DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset2!.FileName));
+            List<Asset> image2DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset4!.FileName));
+            List<Asset> image9DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
             Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset5!.FileName));
+            List<Asset> image11DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
             Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset11!.FileName));
+            List<Asset> image1336DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
             Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
@@ -2511,24 +2512,24 @@ public class FindDuplicatedAssetsWindowTests
 
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
 
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset1!.FileName));
+            List<Asset> image1DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset2!.FileName));
+            List<Asset> image2DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset4!.FileName));
+            List<Asset> image9DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
             Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
 
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset5!.FileName));
+            List<Asset> image11DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
             Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
 
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets.First(
-                s => s.Any(a => a.FileName == _asset11!.FileName));
+            List<Asset> image1336DuplicatesSet =
+                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
             Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
@@ -2990,8 +2991,8 @@ public class FindDuplicatedAssetsWindowTests
     private DuplicatedAssetViewModel FindDuplicatedAssetVm(Asset asset)
     {
         return _findDuplicatedAssetsViewModel!.DuplicatedAssetSets
-                                              .SelectMany(s => s.AsEnumerable())
-                                              .First(a => a.Asset.FullPath == asset.FullPath);
+            .SelectMany(s => s.AsEnumerable())
+            .First(a => a.Asset.FullPath == asset.FullPath);
     }
 
     private
@@ -3007,13 +3008,13 @@ public class FindDuplicatedAssetsWindowTests
         List<string> notifyApplicationVmPropertyChangedEvents = [];
         List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances = [];
 
-        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyFindDuplicatedAssetsVmPropertyChangedEvents.Add(e.PropertyName!);
             findDuplicatedAssetsViewModelInstances.Add((FindDuplicatedAssetsViewModel)sender!);
         };
 
-        _applicationViewModel!.PropertyChanged += delegate (object? _, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate(object? _, PropertyChangedEventArgs e)
         {
             notifyApplicationVmPropertyChangedEvents.Add(e.PropertyName!);
         };
@@ -3021,7 +3022,7 @@ public class FindDuplicatedAssetsWindowTests
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
         _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
-            delegate (object _, MessageBoxInformationSentEventArgs e)
+            delegate(object _, MessageBoxInformationSentEventArgs e)
             {
                 messagesInformationSent.Add(e);
             };
@@ -3053,7 +3054,7 @@ public class FindDuplicatedAssetsWindowTests
     {
         List<Asset[]> deleteDuplicatedAssetsEvents = [];
 
-        DeleteDuplicatedAssets += delegate (object _, Asset[] asset)
+        DeleteDuplicatedAssets += delegate(object _, Asset[] asset)
         {
             deleteDuplicatedAssetsEvents.Add(asset);
         };
@@ -3180,8 +3181,8 @@ public class FindDuplicatedAssetsWindowTests
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
                     DuplicatedAssetViewModel actualSibling =
-                        duplicatedAsset.ParentViewModel.First(
-                            x => x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
+                        duplicatedAsset.ParentViewModel.First(x =>
+                            x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
                     Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 

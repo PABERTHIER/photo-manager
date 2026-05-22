@@ -3317,7 +3317,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         List<string> notifyPropertyChangedEvents = [];
         List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances = [];
 
-        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             findDuplicatedAssetsViewModelInstances.Add((FindDuplicatedAssetsViewModel)sender!);
@@ -3326,7 +3326,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
         _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
-            delegate (object _, MessageBoxInformationSentEventArgs e)
+            delegate(object _, MessageBoxInformationSentEventArgs e)
             {
                 messagesInformationSent.Add(e);
             };
@@ -3352,7 +3352,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     {
         List<Asset[]> deleteDuplicatedAssetsEvents = [];
 
-        DeleteDuplicatedAssets += delegate (object _, Asset[] asset)
+        DeleteDuplicatedAssets += delegate(object _, Asset[] asset)
         {
             deleteDuplicatedAssetsEvents.Add(asset);
         };

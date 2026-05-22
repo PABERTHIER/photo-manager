@@ -68,7 +68,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -94,7 +94,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -128,7 +128,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = new BitmapImageData(new()),
             Metadata = new()
@@ -154,7 +154,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -179,7 +179,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -212,7 +212,7 @@ public class FindDuplicatedAssetsViewModelTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -1832,13 +1832,13 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
 
             List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(3));
             Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName, _asset3Temp!.FileName }));
 
             List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
@@ -2002,13 +2002,13 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
 
             List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName }));
 
             List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
@@ -2528,13 +2528,13 @@ public class FindDuplicatedAssetsViewModelTests
         List<string> notifyApplicationVmPropertyChangedEvents = [];
         List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances = [];
 
-        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyFindDuplicatedAssetsVmPropertyChangedEvents.Add(e.PropertyName!);
             findDuplicatedAssetsViewModelInstances.Add((FindDuplicatedAssetsViewModel)sender!);
         };
 
-        _applicationViewModel!.PropertyChanged += delegate (object? _, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate(object? _, PropertyChangedEventArgs e)
         {
             notifyApplicationVmPropertyChangedEvents.Add(e.PropertyName!);
         };
@@ -2542,7 +2542,7 @@ public class FindDuplicatedAssetsViewModelTests
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
         _findDuplicatedAssetsViewModel!.MessageBoxInformationSent +=
-            delegate (object _, MessageBoxInformationSentEventArgs e)
+            delegate(object _, MessageBoxInformationSentEventArgs e)
             {
                 messagesInformationSent.Add(e);
             };
@@ -2597,8 +2597,8 @@ public class FindDuplicatedAssetsViewModelTests
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
                 DuplicatedSetViewModel actualSet =
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(
-                        x => x[0].Asset.Hash == expectedDuplicatedAssetSets[i][0].Asset.Hash);
+                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(x =>
+                        x[0].Asset.Hash == expectedDuplicatedAssetSets[i][0].Asset.Hash);
 
                 AssertDuplicatedAssetsSet(actualSet, expectedDuplicatedAssetSets[i]);
             }
@@ -2663,8 +2663,8 @@ public class FindDuplicatedAssetsViewModelTests
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
                     DuplicatedAssetViewModel actualSibling =
-                        duplicatedAsset.ParentViewModel.First(
-                            x => x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
+                        duplicatedAsset.ParentViewModel.First(x =>
+                            x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
                     Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
 

@@ -44,7 +44,7 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
                 BitmapImageData image =
-                    BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], ImageRotation.Rotation0, _logger);
+                    BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], ImageRotation.Rotate0, _logger);
                 results[i] = (image.BitmapImage.PixelWidth, image.BitmapImage.PixelHeight);
             }
 
@@ -64,7 +64,7 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                results[i] = GetImageDimensionsViaDecoder(_imageBuffers[i], ImageRotation.Rotation0);
+                results[i] = GetImageDimensionsViaDecoder(_imageBuffers[i], ImageRotation.Rotate0);
             }
 
             return results;
@@ -82,7 +82,7 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], ImageRotation.Rotation0);
+                results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], ImageRotation.Rotate0);
             }
 
             return results;

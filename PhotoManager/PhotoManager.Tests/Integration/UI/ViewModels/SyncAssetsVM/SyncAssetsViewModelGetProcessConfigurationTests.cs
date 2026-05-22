@@ -217,7 +217,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
 
-        _syncAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
+        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);
