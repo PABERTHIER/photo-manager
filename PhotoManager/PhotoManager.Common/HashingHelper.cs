@@ -60,10 +60,20 @@ public static class HashingHelper
     // For GIF or some heic file it returns "00000000000000"
     public static string CalculateDHash(string? filePath)
     {
-        bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
+        ArgumentNullException.ThrowIfNull(filePath);
 
-        using (Bitmap? image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new(filePath!))
+        if (!File.Exists(filePath))
         {
+            throw new ArgumentException($"The file '{filePath}' does not exist.", nameof(filePath));
+        }
+
+        using (SkiaImageData? imageData = BitmapHelper.LoadBitmapFromPath(filePath))
+        {
+            if (imageData == null)
+            {
+                return "00000000000000";
+            }
+
             ulong hash = 0UL;
             ulong mask = 1UL;
 
@@ -71,12 +81,14 @@ public static class HashingHelper
             {
                 for (int x = 0; x < 7; x++)
                 {
-                    float? leftPixel = image?.GetPixel(x, y).GetBrightness();
-                    float? rightPixel = image?.GetPixel(x + 1, y).GetBrightness();
+                    float leftPixel = imageData.GetPixelBrightness(x, y);
+                    float rightPixel = imageData.GetPixelBrightness(x + 1, y);
+
                     if (leftPixel < rightPixel)
                     {
                         hash |= mask;
                     }
+
                     mask <<= 1;
                 }
             }

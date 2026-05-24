@@ -18,6 +18,18 @@ public class BitmapImageDataTests
     }
 
     [Test]
+    [TestCase(ImageRotation.Rotate0, Rotation.Rotate0)]
+    [TestCase(ImageRotation.Rotate90, Rotation.Rotate90)]
+    [TestCase(ImageRotation.Rotate180, Rotation.Rotate180)]
+    [TestCase(ImageRotation.Rotate270, Rotation.Rotate270)]
+    public void ToWpfRotation_ValidRotation_ReturnsCorrectWpfRotation(ImageRotation input, Rotation expected)
+    {
+        Rotation result = BitmapImageData.ToWpfRotation(input);
+
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void MapFromWpfRotation_InvalidRotation_ReturnsRotate0()
     {
         const Rotation rotation = (Rotation)999;

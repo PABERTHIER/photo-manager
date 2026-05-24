@@ -249,7 +249,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImageData image1 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image1, Is.Not.Null);
-        Assert.That(image1.BitmapImage.StreamSource, Is.Null);
+        Assert.That(image1.BitmapImage.StreamSource, Is.Not.Null);
         Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));
         Assert.That(image1.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
@@ -308,7 +308,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImageData image2 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image2, Is.Not.Null);
-        Assert.That(image2.BitmapImage.StreamSource, Is.Null);
+        Assert.That(image2.BitmapImage.StreamSource, Is.Not.Null);
         Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
         Assert.That(image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
         Assert.That(image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
@@ -373,7 +373,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImageData image3 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image3, Is.Not.Null);
-        Assert.That(image3.BitmapImage.StreamSource, Is.Null);
+        Assert.That(image3.BitmapImage.StreamSource, Is.Not.Null);
         Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
         Assert.That(image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
         Assert.That(image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
@@ -444,7 +444,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImageData image4 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image4, Is.Not.Null);
-        Assert.That(image4.BitmapImage.StreamSource, Is.Null);
+        Assert.That(image4.BitmapImage.StreamSource, Is.Not.Null);
         Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
         Assert.That(image4.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
         Assert.That(image4.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));

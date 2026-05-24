@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Common;
+﻿using System.Windows.Media.Imaging;
+
+namespace PhotoManager.Common;
 
 /// <summary>
 /// Temporary WPF-backed implementation of <see cref="IImageData"/>.

@@ -1237,6 +1237,8 @@ public class AssetCreationServiceTests
     [TestCase(1000, 10, 8, 10)]
     [TestCase(10, 10000, 7500, 10000)]
     [TestCase(100000, 100, 75, 100)]
+    [TestCase(150, 10000000, 7500000, 10000000)]
+    [TestCase(-100, -100, -75, -100)]
     public void CreateAsset_HeicPictureAndBasicHashTypeAndDifferentThumbnailSettings_ReturnsAsset(
         int thumbnailMaxWidth,
         int thumbnailMaxHeight,
@@ -1945,69 +1947,11 @@ public class AssetCreationServiceTests
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        OverflowException overflowException = new("The image data generated an overflow during processing.");
-        _testLogger!.AssertLogExceptions([overflowException], typeof(AssetCreationService));
+        NotSupportedException notSupportedException =
+            new("No imaging component suitable to complete this operation was found.");
+        _testLogger!.AssertLogExceptions([notSupportedException], typeof(AssetCreationService));
     }
 
-    [Test]
-    public void
-        CreateAsset_HeicPictureAndBasicHashTypeAndThumbnailSettingsTooBig_LogsItAndReturnsNullAndAssetIsNotCreated()
-    {
-        const string assetName = FileNames.IMAGE_11_HEIC;
-        const int thumbnailMaxWidth = 150;
-        const int thumbnailMaxHeight = 10000000;
-
-        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
-
-        _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
-
-        string imagePath = Path.Combine(_assetsDirectory!, assetName);
-        Assert.That(File.Exists(imagePath), Is.True);
-
-        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Is.Empty);
-
-        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, assetName);
-
-        Assert.That(asset, Is.Null);
-
-        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Is.Empty);
-
-        InvalidOperationException invalidOperationException =
-            new("Operation is not valid due to the current state of the object.");
-        _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
-    }
-
-    [Test]
-    public void
-        CreateAsset_HeicPictureAndBasicHashTypeAndNegativeThumbnailSettings_LogsItAndReturnsNullAndAssetIsNotCreated()
-    {
-        const string assetName = FileNames.IMAGE_11_HEIC;
-        const int thumbnailMaxWidth = -100;
-        const int thumbnailMaxHeight = -100;
-
-        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
-
-        _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
-
-        string imagePath = Path.Combine(_assetsDirectory!, assetName);
-        Assert.That(File.Exists(imagePath), Is.True);
-
-        List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Is.Empty);
-
-        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, assetName);
-
-        Assert.That(asset, Is.Null);
-
-        assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Is.Empty);
-
-        InvalidOperationException invalidOperationException =
-            new("Operation is not valid due to the current state of the object.");
-        _testLogger!.AssertLogExceptions([invalidOperationException], typeof(AssetCreationService));
-    }
 
     [Test]
     public void

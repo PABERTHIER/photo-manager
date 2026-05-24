@@ -43,28 +43,31 @@ public class ImageProcessingServiceTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
         {
-            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -74,9 +77,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100,
-                100);
+        IImageData image =
+            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
@@ -102,14 +104,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetJpegBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetJpegBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
-            _imageProcessingService!.GetJpegBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -133,28 +134,31 @@ public class ImageProcessingServiceTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -164,9 +168,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100,
-                100);
+        IImageData image =
+            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
@@ -192,14 +195,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetPngBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetPngBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception =
-            Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetPngBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -223,28 +225,31 @@ public class ImageProcessingServiceTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -254,9 +259,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100,
-                100);
+        IImageData image =
+            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
@@ -282,14 +286,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetGifBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetGifBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception =
-            Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetGifBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -464,18 +467,12 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        int expectedThumbnailWidth =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailHeight : thumbnailWidth;
-        int expectedThumbnailHeight =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : thumbnailHeight;
-
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth,
-                thumbnailHeight);
+        IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(expectedThumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(expectedThumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
         byte[] imageBuffer;
@@ -513,18 +510,19 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
+        // HEIC codec (libheif) auto-orients during decode based on EXIF orientation
+        // 90°/270° rotations swap dimensions → landscape (4032×3024) → fits 200×150
+        // 0°/180° keep portrait (3024×4032) → fits 113×150
         int expectedThumbnailWidth =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailHeight : 113;
-        int expectedThumbnailHeight =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? 113 : thumbnailHeight;
+            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : 113;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, thumbnailWidth,
+        IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, thumbnailWidth,
                 thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(expectedThumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(expectedThumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(expectedThumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(thumbnailImage);
 
@@ -538,9 +536,9 @@ public class ImageProcessingServiceTests
     // TODO: Because the Heic needs another type of loading, it doubles the ImageByteSizes value
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, 2534, "")]
-    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 2534, "")]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
     [TestCase(FileNames.IMAGE_2_JPG, ImageByteSizes.IMAGE_2_JPG, "")]
     [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
     [TestCase(FileNames.IMAGE_3_JPG, ImageByteSizes.IMAGE_3_JPG, "")]
@@ -605,7 +603,7 @@ public class ImageProcessingServiceTests
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1414_JPG, ImageByteSizes._1414_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1415_JPG, 8259,
+    [TestCase(FileNames._1415_JPG, 7702,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     public void LoadBitmapThumbnailImage_WithoutRotationAndValidImage_ReturnsValidBitmapImage(
         string fileName, int imageByteSize, string additionalPath)
@@ -620,12 +618,12 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(thumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(thumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
         byte[] imageBuffer;
@@ -654,10 +652,10 @@ public class ImageProcessingServiceTests
     // slightly different decoded pixel data, leading to different JPEG re-encoding sizes (~1% variance).
     // A 2% tolerance accommodates codec differences while still catching genuine encoding regressions.
     [Test]
-    [TestCase(FileNames.IMAGE_11_HEIC, 10275)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 10595)]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 10086)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 10914)]
+    [TestCase(FileNames.IMAGE_11_HEIC, 8431)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 8669)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 8228)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8980)]
     public void LoadBitmapThumbnailImage_WithoutRotationAndValidHeicImage_ReturnsValidBitmapImage(
         string fileName, int expectedByteSize)
     {
@@ -667,17 +665,17 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(thumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(thumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(thumbnailImage);
 
         Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer.Length, Is.EqualTo(expectedByteSize).Within(2).Percent);
+        Assert.That(imageBuffer, Has.Length.EqualTo(expectedByteSize).Within(2).Percent);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }

@@ -471,7 +471,7 @@ public class ViewerUserControlTests
         BitmapImage? bitmapImage = ShowImage();
 
         Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
+        Assert.That(bitmapImage.StreamSource, Is.Not.Null);
         Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
@@ -622,7 +622,7 @@ public class ViewerUserControlTests
         BitmapImage? bitmapImage = ShowImage();
 
         Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
+        Assert.That(bitmapImage.StreamSource, Is.Not.Null);
         Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));

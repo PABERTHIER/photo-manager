@@ -108,12 +108,12 @@ public class BitmapHelperLoadBitmapHeicOriginalImageBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public BitmapImageData[] Original()
+    public SkiaImageData[] Original()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            BitmapImageData[] results = new BitmapImageData[_imageBuffers.Length];
+            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
@@ -125,12 +125,12 @@ public class BitmapHelperLoadBitmapHeicOriginalImageBenchmarks
     }
 
     [Benchmark]
-    public BitmapImageData[] Optimized_StandardWpf()
+    public SkiaImageData[] Optimized_StandardWpf()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            BitmapImageData[] results = new BitmapImageData[_imageBuffers.Length];
+            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
@@ -158,14 +158,14 @@ public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public BitmapImageData[] Original()
+    public SkiaImageData[] Original()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
             int[] widths = BitmapHelperHeicBenchmarkHelper.ThumbnailWidths;
             int[] heights = BitmapHelperHeicBenchmarkHelper.ThumbnailHeights;
-            BitmapImageData[] results = new BitmapImageData[_imageBuffers.Length];
+            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
@@ -178,14 +178,14 @@ public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
     }
 
     [Benchmark]
-    public BitmapImageData[] Optimized_StandardWpf()
+    public SkiaImageData[] Optimized_StandardWpf()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
             int[] widths = BitmapHelperHeicBenchmarkHelper.ThumbnailWidths;
             int[] heights = BitmapHelperHeicBenchmarkHelper.ThumbnailHeights;
-            BitmapImageData[] results = new BitmapImageData[_imageBuffers.Length];
+            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
@@ -214,12 +214,12 @@ public class BitmapHelperLoadBitmapHeicImageFromPathBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public BitmapImageData[] Original()
+    public SkiaImageData[] Original()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            BitmapImageData[] results = new BitmapImageData[_imagePaths.Length];
+            SkiaImageData[] results = new SkiaImageData[_imagePaths.Length];
 
             for (int i = 0; i < _imagePaths.Length; i++)
             {
@@ -231,12 +231,12 @@ public class BitmapHelperLoadBitmapHeicImageFromPathBenchmarks
     }
 
     [Benchmark]
-    public BitmapImageData[] Optimized_StandardWpf()
+    public SkiaImageData[] Optimized_StandardWpf()
     {
         return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
         {
             ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            BitmapImageData[] results = new BitmapImageData[_imagePaths.Length];
+            SkiaImageData[] results = new SkiaImageData[_imagePaths.Length];
 
             for (int i = 0; i < _imagePaths.Length; i++)
             {

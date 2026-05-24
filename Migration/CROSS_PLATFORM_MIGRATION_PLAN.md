@@ -1,4 +1,4 @@
-# Cross-Platform Migration Plan — PhotoManager
+﻿# Cross-Platform Migration Plan — PhotoManager
 
 > **Goal**: Migrate PhotoManager from a Windows-only WPF application to a cross-platform desktop
 > application that runs on **Windows, Linux, and macOS**, while maintaining existing functionality,
@@ -375,7 +375,7 @@ This is the simplest, highest-impact change — `Rotation` is used in ~83 test f
 | `IApplication` | `LoadBitmapHeicImageFromPath` | Returns `BitmapImage` → `IImageData` |
 | `Asset` | `ImageData` property | Type `BitmapImage?` → `IImageData?` |
 
-#### 1.3 Rewrite `BitmapHelper.cs` (Heaviest File)
+#### 1.3 Rewrite `BitmapHelper.cs` (Heaviest File) **DONE**
 
 This is the most complex change. Current `BitmapHelper` creates WPF `BitmapImage` objects with
 `StreamSource`, `CacheOption`, `Rotation`, `DecodePixelWidth`, etc.
@@ -765,7 +765,7 @@ Phase 0: Preparation & Abstraction
 Phase 1: Remove WPF from Non-UI Layers (LARGEST PHASE)
   ├── 1.1 Replace Rotation enum everywhere (~83 test files) **DONE**
   ├── 1.2 Replace BitmapImage in Domain interfaces **DONE**
-  ├── 1.3 Rewrite BitmapHelper.cs with SkiaSharp
+  ├── 1.3 Rewrite BitmapHelper.cs with SkiaSharp **DONE**
   ├── 1.4 Rewrite ExifHelper.cs EXIF reading (unify on Magick.NET)
   ├── 1.5 Remove System.Drawing usage
   ├── 1.6 Remove WPF GlobalUsings from non-UI projects

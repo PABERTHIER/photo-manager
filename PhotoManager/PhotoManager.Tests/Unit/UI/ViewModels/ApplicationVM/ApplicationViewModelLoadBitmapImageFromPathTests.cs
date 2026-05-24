@@ -160,8 +160,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(rotation)));
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWith));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
@@ -256,7 +256,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
@@ -279,7 +279,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
+    public void LoadBitmapImageFromPath_InvalidRotation_ReturnBitmapImageWithRotate0()
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -341,10 +341,17 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
-        Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
+        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
+        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
+        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
+        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -363,7 +370,6 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(folderRemovedEvents, Is.Empty);
     }
 
-    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
@@ -430,11 +436,10 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(rotation)));
-        Assert.That(image.Width,
-            Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
         Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
         Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
         Assert.That(image.DecodePixelWidth, Is.Zero);

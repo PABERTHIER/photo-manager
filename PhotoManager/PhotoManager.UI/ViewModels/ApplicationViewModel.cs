@@ -1,8 +1,8 @@
 ﻿using PhotoManager.Application;
-using PhotoManager.Common;
 using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
+using PhotoManager.UI.Converters;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
@@ -383,7 +383,7 @@ public class ApplicationViewModel : BaseViewModel
         }
 
         IImageData imageData = _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-        return ((BitmapImageData)imageData).BitmapImage;
+        return ConvertToWpfBitmapImage(imageData);
     }
 
     public BitmapImage LoadBitmapHeicImageFromPath()
@@ -395,7 +395,13 @@ public class ApplicationViewModel : BaseViewModel
 
         IImageData imageData = _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath,
             CurrentAsset.ImageRotation);
-        return ((BitmapImageData)imageData).BitmapImage;
+        return ConvertToWpfBitmapImage(imageData, true);
+    }
+
+    private static BitmapImage ConvertToWpfBitmapImage(IImageData imageData, bool applyRotation = false)
+    {
+        return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Jpeg, applyRotation)
+               ?? new BitmapImage();
     }
 
     public void CalculateGlobalAssetsCounter()

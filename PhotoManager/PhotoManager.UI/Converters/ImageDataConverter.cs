@@ -2,6 +2,7 @@
 using PhotoManager.Common.Imaging;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.Converters;
 
@@ -14,9 +15,9 @@ public class ImageDataConverter : IValueConverter
             return bitmapImageData.BitmapImage;
         }
 
-        if (value is IImageData)
+        if (value is IImageData imageData)
         {
-            return null;
+            return ConvertToWpfBitmapImage(imageData);
         }
 
         return value;
@@ -25,5 +26,10 @@ public class ImageDataConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
+    }
+
+    private static BitmapImage? ConvertToWpfBitmapImage(IImageData imageData)
+    {
+        return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Png);
     }
 }

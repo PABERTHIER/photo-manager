@@ -91,9 +91,9 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
     [Test]
     [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
     // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
         ImageRotation rotation, int expectedWidth, int expectedHeight)
@@ -161,7 +161,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(rotation)));
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
@@ -187,15 +187,15 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC,
-        PixelHeightAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
-        ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
+        PixelWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC,
+        ThumbnailHeightAsset.IMAGE_11_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC,
         PixelHeightAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC,
         ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, Hashes.IMAGE_11_180_DEG_HEIC)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
-        PixelHeightAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC,
-        ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, Hashes.IMAGE_11_270_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
+        PixelWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC,
+        ThumbnailHeightAsset.IMAGE_11_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, Hashes.IMAGE_11_270_DEG_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
         string fileName,
         ImageRotation rotation,
@@ -264,7 +264,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(rotation)));
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
@@ -359,7 +359,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
         Assert.That(image.DecodePixelWidth, Is.Zero);
         Assert.That(image.DecodePixelHeight, Is.Zero);
@@ -382,7 +382,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_InvalidRotation_ThrowsArgumentException()
+    public void LoadBitmapHeicImageFromPath_InvalidRotation_ReturnBitmapImageWithRotate0()
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -444,10 +444,17 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => _applicationViewModel!.LoadBitmapHeicImageFromPath());
+        BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
 
-        Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
+        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 

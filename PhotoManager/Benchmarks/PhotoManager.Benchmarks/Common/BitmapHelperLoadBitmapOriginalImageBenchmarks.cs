@@ -43,9 +43,9 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                BitmapImageData image =
+                SkiaImageData image =
                     BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], ImageRotation.Rotate0, _logger);
-                results[i] = (image.BitmapImage.PixelWidth, image.BitmapImage.PixelHeight);
+                results[i] = (image.Width, image.Height);
             }
 
             return results;

@@ -1,4 +1,4 @@
-# Multi-Threading Plan for PhotoManager
+﻿# Multi-Threading Plan for PhotoManager
 
 ## Executive Summary
 
@@ -104,7 +104,7 @@ record ProcessedAsset(
 ```
 
 **Key decisions:**
-- Replace WPF `BitmapImage` thumbnail pipeline with ImageMagick (thread-safe, no STA requirement) — **Abstraction layer DONE** (IImageData/ImageRotation introduced; BitmapHelper still uses WPF internally, pending SkiaSharp rewrite in Phase 1.3)
+- Replace WPF `BitmapImage` thumbnail pipeline with ImageMagick (thread-safe, no STA requirement) — **DONE** (IImageData/ImageRotation introduced; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC fallback, fully thread-safe)
 - Each worker creates its own `MagickImage` instance (ImageMagick is thread-safe at instance level)
 - PHash workers can share a thread pool since they're CPU-bound
 - Return the `byte[]` buffer to the pool after hash computation
@@ -205,7 +205,7 @@ public record PipelineOptions(
 ### Step 2: Refactor AssetCreationService for Thread Safety
 
 Current `AssetCreationService` uses:
-- `IImageProcessingService` (wraps WPF BitmapHelper) — **NOT thread-safe**
+- `IImageProcessingService` (wraps SkiaSharp BitmapHelper) — **Thread-safe** (SkiaSharp SKBitmap is thread-safe for read operations)
 - `IImageMetadataService` (stateless EXIF reading) — **thread-safe**
 - `IAssetHashCalculatorService` (stateless) — **thread-safe**
 - `IAssetRepository` (ConcurrentDictionary-backed) — **thread-safe for reads**

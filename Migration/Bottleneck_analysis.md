@@ -1,4 +1,4 @@
-# Performance Bottleneck Analysis
+﻿# Performance Bottleneck Analysis
 
 ## Executive Summary
 
@@ -517,7 +517,7 @@ public void Initialize(string databasePath)
 4. Parallelize duplicate detection without `.AsOrdered()`
 
 ### Phase 4: Architecture Evolution
-1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **Abstraction layer DONE** (IImageData/ImageRotation replace WPF types in all interfaces; BitmapHelper internal rewrite pending Phase 1.3)
+1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **DONE** (IImageData/ImageRotation replace WPF types in all interfaces; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC fallback)
 2. Store file properties in SQLite (eliminate startup stats entirely)
 3. Consider memory-mapped thumbnails or separate thumbnail file
 4. Implement FileSystemWatcher for real-time change detection

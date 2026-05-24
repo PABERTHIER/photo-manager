@@ -1,5 +1,6 @@
 ﻿using ImageMagick;
 using Microsoft.Extensions.Logging;
+using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Common;
 

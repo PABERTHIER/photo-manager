@@ -589,7 +589,8 @@ public class FindDuplicatedAssetsViewModelPHashTests
                 },
                 Thumbnail = new()
                 {
-                    Width = ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC
+                    Width = ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC,
+                    Height = ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC
                 }
             },
             FileProperties = new()
