@@ -77,7 +77,7 @@ public class FindDuplicatedAssetsWindowTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -111,7 +111,7 @@ public class FindDuplicatedAssetsWindowTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -137,7 +137,7 @@ public class FindDuplicatedAssetsWindowTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -163,7 +163,7 @@ public class FindDuplicatedAssetsWindowTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -193,7 +193,7 @@ public class FindDuplicatedAssetsWindowTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -643,7 +643,7 @@ public class FindDuplicatedAssetsWindowTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -1643,7 +1643,7 @@ public class FindDuplicatedAssetsWindowTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -2567,7 +2567,7 @@ public class FindDuplicatedAssetsWindowTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 

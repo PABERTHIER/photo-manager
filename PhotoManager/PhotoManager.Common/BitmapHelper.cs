@@ -13,7 +13,7 @@ public static class BitmapHelper
 
         try
         {
-            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation);
+            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
         }
         catch (Exception ex) when (ex is not OverflowException)
         {
@@ -32,7 +32,7 @@ public static class BitmapHelper
 
         try
         {
-            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, width, height);
+            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, width, height, logger);
         }
         catch (Exception ex) when (ex is not OverflowException)
         {
@@ -117,7 +117,7 @@ public static class BitmapHelper
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
-    public static SkiaImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation)
+    public static SkiaImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation, ILogger logger)
     {
         if (File.Exists(imagePath))
         {
@@ -135,7 +135,7 @@ public static class BitmapHelper
                 }
             }
 
-            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation);
+            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
         }
 
         return SkiaImageData.Empty();
@@ -175,10 +175,10 @@ public static class BitmapHelper
             {
                 // SkiaSharp cannot decode HEIC — decode with MagickImage, then resize with SkiaSharp
                 byte[] decodedBuffer = DecodeHeicToBmp(buffer);
-                return SkiaImageData.FromEncodedBytes(decodedBuffer, ImageRotation.Rotate0, width, height);
+                return SkiaImageData.FromEncodedBytes(decodedBuffer, ImageRotation.Rotate0, width, height, logger);
             }
 
-            return SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, width, height);
+            return SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, width, height, logger);
         }
         catch (Exception ex) when (ex is not OverflowException)
         {

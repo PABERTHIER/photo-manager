@@ -19,7 +19,7 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation)
     {
-        return BitmapHelper.LoadBitmapImageFromPath(imagePath, rotation);
+        return BitmapHelper.LoadBitmapImageFromPath(imagePath, rotation, logger);
     }
 
     // From AssetCreationService for CreateAsset() to get the originalImage for HEIC

@@ -88,7 +88,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_1_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -122,7 +122,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate180,
             Hash = PHashes.IMAGE_1_180_DEG_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -156,7 +156,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate270,
             Hash = PHashes.IMAGE_1_270_DEG_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -190,7 +190,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate90,
             Hash = PHashes.IMAGE_1_90_DEG_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -224,7 +224,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -250,7 +250,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_2_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -276,7 +276,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_3_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -302,7 +302,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_4_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -328,7 +328,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_5_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -354,7 +354,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_6_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -380,7 +380,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_7_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -410,7 +410,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_8_JPEG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -436,7 +436,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_9_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -470,7 +470,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_10_PORTRAIT_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -500,7 +500,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = PHashes.IMAGE_11_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -534,7 +534,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate180,
             Hash = PHashes.IMAGE_11_180_DEG_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -568,7 +568,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate270,
             Hash = PHashes.IMAGE_11_270_DEG_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -602,7 +602,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate90,
             Hash = PHashes.IMAGE_11_90_DEG_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -1247,7 +1247,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             _asset32 = _asset32!.WithFolder(folder7!);
 
             // Because _asset24 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset24!.ImageData = new BitmapImageData(new());
+            _asset24!.ImageData = SkiaImageData.Empty();
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -1719,7 +1719,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             _asset31 = _asset31!.WithFolder(folder7!);
 
             // Because _asset24 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset24!.ImageData = new BitmapImageData(new());
+            _asset24!.ImageData = SkiaImageData.Empty();
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];

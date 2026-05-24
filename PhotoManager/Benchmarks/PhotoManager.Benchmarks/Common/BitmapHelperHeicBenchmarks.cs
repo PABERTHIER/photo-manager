@@ -210,7 +210,7 @@ public class BitmapHelperLoadBitmapHeicImageFromPathBenchmarks
     public void Setup()
     {
         _imagePaths = BitmapHelperHeicBenchmarkHelper.GetImagePaths();
-        _logger = NullLogger<ImageProcessingService>.Instance;
+        _logger = NullLogger.Instance;
     }
 
     [Benchmark(Baseline = true)]
@@ -240,7 +240,7 @@ public class BitmapHelperLoadBitmapHeicImageFromPathBenchmarks
 
             for (int i = 0; i < _imagePaths.Length; i++)
             {
-                results[i] = BitmapHelper.LoadBitmapImageFromPath(_imagePaths[i], rotations[i]);
+                results[i] = BitmapHelper.LoadBitmapImageFromPath(_imagePaths[i], rotations[i], _logger);
             }
 
             return results;

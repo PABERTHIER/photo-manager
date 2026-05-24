@@ -71,7 +71,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -105,7 +105,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -131,7 +131,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_2_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -157,7 +157,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -187,7 +187,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -635,7 +635,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             DuplicatedSetViewModel duplicatedAssetSet1 = [];
             DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -1025,7 +1025,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -1052,7 +1052,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
 
             // Because _asset13 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset13.ImageData = new BitmapImageData(new());
+            _asset13.ImageData = SkiaImageData.Empty();
 
             // Image 1336
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
@@ -1367,7 +1367,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Fourth Collapse - collapse _asset13 (current in Image 1336 set)
             // Set still has 2 visible after this → stays in set, resets to _asset12
             // Because _asset12 will become the CurrentAsset so the ImageData will be loaded
-            _asset12.ImageData = new BitmapImageData(new());
+            _asset12.ImageData = SkiaImageData.Empty();
 
             DuplicatedAssetViewModel collapseAsset13 =
                 _findDuplicatedAssetsViewModel!.DuplicatedAssetSets
@@ -1580,7 +1580,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Sixth Collapse - collapse _asset1 (current in Image 1 set)
             // Set still has 2 visible after this → stays in set, resets to _asset6
             // Because _asset6 will become the CurrentAsset so the ImageData will be loaded
-            _asset6.ImageData = new BitmapImageData(new());
+            _asset6.ImageData = SkiaImageData.Empty();
 
             DuplicatedAssetViewModel collapseAsset1 =
                 _findDuplicatedAssetsViewModel!.DuplicatedAssetSets
@@ -2083,7 +2083,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -2231,7 +2231,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
 
             // Because _asset13 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset13.ImageData = new BitmapImageData(new());
+            _asset13.ImageData = SkiaImageData.Empty();
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2814,7 +2814,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset14 = _asset14!.WithFolder(folder7!);
 
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
-            _asset11.ImageData = new BitmapImageData(new());
+            _asset11.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 

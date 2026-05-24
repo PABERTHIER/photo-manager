@@ -1,5 +1,5 @@
-﻿using PhotoManager.Common;
-using PhotoManager.Common.Imaging;
+﻿using PhotoManager.Common.Imaging;
+using PhotoManager.UI.Models;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;

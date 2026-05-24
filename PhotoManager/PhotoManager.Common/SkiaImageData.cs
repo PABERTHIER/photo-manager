@@ -1,4 +1,5 @@
 ﻿using ImageMagick;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
 
 namespace PhotoManager.Common;
@@ -62,9 +63,9 @@ public sealed class SkiaImageData : IImageData
     /// <summary>
     /// Creates a <see cref="SkiaImageData"/> from raw image bytes (JPEG, PNG, GIF, BMP, etc.).
     /// </summary>
-    public static SkiaImageData FromEncodedBytes(byte[] buffer, ImageRotation rotation)
+    public static SkiaImageData FromEncodedBytes(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
-        ValidateBuffer(buffer);
+        ValidateBuffer(buffer, logger);
 
         SKBitmap bitmap = SKBitmap.Decode(buffer)
             ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
@@ -74,9 +75,10 @@ public sealed class SkiaImageData : IImageData
     /// <summary>
     /// Creates a <see cref="SkiaImageData"/> from raw image bytes with resize.
     /// </summary>
-    public static SkiaImageData FromEncodedBytes(byte[] buffer, ImageRotation rotation, int width, int height)
+    public static SkiaImageData FromEncodedBytes(byte[] buffer, ImageRotation rotation, int width, int height,
+        ILogger logger)
     {
-        ValidateBuffer(buffer);
+        ValidateBuffer(buffer, logger);
 
         SKBitmap original = SKBitmap.Decode(buffer)
             ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
@@ -97,9 +99,9 @@ public sealed class SkiaImageData : IImageData
     /// <summary>
     /// Creates a rotated <see cref="SkiaImageData"/> from raw image bytes.
     /// </summary>
-    public static SkiaImageData FromEncodedBytesWithRotation(byte[] buffer, ImageRotation rotation)
+    public static SkiaImageData FromEncodedBytesWithRotation(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
-        ValidateBuffer(buffer);
+        ValidateBuffer(buffer, logger);
 
         SKBitmap decoded = SKBitmap.Decode(buffer)
             ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
@@ -125,9 +127,9 @@ public sealed class SkiaImageData : IImageData
     /// Width/height targets are applied after rotation, so they describe the final displayed orientation.
     /// </summary>
     public static SkiaImageData FromEncodedBytesWithRotation(byte[] buffer, ImageRotation rotation, int width,
-        int height)
+        int height, ILogger logger)
     {
-        ValidateBuffer(buffer);
+        ValidateBuffer(buffer, logger);
 
         SKBitmap decoded = SKBitmap.Decode(buffer)
             ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
@@ -244,14 +246,15 @@ public sealed class SkiaImageData : IImageData
                    "No imaging component suitable to complete this operation was found.");
     }
 
-    private static void ValidateBuffer(byte[] buffer)
+    private static void ValidateBuffer(byte[] buffer, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(buffer);
 
         if (buffer.Length == 0)
         {
-            throw new ArgumentException("Value cannot be empty.", nameof(buffer));
-            // TODO: Add Log here (this will break some tests, fix them by adding the exception in the AssertLogExceptions method)
+            ArgumentException exception = new("Value cannot be empty.", nameof(buffer));
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
         }
     }
 

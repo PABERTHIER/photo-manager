@@ -197,7 +197,7 @@ public class SkiaImageDataTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate90))
+        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate90, _testLogger!))
         {
             using (Assert.EnterMultipleScope())
             {
@@ -214,7 +214,7 @@ public class SkiaImageDataTests
     public void FromEncodedBytes_NullBuffer_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0));
+            SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
@@ -223,9 +223,10 @@ public class SkiaImageDataTests
     public void FromEncodedBytes_EmptyBuffer_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            SkiaImageData.FromEncodedBytes([], ImageRotation.Rotate0));
+            SkiaImageData.FromEncodedBytes([], ImageRotation.Rotate0, _testLogger!));
 
-        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+        _testLogger!.AssertLogExceptions(
+            [new ArgumentException("Value cannot be empty. (Parameter 'buffer')")], typeof(SkiaImageData));
     }
 
     [Test]
@@ -234,7 +235,7 @@ public class SkiaImageDataTests
         byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
 
         Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytes(invalidBuffer, ImageRotation.Rotate0));
+            SkiaImageData.FromEncodedBytes(invalidBuffer, ImageRotation.Rotate0, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
@@ -245,7 +246,8 @@ public class SkiaImageDataTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, 100, 100))
+        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, 100, 100,
+                   _testLogger!))
         {
             using (Assert.EnterMultipleScope())
             {
@@ -262,7 +264,7 @@ public class SkiaImageDataTests
     public void FromEncodedBytes_WithResizeNullBuffer_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0, 100, 100));
+            SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0, 100, 100, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
@@ -271,9 +273,10 @@ public class SkiaImageDataTests
     public void FromEncodedBytes_WithResizeEmptyBuffer_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            SkiaImageData.FromEncodedBytes([], ImageRotation.Rotate0, 100, 100));
+            SkiaImageData.FromEncodedBytes([], ImageRotation.Rotate0, 100, 100, _testLogger!));
 
-        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+        _testLogger!.AssertLogExceptions(
+            [new ArgumentException("Value cannot be empty. (Parameter 'buffer')")], typeof(SkiaImageData));
     }
 
     [Test]
@@ -282,7 +285,8 @@ public class SkiaImageDataTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0))
+        using (SkiaImageData imageData = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0,
+                   _testLogger!))
         {
             using (Assert.EnterMultipleScope())
             {
@@ -301,9 +305,11 @@ public class SkiaImageDataTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using (SkiaImageData original = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0))
+        using (SkiaImageData original = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            using (SkiaImageData rotated = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90))
+            using (SkiaImageData rotated = SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90,
+                       _testLogger!))
             {
                 using (Assert.EnterMultipleScope())
                 {
@@ -321,7 +327,7 @@ public class SkiaImageDataTests
     public void FromEncodedBytesWithRotation_NullBuffer_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0));
+            SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
@@ -330,9 +336,10 @@ public class SkiaImageDataTests
     public void FromEncodedBytesWithRotation_EmptyBuffer_ThrowsArgumentException()
     {
         Assert.Throws<ArgumentException>(() =>
-            SkiaImageData.FromEncodedBytesWithRotation([], ImageRotation.Rotate0));
+            SkiaImageData.FromEncodedBytesWithRotation([], ImageRotation.Rotate0, _testLogger!));
 
-        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+        _testLogger!.AssertLogExceptions(
+            [new ArgumentException("Value cannot be empty. (Parameter 'buffer')")], typeof(SkiaImageData));
     }
 
     [Test]
@@ -342,7 +349,7 @@ public class SkiaImageDataTests
         byte[] buffer = File.ReadAllBytes(filePath);
 
         using (SkiaImageData imageData =
-               SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90, 200, 150))
+               SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90, 200, 150, _testLogger!))
         {
             using (Assert.EnterMultipleScope())
             {
@@ -362,7 +369,7 @@ public class SkiaImageDataTests
         byte[] buffer = File.ReadAllBytes(filePath);
 
         using (SkiaImageData imageData =
-               SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90, 84, 150))
+               SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate90, 84, 150, _testLogger!))
         {
             using (Assert.EnterMultipleScope())
             {
@@ -379,7 +386,50 @@ public class SkiaImageDataTests
     public void FromEncodedBytesWithRotation_WithResizeNullBuffer_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0, 100, 100));
+            SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0, 100, 100, _testLogger!));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytesWithRotation_WithResizeEmptyBuffer_ThrowsArgumentException()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            SkiaImageData.FromEncodedBytesWithRotation([], ImageRotation.Rotate0, 100, 100, _testLogger!));
+
+        _testLogger!.AssertLogExceptions(
+            [new ArgumentException("Value cannot be empty. (Parameter 'buffer')")], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytesWithRotation_InvalidBuffer_ThrowsException()
+    {
+        byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
+
+        Assert.Throws<ArgumentNullException>(() =>
+            SkiaImageData.FromEncodedBytesWithRotation(invalidBuffer, ImageRotation.Rotate90, _testLogger!));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytesWithRotation_WithResizeInvalidBuffer_ThrowsException()
+    {
+        byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
+
+        Assert.Throws<ArgumentNullException>(() =>
+            SkiaImageData.FromEncodedBytesWithRotation(invalidBuffer, ImageRotation.Rotate90, 100, 100, _testLogger!));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytes_WithResizeInvalidBuffer_ThrowsException()
+    {
+        byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
+
+        Assert.Throws<ArgumentNullException>(() =>
+            SkiaImageData.FromEncodedBytes(invalidBuffer, ImageRotation.Rotate0, 100, 100, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }

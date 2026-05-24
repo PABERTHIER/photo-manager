@@ -416,7 +416,7 @@ public class AssetRepositoryTests
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImageData(new()));
+            .Returns(SkiaImageData.Empty());
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
@@ -464,7 +464,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "photo.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImageData(new()));
+            .Returns(SkiaImageData.Empty());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();
@@ -587,7 +587,7 @@ public class AssetRepositoryTests
             .Returns(new Dictionary<string, byte[]> { { "sunset.jpg", thumbnailData } });
 
         _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new BitmapImageData(new()));
+            .Returns(SkiaImageData.Empty());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
         TestLogger<AssetRepository> testLogger = new();

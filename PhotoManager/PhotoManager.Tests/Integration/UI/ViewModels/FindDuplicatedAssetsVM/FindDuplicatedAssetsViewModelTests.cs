@@ -70,7 +70,7 @@ public class FindDuplicatedAssetsViewModelTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -96,7 +96,7 @@ public class FindDuplicatedAssetsViewModelTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -130,7 +130,7 @@ public class FindDuplicatedAssetsViewModelTests
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -1855,7 +1855,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new BitmapImageData(new());
+            _asset1Temp.ImageData = SkiaImageData.Empty();
             _asset3Temp = _asset3Temp.WithFolder(exemptedFolder!);
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
@@ -2025,7 +2025,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new BitmapImageData(new());
+            _asset1Temp.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 

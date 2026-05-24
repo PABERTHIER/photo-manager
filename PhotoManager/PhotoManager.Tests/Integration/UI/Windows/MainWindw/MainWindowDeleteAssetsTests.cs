@@ -62,7 +62,7 @@ public class MainWindowDeleteAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -88,7 +88,7 @@ public class MainWindowDeleteAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },

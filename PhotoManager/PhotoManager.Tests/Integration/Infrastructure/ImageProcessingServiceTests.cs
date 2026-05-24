@@ -44,7 +44,8 @@ public class ImageProcessingServiceTests
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
             byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
@@ -135,7 +136,8 @@ public class ImageProcessingServiceTests
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
             byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
@@ -226,7 +228,8 @@ public class ImageProcessingServiceTests
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0))
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
             byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 

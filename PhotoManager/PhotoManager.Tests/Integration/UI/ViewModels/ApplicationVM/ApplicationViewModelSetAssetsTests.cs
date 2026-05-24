@@ -331,10 +331,10 @@ public class ApplicationViewModelSetAssetsTests
         _asset3 = _asset3!.WithFolder(folder);
         _asset4 = _asset4!.WithFolder(folder);
 
-        _asset1.ImageData = new BitmapImageData(new());
-        _asset2.ImageData = new BitmapImageData(new());
-        _asset3.ImageData = new BitmapImageData(new());
-        _asset4.ImageData = new BitmapImageData(new());
+        _asset1.ImageData = SkiaImageData.Empty();
+        _asset2.ImageData = SkiaImageData.Empty();
+        _asset3.ImageData = SkiaImageData.Empty();
+        _asset4.ImageData = SkiaImageData.Empty();
 
         const string expectedStatusMessage = "The catalog process has ended.";
         string expectedAppTitle =

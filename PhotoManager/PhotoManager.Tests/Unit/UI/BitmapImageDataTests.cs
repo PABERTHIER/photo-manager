@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using PhotoManager.UI.Models;
+using System.Windows;
 using System.Windows.Media;
 
-namespace PhotoManager.Tests.Unit.Common;
+namespace PhotoManager.Tests.Unit.UI;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]
@@ -164,86 +165,6 @@ public class BitmapImageDataTests
             imageData.ToByteArray((ImageEncodingFormat)999));
 
         Assert.That(exception?.ParamName, Is.EqualTo("format"));
-    }
-
-    [Test]
-    public void ToStream_JpegFormat_ReturnsReadableStream()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        using Stream result = imageData.ToStream(ImageEncodingFormat.Jpeg);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Position, Is.Zero);
-            Assert.That(result.CanRead, Is.True);
-            Assert.That(result.Length, Is.GreaterThan(0));
-        }
-    }
-
-    [Test]
-    public void ToStream_PngFormat_ReturnsReadableStream()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        using Stream result = imageData.ToStream(ImageEncodingFormat.Png);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Position, Is.Zero);
-            Assert.That(result.CanRead, Is.True);
-            Assert.That(result.Length, Is.GreaterThan(0));
-        }
-    }
-
-    [Test]
-    public void ToStream_GifFormat_ReturnsReadableStream()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        using Stream result = imageData.ToStream(ImageEncodingFormat.Gif);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Position, Is.Zero);
-            Assert.That(result.CanRead, Is.True);
-            Assert.That(result.Length, Is.GreaterThan(0));
-        }
-    }
-
-    [Test]
-    public void ToStream_BmpFormat_ReturnsReadableStream()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        using Stream result = imageData.ToStream(ImageEncodingFormat.Bmp);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(result.Position, Is.Zero);
-            Assert.That(result.CanRead, Is.True);
-            Assert.That(result.Length, Is.GreaterThan(0));
-        }
-    }
-
-    [Test]
-    public void ToStream_InvalidFormat_ThrowsArgumentOutOfRangeException()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            imageData.ToStream((ImageEncodingFormat)999));
-
-        Assert.That(exception?.ParamName, Is.EqualTo("format"));
-    }
-
-    [Test]
-    public void Dispose_DoesNotThrow()
-    {
-        BitmapImageData imageData = new(CreateTestBitmapImage(), ImageRotation.Rotate0);
-
-        Assert.DoesNotThrow(imageData.Dispose);
     }
 
     [Test]

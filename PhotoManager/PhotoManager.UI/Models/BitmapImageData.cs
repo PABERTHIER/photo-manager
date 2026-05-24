@@ -1,13 +1,15 @@
-﻿using System.Windows.Media.Imaging;
+﻿using PhotoManager.Common.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
 
-namespace PhotoManager.Common;
+namespace PhotoManager.UI.Models;
 
 /// <summary>
 /// Temporary WPF-backed implementation of <see cref="IImageData"/>.
 /// Wraps a <see cref="BitmapImage"/> for the transition period until BitmapHelper
 /// is rewritten with SkiaSharp (Phase 1.3).
 /// </summary>
-public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotation) : IImageData
+public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotation)
 {
     public BitmapImageData(BitmapImage bitmapImage) : this(bitmapImage, MapFromWpfRotation(bitmapImage.Rotation))
     {
@@ -36,30 +38,6 @@ public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotat
             encoder.Save(stream);
             return stream.ToArray();
         }
-    }
-
-    public Stream ToStream(ImageEncodingFormat format)
-    {
-        MemoryStream stream = new();
-        BitmapEncoder encoder = format switch
-        {
-            ImageEncodingFormat.Jpeg => new JpegBitmapEncoder(),
-            ImageEncodingFormat.Png => new PngBitmapEncoder(),
-            ImageEncodingFormat.Gif => new GifBitmapEncoder(),
-            ImageEncodingFormat.Bmp => new BmpBitmapEncoder(),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-        };
-
-        encoder.Frames.Add(BitmapFrame.Create(BitmapImage));
-        encoder.Save(stream);
-        stream.Position = 0;
-
-        return stream;
-    }
-
-    public void Dispose()
-    {
-        // BitmapImage is frozen (immutable) in WPF and does not require explicit disposal
     }
 
     public static Rotation ToWpfRotation(ImageRotation rotation)

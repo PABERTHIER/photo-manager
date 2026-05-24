@@ -606,7 +606,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
-        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
+        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Bitmap, Is.Not.Null);
@@ -625,7 +625,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
+        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Bitmap, Is.Not.Null);
@@ -644,7 +644,7 @@ public class BitmapHelperTests
         string? filePath = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation);
+        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Bitmap, Is.Not.Null);
@@ -663,7 +663,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         const ImageRotation rotation = (ImageRotation)999;
 
-        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
+        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Bitmap, Is.Not.Null);
@@ -682,7 +682,7 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const ImageRotation rotation = ImageRotation.Rotate0;
 
-        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
+        SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
 
         using (Assert.EnterMultipleScope())
         {
@@ -1126,7 +1126,8 @@ public class BitmapHelperTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0);
+        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+            _testLogger!);
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
@@ -1216,7 +1217,8 @@ public class BitmapHelperTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0);
+        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+            _testLogger!);
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
@@ -1307,7 +1309,8 @@ public class BitmapHelperTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0);
+        SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+            _testLogger!);
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 
