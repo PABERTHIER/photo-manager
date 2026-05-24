@@ -241,12 +241,8 @@ public static class BitmapHelper
 
             try
             {
-                SKBitmap? decoded = SKBitmap.Decode(buffer);
-
-                if (decoded != null)
-                {
-                    return new(decoded, ImageRotation.Rotate0);
-                }
+                SKBitmap decoded = SKBitmap.Decode(buffer);
+                return new(decoded, ImageRotation.Rotate0);
             }
             catch (ArgumentNullException)
             {
@@ -407,9 +403,7 @@ public static class BitmapHelper
     private static SKBitmap MagickImageToSkBitmap(MagickImage magickImage)
     {
         byte[] bmpData = magickImage.ToByteArray(MagickFormat.Bmp);
-        SKBitmap bitmap = SKBitmap.Decode(bmpData)
-            ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
-        return bitmap;
+        return SKBitmap.Decode(bmpData);
     }
 
     private static byte[] DecodeHeicToBmp(byte[] buffer)
@@ -438,9 +432,7 @@ public static class BitmapHelper
 
     private static SKBitmap ResizeBitmapInternal(SKBitmap source, int targetWidth, int targetHeight)
     {
-        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions)
-               ?? throw new NotSupportedException(
-                   "No imaging component suitable to complete this operation was found.");
+        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions);
     }
 
     private static SKBitmap CloneBitmap(SKBitmap source)

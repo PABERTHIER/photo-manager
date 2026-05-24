@@ -58,10 +58,8 @@ public static class HashingHelper
     }
 
     // For GIF or some heic file it returns "00000000000000"
-    public static string CalculateDHash(string? filePath)
+    public static string CalculateDHash(string filePath)
     {
-        ArgumentNullException.ThrowIfNull(filePath);
-
         if (!File.Exists(filePath))
         {
             throw new ArgumentException($"The file '{filePath}' does not exist.", nameof(filePath));

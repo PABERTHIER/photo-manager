@@ -536,7 +536,6 @@ public class ImageProcessingServiceTests
     }
 
     // TODO: Because the rotation is not used, it impacts the ImageByteSizes for the rotated images
-    // TODO: Because the Heic needs another type of loading, it doubles the ImageByteSizes value
     [Test]
     [TestCase(FileNames.IMAGE_1_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]

@@ -548,6 +548,70 @@ public class SkiaImageDataTests
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
 
+    [Test]
+    public void FromEncodedBytes_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
+    {
+        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 1*1/200 = 0
+        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
+
+        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
+            SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
+
+        Assert.That(exception.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytesWithRotation_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
+    {
+        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 0
+        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
+
+        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
+            SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
+
+        Assert.That(exception.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void ToByteArray_JpegWithUnsupportedColorType_ReturnsEmptyArray()
+    {
+        // Rg88 color type causes SKImage.Encode to return null for JPEG
+        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
+        {
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Jpeg);
+
+                Assert.That(result, Is.Empty);
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
+    public void ToByteArray_PngWithUnsupportedColorType_ReturnsEmptyArray()
+    {
+        // Rg88 color type causes SKImage.Encode to return null for PNG
+        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
+        {
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Png);
+
+                Assert.That(result, Is.Empty);
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
     private static SkiaImageData CreateTestImageData()
     {
         SKBitmap bitmap = new(10, 10);
@@ -558,5 +622,24 @@ public class SkiaImageDataTests
         }
 
         return new SkiaImageData(bitmap, ImageRotation.Rotate0);
+    }
+
+    private static byte[] CreateNarrowTallImageBuffer(int width, int height)
+    {
+        using (SKBitmap bitmap = new(width, height))
+        {
+            using (SKCanvas canvas = new(bitmap))
+            {
+                canvas.Clear(SKColors.Blue);
+            }
+
+            using (SKImage image = SKImage.FromBitmap(bitmap))
+            {
+                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    return data.ToArray();
+                }
+            }
+        }
     }
 }

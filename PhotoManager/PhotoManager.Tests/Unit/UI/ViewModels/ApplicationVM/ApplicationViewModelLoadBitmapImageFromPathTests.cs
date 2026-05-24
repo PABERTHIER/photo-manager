@@ -1,7 +1,9 @@
-﻿using PhotoManager.UI.Models;
+﻿using PhotoManager.Application;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
@@ -460,6 +462,71 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
         Assert.That(folderRemovedEvents, Is.Empty);
+    }
+
+    [Test]
+    public void LoadBitmapImageFromPath_ImageDataEncodesToEmptyBytes_ReturnsDefaultBitmapImage()
+    {
+        IApplication applicationMock = Substitute.For<IApplication>();
+        applicationMock.GetInitialFolderPath().Returns(@"C:\test");
+        applicationMock.GetAboutInformation(Arg.Any<Assembly>()).Returns(
+            new AboutInformation { Product = "PhotoManager", Version = "1.0" });
+
+        ApplicationViewModel applicationViewModel = new(applicationMock);
+
+        IImageData thumbnailImageData = Substitute.For<IImageData>();
+        IImageData emptyEncodingImageData = Substitute.For<IImageData>();
+        emptyEncodingImageData.ToByteArray(ImageEncodingFormat.Jpeg).Returns([]);
+
+        Guid folderId = Guid.NewGuid();
+        Folder folder = new() { Id = folderId, Path = @"C:\test" };
+
+        Asset asset = new()
+        {
+            FolderId = folderId,
+            Folder = folder,
+            FileName = "test.jpg",
+            Pixel = new()
+            {
+                Asset = new()
+                {
+                    Width = PixelWidthAsset.IMAGE_1_JPG,
+                    Height = PixelHeightAsset.IMAGE_1_JPG
+                },
+                Thumbnail = new()
+                {
+                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_1_JPG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.IMAGE_1_JPG,
+            ImageData = thumbnailImageData,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
+
+        applicationViewModel.SetAssets(@"C:\test", [asset]);
+
+        applicationMock.LoadBitmapImageFromPath(asset.FullPath, asset.ImageRotation).Returns(emptyEncodingImageData);
+
+        BitmapImage image = applicationViewModel.LoadBitmapImageFromPath();
+
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     private

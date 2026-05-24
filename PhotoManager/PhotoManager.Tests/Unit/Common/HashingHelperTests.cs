@@ -255,7 +255,7 @@ public class HashingHelperTests
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
         ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_assetsDirectory));
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_assetsDirectory!));
 
         Assert.That(exception?.Message,
             Is.EqualTo($"The file '{_assetsDirectory}' does not exist. (Parameter 'filePath')"));
@@ -265,14 +265,13 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateDHash_ImagePathIsNull_ThrowsArgumentNullException()
+    public void CalculateDHash_ImagePathIsNull_ThrowsArgumentException()
     {
         string? filePath = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'filePath')"));
+        Assert.That(exception?.Message, Is.EqualTo("The file '' does not exist. (Parameter 'filePath')"));
         Assert.That(exception?.ParamName, Is.EqualTo("filePath"));
 
         _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));

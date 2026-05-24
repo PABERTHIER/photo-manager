@@ -275,10 +275,7 @@ public class ApplicationViewModel : BaseViewModel
                 ChangeAppMode();
             }
 
-            if (newViewerPosition > -1)
-            {
-                ViewerPosition = newViewerPosition;
-            }
+            ViewerPosition = newViewerPosition;
         }
     }
 

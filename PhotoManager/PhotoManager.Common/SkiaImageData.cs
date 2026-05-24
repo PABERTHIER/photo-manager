@@ -67,8 +67,7 @@ public sealed class SkiaImageData : IImageData
     {
         ValidateBuffer(buffer, logger);
 
-        SKBitmap bitmap = SKBitmap.Decode(buffer)
-            ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        SKBitmap bitmap = SKBitmap.Decode(buffer);
         return new(bitmap, rotation);
     }
 
@@ -80,8 +79,7 @@ public sealed class SkiaImageData : IImageData
     {
         ValidateBuffer(buffer, logger);
 
-        SKBitmap original = SKBitmap.Decode(buffer)
-            ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        SKBitmap original = SKBitmap.Decode(buffer);
 
         try
         {
@@ -103,8 +101,7 @@ public sealed class SkiaImageData : IImageData
     {
         ValidateBuffer(buffer, logger);
 
-        SKBitmap decoded = SKBitmap.Decode(buffer)
-            ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        SKBitmap decoded = SKBitmap.Decode(buffer);
 
         if (rotation == ImageRotation.Rotate0)
         {
@@ -131,8 +128,7 @@ public sealed class SkiaImageData : IImageData
     {
         ValidateBuffer(buffer, logger);
 
-        SKBitmap decoded = SKBitmap.Decode(buffer)
-            ?? throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        SKBitmap decoded = SKBitmap.Decode(buffer);
 
         SKBitmap? rotated = null;
 
