@@ -99,12 +99,12 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
-        PixelWidthAsset.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC,
         PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
-        PixelWidthAsset.IMAGE_11_270_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName,
         ImageRotation rotation, int expectedWidth, int expectedHeight)
     {

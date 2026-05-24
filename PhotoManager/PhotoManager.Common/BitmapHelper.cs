@@ -50,11 +50,13 @@ public static class BitmapHelper
         {
             using (MemoryStream stream = new(buffer))
             {
-                using (MagickImage magickImage = new(stream))
+                MagickReadSettings settings = new();
+                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                using (MagickImage magickImage = new(stream, settings))
                 {
-                    // HEIC codec (libheif) auto-orients based on EXIF, no manual rotation needed
                     SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                    return new(bitmap, rotation);
+                    return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
                 }
             }
         }
@@ -84,27 +86,46 @@ public static class BitmapHelper
 
             using (MemoryStream stream = new(buffer))
             {
-                using (MagickImage magickImage = new(stream))
+                MagickReadSettings settings = new();
+                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                using (MagickImage magickImage = new(stream, settings))
                 {
-                    // HEIC codec (libheif) auto-orients based on EXIF, no manual rotation needed
-
-                    if (targetWidth > 0 || targetHeight > 0)
-                    {
-                        if (targetWidth == 0)
-                        {
-                            targetWidth = (int)magickImage.Width;
-                        }
-
-                        if (targetHeight == 0)
-                        {
-                            targetHeight = (int)magickImage.Height;
-                        }
-
-                        magickImage.Resize((uint)targetWidth, (uint)targetHeight);
-                    }
-
                     SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                    return new(bitmap, rotation);
+                    SKBitmap? rotated = null;
+
+                    try
+                    {
+                        SKBitmap source = bitmap;
+
+                        if (rotation != ImageRotation.Rotate0)
+                        {
+                            rotated = SkiaImageData.ApplyRotation(bitmap, rotation);
+                            source = rotated;
+                        }
+
+                        (int finalWidth, int finalHeight) = CalculateFitDimensions(targetWidth, targetHeight,
+                            source.Width, source.Height);
+
+                        if (finalWidth == source.Width && finalHeight == source.Height)
+                        {
+                            if (source == rotated)
+                            {
+                                rotated = null;
+                                return new(source, rotation);
+                            }
+
+                            return new(CloneBitmap(source), rotation);
+                        }
+
+                        SKBitmap resized = ResizeBitmapInternal(source, finalWidth, finalHeight);
+                        return new(resized, rotation);
+                    }
+                    finally
+                    {
+                        rotated?.Dispose();
+                        bitmap.Dispose();
+                    }
                 }
             }
         }
@@ -127,7 +148,10 @@ public static class BitmapHelper
             {
                 using (MemoryStream stream = new(buffer))
                 {
-                    using (MagickImage magickImage = new(stream))
+                    MagickReadSettings settings = new();
+                    settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                    using (MagickImage magickImage = new(stream, settings))
                     {
                         SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
                         return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
@@ -148,7 +172,10 @@ public static class BitmapHelper
         {
             try
             {
-                using (MagickImage magickImage = new(imagePath))
+                MagickReadSettings settings = new();
+                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                using (MagickImage magickImage = new(imagePath, settings))
                 {
                     SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
                     return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
@@ -405,5 +432,44 @@ public static class BitmapHelper
         }
 
         return buffer[4] == 0x66 && buffer[5] == 0x74 && buffer[6] == 0x79 && buffer[7] == 0x70;
+    }
+
+    private static readonly SKSamplingOptions ResizeSamplingOptions = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+
+    private static SKBitmap ResizeBitmapInternal(SKBitmap source, int targetWidth, int targetHeight)
+    {
+        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions)
+               ?? throw new NotSupportedException(
+                   "No imaging component suitable to complete this operation was found.");
+    }
+
+    private static SKBitmap CloneBitmap(SKBitmap source)
+    {
+        SKBitmap clone = new(source.Width, source.Height, source.ColorType, source.AlphaType);
+        source.CopyTo(clone);
+        return clone;
+    }
+
+    // Fits within bounding box preserving aspect ratio without upscaling (matches MagickGeometry)
+    private static (int Width, int Height) CalculateFitDimensions(int requestedWidth, int requestedHeight,
+        int sourceWidth, int sourceHeight)
+    {
+        if (requestedWidth == 0 && requestedHeight == 0)
+        {
+            return (sourceWidth, sourceHeight);
+        }
+
+        double scaleX = requestedWidth > 0 ? (double)requestedWidth / sourceWidth : double.MaxValue;
+        double scaleY = requestedHeight > 0 ? (double)requestedHeight / sourceHeight : double.MaxValue;
+        double scale = Math.Min(scaleX, scaleY);
+
+        if (scale >= 1.0)
+        {
+            return (sourceWidth, sourceHeight);
+        }
+
+        int finalWidth = Math.Max(1, (int)Math.Round(sourceWidth * scale, MidpointRounding.AwayFromZero));
+        int finalHeight = Math.Max(1, (int)Math.Round(sourceHeight * scale, MidpointRounding.AwayFromZero));
+        return (finalWidth, finalHeight);
     }
 }

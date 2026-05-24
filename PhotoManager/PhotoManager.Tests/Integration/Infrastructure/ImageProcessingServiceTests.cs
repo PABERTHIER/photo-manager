@@ -513,7 +513,7 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        // HEIC codec (libheif) auto-orients during decode based on EXIF orientation
+        // With preserve-orientation, rotation is applied manually via SkiaSharp.
         // 90°/270° rotations swap dimensions → landscape (4032×3024) → fits 200×150
         // 0°/180° keep portrait (3024×4032) → fits 113×150
         int expectedThumbnailWidth =

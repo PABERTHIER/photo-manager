@@ -258,7 +258,7 @@ public sealed class SkiaImageData : IImageData
         }
     }
 
-    private static SKBitmap ApplyRotation(SKBitmap source, ImageRotation rotation)
+    internal static SKBitmap ApplyRotation(SKBitmap source, ImageRotation rotation)
     {
         float degrees = rotation switch
         {

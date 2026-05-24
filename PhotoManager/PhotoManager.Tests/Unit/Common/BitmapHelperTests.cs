@@ -392,16 +392,16 @@ public class BitmapHelperTests
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
     [TestCase(ImageRotation.Rotate0, 100, 100, ImageRotation.Rotate0, 75, 100)]
-    [TestCase(ImageRotation.Rotate90, 100, 100, ImageRotation.Rotate90, 75, 100)]
+    [TestCase(ImageRotation.Rotate90, 100, 100, ImageRotation.Rotate90, 100, 75)]
     [TestCase(ImageRotation.Rotate180, 100, 100, ImageRotation.Rotate180, 75, 100)]
-    [TestCase(ImageRotation.Rotate270, 100, 100, ImageRotation.Rotate270, 75, 100)]
-    [TestCase(ImageRotation.Rotate90, 10000, 100, ImageRotation.Rotate90, 75, 100)]
-    [TestCase(ImageRotation.Rotate90, 100, 10000, ImageRotation.Rotate90, 100, 133)]
-    [TestCase(ImageRotation.Rotate90, 0, 10000, ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC,
-        PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(ImageRotation.Rotate90, 100, 0, ImageRotation.Rotate90, 100, 133)]
-    [TestCase(ImageRotation.Rotate90, 0, 0, ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC,
-        PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate270, 100, 100, ImageRotation.Rotate270, 100, 75)]
+    [TestCase(ImageRotation.Rotate90, 10000, 100, ImageRotation.Rotate90, 133, 100)]
+    [TestCase(ImageRotation.Rotate90, 100, 10000, ImageRotation.Rotate90, 100, 75)]
+    [TestCase(ImageRotation.Rotate90, 0, 10000, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC,
+        PixelWidthAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate90, 100, 0, ImageRotation.Rotate90, 100, 75)]
+    [TestCase(ImageRotation.Rotate90, 0, 0, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC,
+        PixelWidthAsset.IMAGE_11_HEIC)]
     // [TestCase(null, 100, 100, ImageRotation.Rotate0, 75, 100)]
     // [TestCase(ImageRotation.Rotate90, null, 100, ImageRotation.Rotate90, 100, 133)]
     // [TestCase(ImageRotation.Rotate90, 100, null, ImageRotation.Rotate90, 75, 100)]
@@ -458,8 +458,8 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(-100, 100, 75, 100)]
-    [TestCase(100, -100, 75, 100)]
+    [TestCase(-100, 100, 100, 75)]
+    [TestCase(100, -100, 100, 75)]
     public void LoadBitmapHeicThumbnailImage_NegativeWidthOrHeight_ReturnsBitmapImage(int width, int height,
         int expectedWidth, int expectedHeight)
     {
@@ -494,15 +494,15 @@ public class BitmapHelperTests
         Assert.That(image.Bitmap, Is.Not.Null);
         Assert.That(image.Bitmap.IsEmpty, Is.False);
         Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate90));
-        Assert.That(image.Width, Is.EqualTo(75));
-        Assert.That(image.Height, Is.EqualTo(100));
+        Assert.That(image.Width, Is.EqualTo(100));
+        Assert.That(image.Height, Is.EqualTo(75));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsOriginalSizeBitmapImage()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -514,9 +514,9 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Bitmap, Is.Not.Null);
         Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(1));
-        Assert.That(image.Height, Is.EqualTo(1));
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.Height, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -726,12 +726,12 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
-        PixelWidthAsset.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC,
         PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_270_DEG_HEIC,
-        PixelWidthAsset.IMAGE_11_270_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
     public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
         string fileName, ImageRotation rotation, int expectedWidth, int expectedHeight)
     {

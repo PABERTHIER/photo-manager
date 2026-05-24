@@ -450,10 +450,10 @@ public static class Constants
         public const int IMAGE_9_PNG = 12834;
         public const int IMAGE_9_DUPLICATE_PNG = 12834;
         public const int IMAGE_10_PORTRAIT_PNG = 10117;
-        public const int IMAGE_11_HEIC = 6158;
-        public const int IMAGE_11_90_DEG_HEIC = 9505;
-        public const int IMAGE_11_180_DEG_HEIC = 6154;
-        public const int IMAGE_11_270_DEG_HEIC = 9814;
+        public const int IMAGE_11_HEIC = 5521;
+        public const int IMAGE_11_90_DEG_HEIC = 8669;
+        public const int IMAGE_11_180_DEG_HEIC = 5478;
+        public const int IMAGE_11_270_DEG_HEIC = 8980;
         public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3054;
         public const int _1336_ORIGINAL_JPG = 10000;
         public const int _1336_1_K_JPG = 10176;

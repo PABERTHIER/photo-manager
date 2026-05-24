@@ -395,12 +395,12 @@ public class ApplicationViewModel : BaseViewModel
 
         IImageData imageData = _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath,
             CurrentAsset.ImageRotation);
-        return ConvertToWpfBitmapImage(imageData, true);
+        return ConvertToWpfBitmapImage(imageData);
     }
 
-    private static BitmapImage ConvertToWpfBitmapImage(IImageData imageData, bool applyRotation = false)
+    private static BitmapImage ConvertToWpfBitmapImage(IImageData imageData)
     {
-        return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Jpeg, applyRotation)
+        return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Jpeg, false)
                ?? new BitmapImage();
     }
 
