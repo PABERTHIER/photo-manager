@@ -353,9 +353,7 @@ public static class BitmapHelper
 
     private static SKBitmap ResizeBitmapInternal(SKBitmap source, int targetWidth, int targetHeight)
     {
-        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions)
-               ?? throw new NotSupportedException(
-                   "No imaging component suitable to complete this operation was found.");
+        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions);
     }
 
     private static SKBitmap CloneBitmap(SKBitmap source)
