@@ -10564,10 +10564,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
 
-        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        // Deleted assets release ImageData immediately; only the remaining visible assets keep their loaded thumbnails.
         if (string.Equals(catalogChange.Asset!.Folder.Path, currentDirectory))
         {
-            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else

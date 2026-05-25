@@ -5,6 +5,12 @@ namespace PhotoManager.Persistence.Repositories;
 
 internal sealed class ThumbnailPersistence(ISqliteConnectionFactory connectionFactory) : IThumbnailPersistence
 {
+    internal const string UPSERT_SQL = """
+                                       INSERT INTO Thumbnails (FolderId, FileName, Data)
+                                       VALUES ($folderId, $fileName, $data)
+                                       ON CONFLICT(FolderId, FileName) DO UPDATE SET Data = excluded.Data;
+                                       """;
+
     public Dictionary<string, byte[]> GetByFolderId(Guid folderId)
     {
         using (SqliteConnection connection = connectionFactory.Open())
@@ -86,13 +92,8 @@ internal sealed class ThumbnailPersistence(ISqliteConnectionFactory connectionFa
         {
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = """
-                                      INSERT INTO Thumbnails (FolderId, FileName, Data) VALUES ($folderId, $fileName, $data)
-                                      ON CONFLICT(FolderId, FileName) DO UPDATE SET Data = excluded.Data;
-                                      """;
-                command.Parameters.AddWithValue("$folderId", folderId);
-                command.Parameters.AddWithValue("$fileName", fileName);
-                command.Parameters.AddWithValue("$data", data);
+                command.CommandText = UPSERT_SQL;
+                BindUpsert(command, folderId, fileName, data);
 
                 command.ExecuteNonQuery();
             }
@@ -140,5 +141,12 @@ internal sealed class ThumbnailPersistence(ISqliteConnectionFactory connectionFa
                 return command.ExecuteScalar() != null;
             }
         }
+    }
+
+    internal static void BindUpsert(SqliteCommand command, Guid folderId, string fileName, byte[] data)
+    {
+        command.Parameters.AddWithValue("$folderId", folderId);
+        command.Parameters.AddWithValue("$fileName", fileName);
+        command.Parameters.AddWithValue("$data", data);
     }
 }

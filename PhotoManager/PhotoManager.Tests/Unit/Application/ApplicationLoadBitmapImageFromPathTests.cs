@@ -90,10 +90,10 @@ public class ApplicationLoadBitmapImageFromPathTests
 
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
-        IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWith));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
     }
@@ -106,7 +106,7 @@ public class ApplicationLoadBitmapImageFromPathTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
@@ -122,7 +122,7 @@ public class ApplicationLoadBitmapImageFromPathTests
         string? filePath = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        IImageData image = _application!.LoadBitmapImageFromPath(filePath!, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath!, rotation);
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
@@ -131,17 +131,17 @@ public class ApplicationLoadBitmapImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapImageFromPath_InvalidRotation_ReturnsBitmapImageWithInvalidRotation()
+    public void LoadBitmapImageFromPath_InvalidRotation_ReturnsBitmapImageWithRotate0()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         const ImageRotation rotation = (ImageRotation)999;
 
-        IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
         Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
     }
@@ -154,12 +154,12 @@ public class ApplicationLoadBitmapImageFromPathTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const ImageRotation rotation = ImageRotation.Rotate0;
 
-        IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(image, Is.Not.Null);
-            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
             Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
         }

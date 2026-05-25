@@ -157,7 +157,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
+            using IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
                 folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,

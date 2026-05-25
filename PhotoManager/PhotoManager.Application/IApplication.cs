@@ -20,7 +20,6 @@ public interface IApplication
     string GetExemptedFolderPath();
     AboutInformation GetAboutInformation(Assembly assembly);
     IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation);
-    IImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation);
     bool FileExists(string fullPath);
     int GetTotalFilesCount();
     bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);

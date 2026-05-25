@@ -97,7 +97,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
     // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
+    public void LoadBitmapImageFromPath_HeicValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
         ImageRotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -159,7 +159,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -198,7 +198,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
         PixelHeightAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC,
         ThumbnailHeightAsset.IMAGE_11_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, Hashes.IMAGE_11_270_DEG_HEIC)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
+    public void LoadBitmapImageFromPath_HeicValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
         string fileName,
         ImageRotation rotation,
         int expectedWidth,
@@ -262,7 +262,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -292,7 +292,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
+    public void LoadBitmapImageFromPath_HeicImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -358,7 +358,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -384,7 +384,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_InvalidRotation_ReturnBitmapImageWithRotate0()
+    public void LoadBitmapImageFromPath_HeicInvalidRotation_ReturnBitmapImageWithRotate0()
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -446,7 +446,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapHeicImageFromPath();
+        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
@@ -476,7 +476,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_ImageDataEncodesToEmptyBytes_ReturnsDefaultBitmapImage()
+    public void LoadBitmapImageFromPath_HeicImageDataEncodesToEmptyBytes_ReturnsDefaultBitmapImage()
     {
         IApplication applicationMock = Substitute.For<IApplication>();
         applicationMock.GetInitialFolderPath().Returns(@"C:\test");
@@ -529,10 +529,10 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         applicationViewModel.SetAssets(@"C:\test", [asset]);
 
-        applicationMock.LoadBitmapHeicImageFromPath(asset.FullPath, asset.ImageRotation)
+        applicationMock.LoadBitmapImageFromPath(asset.FullPath, asset.ImageRotation)
             .Returns(emptyEncodingImageData);
 
-        BitmapImage image = applicationViewModel.LoadBitmapHeicImageFromPath();
+        BitmapImage image = applicationViewModel.LoadBitmapImageFromPath();
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);

@@ -10,34 +10,10 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
         return BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, logger);
     }
 
-    // From AssetRepository
-    public IImageData LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
-    {
-        return BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height, logger);
-    }
-
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation)
     {
         return BitmapHelper.LoadBitmapImageFromPath(imagePath, rotation, logger);
-    }
-
-    // From AssetCreationService for CreateAsset() to get the originalImage for HEIC
-    public IImageData LoadBitmapHeicOriginalImage(byte[] imageBytes, ImageRotation rotation)
-    {
-        return BitmapHelper.LoadBitmapHeicOriginalImage(imageBytes, rotation, logger);
-    }
-
-    // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
-    public IImageData LoadBitmapHeicThumbnailImage(byte[] buffer, ImageRotation rotation, int width, int height)
-    {
-        return BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height, logger);
-    }
-
-    // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public IImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation)
-    {
-        return BitmapHelper.LoadBitmapHeicImageFromPath(imagePath, rotation, logger);
     }
 
     public byte[] GetJpegBitmapImage(IImageData thumbnailImage)

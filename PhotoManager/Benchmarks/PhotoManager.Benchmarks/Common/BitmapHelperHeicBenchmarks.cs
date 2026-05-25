@@ -95,56 +95,6 @@ internal static class BitmapHelperHeicBenchmarkHelper
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
-public class BitmapHelperLoadBitmapHeicOriginalImageBenchmarks
-{
-    private byte[][] _imageBuffers = null!;
-    private ILogger _logger = null!;
-
-    [GlobalSetup]
-    public void Setup()
-    {
-        _imageBuffers = BitmapHelperHeicBenchmarkHelper.LoadImageBuffers();
-        _logger = NullLogger<ImageProcessingService>.Instance;
-    }
-
-    [Benchmark(Baseline = true)]
-    public SkiaImageData[] Original()
-    {
-        return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
-        {
-            ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
-
-            for (int i = 0; i < _imageBuffers.Length; i++)
-            {
-                results[i] = BitmapHelper.LoadBitmapHeicOriginalImage(_imageBuffers[i], rotations[i], _logger);
-            }
-
-            return results;
-        });
-    }
-
-    [Benchmark]
-    public SkiaImageData[] Optimized_StandardWpf()
-    {
-        return BitmapHelperHeicBenchmarkHelper.RunOnStaThread(() =>
-        {
-            ImageRotation[] rotations = BitmapHelperHeicBenchmarkHelper.Rotations;
-            SkiaImageData[] results = new SkiaImageData[_imageBuffers.Length];
-
-            for (int i = 0; i < _imageBuffers.Length; i++)
-            {
-                results[i] = BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], rotations[i], _logger);
-            }
-
-            return results;
-        });
-    }
-}
-
-[MemoryDiagnoser]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[RankColumn]
 public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
 {
     private byte[][] _imageBuffers = null!;
@@ -169,7 +119,7 @@ public class BitmapHelperLoadBitmapHeicThumbnailImageBenchmarks
 
             for (int i = 0; i < _imageBuffers.Length; i++)
             {
-                results[i] = BitmapHelper.LoadBitmapHeicThumbnailImage(_imageBuffers[i], rotations[i], widths[i],
+                results[i] = BitmapHelper.LoadBitmapThumbnailImage(_imageBuffers[i], rotations[i], widths[i],
                     heights[i], _logger);
             }
 
@@ -223,7 +173,7 @@ public class BitmapHelperLoadBitmapHeicImageFromPathBenchmarks
 
             for (int i = 0; i < _imagePaths.Length; i++)
             {
-                results[i] = BitmapHelper.LoadBitmapHeicImageFromPath(_imagePaths[i], rotations[i], _logger);
+                results[i] = BitmapHelper.LoadBitmapImageFromPath(_imagePaths[i], rotations[i], _logger);
             }
 
             return results;

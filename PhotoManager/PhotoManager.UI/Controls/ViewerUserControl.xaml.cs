@@ -86,9 +86,7 @@ public partial class ViewerUserControl
     {
         if (ViewModel is { CurrentAsset: not null })
         {
-            bool isHeic = ViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
-
-            BitmapImage source = isHeic ? ViewModel.LoadBitmapHeicImageFromPath() : ViewModel.LoadBitmapImageFromPath();
+            BitmapImage source = ViewModel.LoadBitmapImageFromPath();
 
             Image.Source = source;
             BackgroundImage.Source = source;

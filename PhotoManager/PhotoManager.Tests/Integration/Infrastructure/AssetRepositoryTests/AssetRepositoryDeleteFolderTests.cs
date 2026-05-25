@@ -119,8 +119,9 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -302,8 +303,9 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }

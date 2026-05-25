@@ -216,7 +216,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public async Task LoadBitmapHeicImageFromPath_CataloguedAssets_ReturnsBitmapImage()
+    public async Task LoadBitmapImageFromPath_HeicCataloguedAssets_ReturnsBitmapImage()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
@@ -246,7 +246,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
         const string expectedStatusMessage = "The catalog process has ended.";
 
-        BitmapImageData image1 = new(_applicationViewModel!.LoadBitmapHeicImageFromPath());
+        BitmapImageData image1 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image1, Is.Not.Null);
         Assert.That(image1.BitmapImage.StreamSource, Is.Not.Null);
@@ -305,7 +305,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[1]);
 
-        BitmapImageData image2 = new(_applicationViewModel!.LoadBitmapHeicImageFromPath());
+        BitmapImageData image2 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image2, Is.Not.Null);
         Assert.That(image2.BitmapImage.StreamSource, Is.Not.Null);
@@ -370,7 +370,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[2]);
 
-        BitmapImageData image3 = new(_applicationViewModel!.LoadBitmapHeicImageFromPath());
+        BitmapImageData image3 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image3, Is.Not.Null);
         Assert.That(image3.BitmapImage.StreamSource, Is.Not.Null);
@@ -441,7 +441,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[3]);
 
-        BitmapImageData image4 = new(_applicationViewModel!.LoadBitmapHeicImageFromPath());
+        BitmapImageData image4 = new(_applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(image4, Is.Not.Null);
         Assert.That(image4.BitmapImage.StreamSource, Is.Not.Null);
@@ -519,7 +519,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_NoCataloguedAssets_ThrowsNullReferenceException()
+    public void LoadBitmapImageFromPath_HeicNoCataloguedAssets_ThrowsNullReferenceException()
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -532,7 +532,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         CheckBeforeChanges(_assetsDirectory!);
 
         NullReferenceException? exception =
-            Assert.Throws<NullReferenceException>(() => _applicationViewModel!.LoadBitmapHeicImageFromPath());
+            Assert.Throws<NullReferenceException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
 
         Assert.That(exception?.Message, Is.EqualTo("CurrentAsset is null"));
 

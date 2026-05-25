@@ -110,6 +110,36 @@ public class SkiaImageDataTests
     }
 
     [Test]
+    [TestCase(ImageEncodingFormat.Gif)]
+    [TestCase(ImageEncodingFormat.Bmp)]
+    public void ToByteArray_GifOrBmpFromRgbaBitmap_PreservesColorChannels(ImageEncodingFormat format)
+    {
+        using (SKBitmap bitmap = new(new SKImageInfo(2, 2, SKColorType.Rgba8888, SKAlphaType.Premul)))
+        {
+            bitmap.Erase(SKColors.Red);
+
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] result = imageData.ToByteArray(format);
+
+                using (SKBitmap? decoded = SKBitmap.Decode(result))
+                {
+                    Assert.That(decoded, Is.Not.Null);
+                    SKColor pixel = decoded!.GetPixel(0, 0);
+
+                    using (Assert.EnterMultipleScope())
+                    {
+                        Assert.That(pixel.Red, Is.GreaterThan(200));
+                        Assert.That(pixel.Blue, Is.LessThan(50));
+                    }
+                }
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
     public void ToByteArray_InvalidFormat_ThrowsArgumentOutOfRangeException()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -300,7 +330,7 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytesWithRotation_Rotate90_ReturnsRotatedImage()
+    public void FromEncodedBytesWithRotation_Rotate90_ReturnsRotatedImageWithRotate0()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -315,7 +345,7 @@ public class SkiaImageDataTests
                 {
                     Assert.That(rotated.Width, Is.EqualTo(original.Height));
                     Assert.That(rotated.Height, Is.EqualTo(original.Width));
-                    Assert.That(rotated.Rotation, Is.EqualTo(ImageRotation.Rotate90));
+                    Assert.That(rotated.Rotation, Is.EqualTo(ImageRotation.Rotate0));
                 }
 
                 _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -343,7 +373,7 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytesWithRotation_WithResize_ReturnsResizedRotatedImage()
+    public void FromEncodedBytesWithRotation_WithResize_ReturnsResizedRotatedImageWithRotate0()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -355,7 +385,7 @@ public class SkiaImageDataTests
             {
                 Assert.That(imageData.Width, Is.EqualTo(200));
                 Assert.That(imageData.Height, Is.EqualTo(150));
-                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate90));
+                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             }
 
             _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -363,7 +393,7 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytesWithRotation_RotatedThumbnailResize_KeepsRequestedDimensions()
+    public void FromEncodedBytesWithRotation_RotatedThumbnailResize_KeepsRequestedDimensionsAndRotate0()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -375,7 +405,7 @@ public class SkiaImageDataTests
             {
                 Assert.That(imageData.Width, Is.EqualTo(84));
                 Assert.That(imageData.Height, Is.EqualTo(150));
-                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate90));
+                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             }
 
             _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -453,7 +483,7 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromBitmapWithRotation_Rotate90_ReturnsSwappedDimensions()
+    public void FromBitmapWithRotation_Rotate90_ReturnsSwappedDimensionsWithRotate0()
     {
         SKBitmap bitmap = new(100, 50);
 
@@ -463,7 +493,7 @@ public class SkiaImageDataTests
             {
                 Assert.That(imageData.Width, Is.EqualTo(50));
                 Assert.That(imageData.Height, Is.EqualTo(100));
-                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate90));
+                Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
             }
 
             _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));

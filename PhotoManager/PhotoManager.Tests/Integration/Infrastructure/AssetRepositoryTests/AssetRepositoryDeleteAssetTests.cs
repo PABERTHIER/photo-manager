@@ -300,7 +300,7 @@ public class AssetRepositoryDeleteAssetTests
 
         try
         {
-            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+            const string exceptionMessage = "Value cannot be null. (Parameter 'fileName')";
 
             string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
             string? assetFileName = null;

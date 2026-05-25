@@ -162,6 +162,16 @@ public class ApplicationViewModelRemoveAssetsTests
         };
     }
 
+    [SetUp]
+    public void SetUp()
+    {
+        _asset1!.ImageData = SkiaImageData.Empty();
+        _asset2!.ImageData = SkiaImageData.Empty();
+        _asset3!.ImageData = SkiaImageData.Empty();
+        _asset4!.ImageData = SkiaImageData.Empty();
+        _asset5!.ImageData = SkiaImageData.Empty();
+    }
+
     [TearDown]
     public void TearDown()
     {

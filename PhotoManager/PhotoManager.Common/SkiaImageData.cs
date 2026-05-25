@@ -105,13 +105,13 @@ public sealed class SkiaImageData : IImageData
 
         if (rotation == ImageRotation.Rotate0)
         {
-            return new(decoded, rotation);
+            return new(decoded, ImageRotation.Rotate0);
         }
 
         try
         {
             SKBitmap rotated = ApplyRotation(decoded, rotation);
-            return new(rotated, rotation);
+            return new(rotated, ImageRotation.Rotate0);
         }
         finally
         {
@@ -144,7 +144,7 @@ public sealed class SkiaImageData : IImageData
 
             (int targetWidth, int targetHeight) = CalculateTargetDimensions(width, height, source.Width, source.Height);
             SKBitmap resized = ResizeBitmap(source, targetWidth, targetHeight);
-            return new(resized, rotation);
+            return new(resized, ImageRotation.Rotate0);
         }
         finally
         {
@@ -163,13 +163,13 @@ public sealed class SkiaImageData : IImageData
 
         if (rotation == ImageRotation.Rotate0)
         {
-            return new(bitmap, rotation);
+            return new(bitmap, ImageRotation.Rotate0);
         }
 
         try
         {
             SKBitmap rotated = ApplyRotation(bitmap, rotation);
-            return new(rotated, rotation);
+            return new(rotated, ImageRotation.Rotate0);
         }
         finally
         {
@@ -321,11 +321,23 @@ public sealed class SkiaImageData : IImageData
 
     private MagickImage CreateMagickImageFromBitmap()
     {
-        byte[] pixelData = Bitmap.Bytes;
+        if (Bitmap.ColorType == SKColorType.Bgra8888 && Bitmap.RowBytes == Bitmap.Width * 4)
+        {
+            return CreateMagickImage(Bitmap.Bytes, Bitmap.Width, Bitmap.Height);
+        }
+
+        using (SKBitmap bgraBitmap = Bitmap.Copy(SKColorType.Bgra8888))
+        {
+            return CreateMagickImage(bgraBitmap.Bytes, bgraBitmap.Width, bgraBitmap.Height);
+        }
+    }
+
+    private static MagickImage CreateMagickImage(byte[] pixelData, int width, int height)
+    {
         MagickReadSettings settings = new()
         {
-            Width = (uint)Bitmap.Width,
-            Height = (uint)Bitmap.Height,
+            Width = (uint)width,
+            Height = (uint)height,
             Format = MagickFormat.Bgra,
             Depth = 8
         };

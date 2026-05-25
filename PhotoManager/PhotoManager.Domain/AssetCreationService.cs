@@ -87,7 +87,7 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        IImageData thumbnailImage =
+        using IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetPngBitmapImage(thumbnailImage);
@@ -121,7 +121,7 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        IImageData thumbnailImage =
+        using IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetGifBitmapImage(thumbnailImage);
@@ -151,12 +151,12 @@ public class AssetCreationService(
             userConfigurationService.AssetSettings.CorruptedImageOrientation);
         (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
             GetRotationAndCorruptionInfo(exifOrientation);
-        IImageData originalImage = imageProcessingService.LoadBitmapHeicOriginalImage(imageBytes, rotation);
-        (int originalDecodeWidth, int originalDecodeHeight) = (originalImage.Width, originalImage.Height);
+        (int originalDecodeWidth, int originalDecodeHeight) =
+            imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        IImageData thumbnailImage =
-            imageProcessingService.LoadBitmapHeicThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
+        using IImageData thumbnailImage =
+            imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);
 
@@ -191,7 +191,7 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        IImageData thumbnailImage =
+        using IImageData thumbnailImage =
             imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
                 thumbnailDecodeHeight);
         byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);

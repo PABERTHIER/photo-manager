@@ -78,8 +78,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        IImageData image =
-            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
@@ -170,8 +170,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        IImageData image =
-            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
@@ -262,8 +262,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        IImageData image =
-            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
@@ -470,7 +470,7 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        IImageData thumbnailImage =
+        using IImageData thumbnailImage =
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
@@ -504,7 +504,7 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageByteSizes.IMAGE_11_90_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, ImageByteSizes.IMAGE_11_180_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, ImageByteSizes.IMAGE_11_270_DEG_HEIC)]
-    public void LoadBitmapHeicThumbnailImage_ValidImage_ReturnsValidBitmapImage(
+    public void LoadBitmapThumbnailImage_HeicValidImage_ReturnsValidBitmapImage(
         string fileName, ImageRotation rotation, int imageByteSize)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
@@ -519,8 +519,8 @@ public class ImageProcessingServiceTests
         int expectedThumbnailWidth =
             rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : 113;
 
-        IImageData thumbnailImage =
-            _imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, thumbnailWidth,
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth,
                 thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
@@ -535,80 +535,81 @@ public class ImageProcessingServiceTests
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
-    // TODO: Because the rotation is not used, it impacts the ImageByteSizes for the rotated images
     [Test]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_2_JPG, ImageByteSizes.IMAGE_2_JPG, "")]
-    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
-    [TestCase(FileNames.IMAGE_3_JPG, ImageByteSizes.IMAGE_3_JPG, "")]
-    [TestCase(FileNames.IMAGE_4_JPG, ImageByteSizes.IMAGE_4_JPG, "")]
-    [TestCase(FileNames.IMAGE_5_JPG, ImageByteSizes.IMAGE_5_JPG, "")]
-    [TestCase(FileNames.IMAGE_6_JPG, ImageByteSizes.IMAGE_6_JPG, "")]
-    [TestCase(FileNames.IMAGE_7_JPG, ImageByteSizes.IMAGE_7_JPG, "")]
-    [TestCase(FileNames.IMAGE_8_JPEG, ImageByteSizes.IMAGE_8_JPEG, "")]
-    [TestCase(FileNames.IMAGE_9_PNG, ImageByteSizes.IMAGE_9_PNG, "")]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
-    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
-    [TestCase(FileNames.HOMER_GIF, ImageByteSizes.HOMER_GIF, "")]
-    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageRotation.Rotate90, ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageRotation.Rotate180, ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, ImageRotation.Rotate270, ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_2_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_JPG, "")]
+    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+    [TestCase(FileNames.IMAGE_3_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_3_JPG, "")]
+    [TestCase(FileNames.IMAGE_4_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_4_JPG, "")]
+    [TestCase(FileNames.IMAGE_5_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_5_JPG, "")]
+    [TestCase(FileNames.IMAGE_6_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_6_JPG, "")]
+    [TestCase(FileNames.IMAGE_7_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_7_JPG, "")]
+    [TestCase(FileNames.IMAGE_8_JPEG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_8_JPEG, "")]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_PNG, "")]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageRotation.Rotate0,
+        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotate0, ImageByteSizes.HOMER_GIF, "")]
+    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
+    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageByteSizes._1336_BOTTOM_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageByteSizes._1336_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageByteSizes._1336_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageByteSizes._1336_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_PART_JPG, ImageByteSizes._1336_TOP_PART_JPG,
+    [TestCase(FileNames._1336_TOP_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_1_K_JPG, ImageByteSizes._1336_1_K_JPG,
+    [TestCase(FileNames._1336_1_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_1_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_2_K_JPG, ImageByteSizes._1336_2_K_JPG,
+    [TestCase(FileNames._1336_2_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_2_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_3_K_JPG, ImageByteSizes._1336_3_K_JPG,
+    [TestCase(FileNames._1336_3_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_3_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_8_K_JPG, ImageByteSizes._1336_8_K_JPG,
+    [TestCase(FileNames._1336_8_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_8_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageByteSizes._1336_THUMBNAIL_JPG,
+    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_THUMBNAIL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageByteSizes.IMAGE_1336_MINI_JPG,
+    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_MINI_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
+    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageRotation.Rotate0,
+        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageByteSizes.IMAGE_1336_SMALL_JPG,
+    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_SMALL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames._1337_JPG, ImageByteSizes._1337_JPG,
+    [TestCase(FileNames._1337_JPG, ImageRotation.Rotate0, ImageByteSizes._1337_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
-    [TestCase(FileNames._1349_JPG, ImageByteSizes._1349_JPG,
+    [TestCase(FileNames._1349_JPG, ImageRotation.Rotate0, ImageByteSizes._1349_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1350_JPG, ImageByteSizes._1350_JPG,
+    [TestCase(FileNames._1350_JPG, ImageRotation.Rotate0, ImageByteSizes._1350_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1413_JPG, ImageByteSizes._1413_JPG,
+    [TestCase(FileNames._1413_JPG, ImageRotation.Rotate0, ImageByteSizes._1413_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1414_JPG, ImageByteSizes._1414_JPG,
+    [TestCase(FileNames._1414_JPG, ImageRotation.Rotate0, ImageByteSizes._1414_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1415_JPG, 7702,
+    [TestCase(FileNames._1415_JPG, ImageRotation.Rotate270, ImageByteSizes._1415_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    public void LoadBitmapThumbnailImage_WithoutRotationAndValidImage_ReturnsValidBitmapImage(
-        string fileName, int imageByteSize, string additionalPath)
+    public void LoadBitmapThumbnailImage_StoredThumbnailWithRotation_ReturnsValidBitmapImage(
+        string fileName, ImageRotation rotation, int imageByteSize, string additionalPath)
     {
         string folderPath = string.IsNullOrEmpty(additionalPath)
             ? _assetsDirectory!
@@ -620,8 +621,8 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        IImageData thumbnailImage =
-            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
         Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
@@ -654,12 +655,12 @@ public class ImageProcessingServiceTests
     // slightly different decoded pixel data, leading to different JPEG re-encoding sizes (~1% variance).
     // A 2% tolerance accommodates codec differences while still catching genuine encoding regressions.
     [Test]
-    [TestCase(FileNames.IMAGE_11_HEIC, 8431)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 8669)]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 8228)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8980)]
-    public void LoadBitmapThumbnailImage_WithoutRotationAndValidHeicImage_ReturnsValidBitmapImage(
-        string fileName, int expectedByteSize)
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotate0, ImageByteSizes.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageByteSizes.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, ImageByteSizes.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, ImageByteSizes.IMAGE_11_270_DEG_HEIC)]
+    public void LoadBitmapThumbnailImage_StoredHeicThumbnailWithRotation_ReturnsValidBitmapImage(
+        string fileName, ImageRotation rotation, int expectedByteSize)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -667,11 +668,14 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        IImageData thumbnailImage =
-            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        int expectedThumbnailWidth =
+            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : 113;
+
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(expectedThumbnailWidth));
         Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(thumbnailImage);

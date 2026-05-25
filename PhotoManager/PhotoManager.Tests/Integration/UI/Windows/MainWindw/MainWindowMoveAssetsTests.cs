@@ -2960,7 +2960,8 @@ public class MainWindowMoveAssetsTests
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
                 currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
-            Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
+            Assert.That(currentSelectedAsset.ImageData,
+                currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
         }
     }
 

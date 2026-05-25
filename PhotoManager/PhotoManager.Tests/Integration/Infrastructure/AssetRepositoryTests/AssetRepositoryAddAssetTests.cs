@@ -429,15 +429,14 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_ThumbnailDataIsNull_AssetIsAddedAndThrowsInvalidOperationException()
+    public void AddAsset_ThumbnailDataIsNull_ThrowsArgumentNullExceptionAndDoesNotMutateCatalog()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            const string exceptionMessage = "Value must be set.";
+            const string exceptionMessage = "Value cannot be null. (Parameter 'thumbnailData')";
 
             string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
@@ -447,17 +446,16 @@ public class AssetRepositoryAddAssetTests
             Asset[] assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            InvalidOperationException? exception =
-                Assert.Throws<InvalidOperationException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+            Assert.That(exception?.ParamName, Is.EqualTo("thumbnailData"));
 
             assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Length.EqualTo(1));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets, Is.Empty);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             Exception expectedException = new(exceptionMessage);
             _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
@@ -472,8 +470,15 @@ public class AssetRepositoryAddAssetTests
     public void AddAsset_ConcurrentAccess_ReturnsTrueAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
+        object assetsUpdatedLock = new();
         IDisposable assetsUpdatedSubscription =
-            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(unit =>
+            {
+                lock (assetsUpdatedLock)
+                {
+                    assetsUpdatedEvents.Add(unit);
+                }
+            });
 
         try
         {

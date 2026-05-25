@@ -226,10 +226,10 @@ public class ApplicationLoadBitmapImageFromPathTests
         Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
         Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
 
-        IImageData image1 = _application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
-        IImageData image2 = _application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
-        IImageData image3 = _application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
-        IImageData image4 = _application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
+        using IImageData image1 = _application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
+        using IImageData image2 = _application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
+        using IImageData image3 = _application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
+        using IImageData image4 = _application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
 
         using (Assert.EnterMultipleScope())
         {

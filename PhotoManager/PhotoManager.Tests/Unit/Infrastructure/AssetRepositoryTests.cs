@@ -149,12 +149,52 @@ public class AssetRepositoryTests
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
                 _folderPersistenceMock!.Received(1).Insert(Arg.Any<string>());
-                _assetPersistenceMock!.DidNotReceive().Upsert(Arg.Any<Asset>());
-                _thumbnailPersistenceMock!.DidNotReceive()
-                    .Upsert(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<byte[]>());
+                _persistenceContextMock!.DidNotReceive().UpsertAssetWithThumbnail(Arg.Any<Asset>(), Arg.Any<byte[]>());
                 _imageProcessingServiceMock!.DidNotReceive()
-                    .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    .LoadBitmapThumbnailImage(
+                        Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void AddAsset_PersistenceThrowsException_LogsItAndDoesNothing()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+            Asset asset = _asset1!.WithFolder(folder);
+            byte[] thumbnailData = [1, 2, 3];
+            IOException expectedException = new("Asset persistence error");
+
+            _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+            _assetRepository!.AddFolder(folderPath);
+            _persistenceContextMock!.When(context => context.UpsertAssetWithThumbnail(asset, thumbnailData))
+                                    .Do(_ => throw expectedException);
+
+            IOException? exception = Assert.Throws<IOException>(() => _assetRepository.AddAsset(asset, thumbnailData));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+                Assert.That(_assetRepository.GetCataloguedAssets(), Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+
+                _persistenceContextMock!.Received(1).UpsertAssetWithThumbnail(asset, thumbnailData);
+                _thumbnailPersistenceMock!.DidNotReceive().GetByFolderId(Arg.Any<Guid>());
+                _imageProcessingServiceMock!.DidNotReceive()
+                    .LoadBitmapThumbnailImage(
+                        Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
                 _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }
@@ -177,7 +217,8 @@ public class AssetRepositoryTests
 
             IOException expectedException = new("Failed to access blob storage");
 
-            _assetPersistenceMock!.DeleteByFolderId(Arg.Any<Guid>()).Throws(expectedException);
+            _persistenceContextMock!.When(context => context.DeleteFolderWithAssetsAndThumbnails(folder.Id))
+                                    .Do(_ => throw expectedException);
 
             using (Assert.EnterMultipleScope())
             {
@@ -187,10 +228,53 @@ public class AssetRepositoryTests
 
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
-                _assetPersistenceMock!.Received(1).DeleteByFolderId(folder.Id);
-                _thumbnailPersistenceMock!.DidNotReceive().DeleteByFolderId(Arg.Any<Guid>());
+                _persistenceContextMock!.Received(1).DeleteFolderWithAssetsAndThumbnails(folder.Id);
+                _assetPersistenceMock!.DidNotReceive().DeleteByFolderId(Arg.Any<Guid>());
+                _thumbnailPersistenceMock!.DidNotReceive().Delete(Arg.Any<Guid>(), Arg.Any<string>());
                 _folderPersistenceMock!.DidNotReceive().Delete(Arg.Any<Guid>());
 
+                _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void DeleteAsset_DatabaseThrowsException_DoesNotMutateRepository()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+            Asset asset = _asset1!.WithFolder(folder);
+            byte[] thumbnailData = [1, 2, 3];
+            IOException expectedException = new("Failed to delete asset");
+
+            _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+            _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+            _assetRepository.AddFolder(folderPath);
+            _assetRepository.AddAsset(asset, thumbnailData);
+            assetsUpdatedEvents.Clear();
+
+            _persistenceContextMock!.When(context => context.DeleteAssetWithThumbnail(folder.Id, asset.FileName))
+                                    .Do(_ => throw expectedException);
+
+            IOException? exception = Assert.Throws<IOException>(() =>
+                _assetRepository.DeleteAsset(folderPath, asset.FileName));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(exception?.Message, Is.EqualTo(expectedException.Message));
+                Assert.That(_assetRepository.GetCataloguedAssets(), Has.Length.EqualTo(1));
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+
+                _persistenceContextMock!.Received(1).DeleteAssetWithThumbnail(folder.Id, asset.FileName);
                 _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
             }
         }
@@ -225,8 +309,7 @@ public class AssetRepositoryTests
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _folderPersistenceMock!.DidNotReceive().Insert(Arg.Any<string>());
-            _assetPersistenceMock!.DidNotReceive().Upsert(Arg.Any<Asset>());
-            _thumbnailPersistenceMock!.DidNotReceive().Upsert(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<byte[]>());
+            _persistenceContextMock!.DidNotReceive().UpsertAssetWithThumbnail(Arg.Any<Asset>(), Arg.Any<byte[]>());
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -415,7 +498,8 @@ public class AssetRepositoryTests
         persistenceContextMock.SyncDefinitions.Returns(syncDefinitionsPersistenceMock);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(SkiaImageData.Empty());
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
@@ -435,7 +519,8 @@ public class AssetRepositoryTests
                 Assert.That(assets[0].FileName, Is.EqualTo("img1.jpg"));
                 Assert.That(assets[0].ImageData, Is.Not.Null);
 
-                imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(validThumbnail, 50, 50);
+                imageProcessingServiceMock.Received(1)
+                    .LoadBitmapThumbnailImage(validThumbnail, ImageRotation.Rotate0, 50, 50);
 
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -463,7 +548,8 @@ public class AssetRepositoryTests
         _thumbnailPersistenceMock!.GetByFolderId(folderId)
             .Returns(new Dictionary<string, byte[]> { { "photo.jpg", thumbnailData } });
 
-        _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        _imageProcessingServiceMock!.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(SkiaImageData.Empty());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
@@ -480,7 +566,8 @@ public class AssetRepositoryTests
             {
                 Assert.That(result, Is.Not.Null);
 
-                _imageProcessingServiceMock!.Received(1).LoadBitmapThumbnailImage(thumbnailData, 100, 100);
+                _imageProcessingServiceMock!.Received(1)
+                    .LoadBitmapThumbnailImage(thumbnailData, ImageRotation.Rotate0, 100, 100);
 
                 testLogger.AssertLogExceptions([], typeof(AssetRepository));
             }
@@ -518,7 +605,8 @@ public class AssetRepositoryTests
                 Assert.That(result, Is.Null);
 
                 _imageProcessingServiceMock!.DidNotReceive()
-                    .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    .LoadBitmapThumbnailImage(
+                        Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
                 testLogger.AssertLogExceptions([], typeof(AssetRepository));
             }
@@ -540,7 +628,8 @@ public class AssetRepositoryTests
             Assert.That(result, Is.Null);
 
             _imageProcessingServiceMock!.DidNotReceive()
-                .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                .LoadBitmapThumbnailImage(
+                    Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
             _thumbnailPersistenceMock!.DidNotReceive().GetByFolderId(Arg.Any<Guid>());
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
@@ -586,7 +675,8 @@ public class AssetRepositoryTests
         _thumbnailPersistenceMock!.GetByFolderId(folderId)
             .Returns(new Dictionary<string, byte[]> { { "sunset.jpg", thumbnailData } });
 
-        _imageProcessingServiceMock!.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        _imageProcessingServiceMock!.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(SkiaImageData.Empty());
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!);
@@ -605,7 +695,8 @@ public class AssetRepositoryTests
                 Assert.That(assets[0].FileName, Is.EqualTo("sunset.jpg"));
                 Assert.That(assets[0].ImageData, Is.Not.Null);
 
-                _imageProcessingServiceMock!.Received(1).LoadBitmapThumbnailImage(thumbnailData, 80, 60);
+                _imageProcessingServiceMock!.Received(1)
+                    .LoadBitmapThumbnailImage(thumbnailData, ImageRotation.Rotate0, 80, 60);
 
                 testLogger.AssertLogExceptions([], typeof(AssetRepository));
             }
@@ -669,7 +760,8 @@ public class AssetRepositoryTests
                 Assert.That(assets, Is.Empty);
 
                 _imageProcessingServiceMock!.DidNotReceive()
-                    .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    .LoadBitmapThumbnailImage(
+                        Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
                 testLogger.AssertLogExceptions([], typeof(AssetRepository));
             }
@@ -691,10 +783,224 @@ public class AssetRepositoryTests
             Assert.That(assets, Is.Empty);
 
             _imageProcessingServiceMock!.DidNotReceive()
-                .LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                .LoadBitmapThumbnailImage(
+                    Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
             _thumbnailPersistenceMock!.DidNotReceive().GetByFolderId(Arg.Any<Guid>());
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
+    }
+
+    [Test]
+    public void DeleteAsset_AssetHasImageData_DisposesImageData()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        IImageData imageData = Substitute.For<IImageData>();
+        Asset asset = CreateAssetWithImageData(folder, imageData);
+
+        _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+        _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+        _assetRepository!.AddAsset(asset, [1, 2, 3]);
+
+        Asset? deletedAsset = _assetRepository.DeleteAsset(folderPath, asset.FileName);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(deletedAsset, Is.SameAs(asset));
+            Assert.That(deletedAsset!.ImageData, Is.Null);
+            imageData.Received(1).Dispose();
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+    }
+
+    [Test]
+    public void AddAsset_ReplacesExistingAsset_DisposesPreviousImageDataAndKeepsAssetCounter()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        IImageData previousImageData = Substitute.For<IImageData>();
+        IImageData currentImageData = Substitute.For<IImageData>();
+        Asset previousAsset = CreateAssetWithImageData(folder, previousImageData);
+        Asset currentAsset = CreateAssetWithImageData(folder, currentImageData);
+
+        _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+        _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+        _assetRepository!.AddAsset(previousAsset, [1, 2, 3]);
+        _assetRepository.AddAsset(currentAsset, [4, 5, 6]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_assetRepository.GetAssetsCounter(), Is.EqualTo(1));
+            previousImageData.Received(1).Dispose();
+            currentImageData.DidNotReceive().Dispose();
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+    }
+
+    [Test]
+    public void AddAsset_SameReferenceAddedTwice_DoesNotDisposeImageDataAndKeepsAssetCounter()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        IImageData imageData = Substitute.For<IImageData>();
+        Asset asset = CreateAssetWithImageData(folder, imageData);
+
+        _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+        _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+        _assetRepository!.AddAsset(asset, [1, 2, 3]);
+        _assetRepository.AddAsset(asset, [4, 5, 6]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_assetRepository.GetAssetsCounter(), Is.EqualTo(1));
+            Assert.That(asset.ImageData, Is.Not.Null);
+            imageData.DidNotReceive().Dispose();
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+    }
+
+    [Test]
+    public void DeleteFolder_AssetsHaveImageData_DisposesImageData()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        IImageData imageData = Substitute.For<IImageData>();
+        Asset asset = CreateAssetWithImageData(folder, imageData);
+
+        _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+        _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+        _assetRepository!.AddAsset(asset, [1, 2, 3]);
+
+        _assetRepository.DeleteFolder(folder);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(asset.ImageData, Is.Null);
+            imageData.Received(1).Dispose();
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+    }
+
+    [Test]
+    public void Dispose_AssetsHaveImageData_DisposesImageData()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+        Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+        IImageData imageData = Substitute.For<IImageData>();
+        Asset asset = CreateAssetWithImageData(folder, imageData);
+
+        _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+        _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+        _assetRepository!.AddAsset(asset, [1, 2, 3]);
+
+        _assetRepository.Dispose();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(asset.ImageData, Is.Null);
+            imageData.Received(1).Dispose();
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+    }
+
+    [Test]
+    public void AddAsset_ConcurrentSameFileName_RetriesAndFinalAssetCountIsOne()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER);
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
+
+            _folderPersistenceMock!.Insert(folderPath).Returns(folder);
+            _thumbnailPersistenceMock!.GetByFolderId(folder.Id).Returns([]);
+
+            const int threadCount = 50;
+            ManualResetEventSlim barrier = new(false);
+
+            Asset[] assets = new Asset[threadCount];
+
+            for (int i = 0; i < threadCount; i++)
+            {
+                assets[i] = new()
+                {
+                    Folder = folder,
+                    FolderId = folder.Id,
+                    FileName = FileNames.IMAGE_1_JPG,
+                    ImageRotation = ImageRotation.Rotate0,
+                    Pixel = new()
+                    {
+                        Asset = new()
+                        {
+                            Width = PixelWidthAsset.IMAGE_1_JPG,
+                            Height = PixelHeightAsset.IMAGE_1_JPG
+                        },
+                        Thumbnail = new()
+                        {
+                            Width = ThumbnailWidthAsset.IMAGE_1_JPG,
+                            Height = ThumbnailHeightAsset.IMAGE_1_JPG
+                        }
+                    },
+                    FileProperties = new()
+                    {
+                        Size = FileSize.IMAGE_1_JPG,
+                        Creation = DateTime.Now,
+                        Modification = ModificationDate.Default
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now,
+                    Hash = Hashes.IMAGE_1_JPG,
+                    Metadata = new()
+                    {
+                        Corrupted = new() { IsTrue = false, Message = null },
+                        Rotated = new() { IsTrue = false, Message = null }
+                    }
+                };
+            }
+
+            Task[] tasks = new Task[threadCount];
+
+            for (int i = 0; i < threadCount; i++)
+            {
+                int idx = i;
+                tasks[i] = Task.Run(() =>
+                {
+                    // ReSharper disable once AccessToDisposedClosure
+                    barrier.Wait();
+                    _assetRepository!.AddAsset(assets[idx], [1, 2, 3]);
+                });
+            }
+
+            barrier.Set();
+            Task.WaitAll(tasks);
+            barrier.Dispose();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_assetRepository!.GetAssetsCounter(), Is.EqualTo(1));
+                Assert.That(_assetRepository.GetCataloguedAssets(), Has.Length.EqualTo(1));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(threadCount));
+
+                _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+            }
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    private Asset CreateAssetWithImageData(Folder folder, IImageData imageData)
+    {
+        Asset asset = _asset1!.WithFolder(folder);
+        asset.ImageData = imageData;
+        return asset;
     }
 }

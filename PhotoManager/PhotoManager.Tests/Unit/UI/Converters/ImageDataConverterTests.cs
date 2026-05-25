@@ -24,11 +24,15 @@ public class ImageDataConverterTests
     public void Convert_IImageDataNotBitmapImageData_ReturnsNull()
     {
         ImageDataConverter converter = new();
-        IImageData imageData = Substitute.For<IImageData>();
 
-        object? result = converter.Convert(imageData, typeof(object), null, CultureInfo.InvariantCulture);
+        using (IImageData imageData = Substitute.For<IImageData>())
+        {
+            imageData.ToByteArray(ImageEncodingFormat.Png).Returns([]);
 
-        Assert.That(result, Is.Null);
+            object? result = converter.Convert(imageData, typeof(object), null, CultureInfo.InvariantCulture);
+
+            Assert.That(result, Is.Null);
+        }
     }
 
     [Test]
@@ -87,29 +91,34 @@ public class ImageDataConverterTests
     }
 
     [Test]
-    [TestCase(ImageRotation.Rotate90, Rotation.Rotate90)]
-    [TestCase(ImageRotation.Rotate180, Rotation.Rotate180)]
-    [TestCase(ImageRotation.Rotate270, Rotation.Rotate270)]
-    public void Convert_RotatedSkiaImageData_ReturnsBitmapImageWithRotation(ImageRotation rotation,
-        Rotation expectedRotation)
+    [TestCase(ImageRotation.Rotate90)]
+    [TestCase(ImageRotation.Rotate180)]
+    [TestCase(ImageRotation.Rotate270)]
+    public void Convert_RotatedSkiaImageData_ReturnsBitmapImageWithoutApplyingRotation(ImageRotation rotation)
     {
         ImageDataConverter converter = new();
 
-        using (SKBitmap bitmap = new(10, 10))
+        using (SKBitmap bitmap = new(10, 20))
         {
             using (SKCanvas canvas = new(bitmap))
             {
                 canvas.Clear(SKColors.Blue);
             }
 
-            using (SkiaImageData imageData = new(bitmap, rotation))
+            int expectedWidth = rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? 20 : 10;
+            int expectedHeight = rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? 10 : 20;
+
+            using (SkiaImageData imageData = SkiaImageData.FromBitmapWithRotation(bitmap, rotation))
             {
                 object? result = converter.Convert(imageData, typeof(object), null, CultureInfo.InvariantCulture);
 
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(result, Is.TypeOf<BitmapImage>());
-                    Assert.That(((BitmapImage)result!).Rotation, Is.EqualTo(expectedRotation));
+                    BitmapImage bitmapImage = (BitmapImage)result!;
+                    Assert.That(bitmapImage.Rotation, Is.EqualTo(Rotation.Rotate0));
+                    Assert.That(bitmapImage.PixelWidth, Is.EqualTo(expectedWidth));
+                    Assert.That(bitmapImage.PixelHeight, Is.EqualTo(expectedHeight));
                 }
             }
         }

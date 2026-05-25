@@ -954,12 +954,7 @@ public class ViewerUserControlTests
 
         if (_applicationViewModel is { CurrentAsset: not null })
         {
-            bool isHeic =
-                _applicationViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
-
-            bitmapImage = isHeic
-                ? _applicationViewModel.LoadBitmapHeicImageFromPath()
-                : _applicationViewModel.LoadBitmapImageFromPath();
+            bitmapImage = _applicationViewModel.LoadBitmapImageFromPath();
         }
 
         return bitmapImage;

@@ -91,6 +91,77 @@ public sealed class SqlitePersistenceContext(
         return File.Exists(ResolveBackupFilePath(backupDate));
     }
 
+    public void UpsertAssetWithThumbnail(Asset asset, byte[] thumbnailData)
+    {
+        EnsureInitialized();
+        ArgumentNullException.ThrowIfNull(asset);
+        ArgumentNullException.ThrowIfNull(thumbnailData);
+
+        using (SqliteConnection connection = factory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SqliteCommand assetCommand = connection.CreateCommand())
+                {
+                    assetCommand.Transaction = transaction;
+                    assetCommand.CommandText = AssetPersistence.UPSERT_SQL;
+                    AssetPersistence.BindAsset(assetCommand, asset);
+                    assetCommand.ExecuteNonQuery();
+                }
+
+                using (SqliteCommand thumbnailCommand = connection.CreateCommand())
+                {
+                    thumbnailCommand.Transaction = transaction;
+                    thumbnailCommand.CommandText = ThumbnailPersistence.UPSERT_SQL;
+                    ThumbnailPersistence.BindUpsert(thumbnailCommand, asset.FolderId, asset.FileName,
+                        thumbnailData);
+                    thumbnailCommand.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+        }
+    }
+
+    public void DeleteAssetWithThumbnail(Guid folderId, string fileName)
+    {
+        EnsureInitialized();
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+        using (SqliteConnection connection = factory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                ExecuteNonQuery(connection, transaction,
+                    "DELETE FROM Thumbnails WHERE FolderId = $folderId AND FileName = $fileName;",
+                    folderId, fileName);
+                ExecuteNonQuery(connection, transaction,
+                    "DELETE FROM Assets WHERE FolderId = $folderId AND FileName = $fileName;",
+                    folderId, fileName);
+
+                transaction.Commit();
+            }
+        }
+    }
+
+    public void DeleteFolderWithAssetsAndThumbnails(Guid folderId)
+    {
+        EnsureInitialized();
+
+        using (SqliteConnection connection = factory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                ExecuteNonQuery(connection, transaction, "DELETE FROM Thumbnails WHERE FolderId = $folderId;",
+                    folderId);
+                ExecuteNonQuery(connection, transaction, "DELETE FROM Assets WHERE FolderId = $folderId;", folderId);
+                ExecuteNonQuery(connection, transaction, "DELETE FROM Folders WHERE Id = $folderId;", folderId);
+
+                transaction.Commit();
+            }
+        }
+    }
+
     public void DeleteOldBackups(ushort backupsToKeep)
     {
         EnsureInitialized();
@@ -142,6 +213,24 @@ public sealed class SqlitePersistenceContext(
     {
         string fileName = $"{backupDate:yyyyMMdd}.zip";
         return Path.Combine(_backupsDirectory, fileName);
+    }
+
+    private static void ExecuteNonQuery(SqliteConnection connection, SqliteTransaction transaction, string commandText,
+        Guid folderId, string? fileName = null)
+    {
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = commandText;
+            command.Parameters.AddWithValue("$folderId", folderId);
+
+            if (fileName != null)
+            {
+                command.Parameters.AddWithValue("$fileName", fileName);
+            }
+
+            command.ExecuteNonQuery();
+        }
     }
 
     public void Dispose()

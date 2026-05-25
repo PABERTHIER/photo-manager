@@ -209,7 +209,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public async Task LoadBitmapHeicImageFromPath_CataloguedAssets_ReturnsBitmapImage()
+    public async Task LoadBitmapImageFromPath_HeicCataloguedAssets_ReturnsBitmapImage()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
@@ -226,10 +226,10 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
         Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
 
-        IImageData image1 = _application!.LoadBitmapHeicImageFromPath(asset1.FullPath, asset1.ImageRotation);
-        IImageData image2 = _application!.LoadBitmapHeicImageFromPath(asset2.FullPath, asset2.ImageRotation);
-        IImageData image3 = _application!.LoadBitmapHeicImageFromPath(asset3.FullPath, asset3.ImageRotation);
-        IImageData image4 = _application!.LoadBitmapHeicImageFromPath(asset4.FullPath, asset4.ImageRotation);
+        using IImageData image1 = _application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
+        using IImageData image2 = _application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
+        using IImageData image3 = _application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
+        using IImageData image4 = _application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
 
         Assert.That(image1, Is.Not.Null);
         Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));

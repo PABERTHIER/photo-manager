@@ -870,6 +870,9 @@ public class MainWindowDeleteAssetsTests
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
+            _asset1Temp.ImageData = null;
+            _asset2Temp.ImageData = null;
+
             CheckAfterChanges(
                 _applicationViewModel!,
                 destinationDirectory,
@@ -2145,6 +2148,9 @@ public class MainWindowDeleteAssetsTests
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
+            _asset1Temp.ImageData = null;
+            _asset2Temp.ImageData = null;
+
             CheckAfterChanges(
                 _applicationViewModel!,
                 destinationDirectory,
@@ -2730,7 +2736,8 @@ public class MainWindowDeleteAssetsTests
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
                 currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
-            Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
+            Assert.That(currentSelectedAsset.ImageData,
+                currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
         }
     }
 
@@ -2749,7 +2756,8 @@ public class MainWindowDeleteAssetsTests
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
-                Assert.That(currentObservableAsset.ImageData, Is.Not.Null);
+                Assert.That(currentObservableAsset.ImageData,
+                    currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
             }
             else
             {

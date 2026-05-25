@@ -6,24 +6,6 @@ namespace PhotoManager.Common;
 
 public static class BitmapHelper
 {
-    // From AssetCreationService for CreateAsset() to get the originalImage
-    public static SkiaImageData LoadBitmapOriginalImage(byte[] buffer, ImageRotation rotation, ILogger logger)
-    {
-        ValidateBuffer(buffer);
-
-        try
-        {
-            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
-        }
-        catch (Exception ex) when (ex is not OverflowException)
-        {
-            NotSupportedException exception =
-                new("No imaging component suitable to complete this operation was found.");
-            logger.LogError(exception, "{ExMessage}", exception.Message);
-            throw exception;
-        }
-    }
-
     // From AssetCreationService for CreateAsset() to get the thumbnailImage
     public static SkiaImageData LoadBitmapThumbnailImage(byte[] buffer, ImageRotation rotation, int width,
         int height, ILogger logger)
@@ -32,6 +14,11 @@ public static class BitmapHelper
 
         try
         {
+            if (IsHeicFormat(buffer))
+            {
+                return LoadHeicThumbnailImage(buffer, rotation, width, height, logger);
+            }
+
             return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, width, height, logger);
         }
         catch (Exception ex) when (ex is not OverflowException)
@@ -43,100 +30,6 @@ public static class BitmapHelper
         }
     }
 
-    // From AssetCreationService for CreateAsset() to get the originalImage for HEIC
-    public static SkiaImageData LoadBitmapHeicOriginalImage(byte[] buffer, ImageRotation rotation, ILogger logger)
-    {
-        try
-        {
-            using (MemoryStream stream = new(buffer))
-            {
-                MagickReadSettings settings = new();
-                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
-
-                using (MagickImage magickImage = new(stream, settings))
-                {
-                    SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                    return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
-                }
-            }
-        }
-        catch (MagickException)
-        {
-            logger.LogError("The image is not valid or in an unsupported format");
-        }
-
-        return SkiaImageData.Empty();
-    }
-
-    // From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC
-    public static SkiaImageData LoadBitmapHeicThumbnailImage(byte[] buffer, ImageRotation rotation, int width,
-        int height, ILogger logger)
-    {
-        ArgumentNullException.ThrowIfNull(buffer);
-
-        if (buffer.Length == 0)
-        {
-            throw new ArgumentException("Value cannot be empty.", nameof(buffer));
-        }
-
-        try
-        {
-            int targetWidth = Math.Abs(width);
-            int targetHeight = Math.Abs(height);
-
-            using (MemoryStream stream = new(buffer))
-            {
-                MagickReadSettings settings = new();
-                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
-
-                using (MagickImage magickImage = new(stream, settings))
-                {
-                    SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                    SKBitmap? rotated = null;
-
-                    try
-                    {
-                        SKBitmap source = bitmap;
-
-                        if (rotation != ImageRotation.Rotate0)
-                        {
-                            rotated = SkiaImageData.ApplyRotation(bitmap, rotation);
-                            source = rotated;
-                        }
-
-                        (int finalWidth, int finalHeight) = CalculateFitDimensions(targetWidth, targetHeight,
-                            source.Width, source.Height);
-
-                        if (finalWidth == source.Width && finalHeight == source.Height)
-                        {
-                            if (source == rotated)
-                            {
-                                rotated = null;
-                                return new(source, rotation);
-                            }
-
-                            return new(CloneBitmap(source), rotation);
-                        }
-
-                        SKBitmap resized = ResizeBitmapInternal(source, finalWidth, finalHeight);
-                        return new(resized, rotation);
-                    }
-                    finally
-                    {
-                        rotated?.Dispose();
-                        bitmap.Dispose();
-                    }
-                }
-            }
-        }
-        catch (MagickException)
-        {
-            logger.LogError("The image is not valid or in an unsupported format");
-        }
-
-        return SkiaImageData.Empty();
-    }
-
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public static SkiaImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation, ILogger logger)
     {
@@ -144,74 +37,10 @@ public static class BitmapHelper
         {
             byte[] buffer = File.ReadAllBytes(imagePath);
 
-            if (IsHeicFormat(buffer))
-            {
-                using (MemoryStream stream = new(buffer))
-                {
-                    MagickReadSettings settings = new();
-                    settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
-
-                    using (MagickImage magickImage = new(stream, settings))
-                    {
-                        SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                        return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
-                    }
-                }
-            }
-
-            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
+            return LoadBitmapOriginalImage(buffer, rotation, logger);
         }
 
         return SkiaImageData.Empty();
-    }
-
-    // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public static SkiaImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation, ILogger logger)
-    {
-        if (File.Exists(imagePath))
-        {
-            try
-            {
-                MagickReadSettings settings = new();
-                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
-
-                using (MagickImage magickImage = new(imagePath, settings))
-                {
-                    SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                    return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
-                }
-            }
-            catch (MagickException)
-            {
-                logger.LogError("Failed to load HEIC image from path: {imagePath}.", imagePath);
-            }
-        }
-
-        return SkiaImageData.Empty();
-    }
-
-    // From AssetRepository
-    // TODO: Because the rotation is not used, it impacts the ImageByteSizes for the rotated images
-    public static SkiaImageData LoadBitmapThumbnailImage(byte[] buffer, int width, int height, ILogger logger)
-    {
-        ValidateBuffer(buffer);
-
-        try
-        {
-            if (IsHeicFormat(buffer))
-            {
-                // SkiaSharp cannot decode HEIC — decode with MagickImage, then resize with SkiaSharp
-                byte[] decodedBuffer = DecodeHeicToBmp(buffer);
-                return SkiaImageData.FromEncodedBytes(decodedBuffer, ImageRotation.Rotate0, width, height, logger);
-            }
-
-            return SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, width, height, logger);
-        }
-        catch (Exception ex) when (ex is not OverflowException)
-        {
-            logger.LogError(ex, "No imaging component suitable to complete this operation was found.");
-            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
-        }
     }
 
     // From HashingHelper.CalculateDHash for loading any image file to SKBitmap for pixel access
@@ -285,7 +114,10 @@ public static class BitmapHelper
                 {
                     using (MemoryStream stream = new(buffer))
                     {
-                        using (MagickImage magickImage = new(stream))
+                        MagickReadSettings settings = new();
+                        settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                        using (MagickImage magickImage = new(stream, settings))
                         {
                             rawWidth = (int)magickImage.Width;
                             rawHeight = (int)magickImage.Height;
@@ -294,9 +126,11 @@ public static class BitmapHelper
                 }
                 else
                 {
-                    SkiaImageData image = LoadBitmapOriginalImage(buffer, ImageRotation.Rotate0, logger);
-                    rawWidth = image.Width;
-                    rawHeight = image.Height;
+                    using (SkiaImageData image = LoadBitmapOriginalImage(buffer, ImageRotation.Rotate0, logger))
+                    {
+                        rawWidth = image.Width;
+                        rawHeight = image.Height;
+                    }
                 }
             }
             catch (NotSupportedException)
@@ -315,6 +149,104 @@ public static class BitmapHelper
         return rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270
             ? (rawHeight, rawWidth)
             : (rawWidth, rawHeight);
+    }
+
+    private static SkiaImageData LoadBitmapOriginalImage(byte[] buffer, ImageRotation rotation, ILogger logger)
+    {
+        ValidateBuffer(buffer);
+
+        try
+        {
+            if (IsHeicFormat(buffer))
+            {
+                return LoadHeicOriginalImage(buffer, rotation);
+            }
+
+            return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
+        }
+        catch (Exception ex) when (ex is not OverflowException)
+        {
+            NotSupportedException exception =
+                new("No imaging component suitable to complete this operation was found.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
+        }
+    }
+
+    private static SkiaImageData LoadHeicOriginalImage(byte[] buffer, ImageRotation rotation)
+    {
+        using (MemoryStream stream = new(buffer))
+        {
+            MagickReadSettings settings = new();
+            settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+            using (MagickImage magickImage = new(stream, settings))
+            {
+                SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
+                return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
+            }
+        }
+    }
+
+    private static SkiaImageData LoadHeicThumbnailImage(byte[] buffer, ImageRotation rotation, int width, int height,
+        ILogger logger)
+    {
+        try
+        {
+            int targetWidth = Math.Abs(width);
+            int targetHeight = Math.Abs(height);
+
+            using (MemoryStream stream = new(buffer))
+            {
+                MagickReadSettings settings = new();
+                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+                using (MagickImage magickImage = new(stream, settings))
+                {
+                    SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
+                    SKBitmap? rotated = null;
+
+                    try
+                    {
+                        SKBitmap source = bitmap;
+
+                        if (rotation != ImageRotation.Rotate0)
+                        {
+                            rotated = SkiaImageData.ApplyRotation(bitmap, rotation);
+                            source = rotated;
+                        }
+
+                        (int finalWidth, int finalHeight) = CalculateFitDimensions(targetWidth, targetHeight,
+                            source.Width, source.Height);
+
+                        if (finalWidth == source.Width && finalHeight == source.Height)
+                        {
+                            if (source == rotated)
+                            {
+                                rotated = null;
+                                return new(source, ImageRotation.Rotate0);
+                            }
+
+                            return new(CloneBitmap(source), ImageRotation.Rotate0);
+                        }
+
+                        SKBitmap resized = ResizeBitmapInternal(source, finalWidth, finalHeight);
+                        return new(resized, ImageRotation.Rotate0);
+                    }
+                    finally
+                    {
+                        rotated?.Dispose();
+                        bitmap.Dispose();
+                    }
+                }
+            }
+        }
+        catch (MagickException)
+        {
+            logger.LogError("The image is not valid or in an unsupported format");
+        }
+
+        return SkiaImageData.Empty();
     }
 
     private static (int width, int height) TryReadDimensionsFromHeader(ReadOnlySpan<byte> buffer)
@@ -406,17 +338,6 @@ public static class BitmapHelper
         return SKBitmap.Decode(bmpData);
     }
 
-    private static byte[] DecodeHeicToBmp(byte[] buffer)
-    {
-        using (MemoryStream stream = new(buffer))
-        {
-            using (MagickImage magickImage = new(stream))
-            {
-                return magickImage.ToByteArray(MagickFormat.Bmp);
-            }
-        }
-    }
-
     private static bool IsHeicFormat(byte[] buffer)
     {
         // HEIC/HEIF container: bytes 4-7 are "ftyp" (ISO base media file format box)
@@ -432,7 +353,9 @@ public static class BitmapHelper
 
     private static SKBitmap ResizeBitmapInternal(SKBitmap source, int targetWidth, int targetHeight)
     {
-        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions);
+        return source.Resize(new SKImageInfo(targetWidth, targetHeight), ResizeSamplingOptions)
+               ?? throw new NotSupportedException(
+                   "No imaging component suitable to complete this operation was found.");
     }
 
     private static SKBitmap CloneBitmap(SKBitmap source)

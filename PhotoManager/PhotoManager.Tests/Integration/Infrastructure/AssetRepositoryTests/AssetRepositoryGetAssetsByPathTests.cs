@@ -232,7 +232,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -276,7 +277,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -623,7 +624,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -679,7 +681,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Assert.That(assets, Is.Empty);
 
                 imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                    Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
