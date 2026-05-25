@@ -1,16 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Benchmarks.Common;
 
-// LoadBitmapOriginalImage decodes full pixel data (OnLoad cache) into ~3.5 MB of unmanaged WIC memory per image.
-// BenchmarkDotNet's default invocation count (~250× for ~2ms ops) × 4 images = ~3.5 GB unmanaged per iteration.
-// Unmanaged WIC memory is invisible to GC, so it accumulates until Win32 OOM.
-// Fix: invocationCount=1 (one benchmark call per measurement), IterationCleanup forces GC to release WIC COM objects.
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
-[SimpleJob(warmupCount: 3, iterationCount: 10, invocationCount: 1)]
 public class BitmapHelperLoadBitmapOriginalImageBenchmarks
 {
     private byte[][] _imageBuffers = null!;
@@ -23,83 +17,34 @@ public class BitmapHelperLoadBitmapOriginalImageBenchmarks
         _logger = NullLogger.Instance;
     }
 
-    [IterationCleanup]
-    public void IterationCleanup()
-    {
-        // Force finalization of managed BitmapImage/BitmapDecoder wrappers to release unmanaged WIC COM memory.
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-        GC.Collect();
-    }
-
-    // Current: fully decodes the image at original resolution only to read PixelWidth/PixelHeight,
-    // which are then immediately discarded. The decoded pixels are never used.
     [Benchmark(Baseline = true)]
-    public (int, int)[] Original()
+    public (int, int)[] Current_SkiaSharp()
     {
-        return Shared.RunOnStaThread(() =>
+        (int, int)[] results = new (int, int)[_imageBuffers.Length];
+
+        for (int i = 0; i < _imageBuffers.Length; i++)
         {
-            (int, int)[] results = new (int, int)[_imageBuffers.Length];
+            SkiaImageData image =
+                SkiaImageData.FromEncodedBytesWithRotation(_imageBuffers[i], ImageRotation.Rotate0, _logger);
+            results[i] = (image.Width, image.Height);
+        }
 
-            for (int i = 0; i < _imageBuffers.Length; i++)
-            {
-                BitmapImageData image =
-                    BitmapHelper.LoadBitmapOriginalImage(_imageBuffers[i], ImageRotation.Rotation0, _logger);
-                results[i] = (image.BitmapImage.PixelWidth, image.BitmapImage.PixelHeight);
-            }
-
-            return results;
-        });
+        return results;
     }
 
-    // Optimized: BitmapDecoder with DelayCreation reads only the image header/metadata,
-    // skipping full pixel decode. Dimensions are extracted from the SOF segment.
-    // BitmapCacheOption.None avoids caching decoded pixel data between benchmark iterations.
-    [Benchmark]
-    public (int, int)[] Optimized_BitmapDecoder()
-    {
-        return Shared.RunOnStaThread(() =>
-        {
-            (int, int)[] results = new (int, int)[_imageBuffers.Length];
-
-            for (int i = 0; i < _imageBuffers.Length; i++)
-            {
-                results[i] = GetImageDimensionsViaDecoder(_imageBuffers[i], ImageRotation.Rotation0);
-            }
-
-            return results;
-        });
-    }
-
-    // Optimized: reads dimensions directly from raw format headers (zero WIC objects,
+    // Reads dimensions directly from raw format headers (zero codec objects,
     // zero allocations beyond the return tuple). Supports JPEG and PNG.
     [Benchmark]
     public (int, int)[] Optimized_HeaderParsing()
     {
-        return Shared.RunOnStaThread(() =>
+        (int, int)[] results = new (int, int)[_imageBuffers.Length];
+
+        for (int i = 0; i < _imageBuffers.Length; i++)
         {
-            (int, int)[] results = new (int, int)[_imageBuffers.Length];
+            results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], ImageRotation.Rotate0);
+        }
 
-            for (int i = 0; i < _imageBuffers.Length; i++)
-            {
-                results[i] = GetImageDimensionsFromHeader(_imageBuffers[i], ImageRotation.Rotation0);
-            }
-
-            return results;
-        });
-    }
-
-    private static (int width, int height) GetImageDimensionsViaDecoder(byte[] buffer, ImageRotation rotation)
-    {
-        using MemoryStream stream = new(buffer);
-        BitmapDecoder decoder = BitmapDecoder.Create(stream,
-            BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.None);
-        int rawWidth = decoder.Frames[0].PixelWidth;
-        int rawHeight = decoder.Frames[0].PixelHeight;
-
-        return rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270
-            ? (rawHeight, rawWidth)
-            : (rawWidth, rawHeight);
+        return results;
     }
 
     private static (int width, int height) GetImageDimensionsFromHeader(byte[] buffer, ImageRotation rotation)

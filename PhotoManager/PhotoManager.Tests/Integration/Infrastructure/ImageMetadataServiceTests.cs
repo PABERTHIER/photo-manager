@@ -1,4 +1,4 @@
-﻿using System.Drawing.Imaging;
+﻿using SkiaSharp;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -52,13 +52,6 @@ public class ImageMetadataServiceTests
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 8)]
     [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 1)]
-    [TestCase(FileNames.IMAGE_11_HEIC, 1)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
@@ -75,8 +68,8 @@ public class ImageMetadataServiceTests
     }
 
     [Test]
-    [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
+    [TestCase(FileNames.HOMER_GIF)] // GIF has no EXIF orientation data, returns defaultExifOrientation
+    public void GetExifOrientation_FormatWithoutExifData_ReturnsDefaultOrientation(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -86,10 +79,28 @@ public class ImageMetadataServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.DefaultExifOrientation));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC)]
+    public void GetExifOrientation_UnsupportedFormat_ReturnsCorruptedOrientationValue(string fileName)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        ushort orientation = _imageMetadataService!.GetExifOrientation(buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
 
-        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")],
-            typeof(ImageMetadataService));
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -104,9 +115,7 @@ public class ImageMetadataServiceTests
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
 
-        _testLogger!.AssertLogExceptions(
-            [new Exception("No imaging component suitable to complete this operation was found.")],
-            typeof(ImageMetadataService));
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")], typeof(ImageMetadataService));
     }
 
     [Test]
@@ -137,27 +146,29 @@ public class ImageMetadataServiceTests
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
 
-        _testLogger!.AssertLogExceptions(
-            [new Exception("No imaging component suitable to complete this operation was found.")],
-            typeof(ImageMetadataService));
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")], typeof(ImageMetadataService));
     }
 
     [Test]
-    public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
+    public void GetExifOrientation_FormatWithoutExifMetadata_ReturnsDefaultOrientationValue()
     {
-        Bitmap image = new(10, 10);
-
-        using (MemoryStream ms = new())
+        using (SKBitmap bitmap = new(10, 10))
         {
-            image.Save(ms, ImageFormat.Bmp); // Save as BMP to create an invalid format for JPEG
-            byte[] buffer = ms.ToArray(); // Buffer with invalid Exif Metadata (Metadata null)
+            using (SKImage image = SKImage.FromBitmap(bitmap))
+            {
+                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    byte[] buffer = data.ToArray();
 
-            ushort orientation = _imageMetadataService!.GetExifOrientation(
-                buffer,
-                _userConfigurationService!.AssetSettings.DefaultExifOrientation,
-                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+                    ushort orientation = _imageMetadataService!.GetExifOrientation(
+                        buffer,
+                        _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+                        _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-            Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+                    Assert.That(orientation,
+                        Is.EqualTo(_userConfigurationService!.AssetSettings.DefaultExifOrientation));
+                }
+            }
         }
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));

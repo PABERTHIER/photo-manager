@@ -52,7 +52,7 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null);
+            ImageRotation.Rotate0, false, null, false, null);
 
         _sqlitePersistenceContext!.Assets.Upsert(asset);
 
@@ -72,7 +72,7 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null);
+            ImageRotation.Rotate0, false, null, false, null);
 
         _sqlitePersistenceContext!.Assets.Upsert(asset);
 
@@ -80,7 +80,7 @@ public class AssetPersistenceTests
             _testFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_DUPLICATE_JPG,
             PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, PixelHeightAsset.IMAGE_1_DUPLICATE_JPG,
             ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG,
-            ImageRotation.Rotation0, false, null, false, null);
+            ImageRotation.Rotate0, false, null, false, null);
 
         _sqlitePersistenceContext.Assets.Upsert(updatedAsset);
 
@@ -112,7 +112,7 @@ public class AssetPersistenceTests
                 _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
                 PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
                 ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-                ImageRotation.Rotation0, false, null, false, null),
+                ImageRotation.Rotate0, false, null, false, null),
             CreateAsset(
                 _testFolder.Id, FileNames.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC,
                 PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC,
@@ -122,7 +122,7 @@ public class AssetPersistenceTests
                 _testFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
                 PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
                 ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-                ImageRotation.Rotation0, true, "The asset is corrupted", false, null)
+                ImageRotation.Rotate0, true, "The asset is corrupted", false, null)
         ];
 
         _sqlitePersistenceContext!.Assets.UpsertMany(assets);
@@ -139,7 +139,7 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         List<Asset> assets =
         [
@@ -147,12 +147,12 @@ public class AssetPersistenceTests
                 _testFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_DUPLICATE_JPG,
                 PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, PixelHeightAsset.IMAGE_1_DUPLICATE_JPG,
                 ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG,
-                ImageRotation.Rotation0, false, null, false, null),
+                ImageRotation.Rotate0, false, null, false, null),
             CreateAsset(
                 _testFolder.Id, FileNames.IMAGE_2_JPG, Hashes.IMAGE_2_JPG,
                 PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
                 ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG,
-                ImageRotation.Rotation0, false, null, false, null)
+                ImageRotation.Rotate0, false, null, false, null)
         ];
 
         _sqlitePersistenceContext.Assets.UpsertMany(assets);
@@ -173,7 +173,7 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         bool isDeleted = _sqlitePersistenceContext.Assets.Delete(_testFolder.Id, FileNames.IMAGE_1_JPG);
 
@@ -201,12 +201,12 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             _testFolder.Id, FileNames.IMAGE_2_JPG, Hashes.IMAGE_2_JPG,
             PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
             ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         int result = _sqlitePersistenceContext.Assets.DeleteByFolderId(_testFolder.Id);
 
@@ -237,22 +237,22 @@ public class AssetPersistenceTests
 
         _sqlitePersistenceContext!.Assets.Upsert(asset);
 
-        Asset? assetRetrieved = _sqlitePersistenceContext.Assets.Get(
+        Asset? retrievedAsset = _sqlitePersistenceContext.Assets.Get(
             _testFolder.Id, FileNames.IMAGE_1_90_DEG_JPG);
 
-        Assert.That(assetRetrieved, Is.Not.Null);
-        Assert.That(assetRetrieved!.FolderId, Is.EqualTo(_testFolder.Id));
-        Assert.That(assetRetrieved.FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.ImageRotation, Is.EqualTo(ImageRotation.Rotate90));
-        Assert.That(assetRetrieved.Pixel.Asset.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.Pixel.Asset.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.Pixel.Thumbnail.Width, Is.EqualTo(ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.Pixel.Thumbnail.Height, Is.EqualTo(ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.Hash, Is.EqualTo(Hashes.IMAGE_1_90_DEG_JPG));
-        Assert.That(assetRetrieved.Metadata.Corrupted.IsTrue, Is.True);
-        Assert.That(assetRetrieved.Metadata.Corrupted.Message, Is.EqualTo("Bad EXIF data"));
-        Assert.That(assetRetrieved.Metadata.Rotated.IsTrue, Is.True);
-        Assert.That(assetRetrieved.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
+        Assert.That(retrievedAsset, Is.Not.Null);
+        Assert.That(retrievedAsset!.FolderId, Is.EqualTo(_testFolder.Id));
+        Assert.That(retrievedAsset.FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.ImageRotation, Is.EqualTo(ImageRotation.Rotate90));
+        Assert.That(retrievedAsset.Pixel.Asset.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.Pixel.Asset.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.Pixel.Thumbnail.Width, Is.EqualTo(ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.Pixel.Thumbnail.Height, Is.EqualTo(ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.Hash, Is.EqualTo(Hashes.IMAGE_1_90_DEG_JPG));
+        Assert.That(retrievedAsset.Metadata.Corrupted.IsTrue, Is.True);
+        Assert.That(retrievedAsset.Metadata.Corrupted.Message, Is.EqualTo("Bad EXIF data"));
+        Assert.That(retrievedAsset.Metadata.Rotated.IsTrue, Is.True);
+        Assert.That(retrievedAsset.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -264,7 +264,7 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null);
+            ImageRotation.Rotate0, false, null, false, null);
 
         _sqlitePersistenceContext!.Assets.Upsert(asset);
 
@@ -274,6 +274,24 @@ public class AssetPersistenceTests
         Assert.That(retrievedAsset.Metadata.Corrupted.IsTrue, Is.False);
         Assert.That(retrievedAsset.Metadata.Rotated.Message, Is.Null);
         Assert.That(retrievedAsset.Metadata.Rotated.IsTrue, Is.False);
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void Get_AssetWithInvalidRotation_MapsToRotate0()
+    {
+        Asset asset = CreateAsset(
+            _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
+            PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+            ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
+            (ImageRotation)4, false, null, false, null);
+
+        _sqlitePersistenceContext!.Assets.Upsert(asset);
+
+        Asset? retrievedAsset = _sqlitePersistenceContext.Assets.Get(_testFolder.Id, FileNames.IMAGE_1_JPG);
+
+        Assert.That(retrievedAsset!.ImageRotation, Is.EqualTo(ImageRotation.Rotate0));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -296,12 +314,12 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             _testFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
             PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
             ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         IReadOnlyList<Asset> assets = _sqlitePersistenceContext.Assets.GetByFolderId(_testFolder.Id);
 
@@ -330,12 +348,12 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             otherFolder.Id, FileNames.IMAGE_2_JPG, Hashes.IMAGE_2_JPG,
             PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
             ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         IReadOnlyList<Asset> assets = _sqlitePersistenceContext.Assets.GetByFolderId(_testFolder.Id);
 
@@ -365,12 +383,12 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             otherFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
             PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
             ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         IReadOnlyList<Asset> assets = _sqlitePersistenceContext.Assets.GetAll();
 
@@ -389,17 +407,17 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             otherFolder.Id, FileNames.IMAGE_1_DUPLICATE_JPG, Hashes.IMAGE_1_DUPLICATE_JPG,
             PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, PixelHeightAsset.IMAGE_1_DUPLICATE_JPG,
             ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             _testFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
             PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
             ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         IReadOnlyList<Asset> assets = _sqlitePersistenceContext.Assets.GetByHash(Hashes.IMAGE_1_JPG);
 
@@ -433,12 +451,12 @@ public class AssetPersistenceTests
             _testFolder!.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             _testFolder.Id, FileNames.IMAGE_2_JPG, Hashes.IMAGE_2_JPG,
             PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
             ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG,
-            ImageRotation.Rotation0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         Assert.That(_sqlitePersistenceContext.Assets.Count(), Is.EqualTo(2));
 
@@ -446,7 +464,7 @@ public class AssetPersistenceTests
     }
 
     [Test]
-    [TestCase(ImageRotation.Rotation0, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG)]
+    [TestCase(ImageRotation.Rotate0, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG)]
     [TestCase(ImageRotation.Rotate90, FileNames.IMAGE_1_90_DEG_JPG, Hashes.IMAGE_1_90_DEG_JPG)]
     [TestCase(ImageRotation.Rotate180, FileNames.IMAGE_1_180_DEG_JPG, Hashes.IMAGE_1_180_DEG_JPG)]
     [TestCase(ImageRotation.Rotate270, FileNames.IMAGE_1_270_DEG_JPG, Hashes.IMAGE_1_270_DEG_JPG)]
@@ -457,8 +475,8 @@ public class AssetPersistenceTests
             _testFolder!.Id, fileName, hash,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            rotation, false, null, rotation != ImageRotation.Rotation0,
-            rotation != ImageRotation.Rotation0 ? "The asset has been rotated" : null);
+            rotation, false, null, rotation != ImageRotation.Rotate0,
+            rotation != ImageRotation.Rotate0 ? "The asset has been rotated" : null);
 
         _sqlitePersistenceContext!.Assets.Upsert(asset);
 

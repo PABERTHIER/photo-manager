@@ -64,7 +64,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -89,7 +89,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -122,7 +122,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -151,7 +151,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -176,7 +176,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
@@ -221,7 +221,8 @@ public class ApplicationLoadThumbnailTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -245,7 +246,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public async Task LoadThumbnail_CataloguedAssets_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -364,7 +366,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ThumbnailExists_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -439,7 +442,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderDoesNotExist_DoesNotSetBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -519,7 +523,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderPathIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -555,7 +560,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FileNameIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -588,7 +594,7 @@ public class ApplicationLoadThumbnailTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotation0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
@@ -615,7 +621,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ConcurrentAccess_BitmapImageAreSetToEachAssetSafely()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

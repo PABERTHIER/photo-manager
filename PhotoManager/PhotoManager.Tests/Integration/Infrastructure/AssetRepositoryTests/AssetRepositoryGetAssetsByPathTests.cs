@@ -62,7 +62,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -128,7 +128,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -232,7 +232,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -276,7 +277,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -623,7 +624,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -679,7 +681,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Assert.That(assets, Is.Empty);
 
                 imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                    Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

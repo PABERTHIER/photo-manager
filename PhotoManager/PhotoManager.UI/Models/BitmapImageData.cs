@@ -1,11 +1,15 @@
-﻿namespace PhotoManager.Common;
+﻿using PhotoManager.Common.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
+
+namespace PhotoManager.UI.Models;
 
 /// <summary>
 /// Temporary WPF-backed implementation of <see cref="IImageData"/>.
 /// Wraps a <see cref="BitmapImage"/> for the transition period until BitmapHelper
 /// is rewritten with SkiaSharp (Phase 1.3).
 /// </summary>
-public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotation) : IImageData
+public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotation)
 {
     public BitmapImageData(BitmapImage bitmapImage) : this(bitmapImage, MapFromWpfRotation(bitmapImage.Rotation))
     {
@@ -36,35 +40,11 @@ public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotat
         }
     }
 
-    public Stream ToStream(ImageEncodingFormat format)
-    {
-        MemoryStream stream = new();
-        BitmapEncoder encoder = format switch
-        {
-            ImageEncodingFormat.Jpeg => new JpegBitmapEncoder(),
-            ImageEncodingFormat.Png => new PngBitmapEncoder(),
-            ImageEncodingFormat.Gif => new GifBitmapEncoder(),
-            ImageEncodingFormat.Bmp => new BmpBitmapEncoder(),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
-        };
-
-        encoder.Frames.Add(BitmapFrame.Create(BitmapImage));
-        encoder.Save(stream);
-        stream.Position = 0;
-
-        return stream;
-    }
-
-    public void Dispose()
-    {
-        // BitmapImage is frozen (immutable) in WPF and does not require explicit disposal
-    }
-
     public static Rotation ToWpfRotation(ImageRotation rotation)
     {
         return rotation switch
         {
-            ImageRotation.Rotation0 => System.Windows.Media.Imaging.Rotation.Rotate0,
+            ImageRotation.Rotate0 => System.Windows.Media.Imaging.Rotation.Rotate0,
             ImageRotation.Rotate90 => System.Windows.Media.Imaging.Rotation.Rotate90,
             ImageRotation.Rotate180 => System.Windows.Media.Imaging.Rotation.Rotate180,
             ImageRotation.Rotate270 => System.Windows.Media.Imaging.Rotation.Rotate270,
@@ -73,15 +53,15 @@ public sealed class BitmapImageData(BitmapImage bitmapImage, ImageRotation rotat
         };
     }
 
-    internal static ImageRotation MapFromWpfRotation(Rotation wpfRotation)
+    public static ImageRotation MapFromWpfRotation(Rotation wpfRotation)
     {
         return wpfRotation switch
         {
-            System.Windows.Media.Imaging.Rotation.Rotate0 => ImageRotation.Rotation0,
+            System.Windows.Media.Imaging.Rotation.Rotate0 => ImageRotation.Rotate0,
             System.Windows.Media.Imaging.Rotation.Rotate90 => ImageRotation.Rotate90,
             System.Windows.Media.Imaging.Rotation.Rotate180 => ImageRotation.Rotate180,
             System.Windows.Media.Imaging.Rotation.Rotate270 => ImageRotation.Rotate270,
-            _ => ImageRotation.Rotation0
+            _ => ImageRotation.Rotate0
         };
     }
 }

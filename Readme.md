@@ -29,10 +29,8 @@ The SQLite database is stored locally on your computer.**
 ## Upcoming :next_track_button:
 
 - Progress bar.
-- Multithread.
 - Handling corrupted images and videos.
 - Conversion feature (convert heic to jpg for example).
-- Migration to MAUI (or better) for full compatibility on macOs.
 
 ## Run the application :rocket:
 

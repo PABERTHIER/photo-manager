@@ -59,7 +59,7 @@ public class AssetRepositoryDeleteAssetTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -300,7 +300,7 @@ public class AssetRepositoryDeleteAssetTests
 
         try
         {
-            const string exceptionMessage = "Value cannot be null. (Parameter 'key')";
+            const string exceptionMessage = "Value cannot be null. (Parameter 'fileName')";
 
             string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
             string? assetFileName = null;

@@ -60,7 +60,7 @@ public class AssetRepositoryDeleteFolderTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -119,8 +119,9 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }
@@ -302,8 +303,9 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(folders.Contains(_asset1!.Folder), Is.False);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
             _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
         }

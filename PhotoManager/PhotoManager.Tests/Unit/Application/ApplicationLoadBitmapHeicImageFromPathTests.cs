@@ -56,7 +56,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -77,29 +78,24 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(ImageRotation.Rotation0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(ImageRotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
     [TestCase(ImageRotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
     // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(ImageRotation rotation,
-        int expectedWidth, int expectedHeight)
+    public void LoadBitmapImageFromPath_HeicValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
+        ImageRotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
 
-        BitmapImageData image = (BitmapImageData)_application!.LoadBitmapHeicImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.BitmapImage.PixelWidth, Is.EqualTo(expectedWidth));
-        Assert.That(image.BitmapImage.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -109,71 +105,66 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
         PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName,
+    public void LoadBitmapImageFromPath_HeicValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName,
         ImageRotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        BitmapImageData image = (BitmapImageData)_application!.LoadBitmapHeicImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
         Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.BitmapImage.PixelWidth, Is.EqualTo(expectedWidth));
-        Assert.That(image.BitmapImage.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_FilePathIsNull_ReturnsBitmapImage()
+    public void LoadBitmapImageFromPath_HeicFilePathIsNull_ReturnsBitmapImage()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string? filePath = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        BitmapImageData image = (BitmapImageData)_application!.LoadBitmapHeicImageFromPath(filePath!, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath!, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
-        Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+        Assert.That(image.Width, Is.EqualTo(1));
+        Assert.That(image.Height, Is.EqualTo(1));
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
+    public void LoadBitmapImageFromPath_HeicImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        BitmapImageData image = (BitmapImageData)_application!.LoadBitmapHeicImageFromPath(filePath, rotation);
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.BitmapImage.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotation0));
-        Assert.That(image.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+        Assert.That(image.Width, Is.EqualTo(1));
+        Assert.That(image.Height, Is.EqualTo(1));
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_InvalidRotation_ThrowsArgumentException()
+    public void LoadBitmapImageFromPath_HeicInvalidRotation_ReturnsBitmapImageWithRotate0()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const ImageRotation rotation = (ImageRotation)999;
 
-        ArgumentException? exception =
-            Assert.Throws<ArgumentException>(() => _application!.LoadBitmapHeicImageFromPath(filePath, rotation));
+        using IImageData image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-        Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
     }
 }

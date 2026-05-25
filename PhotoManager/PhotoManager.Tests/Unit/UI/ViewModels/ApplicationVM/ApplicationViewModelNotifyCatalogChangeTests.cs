@@ -50,7 +50,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2020,
@@ -75,7 +75,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2048,
@@ -100,7 +100,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2000,
@@ -125,7 +125,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2030,
@@ -150,7 +150,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new()),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2048,
@@ -261,7 +261,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
@@ -357,7 +357,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
@@ -455,7 +455,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
@@ -810,7 +810,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
@@ -900,7 +900,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
@@ -1548,7 +1548,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_JPG, Height = ThumbnailHeightAsset.IMAGE_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
@@ -1634,7 +1634,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
@@ -2266,7 +2266,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_JPG, Height = ThumbnailHeightAsset.IMAGE_JPG }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
@@ -2352,7 +2352,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 }
             },
             Hash = string.Empty,
-            ImageData = new BitmapImageData(new())
+            ImageData = SkiaImageData.Empty()
         };
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];

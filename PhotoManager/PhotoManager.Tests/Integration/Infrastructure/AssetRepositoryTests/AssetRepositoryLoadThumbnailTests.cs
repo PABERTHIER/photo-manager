@@ -60,7 +60,7 @@ public class AssetRepositoryLoadThumbnailTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -157,7 +157,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
+            using IImageData? bitmapImage = _assetRepository!.LoadThumbnail(
                 folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
@@ -344,7 +344,7 @@ public class AssetRepositoryLoadThumbnailTests
                 Folder = folder2,
                 FolderId = folder2.Id,
                 FileName = FileNames.IMAGE_9_PNG,
-                ImageRotation = ImageRotation.Rotation0,
+                ImageRotation = ImageRotation.Rotate0,
                 Pixel = new()
                 {
                     Asset = new()

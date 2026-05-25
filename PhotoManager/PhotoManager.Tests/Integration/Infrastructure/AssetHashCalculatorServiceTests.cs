@@ -501,7 +501,8 @@ public class AssetHashCalculatorServiceTests
         ArgumentException? exception =
             Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
-        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
+        Assert.That(exception?.Message, Is.EqualTo($"The file '{filePath}' does not exist. (Parameter 'filePath')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("filePath"));
 
         _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
@@ -517,13 +518,15 @@ public class AssetHashCalculatorServiceTests
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
             assetHashCalculatorService.CalculateHash(imageBytes!, _assetsDirectory!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
+        Assert.That(exception?.Message,
+            Is.EqualTo($"The file '{_assetsDirectory}' does not exist. (Parameter 'filePath')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("filePath"));
 
         _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }
 
     [Test]
-    public void CalculateHash_DHashAndImagePathIsNull_ThrowsArgumentNullException()
+    public void CalculateHash_DHashAndImagePathIsNull_ThrowsArgumentException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService, _testLogger!);
@@ -531,11 +534,11 @@ public class AssetHashCalculatorServiceTests
         byte[]? imageBytes = null;
         string? filePath = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
-                assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
+        Assert.That(exception?.Message, Is.EqualTo("The file '' does not exist. (Parameter 'filePath')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("filePath"));
 
         _testLogger!.AssertLogExceptions([], typeof(AssetHashCalculatorService));
     }

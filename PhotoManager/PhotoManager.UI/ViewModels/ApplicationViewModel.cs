@@ -1,8 +1,8 @@
 ﻿using PhotoManager.Application;
-using PhotoManager.Common;
 using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
+using PhotoManager.UI.Converters;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
@@ -231,7 +231,11 @@ public class ApplicationViewModel : BaseViewModel
         {
             for (int i = 0; i < assets.Length; i++)
             {
-                _observableAssets.Remove(assets[i]);
+                if (_observableAssets.Remove(assets[i]))
+                {
+                    assets[i].ImageData?.Dispose();
+                    assets[i].ImageData = null;
+                }
 
                 if (ViewerPosition == _observableAssets.Count)
                 {
@@ -275,10 +279,7 @@ public class ApplicationViewModel : BaseViewModel
                 ChangeAppMode();
             }
 
-            if (newViewerPosition > -1)
-            {
-                ViewerPosition = newViewerPosition;
-            }
+            ViewerPosition = newViewerPosition;
         }
     }
 
@@ -382,20 +383,11 @@ public class ApplicationViewModel : BaseViewModel
             throw new NullReferenceException("CurrentAsset is null");
         }
 
-        IImageData imageData = _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-        return ((BitmapImageData)imageData).BitmapImage;
-    }
-
-    public BitmapImage LoadBitmapHeicImageFromPath()
-    {
-        if (CurrentAsset == null)
+        using (IImageData imageData =
+               _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation))
         {
-            throw new NullReferenceException("CurrentAsset is null");
+            return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Jpeg) ?? new BitmapImage();
         }
-
-        IImageData imageData = _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath,
-            CurrentAsset.ImageRotation);
-        return ((BitmapImageData)imageData).BitmapImage;
     }
 
     public void CalculateGlobalAssetsCounter()

@@ -5,11 +5,11 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
 1. Phase 1 - Remove WPF Types from Non-UI Layers
    - 1.1 Replace Rotation enum everywhere — **DONE**
    - 1.2 Replace BitmapImage in Domain interfaces — **DONE**
-   - 1.3 Rewrite BitmapHelper.cs with SkiaSharp
-   - 1.4 Rewrite ExifHelper.cs EXIF reading (unify on Magick.NET)
-   - 1.5 Remove System.Drawing usage
-   - 1.6 Remove WPF GlobalUsings from non-UI projects
-   - 1.7 Update remaining test files
+   - 1.3 Rewrite BitmapHelper.cs with SkiaSharp — **DONE**
+   - 1.4 Rewrite ExifHelper.cs EXIF reading (unify on SkiaSharp) — **DONE**
+   - 1.5 Remove System.Drawing usage — **DONE**
+   - 1.6 Remove WPF GlobalUsings from non-UI projects — **DONE**
+   - 1.7 Update remaining test files — **DONE**
 
 2. Phase 2 - Replace Windows-Specific Infrastructure
    - 2.1 FFmpeg cross-platform distribution

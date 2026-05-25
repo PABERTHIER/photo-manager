@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using SkiaSharp;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 
@@ -43,28 +44,32 @@ public class ImageProcessingServiceTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService.IsValidImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -74,7 +79,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
@@ -85,7 +91,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -100,14 +106,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetJpegBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetJpegBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
-            _imageProcessingService!.GetJpegBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -131,28 +136,32 @@ public class ImageProcessingServiceTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -162,7 +171,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
@@ -173,7 +183,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -188,14 +198,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetPngBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetPngBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception =
-            Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetPngBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -219,28 +228,32 @@ public class ImageProcessingServiceTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        BitmapImageData image = new(new(new(filePath)));
 
-        byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+                Directory.CreateDirectory(destinationNewFileDirectory);
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -250,7 +263,8 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        BitmapImageData image = (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, ImageRotation.Rotation0, 100, 100);
+        using IImageData image =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
 
         byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
@@ -261,7 +275,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -276,14 +290,13 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetGifBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    public void GetGifBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        BitmapImageData image = new(new());
+        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
 
-        InvalidOperationException? exception =
-            Assert.Throws<InvalidOperationException>(() => _imageProcessingService!.GetGifBitmapImage(image));
+        byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
-        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
+        Assert.That(imageBuffer, Is.Empty);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -306,13 +319,12 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_8_JPEG)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
-    [TestCase(FileNames.IMAGE_11_HEIC)]
-    public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
+    public void IsValidImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = _imageProcessingService!.IsValidGdiPlusImage(validImageData);
+        bool result = _imageProcessingService!.IsValidImage(validImageData);
 
         Assert.That(result, Is.True);
 
@@ -320,17 +332,52 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void IsValidGdiPlusImage_EmptyImageData_ReturnsFalse()
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    public void IsValidImage_UnsupportedFormat_ReturnsFalse(string fileName)
     {
-        byte[] emptyHeicData = [];
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = _imageProcessingService!.IsValidGdiPlusImage(emptyHeicData);
+        bool result = _imageProcessingService!.IsValidImage(validImageData);
 
         Assert.That(result, Is.False);
 
-        _testLogger!.AssertLogExceptions(
-            [new Exception("No imaging component suitable to complete this operation was found.")],
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_NullBuffer_ReturnsFalse()
+    {
+        bool result = _imageProcessingService!.IsValidImage(null!);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([new Exception("Value cannot be null. (Parameter 'buffer')")],
             typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_InvalidBuffer_ReturnsFalse()
+    {
+        byte[] buffer = "not an image"u8.ToArray();
+
+        bool result = _imageProcessingService!.IsValidImage(buffer);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_EmptyBuffer_ReturnsFalse()
+    {
+        byte[] emptyBuffer = [];
+
+        bool result = _imageProcessingService!.IsValidImage(emptyBuffer);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -373,74 +420,75 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_JPG, "")]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageRotation.Rotate90, ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageRotation.Rotate180, ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, ImageRotation.Rotate270, ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
-    [TestCase(FileNames.IMAGE_2_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_2_JPG, "")]
-    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
-    [TestCase(FileNames.IMAGE_3_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_3_JPG, "")]
-    [TestCase(FileNames.IMAGE_4_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_4_JPG, "")]
-    [TestCase(FileNames.IMAGE_5_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_5_JPG, "")]
-    [TestCase(FileNames.IMAGE_6_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_6_JPG, "")]
-    [TestCase(FileNames.IMAGE_7_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_7_JPG, "")]
-    [TestCase(FileNames.IMAGE_8_JPEG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_8_JPEG, "")]
-    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_9_PNG, "")]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
-    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG,
+    [TestCase(FileNames.IMAGE_2_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_JPG, "")]
+    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+    [TestCase(FileNames.IMAGE_3_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_3_JPG, "")]
+    [TestCase(FileNames.IMAGE_4_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_4_JPG, "")]
+    [TestCase(FileNames.IMAGE_5_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_5_JPG, "")]
+    [TestCase(FileNames.IMAGE_6_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_6_JPG, "")]
+    [TestCase(FileNames.IMAGE_7_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_7_JPG, "")]
+    [TestCase(FileNames.IMAGE_8_JPEG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_8_JPEG, "")]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_PNG, "")]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageRotation.Rotate0,
+        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG,
         "")]
-    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotation0, ImageByteSizes.HOMER_GIF, "")]
-    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
+    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotate0, ImageByteSizes.HOMER_GIF, "")]
+    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
+    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_BOTTOM_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_TOP_PART_JPG,
+    [TestCase(FileNames._1336_TOP_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_1_K_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_1_K_JPG,
+    [TestCase(FileNames._1336_1_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_1_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_2_K_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_2_K_JPG,
+    [TestCase(FileNames._1336_2_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_2_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_3_K_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_3_K_JPG,
+    [TestCase(FileNames._1336_3_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_3_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_8_K_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_8_K_JPG,
+    [TestCase(FileNames._1336_8_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_8_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageRotation.Rotation0, ImageByteSizes._1336_THUMBNAIL_JPG,
+    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_THUMBNAIL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1336_MINI_JPG,
+    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_MINI_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
+    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageRotation.Rotation0, ImageByteSizes.IMAGE_1336_SMALL_JPG,
+    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_SMALL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames._1337_JPG, ImageRotation.Rotation0, ImageByteSizes._1337_JPG,
+    [TestCase(FileNames._1337_JPG, ImageRotation.Rotate0, ImageByteSizes._1337_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
-    [TestCase(FileNames._1349_JPG, ImageRotation.Rotation0, ImageByteSizes._1349_JPG,
+    [TestCase(FileNames._1349_JPG, ImageRotation.Rotate0, ImageByteSizes._1349_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1350_JPG, ImageRotation.Rotation0, ImageByteSizes._1350_JPG,
+    [TestCase(FileNames._1350_JPG, ImageRotation.Rotate0, ImageByteSizes._1350_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1413_JPG, ImageRotation.Rotation0, ImageByteSizes._1413_JPG,
+    [TestCase(FileNames._1413_JPG, ImageRotation.Rotate0, ImageByteSizes._1413_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1414_JPG, ImageRotation.Rotation0, ImageByteSizes._1414_JPG,
+    [TestCase(FileNames._1414_JPG, ImageRotation.Rotate0, ImageByteSizes._1414_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
     [TestCase(FileNames._1415_JPG, ImageRotation.Rotate270, ImageByteSizes._1415_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
@@ -457,17 +505,12 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        int expectedThumbnailWidth =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailHeight : thumbnailWidth;
-        int expectedThumbnailHeight =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : thumbnailHeight;
-
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(expectedThumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(expectedThumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
         byte[] imageBuffer;
@@ -492,11 +535,11 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotation0, ImageByteSizes.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotate0, ImageByteSizes.IMAGE_11_HEIC)]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageByteSizes.IMAGE_11_90_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, ImageByteSizes.IMAGE_11_180_DEG_HEIC)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, ImageByteSizes.IMAGE_11_270_DEG_HEIC)]
-    public void LoadBitmapHeicThumbnailImage_ValidImage_ReturnsValidBitmapImage(
+    public void LoadBitmapThumbnailImage_HeicValidImage_ReturnsValidBitmapImage(
         string fileName, ImageRotation rotation, int imageByteSize)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
@@ -505,17 +548,19 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
+        // With preserve-orientation, rotation is applied manually via SkiaSharp.
+        // 90°/270° rotations swap dimensions → landscape (4032×3024) → fits 200×150
+        // 0°/180° keep portrait (3024×4032) → fits 113×150
         int expectedThumbnailWidth =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailHeight : 113;
-        int expectedThumbnailHeight =
-            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? 113 : thumbnailHeight;
+            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : 113;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapHeicThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth,
+                thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(expectedThumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(expectedThumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(expectedThumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(thumbnailImage);
 
@@ -525,81 +570,81 @@ public class ImageProcessingServiceTests
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
-    // TODO: Because the rotation is not used, it impacts the ImageByteSizes for the rotated images
-    // TODO: Because the Heic needs another type of loading, it doubles the ImageByteSizes value
     [Test]
-    [TestCase(FileNames.IMAGE_1_JPG, ImageByteSizes.IMAGE_1_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, 2534, "")]
-    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
-    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 2534, "")]
-    [TestCase(FileNames.IMAGE_2_JPG, ImageByteSizes.IMAGE_2_JPG, "")]
-    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
-    [TestCase(FileNames.IMAGE_3_JPG, ImageByteSizes.IMAGE_3_JPG, "")]
-    [TestCase(FileNames.IMAGE_4_JPG, ImageByteSizes.IMAGE_4_JPG, "")]
-    [TestCase(FileNames.IMAGE_5_JPG, ImageByteSizes.IMAGE_5_JPG, "")]
-    [TestCase(FileNames.IMAGE_6_JPG, ImageByteSizes.IMAGE_6_JPG, "")]
-    [TestCase(FileNames.IMAGE_7_JPG, ImageByteSizes.IMAGE_7_JPG, "")]
-    [TestCase(FileNames.IMAGE_8_JPEG, ImageByteSizes.IMAGE_8_JPEG, "")]
-    [TestCase(FileNames.IMAGE_9_PNG, ImageByteSizes.IMAGE_9_PNG, "")]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
-    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
-    [TestCase(FileNames.HOMER_GIF, ImageByteSizes.HOMER_GIF, "")]
-    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
+    [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, ImageRotation.Rotate90, ImageByteSizes.IMAGE_1_90_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, ImageRotation.Rotate180, ImageByteSizes.IMAGE_1_180_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, ImageRotation.Rotate270, ImageByteSizes.IMAGE_1_270_DEG_JPG, "")]
+    [TestCase(FileNames.IMAGE_2_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_JPG, "")]
+    [TestCase(FileNames.IMAGE_2_DUPLICATED_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_2_DUPLICATED_JPG, "")]
+    [TestCase(FileNames.IMAGE_3_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_3_JPG, "")]
+    [TestCase(FileNames.IMAGE_4_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_4_JPG, "")]
+    [TestCase(FileNames.IMAGE_5_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_5_JPG, "")]
+    [TestCase(FileNames.IMAGE_6_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_6_JPG, "")]
+    [TestCase(FileNames.IMAGE_7_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_7_JPG, "")]
+    [TestCase(FileNames.IMAGE_8_JPEG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_8_JPEG, "")]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_PNG, "")]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_10_PORTRAIT_PNG, "")]
+    [TestCase(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ImageRotation.Rotate0,
+        ImageByteSizes.IMAGE_WITH_UPPERCASE_NAME_JPG, "")]
+    [TestCase(FileNames.HOMER_GIF, ImageRotation.Rotate0, ImageByteSizes.HOMER_GIF, "")]
+    [TestCase(FileNames.IMAGE_1_DUPLICATE_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1_DUPLICATE_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
+    [TestCase(FileNames.IMAGE_9_DUPLICATE_PNG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_9_DUPLICATE_PNG,
         $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}")]
-    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageByteSizes._1336_BOTTOM_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_BOTTOM_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_BOTTOM_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageByteSizes._1336_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageByteSizes._1336_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageByteSizes._1336_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_LEFT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_LEFT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_PART_JPG, ImageByteSizes._1336_TOP_PART_JPG,
+    [TestCase(FileNames._1336_TOP_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
+    [TestCase(FileNames._1336_TOP_RIGHT_PART_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_TOP_RIGHT_PART_JPG,
         $"{Directories.DUPLICATES}\\{Directories.PART}")]
-    [TestCase(FileNames._1336_1_K_JPG, ImageByteSizes._1336_1_K_JPG,
+    [TestCase(FileNames._1336_1_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_1_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_2_K_JPG, ImageByteSizes._1336_2_K_JPG,
+    [TestCase(FileNames._1336_2_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_2_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_3_K_JPG, ImageByteSizes._1336_3_K_JPG,
+    [TestCase(FileNames._1336_3_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_3_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
+    [TestCase(FileNames._1336_4_K_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_4_K_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_8_K_JPG, ImageByteSizes._1336_8_K_JPG,
+    [TestCase(FileNames._1336_8_K_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_8_K_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageByteSizes._1336_THUMBNAIL_JPG,
+    [TestCase(FileNames._1336_THUMBNAIL_JPG, ImageRotation.Rotate0, ImageByteSizes._1336_THUMBNAIL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.RESOLUTION}")]
-    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageByteSizes.IMAGE_1336_MINI_JPG,
+    [TestCase(FileNames.IMAGE_1336_MINI_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_MINI_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
+    [TestCase(FileNames.IMAGE_1336_ORIGINAL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_ORIGINAL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
+    [TestCase(FileNames.IMAGE_1336_SHIT_QUALITY_JPG, ImageRotation.Rotate0,
+        ImageByteSizes.IMAGE_1336_SHIT_QUALITY_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageByteSizes.IMAGE_1336_SMALL_JPG,
+    [TestCase(FileNames.IMAGE_1336_SMALL_JPG, ImageRotation.Rotate0, ImageByteSizes.IMAGE_1336_SMALL_JPG,
         $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}")]
-    [TestCase(FileNames._1337_JPG, ImageByteSizes._1337_JPG,
+    [TestCase(FileNames._1337_JPG, ImageRotation.Rotate0, ImageByteSizes._1337_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}")]
-    [TestCase(FileNames._1349_JPG, ImageByteSizes._1349_JPG,
+    [TestCase(FileNames._1349_JPG, ImageRotation.Rotate0, ImageByteSizes._1349_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1350_JPG, ImageByteSizes._1350_JPG,
+    [TestCase(FileNames._1350_JPG, ImageRotation.Rotate0, ImageByteSizes._1350_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}")]
-    [TestCase(FileNames._1413_JPG, ImageByteSizes._1413_JPG,
+    [TestCase(FileNames._1413_JPG, ImageRotation.Rotate0, ImageByteSizes._1413_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1414_JPG, ImageByteSizes._1414_JPG,
+    [TestCase(FileNames._1414_JPG, ImageRotation.Rotate0, ImageByteSizes._1414_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    [TestCase(FileNames._1415_JPG, 8259,
+    [TestCase(FileNames._1415_JPG, ImageRotation.Rotate270, ImageByteSizes._1415_JPG,
         $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}")]
-    public void LoadBitmapThumbnailImage_WithoutRotationAndValidImage_ReturnsValidBitmapImage(
-        string fileName, int imageByteSize, string additionalPath)
+    public void LoadBitmapThumbnailImage_StoredThumbnailWithRotation_ReturnsValidBitmapImage(
+        string fileName, ImageRotation rotation, int imageByteSize, string additionalPath)
     {
         string folderPath = string.IsNullOrEmpty(additionalPath)
             ? _assetsDirectory!
@@ -611,12 +656,12 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(thumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(thumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(thumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
         byte[] imageBuffer;
@@ -645,12 +690,12 @@ public class ImageProcessingServiceTests
     // slightly different decoded pixel data, leading to different JPEG re-encoding sizes (~1% variance).
     // A 2% tolerance accommodates codec differences while still catching genuine encoding regressions.
     [Test]
-    [TestCase(FileNames.IMAGE_11_HEIC, 10275)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 10595)]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 10086)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 10914)]
-    public void LoadBitmapThumbnailImage_WithoutRotationAndValidHeicImage_ReturnsValidBitmapImage(
-        string fileName, int expectedByteSize)
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotate0, ImageByteSizes.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageByteSizes.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, ImageRotation.Rotate180, ImageByteSizes.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, ImageRotation.Rotate270, ImageByteSizes.IMAGE_11_270_DEG_HEIC)]
+    public void LoadBitmapThumbnailImage_StoredHeicThumbnailWithRotation_ReturnsValidBitmapImage(
+        string fileName, ImageRotation rotation, int expectedByteSize)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -658,17 +703,20 @@ public class ImageProcessingServiceTests
         int thumbnailWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
         int thumbnailHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        BitmapImageData thumbnailImage =
-            (BitmapImageData)_imageProcessingService!.LoadBitmapThumbnailImage(buffer, thumbnailWidth, thumbnailHeight);
+        int expectedThumbnailWidth =
+            rotation is ImageRotation.Rotate90 or ImageRotation.Rotate270 ? thumbnailWidth : 113;
+
+        using IImageData thumbnailImage =
+            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, rotation, thumbnailWidth, thumbnailHeight);
 
         Assert.That(thumbnailImage, Is.Not.Null);
-        Assert.That(thumbnailImage.BitmapImage.PixelWidth, Is.EqualTo(thumbnailWidth));
-        Assert.That(thumbnailImage.BitmapImage.PixelHeight, Is.EqualTo(thumbnailHeight));
+        Assert.That(thumbnailImage.Width, Is.EqualTo(expectedThumbnailWidth));
+        Assert.That(thumbnailImage.Height, Is.EqualTo(thumbnailHeight));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(thumbnailImage);
 
         Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer.Length, Is.EqualTo(expectedByteSize).Within(2).Percent);
+        Assert.That(imageBuffer, Has.Length.EqualTo(expectedByteSize).Within(2).Percent);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -677,15 +725,13 @@ public class ImageProcessingServiceTests
     {
         try
         {
-            using (Image.FromFile(filePath))
+            using (SKCodec? codec = SKCodec.Create(filePath))
             {
-                // The image is successfully loaded; consider it valid
-                return true;
+                return codec != null;
             }
         }
         catch (Exception)
         {
-            // An exception occurred while loading the image; consider it invalid
             return false;
         }
     }

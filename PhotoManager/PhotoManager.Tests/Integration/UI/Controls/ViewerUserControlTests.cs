@@ -3,6 +3,7 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -70,7 +71,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -95,7 +96,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -128,7 +129,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -157,7 +158,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -202,7 +203,8 @@ public class ViewerUserControlTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -470,7 +472,7 @@ public class ViewerUserControlTests
         BitmapImage? bitmapImage = ShowImage();
 
         Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
+        Assert.That(bitmapImage.StreamSource, Is.Not.Null);
         Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
@@ -621,7 +623,7 @@ public class ViewerUserControlTests
         BitmapImage? bitmapImage = ShowImage();
 
         Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
+        Assert.That(bitmapImage.StreamSource, Is.Not.Null);
         Assert.That(bitmapImage.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(_asset1.ImageRotation)));
         Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
         Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
@@ -953,12 +955,7 @@ public class ViewerUserControlTests
 
         if (_applicationViewModel is { CurrentAsset: not null })
         {
-            bool isHeic =
-                _applicationViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
-
-            bitmapImage = isHeic
-                ? _applicationViewModel.LoadBitmapHeicImageFromPath()
-                : _applicationViewModel.LoadBitmapImageFromPath();
+            bitmapImage = _applicationViewModel.LoadBitmapImageFromPath();
         }
 
         return bitmapImage;

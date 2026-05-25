@@ -3,15 +3,11 @@
 public interface IImageProcessingService
 {
     IImageData LoadBitmapThumbnailImage(byte[] buffer, ImageRotation rotation, int width, int height);
-    IImageData LoadBitmapThumbnailImage(byte[] buffer, int width, int height);
     IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation);
-    IImageData LoadBitmapHeicOriginalImage(byte[] imageBytes, ImageRotation rotation);
-    IImageData LoadBitmapHeicThumbnailImage(byte[] buffer, ImageRotation rotation, int width, int height);
-    IImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation);
     byte[] GetJpegBitmapImage(IImageData thumbnailImage);
     byte[] GetPngBitmapImage(IImageData thumbnailImage);
     byte[] GetGifBitmapImage(IImageData thumbnailImage);
     (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation);
-    bool IsValidGdiPlusImage(byte[] imageData);
+    bool IsValidImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);
 }

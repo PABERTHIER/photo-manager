@@ -67,7 +67,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -92,7 +92,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -125,7 +125,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -154,7 +154,7 @@ public class ApplicationViewModelSetAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -199,7 +199,8 @@ public class ApplicationViewModelSetAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -330,10 +331,10 @@ public class ApplicationViewModelSetAssetsTests
         _asset3 = _asset3!.WithFolder(folder);
         _asset4 = _asset4!.WithFolder(folder);
 
-        _asset1.ImageData = new BitmapImageData(new());
-        _asset2.ImageData = new BitmapImageData(new());
-        _asset3.ImageData = new BitmapImageData(new());
-        _asset4.ImageData = new BitmapImageData(new());
+        _asset1.ImageData = SkiaImageData.Empty();
+        _asset2.ImageData = SkiaImageData.Empty();
+        _asset3.ImageData = SkiaImageData.Empty();
+        _asset4.ImageData = SkiaImageData.Empty();
 
         const string expectedStatusMessage = "The catalog process has ended.";
         string expectedAppTitle =

@@ -173,7 +173,7 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
         FolderId = Guid.NewGuid(),
         Folder = new() { Id = Guid.Empty, Path = "" },
         FileName = fileName,
-        ImageRotation = ImageRotation.Rotation0,
+        ImageRotation = ImageRotation.Rotate0,
         Pixel = new()
         {
             Asset = new() { Width = 1920, Height = 1080 },

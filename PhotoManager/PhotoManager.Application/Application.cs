@@ -58,8 +58,10 @@ public class Application(
 
     public void LoadThumbnail(Asset asset)
     {
-        asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width,
-            asset.Pixel.Thumbnail.Height);
+        IImageData? imageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName,
+            asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+        asset.ImageData?.Dispose();
+        asset.ImageData = imageData;
     }
 
     public Folder[] GetSubFolders(Folder parentFolder) => assetRepository.GetSubFolders(parentFolder);
@@ -83,9 +85,6 @@ public class Application(
     // ImageProcessingService
     public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation) =>
         imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
-
-    public IImageData LoadBitmapHeicImageFromPath(string imagePath, ImageRotation rotation) =>
-        imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
     // FileOperationsService
     public bool FileExists(string fullPath) => fileOperationsService.FileExists(fullPath);

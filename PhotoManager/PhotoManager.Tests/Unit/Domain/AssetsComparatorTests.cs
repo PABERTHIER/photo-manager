@@ -36,7 +36,7 @@ public class AssetsComparatorTests
             FolderId = new("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
             Folder = new() { Id = Guid.Empty, Path = "" },
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -83,7 +83,7 @@ public class AssetsComparatorTests
             },
             FileProperties = new() { Size = FileSize.HOMER_GIF },
             ThumbnailCreationDateTime = _oldDateTime1,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
@@ -107,7 +107,7 @@ public class AssetsComparatorTests
             },
             FileProperties = new() { Size = FileSize.IMAGE_11_HEIC },
             ThumbnailCreationDateTime = _oldDateTime2,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {

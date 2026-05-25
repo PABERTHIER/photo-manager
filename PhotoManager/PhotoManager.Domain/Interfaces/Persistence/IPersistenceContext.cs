@@ -25,6 +25,15 @@ public interface IPersistenceContext
     ISyncDefinitionsPersistence SyncDefinitions { get; }
     IConfigurationPersistence Configuration { get; }
 
+    /// <summary>Inserts or updates one asset and its thumbnail atomically.</summary>
+    void UpsertAssetWithThumbnail(Asset asset, byte[] thumbnailData);
+
+    /// <summary>Deletes one asset and its thumbnail atomically.</summary>
+    void DeleteAssetWithThumbnail(Guid folderId, string fileName);
+
+    /// <summary>Deletes one folder, its assets, and their thumbnails atomically.</summary>
+    void DeleteFolderWithAssetsAndThumbnails(Guid folderId);
+
     /// <summary>
     /// Reclaims free pages in the database file, reducing its on-disk footprint.
     /// Must not be called inside a transaction.

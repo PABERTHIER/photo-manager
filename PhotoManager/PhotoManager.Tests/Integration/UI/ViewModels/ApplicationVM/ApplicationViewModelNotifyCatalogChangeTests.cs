@@ -81,7 +81,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -106,7 +106,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -139,7 +139,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -168,7 +168,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -201,7 +201,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
             Metadata = new()
             {
@@ -226,7 +226,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -251,7 +251,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
@@ -276,7 +276,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
@@ -309,7 +309,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotation0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_DUPLICATED_JPG,
             Metadata = new()
             {
@@ -350,7 +350,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -10563,10 +10564,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
 
-        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        // Deleted assets release ImageData immediately; only the remaining visible assets keep their loaded thumbnails.
         if (string.Equals(catalogChange.Asset!.Folder.Path, currentDirectory))
         {
-            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else
