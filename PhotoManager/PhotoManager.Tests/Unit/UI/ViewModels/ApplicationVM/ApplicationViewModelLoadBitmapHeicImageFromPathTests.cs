@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;

@@ -394,7 +394,7 @@ This is the most complex change. Current `BitmapHelper` creates WPF `BitmapImage
 | `GifBitmapEncoder` | `SKImage.Encode(SKEncodedImageFormat.Gif, 100)` |
 | `BitmapFrame.Create(image)` | `SKImage.FromBitmap(bitmap)` |
 
-#### 1.4 Rewrite `ExifHelper.cs` EXIF Reading
+#### 1.4 Rewrite `ExifHelper.cs` EXIF Reading **DONE**
 
 | Current WPF API | Replacement |
 |-----------------|-------------|
@@ -410,7 +410,7 @@ ushort orientation = exifProfile?.GetValue(ExifTag.Orientation)?.Value ?? 1;
 return MapOrientationToRotation(orientation);
 ```
 
-#### 1.5 Remove `System.Drawing` Usage
+#### 1.5 Remove `System.Drawing` Usage **DONE**
 
 `BitmapHelper.LoadBitmapFromPath()` and `IsValidGdiPlusImage()` use `System.Drawing.Bitmap`.
 
@@ -418,7 +418,7 @@ return MapOrientationToRotation(orientation);
 - `new Bitmap(stream)` → `SKBitmap.Decode(stream)`
 - Validation → check if `SKCodec.Create(stream)` returns non-null
 
-#### 1.6 Remove WPF Global Usings
+#### 1.6 Remove WPF Global Usings **DONE**
 
 After all replacements are complete:
 
@@ -436,7 +436,7 @@ After all replacements are complete:
 - global using System.Windows.Media.Imaging;
 ```
 
-#### 1.7 Update Tests (~50-70 Files)
+#### 1.7 Update Tests (~50-70 Files) **DONE**
 
 | Test Category | Change Required |
 |---------------|----------------|

@@ -8,6 +8,6 @@ public interface IImageProcessingService
     byte[] GetPngBitmapImage(IImageData thumbnailImage);
     byte[] GetGifBitmapImage(IImageData thumbnailImage);
     (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation);
-    bool IsValidGdiPlusImage(byte[] imageData);
+    bool IsValidImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);
 }

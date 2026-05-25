@@ -1,4 +1,4 @@
-﻿using System.Drawing.Imaging;
+﻿using SkiaSharp;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 
@@ -43,13 +43,6 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 8)]
     [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 1)]
-    [TestCase(FileNames.IMAGE_11_HEIC, 1)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC,
-        1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
@@ -66,14 +59,33 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
+    [TestCase(FileNames.HOMER_GIF)] // GIF has no EXIF orientation data, returns defaultExifOrientation
+    public void GetExifOrientation_FormatWithoutExifData_ReturnsDefaultOrientation(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(
             buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation, _testLogger!);
+
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.DefaultExifOrientation));
+
+        _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC)]
+    public void GetExifOrientation_UnsupportedFormat_ReturnsCorruptedOrientationValue(string fileName)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        ushort orientation = ExifHelper.GetExifOrientation(buffer,
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation, _testLogger!);
 
@@ -94,9 +106,7 @@ public class ExifHelperTests
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
 
-        _testLogger!.AssertLogExceptions(
-            [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
-            typeof(ExifHelperTests));
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")], typeof(ExifHelperTests));
     }
 
     [Test]
@@ -128,29 +138,31 @@ public class ExifHelperTests
 
         Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
 
-        _testLogger!.AssertLogExceptions(
-            [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
-            typeof(ExifHelperTests));
+        _testLogger!.AssertLogExceptions([new Exception("The image is corrupted")], typeof(ExifHelperTests));
     }
 
     [Test]
-    public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
+    public void GetExifOrientation_FormatWithoutExifMetadata_ReturnsDefaultOrientationValue()
     {
-        Bitmap image = new(10, 10);
-
-        using (MemoryStream ms = new())
+        using (SKBitmap bitmap = new(10, 10))
         {
-            image.Save(ms, ImageFormat.Bmp); // Save as BMP to create an invalid format for JPEG
-            byte[] buffer = ms.ToArray(); // Buffer with invalid Exif Metadata (Metadata null)
+            using (SKImage image = SKImage.FromBitmap(bitmap))
+            {
+                using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    byte[] buffer = data.ToArray();
 
-            ushort orientation = ExifHelper.GetExifOrientation(
-                buffer,
-                _userConfigurationService!.AssetSettings.DefaultExifOrientation,
-                _userConfigurationService!.AssetSettings.CorruptedImageOrientation, _testLogger!);
+                    ushort orientation = ExifHelper.GetExifOrientation(
+                        buffer,
+                        _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+                        _userConfigurationService!.AssetSettings.CorruptedImageOrientation, _testLogger!);
 
-            Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
+                    Assert.That(orientation,
+                        Is.EqualTo(_userConfigurationService!.AssetSettings.DefaultExifOrientation));
 
-            _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
+                    _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
+                }
+            }
         }
     }
 
@@ -268,13 +280,12 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_8_JPEG)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
-    [TestCase(FileNames.IMAGE_11_HEIC)]
-    public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
+    public void IsValidImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = ExifHelper.IsValidGdiPlusImage(validImageData, _testLogger!);
+        bool result = ExifHelper.IsValidImage(validImageData, _testLogger!);
 
         Assert.That(result, Is.True);
 
@@ -282,17 +293,52 @@ public class ExifHelperTests
     }
 
     [Test]
-    public void IsValidGdiPlusImage_EmptyImageData_ReturnsFalse()
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    public void IsValidImage_UnsupportedFormat_ReturnsFalse(string fileName)
     {
-        byte[] emptyHeicData = [];
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = ExifHelper.IsValidGdiPlusImage(emptyHeicData, _testLogger!);
+        bool result = ExifHelper.IsValidImage(validImageData, _testLogger!);
 
         Assert.That(result, Is.False);
 
-        _testLogger!.AssertLogExceptions(
-            [new NotSupportedException("No imaging component suitable to complete this operation was found.")],
+        _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
+    }
+
+    [Test]
+    public void IsValidImage_NullBuffer_ReturnsFalse()
+    {
+        bool result = ExifHelper.IsValidImage(null!, _testLogger!);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([new Exception("Value cannot be null. (Parameter 'buffer')")],
             typeof(ExifHelperTests));
+    }
+
+    [Test]
+    public void IsValidImage_InvalidBuffer_ReturnsFalse()
+    {
+        byte[] buffer = "not an image"u8.ToArray();
+
+        bool result = ExifHelper.IsValidImage(buffer, _testLogger!);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
+    }
+
+    [Test]
+    public void IsValidImage_EmptyBuffer_ReturnsFalse()
+    {
+        byte[] emptyBuffer = [];
+
+        bool result = ExifHelper.IsValidImage(emptyBuffer, _testLogger!);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ExifHelperTests));
     }
 
     [Test]

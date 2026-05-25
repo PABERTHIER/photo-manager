@@ -39,32 +39,4 @@ internal static class Shared
 
         return [.. JpgFileNames.Select(f => File.ReadAllBytes(Path.Combine(testFilesDir, f)))];
     }
-
-    internal static T RunOnStaThread<T>(Func<T> func)
-    {
-        T result = default!;
-        Exception? exception = null;
-
-        Thread thread = new(() =>
-        {
-            try
-            {
-                result = func();
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-        });
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
-
-        if (exception != null)
-        {
-            throw exception;
-        }
-
-        return result;
-    }
 }

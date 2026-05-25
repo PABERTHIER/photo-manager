@@ -36,9 +36,9 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
         return BitmapHelper.GetImageDimensions(buffer, rotation, logger);
     }
 
-    public bool IsValidGdiPlusImage(byte[] imageData)
+    public bool IsValidImage(byte[] imageData)
     {
-        return ExifHelper.IsValidGdiPlusImage(imageData, logger);
+        return ExifHelper.IsValidImage(imageData, logger);
     }
 
     public bool IsValidHeic(byte[] imageData)

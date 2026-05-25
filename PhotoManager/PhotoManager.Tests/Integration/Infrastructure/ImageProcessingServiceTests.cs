@@ -1,4 +1,5 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using SkiaSharp;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 
@@ -56,7 +57,7 @@ public class ImageProcessingServiceTests
 
             try
             {
-                Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Assert.That(_imageProcessingService.IsValidImage(imageBuffer), Is.True);
                 Directory.CreateDirectory(destinationNewFileDirectory);
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
@@ -90,7 +91,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -148,7 +149,7 @@ public class ImageProcessingServiceTests
 
             try
             {
-                Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
                 Directory.CreateDirectory(destinationNewFileDirectory);
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
@@ -182,7 +183,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -240,7 +241,7 @@ public class ImageProcessingServiceTests
 
             try
             {
-                Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
                 Directory.CreateDirectory(destinationNewFileDirectory);
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
@@ -274,7 +275,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService!.IsValidGdiPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -318,13 +319,12 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_8_JPEG)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
-    [TestCase(FileNames.IMAGE_11_HEIC)]
-    public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
+    public void IsValidImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = _imageProcessingService!.IsValidGdiPlusImage(validImageData);
+        bool result = _imageProcessingService!.IsValidImage(validImageData);
 
         Assert.That(result, Is.True);
 
@@ -332,17 +332,52 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void IsValidGdiPlusImage_EmptyImageData_ReturnsFalse()
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    public void IsValidImage_UnsupportedFormat_ReturnsFalse(string fileName)
     {
-        byte[] emptyHeicData = [];
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = _imageProcessingService!.IsValidGdiPlusImage(emptyHeicData);
+        bool result = _imageProcessingService!.IsValidImage(validImageData);
 
         Assert.That(result, Is.False);
 
-        _testLogger!.AssertLogExceptions(
-            [new Exception("No imaging component suitable to complete this operation was found.")],
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_NullBuffer_ReturnsFalse()
+    {
+        bool result = _imageProcessingService!.IsValidImage(null!);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([new Exception("Value cannot be null. (Parameter 'buffer')")],
             typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_InvalidBuffer_ReturnsFalse()
+    {
+        byte[] buffer = "not an image"u8.ToArray();
+
+        bool result = _imageProcessingService!.IsValidImage(buffer);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void IsValidImage_EmptyBuffer_ReturnsFalse()
+    {
+        byte[] emptyBuffer = [];
+
+        bool result = _imageProcessingService!.IsValidImage(emptyBuffer);
+
+        Assert.That(result, Is.False);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
     [Test]
@@ -690,15 +725,13 @@ public class ImageProcessingServiceTests
     {
         try
         {
-            using (Image.FromFile(filePath))
+            using (SKCodec? codec = SKCodec.Create(filePath))
             {
-                // The image is successfully loaded; consider it valid
-                return true;
+                return codec != null;
             }
         }
         catch (Exception)
         {
-            // An exception occurred while loading the image; consider it invalid
             return false;
         }
     }

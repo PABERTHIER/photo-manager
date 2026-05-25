@@ -1,6 +1,7 @@
 ﻿using PhotoManager.UI.Models;
 using SkiaSharp;
 using System.Globalization;
+using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Tests.Unit.UI.Converters;
 

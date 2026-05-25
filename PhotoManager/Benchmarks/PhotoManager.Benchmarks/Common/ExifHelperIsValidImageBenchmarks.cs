@@ -5,13 +5,10 @@ namespace PhotoManager.Benchmarks.Common;
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
-public class ExifHelperGetExifOrientationBenchmarks
+public class ExifHelperIsValidImageBenchmarks
 {
     private byte[][] _imageBuffers = null!;
     private ILogger _logger = null!;
-
-    private const ushort DEFAULT_EXIF_ORIENTATION = 1;
-    private const ushort CORRUPTED_IMAGE_ORIENTATION = 0;
 
     [GlobalSetup]
     public void Setup()
@@ -21,17 +18,13 @@ public class ExifHelperGetExifOrientationBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public ushort[] Current_SkiaSharp()
+    public bool[] Current_SkiaSharp()
     {
-        ushort[] results = new ushort[_imageBuffers.Length];
+        bool[] results = new bool[_imageBuffers.Length];
 
         for (int i = 0; i < _imageBuffers.Length; i++)
         {
-            results[i] = ExifHelper.GetExifOrientation(
-                _imageBuffers[i],
-                DEFAULT_EXIF_ORIENTATION,
-                CORRUPTED_IMAGE_ORIENTATION,
-                _logger);
+            results[i] = ExifHelper.IsValidImage(_imageBuffers[i], _logger);
         }
 
         return results;

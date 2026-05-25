@@ -975,7 +975,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
@@ -1008,7 +1008,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
@@ -1066,7 +1066,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
@@ -1100,7 +1100,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
@@ -1164,7 +1164,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
@@ -1203,7 +1203,7 @@ public class BitmapHelperTests
 
         try
         {
-            Assert.That(ExifHelper.IsValidGdiPlusImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
                 Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
@@ -1461,15 +1461,13 @@ public class BitmapHelperTests
     {
         try
         {
-            using (Image.FromFile(filePath))
+            using (SKCodec? codec = SKCodec.Create(filePath))
             {
-                // The image is successfully loaded; consider it valid
-                return true;
+                return codec != null;
             }
         }
         catch (Exception)
         {
-            // An exception occurred while loading the image; consider it invalid
             return false;
         }
     }

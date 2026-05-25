@@ -1,6 +1,6 @@
 ﻿using ImageMagick;
 using Microsoft.Extensions.Logging;
-using System.Windows.Media.Imaging;
+using SkiaSharp;
 
 namespace PhotoManager.Common;
 
@@ -17,35 +17,28 @@ public static class ExifHelper
         {
             using (MemoryStream stream = new(buffer))
             {
-                BitmapDecoder decoder = BitmapDecoder.Create(
-                    stream,
-                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
-                    BitmapCacheOption.None);
-
-                if (decoder.Frames[0].Metadata is BitmapMetadata bitmapMetadata)
+                using (SKCodec? codec = SKCodec.Create(stream))
                 {
-                    object? orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
+                    if (codec == null)
+                    {
+                        logger.LogError("The image is corrupted");
+                        return corruptedImageOrientation;
+                    }
 
-                    if (orientation == null)
+                    SKEncodedOrigin origin = codec.EncodedOrigin;
+
+                    if (origin == SKEncodedOrigin.Default)
                     {
                         return defaultExifOrientation;
                     }
 
-                    return (ushort)orientation;
+                    return (ushort)origin;
                 }
             }
         }
         catch (Exception ex)
         {
-            // All WPF/WIC NotSupportedExceptions always include a COMException as InnerException
-            if (ex is NotSupportedException && ex.InnerException!.HResult == -2003292351)
-            {
-                logger.LogError("The image is corrupted");
-            }
-            else
-            {
-                logger.LogError(ex, "{ExMessage}", ex.Message);
-            }
+            logger.LogError(ex, "{ExMessage}", ex.Message);
         }
 
         return corruptedImageOrientation;
@@ -106,19 +99,17 @@ public static class ExifHelper
         return rotation;
     }
 
-    public static bool IsValidGdiPlusImage(byte[] imageData, ILogger logger)
+    public static bool IsValidImage(byte[] imageData, ILogger logger)
     {
         try
         {
-            using (MemoryStream ms = new(imageData))
+            using (MemoryStream stream = new(imageData))
             {
-                BitmapDecoder.Create(
-                    ms,
-                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
-                    BitmapCacheOption.None);
+                using (SKCodec? codec = SKCodec.Create(stream))
+                {
+                    return codec != null;
+                }
             }
-
-            return true;
         }
         catch (Exception ex)
         {

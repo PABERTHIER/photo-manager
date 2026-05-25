@@ -1,6 +1,7 @@
 ﻿using PhotoManager.UI.Models;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Tests.Unit.UI;
 
