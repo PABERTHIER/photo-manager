@@ -52,6 +52,7 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         }
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Platform-dependent")]
     public static bool IsLockUnavailable(IOException exception)
     {
         if (exception.HResult is SharingViolationHResult or LockViolationHResult)
@@ -69,7 +70,7 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         _lockFileStream = null;
     }
 
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "Cannot change ApplicationData folder existence")]
     private static string GetDefaultLockFilePath()
     {
         string applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

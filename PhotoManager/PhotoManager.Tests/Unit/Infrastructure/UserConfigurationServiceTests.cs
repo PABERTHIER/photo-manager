@@ -367,4 +367,63 @@ public class UserConfigurationServiceTests
         Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo("   "));
         Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(" "));
     }
+
+    [Test]
+    public void PathSettings_PathsContainBareUnixVariable_ReturnsExpandedPaths()
+    {
+        const string variableName = "PHOTOMANAGER_TEST_BARE_VAR";
+        string? previousValue = Environment.GetEnvironmentVariable(variableName);
+        string expandedValue = Path.GetFullPath("C:\\PhotoManager\\BareVarAssets");
+
+        try
+        {
+            Environment.SetEnvironmentVariable(variableName, expandedValue);
+
+            IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock
+                .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "$" + variableName)
+                .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + variableName + "\\Exempted");
+
+            UserConfigurationService userConfigurationService = new(configurationRootMock);
+
+            Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(expandedValue));
+            Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath,
+                Is.EqualTo(Path.GetFullPath(expandedValue + "\\Exempted")));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variableName, previousValue);
+        }
+    }
+
+    [Test]
+    public void PathSettings_PathsContainUndefinedUnixVariable_KeepsOriginalVariableText()
+    {
+        const string variableName = "PHOTOMANAGER_UNDEFINED_VAR_12345";
+        string? previousValue = Environment.GetEnvironmentVariable(variableName);
+
+        try
+        {
+            Environment.SetEnvironmentVariable(variableName, null);
+
+            IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock
+                .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "${" + variableName + "}")
+                .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + variableName);
+
+            UserConfigurationService userConfigurationService = new(configurationRootMock);
+
+            string expectedBracedPath = Path.GetFullPath("${" + variableName + "}");
+            string expectedBarePath = Path.GetFullPath("$" + variableName);
+
+            Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(expectedBracedPath));
+            Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(expectedBarePath));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variableName, previousValue);
+        }
+    }
 }

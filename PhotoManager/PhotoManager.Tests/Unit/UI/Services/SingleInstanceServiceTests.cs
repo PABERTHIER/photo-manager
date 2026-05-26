@@ -14,7 +14,7 @@ public class SingleInstanceServiceTests
     [Test]
     public void TryAcquire_LockIsAvailable_ReturnsTrueAndCreatesLockFile()
     {
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "PhotoManager.lock");
 
         try
@@ -36,7 +36,7 @@ public class SingleInstanceServiceTests
     [Test]
     public void TryAcquire_LockIsAlreadyAcquired_ReturnsTrue()
     {
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "PhotoManager.lock");
 
         try
@@ -59,7 +59,7 @@ public class SingleInstanceServiceTests
     [Test]
     public void TryAcquire_LockIsHeldByAnotherInstance_ReturnsFalse()
     {
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "PhotoManager.lock");
 
         try
@@ -86,7 +86,7 @@ public class SingleInstanceServiceTests
     [Test]
     public void Dispose_LockIsAcquired_ReleasesLock()
     {
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "PhotoManager.lock");
 
         try
@@ -186,7 +186,7 @@ public class SingleInstanceServiceTests
     {
         // When the lock file path points to a directory, FileStream throws
         // UnauthorizedAccessException which is NOT caught (not IOException)
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "PhotoManager.lock");
 
         try
@@ -210,7 +210,7 @@ public class SingleInstanceServiceTests
     [Test]
     public void TryAcquire_LockFileInNonExistentDirectoryPath_CreatesDirectoryAndAcquires()
     {
-        string testDirectory = CreateTestDirectoryPath();
+        string testDirectory = GetTestDirectoryPath();
         string lockFilePath = Path.Combine(testDirectory, "sub", "PhotoManager.lock");
 
         try
@@ -229,7 +229,30 @@ public class SingleInstanceServiceTests
         }
     }
 
-    private static string CreateTestDirectoryPath()
+    [Test]
+    public void TryAcquire_LockFilePathWithoutDirectory_AcquiresLock()
+    {
+        string lockFileName = $"PhotoManagerTest_{Guid.NewGuid()}.lock";
+
+        try
+        {
+            using (SingleInstanceService service = new(lockFileName))
+            {
+                bool result = service.TryAcquire();
+
+                Assert.That(result, Is.True);
+            }
+        }
+        finally
+        {
+            if (File.Exists(lockFileName))
+            {
+                File.Delete(lockFileName);
+            }
+        }
+    }
+
+    private static string GetTestDirectoryPath()
         => Path.Combine(TestContext.CurrentContext.TestDirectory, "PhotoManagerLockTests", Guid.NewGuid().ToString());
 
     private static void DeleteTestDirectory(string testDirectory)

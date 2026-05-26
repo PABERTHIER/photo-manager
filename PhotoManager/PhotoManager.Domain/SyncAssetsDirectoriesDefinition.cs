@@ -44,7 +44,7 @@ public class SyncAssetsDirectoriesDefinition
     {
         string[] parts = directory.Split(DirectorySeparators, StringSplitOptions.RemoveEmptyEntries);
 
-        return parts.Length == 0 ? "\\\\" : $"\\\\{string.Join('\\', parts)}";
+        return $"\\\\{string.Join('\\', parts)}";
     }
 
     private static string NormalizeUnixPath(string directory)

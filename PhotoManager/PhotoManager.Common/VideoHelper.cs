@@ -1,5 +1,6 @@
 ﻿using FFMpegCore;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.Common;
 
@@ -79,7 +80,7 @@ public static class VideoHelper
             string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
 
             string? ffmpegBinPath = GetFfmpegBinaryFolder();
-            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegBinPath ?? string.Empty);
+            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegBinPath!);
 
             // Use FFMpegCore to extract the first frame
             FFMpegArguments
@@ -165,6 +166,7 @@ public static class VideoHelper
         return null;
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Platform-dependent")]
     private static bool ContainsFfmpegExecutable(string? directory)
     {
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))

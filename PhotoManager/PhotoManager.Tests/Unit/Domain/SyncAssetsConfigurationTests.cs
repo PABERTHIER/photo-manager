@@ -267,6 +267,34 @@ public class SyncAssetsConfigurationTests
     }
 
     [Test]
+    public void Validate_DefinitionWithDriveLetterAndNoSeparator_RemovesDefinition()
+    {
+        _syncAssetsConfiguration!.Definitions.Add(new()
+        {
+            SourceDirectory = "C:NoSeparator",
+            DestinationDirectory = "D:AlsoInvalid"
+        });
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
+    }
+
+    [Test]
+    public void Validate_DefinitionWithRemoteAndNoSeparator_RemovesDefinition()
+    {
+        _syncAssetsConfiguration!.Definitions.Add(new()
+        {
+            SourceDirectory = "\\\\",
+            DestinationDirectory = "C:\\Valid\\Path"
+        });
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
+    }
+
+    [Test]
     [TestCase(null, "")]
     [TestCase(null, null)]
     public void Validate_DefinitionsHaveNullSourceAndDestination_ThrowsArgumentNullExceptionAndDoesNotRemoveDefinitions(
@@ -287,6 +315,22 @@ public class SyncAssetsConfigurationTests
         Assert.That(_syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
         Assert.That(_syncAssetsConfiguration.Definitions[0].IncludeSubFolders, Is.False);
         Assert.That(_syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, Is.False);
+    }
+
+    [Test]
+    public void Validate_PathsUseForwardSlashAsSeparator_AreConsideredValidWindowsLocal()
+    {
+        _syncAssetsConfiguration!.Definitions.Add(new()
+        {
+            SourceDirectory = "C:/Users/Photos",
+            DestinationDirectory = "D:/Backup/Photos"
+        });
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:/Users/Photos"));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("D:/Backup/Photos"));
     }
 
     [Test]
@@ -539,5 +583,74 @@ public class SyncAssetsConfigurationTests
         _syncAssetsConfiguration!.Normalize();
 
         Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
+    }
+
+    [Test]
+    public void Normalize_DriveRootOnlyPath_NormalizesToDriveBackslash()
+    {
+        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
+        {
+            SourceDirectory = "C:\\",
+            DestinationDirectory = "D:\\"
+        };
+
+        _syncAssetsConfiguration!.Definitions.Add(syncAssetsDirectoriesDefinition);
+
+        _syncAssetsConfiguration.Normalize();
+
+        Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("C:\\"));
+        Assert.That(syncAssetsDirectoriesDefinition.DestinationDirectory, Is.EqualTo("D:\\"));
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\"));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("D:\\"));
+    }
+
+    [Test]
+    public void Normalize_RemoteRootOnlyPath_NormalizesAsUnixPath()
+    {
+        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
+        {
+            SourceDirectory = "//Server",
+            DestinationDirectory = "//Server"
+        };
+
+        _syncAssetsConfiguration!.Definitions.Add(syncAssetsDirectoriesDefinition);
+
+        _syncAssetsConfiguration.Normalize();
+
+        Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("/Server"));
+        Assert.That(syncAssetsDirectoriesDefinition.DestinationDirectory, Is.EqualTo("/Server"));
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("/Server"));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("/Server"));
+    }
+
+    [Test]
+    public void Normalize_PathsUseForwardSlashAsSeparator_NormalizesToBackslash()
+    {
+        SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
+        {
+            SourceDirectory = "C:/Users/Photos",
+            DestinationDirectory = "D:/Backup/Photos"
+        };
+
+        _syncAssetsConfiguration!.Definitions.Add(syncAssetsDirectoriesDefinition);
+
+        _syncAssetsConfiguration.Normalize();
+
+        Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("C:\\Users\\Photos"));
+        Assert.That(syncAssetsDirectoriesDefinition.DestinationDirectory, Is.EqualTo("D:\\Backup\\Photos"));
+
+        _syncAssetsConfiguration.Validate();
+
+        Assert.That(_syncAssetsConfiguration.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Users\\Photos"));
+        Assert.That(_syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("D:\\Backup\\Photos"));
     }
 }
