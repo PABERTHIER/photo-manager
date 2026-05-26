@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
+using PhotoManager.UI.Services;
 using PhotoManager.UI.Windows;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -17,8 +18,6 @@ namespace PhotoManager.UI;
 [ExcludeFromCodeCoverage]
 public partial class App
 {
-    private static readonly Mutex AppMutex = new(true, "PhotoManagerStartup");
-
     private readonly ServiceProvider _serviceProvider;
 
     /// <summary>
@@ -37,9 +36,13 @@ public partial class App
     private void App_OnStartup(object sender, StartupEventArgs e)
     {
         ILogger<App> logger = _serviceProvider.GetRequiredService<ILogger<App>>();
+
         try
         {
-            if (AppMutex.WaitOne(TimeSpan.Zero, true))
+            ISingleInstanceService singleInstanceService =
+                _serviceProvider.GetRequiredService<ISingleInstanceService>();
+
+            if (singleInstanceService.TryAcquire())
             {
                 MainWindow? mainWindow = _serviceProvider.GetService<MainWindow>();
 
@@ -66,6 +69,13 @@ public partial class App
                 MessageBoxImage.Error);
             throw;
         }
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        ServiceProvider = null;
+        _serviceProvider.Dispose();
+        base.OnExit(e);
     }
 
     private static void ConfigureServices(IServiceCollection services)

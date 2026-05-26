@@ -2,6 +2,8 @@
 
 public class Folder
 {
+    private static readonly char[] PathSeparators = ['\\', '/'];
+
     public required Guid Id { get; init; }
     public required string Path { get; init; }
 
@@ -14,8 +16,8 @@ public class Folder
                 return string.Empty;
             }
 
-            ReadOnlySpan<char> pathAsSpan = Path.AsSpan().TrimEnd('\\');
-            int lastSeparator = pathAsSpan.LastIndexOf('\\');
+            ReadOnlySpan<char> pathAsSpan = Path.AsSpan().TrimEnd(PathSeparators);
+            int lastSeparator = pathAsSpan.LastIndexOfAny(PathSeparators);
 
             return lastSeparator >= 0 ? pathAsSpan[(lastSeparator + 1)..].ToString() : pathAsSpan.ToString();
         }
@@ -41,8 +43,8 @@ public class Folder
             return null;
         }
 
-        ReadOnlySpan<char> pathAsSpan = path.AsSpan().TrimEnd(System.IO.Path.DirectorySeparatorChar);
-        int lastSeparator = pathAsSpan.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+        ReadOnlySpan<char> pathAsSpan = path.AsSpan().TrimEnd(PathSeparators);
+        int lastSeparator = pathAsSpan.LastIndexOfAny(PathSeparators);
 
         return lastSeparator >= 0 ? pathAsSpan[..lastSeparator].ToString() : null;
     }

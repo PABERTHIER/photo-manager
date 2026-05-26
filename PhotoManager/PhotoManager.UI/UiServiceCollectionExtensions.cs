@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PhotoManager.UI.Services;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.Windows;
 
@@ -10,6 +11,7 @@ public static class UiServiceCollectionExtensions
     {
         public void AddUi()
         {
+            services.AddSingleton<ISingleInstanceService, SingleInstanceService>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<ApplicationViewModel>();
         }

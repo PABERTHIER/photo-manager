@@ -521,3 +521,5 @@ public void Initialize(string databasePath)
 2. Store file properties in SQLite (eliminate startup stats entirely)
 3. Consider memory-mapped thumbnails or separate thumbnail file
 4. Implement FileSystemWatcher for real-time change detection
+5. Remove Windows-specific infrastructure blockers — **DONE** (FFmpeg runtimes, file-lock single-instance,
+   portable build/coverage cleanup, and path expansion)

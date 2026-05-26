@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 This file provides shared guidance for AI coding agents (Claude Code, GitHub Copilot, and others) when working with code in this repository.
 
@@ -121,7 +121,7 @@ dotnet test PhotoManager/PhotoManager.slnx
 **Run tests with coverage (local):**
 
 ```bash
-PhotoManager/test-with-coverage.bat
+pwsh PhotoManager/test-with-coverage.ps1
 ```
 
 **Format/Verify code style:**
@@ -308,7 +308,7 @@ finally
 
 - **Microsoft.Data.Sqlite** + **SQLitePCLRaw.bundle_e_sqlite3** - SQLite database
 - **Magick.NET** (ImageMagick) - Image processing
-- **FFMpegCore** - Video processing (FFmpeg executables are extracted from `.rar` files on build via `FileExtractionTask.dll`)
+- **FFMpegCore** - Video processing; versioned FFmpeg runtime packages copy app-local binaries at build time
 - **Serilog** - File logging
 - **Microsoft.Extensions.Logging** - Logging abstraction
 - **NSubstitute** - Test mocking
@@ -354,7 +354,7 @@ The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a singl
 
 ## HEIC/HEVC Support
 
-The application requires HEIF Image Extensions and HEVC Video Extensions to be installed. In CI (`build.yml`), these are installed via `winget` and `Add-AppxPackage`.
+HEIC/HEVC image handling is provided by Magick.NET; CI does not install OS codec extensions.
 
 ## Git Policy — AI Agents Must Never Commit or Push
 

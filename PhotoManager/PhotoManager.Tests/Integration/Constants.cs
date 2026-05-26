@@ -377,8 +377,8 @@ public static class Constants
     public static class FileSize
     {
         public const long HOMER_GIF = 64123;
-        public const long HOMER_JPG = 6599;
-        public const long HOMER_DUPLICATED_JPG = 6599;
+        public const long HOMER_JPG = 6600;
+        public const long HOMER_DUPLICATED_JPG = 6600;
         public const long IMAGE_1_JPG = 29857;
         public const long IMAGE_1_90_DEG_JPG = 31535;
         public const long IMAGE_1_180_DEG_JPG = 31535;
@@ -492,9 +492,9 @@ public static class Constants
         public const string HOMER_GIF =
             "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1";
         public const string HOMER_JPG =
-            "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66";
+            "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
         public const string HOMER_DUPLICATED_JPG =
-            "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66";
+            "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
         public const string IMAGE_1_JPG =
             "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
         public const string IMAGE_1_90_DEG_JPG =

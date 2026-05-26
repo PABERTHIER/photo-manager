@@ -2,6 +2,7 @@
 using PhotoManager.Application;
 using PhotoManager.Domain.Interfaces.Persistence;
 using PhotoManager.UI;
+using PhotoManager.UI.Services;
 using PhotoManager.UI.Windows;
 
 namespace PhotoManager.Tests.Integration.UI;
@@ -93,6 +94,10 @@ public class AppTests
         Assert.That(applicationDescriptor, Is.Null);
 
         // UI
+        ServiceDescriptor? singleInstanceServiceDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(ISingleInstanceService));
+        Assert.That(singleInstanceServiceDescriptor, Is.Null);
+
         ServiceDescriptor? mainWindowDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(MainWindow));
         Assert.That(mainWindowDescriptor, Is.Null);
 
@@ -104,7 +109,7 @@ public class AppTests
 
         ConfigureServices(services);
 
-        Assert.That(services, Has.Count.EqualTo(20));
+        Assert.That(services, Has.Count.EqualTo(21));
 
         // appsettings.json
         configurationRootDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IConfigurationRoot));
@@ -251,16 +256,23 @@ public class AppTests
         Assert.That(applicationDescriptor.ImplementationType, Is.EqualTo(typeof(PhotoManager.Application.Application)));
 
         // UI
+        singleInstanceServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ISingleInstanceService));
+        Assert.That(singleInstanceServiceDescriptor, Is.Not.Null);
+        Assert.That(singleInstanceServiceDescriptor, Is.EqualTo(services[18]));
+        Assert.That(singleInstanceServiceDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(singleInstanceServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(singleInstanceServiceDescriptor.ImplementationType, Is.EqualTo(typeof(SingleInstanceService)));
+
         mainWindowDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(MainWindow));
         Assert.That(mainWindowDescriptor, Is.Not.Null);
-        Assert.That(mainWindowDescriptor, Is.EqualTo(services[18]));
+        Assert.That(mainWindowDescriptor, Is.EqualTo(services[19]));
         Assert.That(mainWindowDescriptor.ImplementationInstance, Is.Null);
         Assert.That(mainWindowDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(mainWindowDescriptor.ImplementationType, Is.EqualTo(typeof(MainWindow)));
 
         applicationViewModelDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ApplicationViewModel));
         Assert.That(applicationViewModelDescriptor, Is.Not.Null);
-        Assert.That(applicationViewModelDescriptor, Is.EqualTo(services[19]));
+        Assert.That(applicationViewModelDescriptor, Is.EqualTo(services[20]));
         Assert.That(applicationViewModelDescriptor.ImplementationInstance, Is.Null);
         Assert.That(applicationViewModelDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(applicationViewModelDescriptor.ImplementationType, Is.EqualTo(typeof(ApplicationViewModel)));

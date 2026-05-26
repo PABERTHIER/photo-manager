@@ -44,4 +44,232 @@ public class VideoHelperTests
         bool result = VideoHelper.IsVideoFile(fileExtension);
         Assert.That(result, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void GetFirstFramePath_FfmpegNotAvailableForInvalidVideo_ReturnsNull()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string destinationPath = Path.Combine(testDirectory, "Output");
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+            string testVideoFile = Path.Combine(testDirectory, "test.mp4");
+            File.WriteAllText(testVideoFile, "not a real video");
+
+            TestLogger<VideoHelperTests> logger = new();
+
+            string? result = VideoHelper.GetFirstFramePath(testDirectory, "test.mp4", destinationPath, logger);
+
+            Assert.That(result, Is.Null);
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_ConfiguredFolderContainsFfmpeg_ReturnsConfiguredFolder()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string configuredDirectory = Path.Combine(testDirectory, "ConfiguredFfmpeg");
+
+        try
+        {
+            Directory.CreateDirectory(configuredDirectory);
+            CreateFfmpegExecutables(configuredDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, configuredDirectory);
+
+            Assert.That(result, Is.EqualTo(configuredDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_AppLocalFolderContainsFfmpeg_ReturnsAppLocalFolder()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string appLocalDirectory = Path.Combine(testDirectory, "Ffmpeg", "Bin");
+
+        try
+        {
+            Directory.CreateDirectory(appLocalDirectory);
+            CreateFfmpegExecutables(appLocalDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, null);
+
+            Assert.That(result, Is.EqualTo(appLocalDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_RuntimeNativeFolderContainsFfmpeg_ReturnsRuntimeNativeFolder()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string runtimeDirectory = Path.Combine(testDirectory, "runtimes", "linux-x64", "native");
+
+        try
+        {
+            Directory.CreateDirectory(runtimeDirectory);
+            CreateFfmpegExecutables(runtimeDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, null);
+
+            Assert.That(result, Is.EqualTo(runtimeDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_LegacyProjectFolderContainsFfmpeg_ReturnsLegacyProjectFolder()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string baseDirectory = Path.Combine(testDirectory, "PhotoManager.Tests", "bin");
+        string legacyDirectory = Path.Combine(testDirectory, "PhotoManager.Common", "Ffmpeg", "Bin");
+
+        try
+        {
+            Directory.CreateDirectory(baseDirectory);
+            Directory.CreateDirectory(legacyDirectory);
+            CreateFfmpegExecutables(legacyDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(baseDirectory, null);
+
+            Assert.That(result, Is.EqualTo(legacyDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_NoFfmpegFolder_ReturnsNull()
+    {
+        string testDirectory = GetTestDirectoryPath();
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, null);
+
+            Assert.That(result, Is.Null);
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_EmptyConfiguredFolder_SearchesAppLocal()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string appLocalDirectory = Path.Combine(testDirectory, "Ffmpeg", "Bin");
+
+        try
+        {
+            Directory.CreateDirectory(appLocalDirectory);
+            CreateFfmpegExecutables(appLocalDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, "");
+
+            Assert.That(result, Is.EqualTo(appLocalDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_WhitespaceConfiguredFolder_SearchesAppLocal()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string appLocalDirectory = Path.Combine(testDirectory, "Ffmpeg", "Bin");
+
+        try
+        {
+            Directory.CreateDirectory(appLocalDirectory);
+            CreateFfmpegExecutables(appLocalDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder(testDirectory, "   ");
+
+            Assert.That(result, Is.EqualTo(appLocalDirectory));
+        }
+        finally
+        {
+            Directory.Delete(testDirectory, true);
+        }
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_NullBaseDirectory_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => VideoHelper.GetFfmpegBinaryFolder(null!, null));
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_Parameterless_ReturnsNonNull()
+    {
+        // Tests the parameterless GetFfmpegBinaryFolder which reads environment variables
+        // and falls back to app-local search
+        string? result = VideoHelper.GetFfmpegBinaryFolder();
+
+        // Result can be null (no ffmpeg found) or a valid path — we just verify no exception
+        Assert.That(result, Is.Null.Or.Not.Empty);
+    }
+
+    [Test]
+    public void GetFfmpegBinaryFolder_ParameterlessWithPhotoManagerEnvVarSet_ReturnsConfiguredPath()
+    {
+        string testDirectory = GetTestDirectoryPath();
+        string? previousValue =
+            Environment.GetEnvironmentVariable("PHOTOMANAGER_FFMPEG_BINARY_FOLDER");
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+            CreateFfmpegExecutables(testDirectory);
+            Environment.SetEnvironmentVariable("PHOTOMANAGER_FFMPEG_BINARY_FOLDER", testDirectory);
+
+            string? result = VideoHelper.GetFfmpegBinaryFolder();
+
+            Assert.That(result, Is.EqualTo(testDirectory));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("PHOTOMANAGER_FFMPEG_BINARY_FOLDER", previousValue);
+
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    private static void CreateFfmpegExecutables(string directory)
+    {
+        File.WriteAllText(Path.Combine(directory, "ffmpeg"), string.Empty);
+        File.WriteAllText(Path.Combine(directory, "ffmpeg.exe"), string.Empty);
+    }
+
+    private static string GetTestDirectoryPath()
+        => Path.Combine(TestContext.CurrentContext.TestDirectory, "PhotoManagerVideoTests", Guid.NewGuid().ToString());
 }

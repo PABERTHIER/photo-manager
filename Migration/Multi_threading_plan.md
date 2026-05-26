@@ -105,6 +105,8 @@ record ProcessedAsset(
 
 **Key decisions:**
 - Replace WPF `BitmapImage` thumbnail pipeline with ImageMagick (thread-safe, no STA requirement) — **DONE** (IImageData/ImageRotation introduced; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC fallback, fully thread-safe)
+- Remove Windows-specific infrastructure blockers before pipeline work — **DONE** (FFmpeg runtimes, no UWP/OS
+  codec dependency, file-lock single-instance, portable path/build tooling)
 - Each worker creates its own `MagickImage` instance (ImageMagick is thread-safe at instance level)
 - PHash workers can share a thread pool since they're CPU-bound
 - Return the `byte[]` buffer to the pool after hash computation

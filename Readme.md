@@ -1,4 +1,4 @@
-# PhotoManager
+﻿# PhotoManager
 
 ![PhotoManager][app-icon]
 
@@ -100,9 +100,62 @@ The lower the value of `PHashThreshold`, the more precise it is.
 
 **The `Paths` part is about settings of paths:** :open_file_folder:
 
-- `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
-- `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
-- `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
+- `AssetsDirectory = "~/Pictures"`: The directory where your assets are, to analyse them.
+- `ExemptedFolderPath = "~/Pictures/PhotoManagerExempted"`: The path where PhotoManager will protect your
+  assets and if there are duplicates in others paths, you will be able to delete all of them except the assets
+  in this exempted path.
+- `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file
+  (used if you set `AnalyseVideos` to true). The full path is built from `AssetsDirectory` and this folder name.
+
+### Path configuration details :world_map:
+
+`AssetsDirectory` and `ExemptedFolderPath` support several expansion syntaxes:
+
+| Syntax | Platform | Example |
+|--------|----------|---------|
+| `~` or `~/...` or `~\...` | All | `~/Pictures` → `C:\Users\<user>\Pictures` (Windows) or `/home/<user>/Pictures` (Linux/macOS) |
+| `%VARIABLE%` | Windows | `%USERPROFILE%\Photos` → `C:\Users\<user>\Photos` |
+| `$VARIABLE` or `${VARIABLE}` | Linux/macOS | `$HOME/Pictures` → `/home/<user>/Pictures` |
+| Absolute path | All | `C:\Photos` (Windows) or `/mnt/data/Photos` (Linux/macOS) |
+
+**Cross-drive paths (Windows):** You can point to any drive letter. For example:
+
+```json
+{
+  "AssetsDirectory": "E:\\Workspace\\PhotoManager\\Test",
+  "ExemptedFolderPath": "E:\\Workspace\\PhotoManager\\Test\\Exempted"
+}
+```
+
+**Cross-platform note:** On Windows, forward slashes in paths (e.g. `~/Workspace/Photos`) are automatically
+normalized to backslashes. On Linux/macOS, backslashes are kept as-is by the OS path APIs.
+Always use the native separator for your platform, or rely on `~` expansion which handles it for you.
+
+**Examples by platform:**
+
+Windows:
+```json
+{
+  "AssetsDirectory": "C:\\Users\\John\\Pictures",
+  "ExemptedFolderPath": "C:\\Users\\John\\Pictures\\Exempted"
+}
+```
+
+Linux/macOS:
+```json
+{
+  "AssetsDirectory": "~/Pictures",
+  "ExemptedFolderPath": "~/Pictures/Exempted"
+}
+```
+
+Using environment variables:
+```json
+{
+  "AssetsDirectory": "%PHOTO_LIBRARY%",
+  "ExemptedFolderPath": "${PHOTO_LIBRARY}/Exempted"
+}
+```
 
 **The `Project` part is about settings of project (there is no need to update it):** :building_construction:
 
@@ -180,31 +233,29 @@ Improvements **WIP**.
 
 [![codecov][codecov-badge]][codecov-link]
 
+To generate a local coverage report:
+
+```powershell
+pwsh PhotoManager/test-with-coverage.ps1
+```
+
+Use `-Filter "FullyQualifiedName~ClassName"` for focused runs. The report is written to `PhotoManager/TestResults`.
+
 ## Transparency :handshake:
 
-This project has some versionned dll and rar files for its own good working.
-There are 3 rar files, located here: PhotoManager\PhotoManager.Common\Ffmpeg
+This project uses versioned FFmpeg runtime packages for video duplicate detection. At build time, `PhotoManager.Common` copies `ffmpeg` and `ffprobe` from the matching `Curiosity.FFmpeg.Runtimes.*`
+NuGet package into the output folder under `Ffmpeg/Bin`. This keeps frame extraction deterministic without keeping Windows-only RAR archives or a custom extraction task in the repository.
 
-- **ffmpeg.rar**
-- **ffplay.rar**
-- **ffprobe.rar**
+If you need to override the bundled binaries, set `PHOTOMANAGER_FFMPEG_BINARY_FOLDER` or `FFMPEG_BINARY_FOLDER` to a folder containing the platform-specific `ffmpeg` executable.
+If neither the bundled folder nor an override exists, FFMpegCore falls back to resolving `ffmpeg` from `PATH`.
 
-They are used for the video duplicates detection feature and are here to ensure everyone has the same exact version (even for GitHub CI). That will prevent asset generation differences accross various versions.
-To add to that, without them, everyone who want to use it will have to install on their own Ffmpeg and add the path to the .exe file to the env variables. With the rar file in the project, there is no need to do all of this (working only for Windows because these are .exe files in the end **WIP**).
-
-When the project is built for the first time, the three .exe files will be extracted from their rar file (in here: PhotoManager\PhotoManager.Common\Ffmpeg\Bin), done by the **FileExtractionTask.dll**.
-
-The FileExtractionTask.dll is located in here: PhotoManager\PhotoManager.Common\MSBuildTask
-Its goal is only to extract the content of a rar file.
-It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Common\PhotoManager.Common.csproj
-And this dll depends on **SharpCompress** library. To avoid the installation of a nuGet just for that, it was better to just add the generated dll of that library.
-
-For the last dll, it is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
+The remaining versioned dll is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
 It is only used for the well working of the tests, accross each machine.
 The **FileDateTask.dll** is used to set a fixed date for every tests files used for integration testing.
 It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests\PhotoManager.Tests.csproj
 
-I've made a specific repo for the two customs dll, injected in the project: [photo-manager-tasks][photo-manager-tasks-link]
+I've made a specific repo for the custom dll, injected in the project:
+[photo-manager-tasks][photo-manager-tasks-link]
 
 [app-icon]: PhotoManager/Images/AppIcon.png
 
