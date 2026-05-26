@@ -184,7 +184,7 @@ public class UserConfigurationServiceTests
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
         Assert.That(assetsDirectory, Is.Not.Null);
-        Assert.That(assetsDirectory, Is.EqualTo("C:\\Path"));
+        Assert.That(assetsDirectory, Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets"));
     }
 
     [Test]
@@ -193,7 +193,7 @@ public class UserConfigurationServiceTests
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
         Assert.That(exemptedFolderPath, Is.Not.Null);
-        Assert.That(exemptedFolderPath, Is.EqualTo("C:\\Path\\To\\FolderExempted"));
+        Assert.That(exemptedFolderPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted"));
     }
 
     [Test]
@@ -207,7 +207,61 @@ public class UserConfigurationServiceTests
 
         Assert.That(firstFrameVideosPath,
             Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
-        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine("C:\\Path\\OutputVideoFirstFrame")));
+        Assert.That(firstFrameVideosPath,
+            Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\TestAssets", Directories.OUTPUT_VIDEO_FIRST_FRAME)));
+    }
+
+    [Test]
+    public void PathSettings_PathsContainEnvironmentVariables_ReturnsExpandedPaths()
+    {
+        const string assetsVariableName = "PHOTOMANAGER_TEST_ASSETS_DIRECTORY";
+        const string exemptedVariableName = "PHOTOMANAGER_TEST_EXEMPTED_FOLDER";
+        string? previousAssetsDirectory = Environment.GetEnvironmentVariable(assetsVariableName);
+        string? previousExemptedFolder = Environment.GetEnvironmentVariable(exemptedVariableName);
+        string expandedAssetsDirectory = Path.GetFullPath(Path.Combine("C:\\PhotoManager", "Assets"));
+        string expandedExemptedFolder = Path.GetFullPath(Path.Combine("C:\\PhotoManager", "Exempted"));
+
+        try
+        {
+            Environment.SetEnvironmentVariable(assetsVariableName, expandedAssetsDirectory);
+            Environment.SetEnvironmentVariable(exemptedVariableName, expandedExemptedFolder);
+
+            IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock
+                .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, $"%{assetsVariableName}%")
+                .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + "{" + exemptedVariableName + "}");
+
+            UserConfigurationService userConfigurationService = new(configurationRootMock);
+
+            Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(expandedAssetsDirectory));
+            Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(expandedExemptedFolder));
+            Assert.That(userConfigurationService.PathSettings.FirstFrameVideosPath,
+                Is.EqualTo(Path.Combine(expandedAssetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(assetsVariableName, previousAssetsDirectory);
+            Environment.SetEnvironmentVariable(exemptedVariableName, previousExemptedFolder);
+        }
+    }
+
+    [Test]
+    public void PathSettings_PathsContainHomeDirectory_ReturnsExpandedPaths()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock
+            .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "~/Pictures")
+            .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "~\\Exempted");
+
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        Assert.That(userConfigurationService.PathSettings.AssetsDirectory,
+            Is.EqualTo(Path.Combine(homeDirectory, "Pictures")));
+        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath,
+            Is.EqualTo(Path.Combine(homeDirectory, "Exempted")));
     }
 
     [Test]
@@ -251,6 +305,66 @@ public class UserConfigurationServiceTests
         string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
 
         Assert.That(paths, Has.Length.EqualTo(1));
-        Assert.That(paths[0], Is.EqualTo("C:\\Path"));
+        Assert.That(paths[0], Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets"));
+    }
+
+    [Test]
+    [TestCase("~/Pictures", "", "~/Pictures")]
+    [TestCase("~/Pictures", " ", "~/Pictures")]
+    [TestCase("~/Pictures", null, "~/Pictures")]
+    [TestCase("~\\Documents", "", "~\\Documents")]
+    [TestCase("~", "", "~")]
+    [TestCase("~", null, "~")]
+    public void ExpandHomeDirectory_HomeDirectoryIsNullOrWhiteSpace_ReturnsOriginalPath(
+        string path, string? homeDirectory, string expectedResult)
+    {
+        string result = UserConfigurationService.ExpandHomeDirectory(path, homeDirectory!);
+
+        Assert.That(result, Is.EqualTo(expectedResult));
+    }
+
+    [Test]
+    [TestCase("~/Pictures", "C:\\Users\\Test", "C:\\Users\\Test\\Pictures")]
+    [TestCase("~\\Documents", "C:\\Users\\Test", "C:\\Users\\Test\\Documents")]
+    [TestCase("~", "C:\\Users\\Test", "C:\\Users\\Test")]
+    [TestCase("/absolute/path", "C:\\Users\\Test", "/absolute/path")]
+    [TestCase("C:\\absolute\\path", "C:\\Users\\Test", "C:\\absolute\\path")]
+    [TestCase("relative/path", "C:\\Users\\Test", "relative/path")]
+    public void ExpandHomeDirectory_VariousPaths_ReturnsExpectedResult(
+        string path, string homeDirectory, string expectedResult)
+    {
+        string result = UserConfigurationService.ExpandHomeDirectory(path, homeDirectory);
+
+        Assert.That(result, Is.EqualTo(expectedResult));
+    }
+
+    [Test]
+    public void PathSettings_EmptyAssetsDirectory_ReturnsEmptyPath()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock
+            .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "")
+            .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "");
+
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
+
+        Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(""));
+        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(""));
+    }
+
+    [Test]
+    public void PathSettings_WhitespaceAssetsDirectory_ReturnsWhitespacePath()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock
+            .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "   ")
+            .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, " ");
+
+        UserConfigurationService userConfigurationService = new(configurationRootMock);
+
+        Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo("   "));
+        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(" "));
     }
 }

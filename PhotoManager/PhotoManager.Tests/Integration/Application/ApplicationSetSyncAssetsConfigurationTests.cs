@@ -55,8 +55,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService, imageMetadataService,
+            _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -80,7 +80,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
     [Test]
     public async Task SetSyncAssetsConfiguration_CataloguedAssetsAndValidDefinitions_SavesConfiguration()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -126,7 +127,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory,
                 Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
             Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory,
-                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes2"));
+                Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes2"));
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.True);
 
@@ -143,7 +144,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
             Assert.That(syncAssetsDirectoriesDefinitions[1].SourceDirectory,
                 Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
             Assert.That(syncAssetsDirectoriesDefinitions[1].DestinationDirectory,
-                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes2"));
+                Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes2"));
             Assert.That(syncAssetsDirectoriesDefinitions[1].IncludeSubFolders, Is.True);
             Assert.That(syncAssetsDirectoriesDefinitions[1].DeleteAssetsNotInSource, Is.True);
 
@@ -187,17 +188,17 @@ public class ApplicationSetSyncAssetsConfigurationTests
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
-                DestinationDirectory = "\\Server\\Valid2\\Path"
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\\\Server\\Valid2\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "C:\\Valid1\\Path",
-                DestinationDirectory = "\\Server\\Valid2\\Path"
+                DestinationDirectory = "\\\\Server\\Valid2\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
                 DestinationDirectory = "C:\\Valid2\\Path",
                 IncludeSubFolders = true,
                 DeleteAssetsNotInSource = true
@@ -211,8 +212,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
-                DestinationDirectory = "\\Server\\Valid1\\Path"
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\\\Server\\Valid1\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
@@ -296,13 +297,14 @@ public class ApplicationSetSyncAssetsConfigurationTests
 
     [Test]
     [TestCase("C:\\Valid1\\Path", "C:\\Valid2\\Path", "C:\\Valid1\\Path", "C:\\Valid2\\Path")]
-    [TestCase("\\Server\\Valid1\\Path", "\\Server\\Valid2\\Path", "\\Server\\Valid1\\Path", "\\Server\\Valid2\\Path")]
-    [TestCase("C:\\Valid1\\Path", "\\Server\\Valid2\\Path", "C:\\Valid1\\Path", "\\Server\\Valid2\\Path")]
-    [TestCase("\\Server\\Valid1\\Path", "C:\\Valid2\\Path", "\\Server\\Valid1\\Path", "C:\\Valid2\\Path")]
+    [TestCase("\\\\Server\\Valid1\\Path", "\\\\Server\\Valid2\\Path", "\\\\Server\\Valid1\\Path",
+        "\\\\Server\\Valid2\\Path")]
+    [TestCase("C:\\Valid1\\Path", "\\\\Server\\Valid2\\Path", "C:\\Valid1\\Path", "\\\\Server\\Valid2\\Path")]
+    [TestCase("\\\\Server\\Valid1\\Path", "C:\\Valid2\\Path", "\\\\Server\\Valid1\\Path", "C:\\Valid2\\Path")]
     [TestCase(@"C:\Some\\Extra\Backslashes1", @"\\Remote\With\\\\Extra\Backslashes2", "C:\\Some\\Extra\\Backslashes1",
-        "\\Remote\\With\\Extra\\Backslashes2")]
+        "\\\\Remote\\With\\Extra\\Backslashes2")]
     [TestCase(@"\\Remote\With\\\\Extra\Backslashes1", @"C:\Some\\Extra\Backslashes2",
-        "\\Remote\\With\\Extra\\Backslashes1", "C:\\Some\\Extra\\Backslashes2")]
+        "\\\\Remote\\With\\Extra\\Backslashes1", "C:\\Some\\Extra\\Backslashes2")]
     public void SetSyncAssetsConfiguration_SameValidDefinitions_SavesConfigurationWithDuplicateDefinitions(
         string sourceDirectory,
         string destinationDirectory,
@@ -453,11 +455,11 @@ public class ApplicationSetSyncAssetsConfigurationTests
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "Invalid1\\Path",
-                DestinationDirectory = "\\Server\\Valid1\\Path"
+                DestinationDirectory = "\\\\Server\\Valid1\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
                 DestinationDirectory = "Invalid2\\Path"
             });
 
@@ -468,8 +470,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
-                DestinationDirectory = "\\Server\\Valid2\\Path"
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
+                DestinationDirectory = "\\\\Server\\Valid2\\Path"
             });
 
             syncAssetsConfigurationToSave.Definitions.Add(new()
@@ -494,9 +496,9 @@ public class ApplicationSetSyncAssetsConfigurationTests
             Assert.That(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
             Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory,
-                Is.EqualTo("\\Server\\Valid2\\Path"));
+                Is.EqualTo("\\\\Server\\Valid2\\Path"));
             Assert.That(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -508,7 +510,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
 
             Assert.That(syncAssetsConfiguration.Definitions[3].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
             Assert.That(syncAssetsConfiguration.Definitions[3].DestinationDirectory,
-                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+                Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
             Assert.That(syncAssetsConfiguration.Definitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsConfiguration.Definitions[3].DeleteAssetsNotInSource, Is.False);
 
@@ -521,8 +523,9 @@ public class ApplicationSetSyncAssetsConfigurationTests
             Assert.That(syncAssetsDirectoriesDefinitions[0].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[0].DeleteAssetsNotInSource, Is.False);
 
-            Assert.That(syncAssetsDirectoriesDefinitions[1].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
-            Assert.That(syncAssetsDirectoriesDefinitions[1].DestinationDirectory, Is.EqualTo("\\Server\\Valid2\\Path"));
+            Assert.That(syncAssetsDirectoriesDefinitions[1].SourceDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
+            Assert.That(syncAssetsDirectoriesDefinitions[1].DestinationDirectory,
+                Is.EqualTo("\\\\Server\\Valid2\\Path"));
             Assert.That(syncAssetsDirectoriesDefinitions[1].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[1].DeleteAssetsNotInSource, Is.False);
 
@@ -534,7 +537,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
 
             Assert.That(syncAssetsDirectoriesDefinitions[3].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
             Assert.That(syncAssetsDirectoriesDefinitions[3].DestinationDirectory,
-                Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+                Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
             Assert.That(syncAssetsDirectoriesDefinitions[3].IncludeSubFolders, Is.False);
             Assert.That(syncAssetsDirectoriesDefinitions[3].DeleteAssetsNotInSource, Is.False);
 
@@ -547,8 +550,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
     }
 
     [Test]
-    public void
-        SetSyncAssetsConfiguration_SyncAssetsConfigurationWithDifferentConfigurations_SavesConfigurationAndEraseThePreviousOne()
+    public void SetSyncAssetsConfiguration_DifferentConfigurations_SavesAndReplacesPreviousConfiguration()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -723,11 +725,11 @@ public class ApplicationSetSyncAssetsConfigurationTests
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "Invalid1\\Path",
-                DestinationDirectory = "\\Server\\Valid1\\Path"
+                DestinationDirectory = "\\\\Server\\Valid1\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
                 DestinationDirectory = "Invalid2\\Path"
             });
 
@@ -772,7 +774,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
 
     [Test]
     public void
-        SetSyncAssetsConfiguration_DefinitionsWithNullPathsForSourceOrDestination_ThrowsArgumentNullExceptionAndDoesNotSaveConfiguration()
+        SetSyncAssetsConfiguration_DefinitionsHaveNullPaths_ThrowsArgumentNullExceptionAndDoesNotSaveConfiguration()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -796,11 +798,11 @@ public class ApplicationSetSyncAssetsConfigurationTests
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = null!,
-                DestinationDirectory = "\\Server\\Valid1\\Path"
+                DestinationDirectory = "\\\\Server\\Valid1\\Path"
             });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
-                SourceDirectory = "\\Server\\Valid1\\Path",
+                SourceDirectory = "\\\\Server\\Valid1\\Path",
                 DestinationDirectory = null!
             });
 
@@ -834,7 +836,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
                 _application!.SetSyncAssetsConfiguration(syncAssetsConfigurationToSave));
 
-            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'input')"));
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'directory')"));
 
             SyncAssetsConfiguration syncAssetsConfiguration = _application!.GetSyncAssetsConfiguration();
 
@@ -927,17 +929,17 @@ public class ApplicationSetSyncAssetsConfigurationTests
         Assert.That(definitions[0].IncludeSubFolders, Is.False);
         Assert.That(definitions[0].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[1].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
-        Assert.That(definitions[1].DestinationDirectory, Is.EqualTo("\\Server\\Valid2\\Path"));
+        Assert.That(definitions[1].SourceDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
+        Assert.That(definitions[1].DestinationDirectory, Is.EqualTo("\\\\Server\\Valid2\\Path"));
         Assert.That(definitions[1].IncludeSubFolders, Is.False);
         Assert.That(definitions[1].DeleteAssetsNotInSource, Is.False);
 
         Assert.That(definitions[2].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
-        Assert.That(definitions[2].DestinationDirectory, Is.EqualTo("\\Server\\Valid2\\Path"));
+        Assert.That(definitions[2].DestinationDirectory, Is.EqualTo("\\\\Server\\Valid2\\Path"));
         Assert.That(definitions[2].IncludeSubFolders, Is.False);
         Assert.That(definitions[2].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[3].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
+        Assert.That(definitions[3].SourceDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
         Assert.That(definitions[3].DestinationDirectory, Is.EqualTo("C:\\Valid2\\Path"));
         Assert.That(definitions[3].IncludeSubFolders, Is.True);
         Assert.That(definitions[3].DeleteAssetsNotInSource, Is.True);
@@ -947,8 +949,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
         Assert.That(definitions[4].IncludeSubFolders, Is.False);
         Assert.That(definitions[4].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[5].SourceDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
-        Assert.That(definitions[5].DestinationDirectory, Is.EqualTo("\\Server\\Valid1\\Path"));
+        Assert.That(definitions[5].SourceDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
+        Assert.That(definitions[5].DestinationDirectory, Is.EqualTo("\\\\Server\\Valid1\\Path"));
         Assert.That(definitions[5].IncludeSubFolders, Is.False);
         Assert.That(definitions[5].DeleteAssetsNotInSource, Is.False);
 
@@ -957,8 +959,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
         Assert.That(definitions[6].IncludeSubFolders, Is.False);
         Assert.That(definitions[6].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[7].SourceDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
-        Assert.That(definitions[7].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+        Assert.That(definitions[7].SourceDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
+        Assert.That(definitions[7].DestinationDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
         Assert.That(definitions[7].IncludeSubFolders, Is.False);
         Assert.That(definitions[7].DeleteAssetsNotInSource, Is.True);
 
@@ -977,27 +979,27 @@ public class ApplicationSetSyncAssetsConfigurationTests
         Assert.That(definitions[10].IncludeSubFolders, Is.True);
         Assert.That(definitions[10].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[11].SourceDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+        Assert.That(definitions[11].SourceDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
         Assert.That(definitions[11].DestinationDirectory, Is.EqualTo("C:\\Valid1\\Path"));
         Assert.That(definitions[11].IncludeSubFolders, Is.False);
         Assert.That(definitions[11].DeleteAssetsNotInSource, Is.False);
 
         Assert.That(definitions[12].SourceDirectory, Is.EqualTo("C:\\Valid1\\Path"));
-        Assert.That(definitions[12].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes"));
+        Assert.That(definitions[12].DestinationDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes"));
         Assert.That(definitions[12].IncludeSubFolders, Is.False);
         Assert.That(definitions[12].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[13].SourceDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes1"));
-        Assert.That(definitions[13].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes2"));
+        Assert.That(definitions[13].SourceDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes1"));
+        Assert.That(definitions[13].DestinationDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes2"));
         Assert.That(definitions[13].IncludeSubFolders, Is.False);
         Assert.That(definitions[13].DeleteAssetsNotInSource, Is.False);
 
         Assert.That(definitions[14].SourceDirectory, Is.EqualTo("C:\\Some\\Extra\\Backslashes1"));
-        Assert.That(definitions[14].DestinationDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes2"));
+        Assert.That(definitions[14].DestinationDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes2"));
         Assert.That(definitions[14].IncludeSubFolders, Is.False);
         Assert.That(definitions[14].DeleteAssetsNotInSource, Is.False);
 
-        Assert.That(definitions[15].SourceDirectory, Is.EqualTo("\\Remote\\With\\Extra\\Backslashes1"));
+        Assert.That(definitions[15].SourceDirectory, Is.EqualTo("\\\\Remote\\With\\Extra\\Backslashes1"));
         Assert.That(definitions[15].DestinationDirectory, Is.EqualTo("C:\\Some\\Extra\\Backslashes2"));
         Assert.That(definitions[15].IncludeSubFolders, Is.False);
         Assert.That(definitions[15].DeleteAssetsNotInSource, Is.False);

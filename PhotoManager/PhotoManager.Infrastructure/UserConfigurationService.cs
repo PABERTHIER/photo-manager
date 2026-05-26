@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PhotoManager.Infrastructure;
 
-public class UserConfigurationService : IUserConfigurationService
+public partial class UserConfigurationService : IUserConfigurationService
 {
 #pragma warning disable IDE0370
     public AssetSettings AssetSettings { get; private set; } = null!;
@@ -86,14 +87,15 @@ public class UserConfigurationService : IUserConfigurationService
 
         HashSettings = new(pHashThreshold, usingDHash, usingMD5Hash, usingPHash);
 
-        string? assetsDirectory = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY);
-        string? exemptedFolderPath = _configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH);
+        string assetsDirectory = ExpandPath(_configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY)!);
+        string exemptedFolderPath =
+            ExpandPath(_configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH)!);
         string? firstFrameVideosFolderName =
             _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
 
-        string firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
+        string firstFrameVideosPath = Path.Combine(assetsDirectory, firstFrameVideosFolderName!);
 
-        PathSettings = new(assetsDirectory!, exemptedFolderPath!, firstFrameVideosPath);
+        PathSettings = new(assetsDirectory, exemptedFolderPath, firstFrameVideosPath);
 
         string? projectName = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME);
         string? projectOwner = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER);
@@ -113,4 +115,46 @@ public class UserConfigurationService : IUserConfigurationService
 
         return fileVersionInfo.ProductVersion;
     }
+
+    private static string ExpandPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return path;
+        }
+
+        string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string expandedPath = ExpandHomeDirectory(path, homeDirectory);
+        expandedPath = Environment.ExpandEnvironmentVariables(expandedPath);
+
+        expandedPath = UnixEnvironmentVariableRegex().Replace(expandedPath, match =>
+        {
+            string variableName = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
+            string? value = Environment.GetEnvironmentVariable(variableName);
+
+            return value ?? match.Value;
+        });
+
+        return Path.GetFullPath(expandedPath);
+    }
+
+    public static string ExpandHomeDirectory(string path, string homeDirectory)
+    {
+        if (path != "~"
+            && !path.StartsWith("~/", StringComparison.Ordinal)
+            && !path.StartsWith("~\\", StringComparison.Ordinal))
+        {
+            return path;
+        }
+
+        if (string.IsNullOrWhiteSpace(homeDirectory))
+        {
+            return path;
+        }
+
+        return path == "~" ? homeDirectory : Path.Combine(homeDirectory, path[2..]);
+    }
+
+    [GeneratedRegex(@"\$(\w+)|\$\{([^}]+)\}")]
+    private static partial Regex UnixEnvironmentVariableRegex();
 }

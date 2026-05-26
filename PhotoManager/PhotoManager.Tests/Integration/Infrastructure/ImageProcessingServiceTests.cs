@@ -685,10 +685,8 @@ public class ImageProcessingServiceTests
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
 
-    // HEIC thumbnail byte sizes vary across machines because the Windows HEIF Image Extensions codec
-    // (installed via Microsoft Store) differs between environments. Different codec versions produce
-    // slightly different decoded pixel data, leading to different JPEG re-encoding sizes (~1% variance).
-    // A 2% tolerance accommodates codec differences while still catching genuine encoding regressions.
+    // HEIC thumbnail byte sizes can vary slightly across native image codec builds and platforms.
+    // A 2% tolerance catches genuine encoding regressions while avoiding OS-specific false positives.
     [Test]
     [TestCase(FileNames.IMAGE_11_HEIC, ImageRotation.Rotate0, ImageByteSizes.IMAGE_11_HEIC)]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, ImageRotation.Rotate90, ImageByteSizes.IMAGE_11_90_DEG_HEIC)]

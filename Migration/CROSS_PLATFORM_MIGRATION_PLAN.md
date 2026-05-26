@@ -111,15 +111,15 @@ PhotoManager.Application/
 | Dependency | Location | Issue | Cross-Platform? |
 |-----------|----------|-------|----------------|
 | **`Magick.NET-Q16-AnyCPU`** v14.11.0 | Common | Image processing (HEIC, hashing, etc.) | ✅ **Already cross-platform** (Windows, Linux, macOS) |
-| **`FFMpegCore`** v5.4.0 | Common | Video frame extraction | ✅ **Cross-platform** — but current bundling uses `.rar` extraction via a Windows-only MSBuild task (`FileExtractionTask.dll`) |
-| **`Microsoft.Toolkit.Uwp.Notifications`** v7.1.3 | UI | Toast notifications | ❌ **Windows-only** UWP package |
-| **`System.Drawing`** | Common (`BitmapHelper`) | `Bitmap` class for `LoadBitmapFromPath` + `IsValidGdiPlusImage` | ⚠️ **Limited cross-platform** (System.Drawing.Common requires libgdiplus on Linux) |
-| **HEIC/HEVC Codecs** | CI (`build.yml`) | Installed via `winget` + `Add-AppxPackage` | ❌ **Windows-only** install mechanism (but Magick.NET handles HEIC natively cross-platform) |
-| **`Mutex("PhotoManagerStartup")`** | UI (`App.xaml.cs`) | Single-instance enforcement | ⚠️ Named Mutexes work differently on Linux/macOS |
+| **`FFMpegCore`** v5.4.0 | Common | Video frame extraction | ✅ **DONE** — versioned `Curiosity.FFmpeg.Runtimes.*` packages copy app-local binaries per RID |
+| **`Microsoft.Toolkit.Uwp.Notifications`** v7.1.3 | UI | Toast notifications | ✅ **DONE** — package removed; no active code usage |
+| **`System.Drawing`** | Common (`BitmapHelper`) | `Bitmap` class for `LoadBitmapFromPath` + `IsValidGdiPlusImage` | ✅ **DONE** **Limited cross-platform** (System.Drawing.Common requires libgdiplus on Linux) |
+| **HEIC/HEVC Codecs** | CI (`build.yml`) | Installed via `winget` + `Add-AppxPackage` | ✅ **DONE** — Windows codec install removed; Magick.NET path verified |
+| **`Mutex("PhotoManagerStartup")`** | UI (`App.xaml.cs`) | Single-instance enforcement | ✅ **DONE** — replaced by app-local file lock service |
 | **`MessageBox.Show()`** | UI (`App.xaml.cs`) | WPF message dialog | ❌ **WPF-only** |
-| **RAR extraction MSBuild task** | Common (`.csproj`) | `FileExtractionTask.dll` extracts FFmpeg from `.rar` files | ❌ **Windows-only** binary |
-| **`rmdir /S /Q`** | Tests (`.csproj`) | Post-build cleanup command | ❌ **Windows-only** command |
-| **Hardcoded Windows paths** | `appsettings.json` (UI + Tests) | `C:\Users\...`, `E:\Workspace\...` | ⚠️ Config-only, user-specific |
+| **RAR extraction MSBuild task** | Common (`.csproj`) | `FileExtractionTask.dll` extracts FFmpeg from `.rar` files | ✅ **DONE** — `.rar` files and custom extraction DLLs removed |
+| **`rmdir /S /Q`** | Tests (`.csproj`) | Post-build cleanup command | ✅ **DONE** — replaced with MSBuild `RemoveDir`; coverage helper moved to `pwsh` |
+| **Hardcoded Windows paths** | `appsettings.json` (UI + Tests) | `C:\Users\...`, `E:\Workspace\...` | ✅ **DONE** — portable examples plus `~`/environment-variable expansion |
 
 ### 2.3 Build & CI Dependencies
 
@@ -128,7 +128,7 @@ PhotoManager.Application/
 | Target framework | `net10.0-windows10.0.26100.0` | Must become `net10.0` (or multi-target) |
 | `<UseWPF>true</UseWPF>` | `Directory.Build.props` (global) | Must move to UI `.csproj` only |
 | CI runner | `windows-latest` only | Must add Linux + macOS matrix |
-| HEIC codec install | `winget` + `Add-AppxPackage` | Replace with Magick.NET native HEIC support |
+| HEIC codec install | `winget` + `Add-AppxPackage` | ✅ **DONE** — removed; Magick.NET native HEIC support verified |
 
 ### 2.4 Test Impact Assessment
 
@@ -452,7 +452,7 @@ After all replacements are complete:
 
 > **Goal**: Make all non-UI infrastructure cross-platform.
 
-#### 2.1 FFmpeg Binary Distribution
+#### 2.1 FFmpeg Binary Distribution **DONE**
 
 **Current**: Windows-only RAR extraction via custom MSBuild task (`FileExtractionTask.dll`)
 
@@ -468,7 +468,11 @@ After all replacements are complete:
 - **Option B**: Bundle platform-specific FFmpeg binaries as `.zip`/`.tar.gz` in the repo
   with cross-platform extraction (using `System.IO.Compression`)
 
-#### 2.2 Replace `Microsoft.Toolkit.Uwp.Notifications`
+**Completed:** Option A was implemented with versioned `Curiosity.FFmpeg.Runtimes.*` packages. The build
+copies `ffmpeg` and `ffprobe` into `Ffmpeg/Bin`, supports environment/configured overrides, and falls back to
+`PATH`. The old `.rar` files and custom extraction DLLs were removed.
+
+#### 2.2 Replace `Microsoft.Toolkit.Uwp.Notifications` **DONE**
 
 **Current**: Windows-only UWP toast notifications (appears to not be actively used in code)
 
@@ -478,7 +482,9 @@ After all replacements are complete:
   - Avalonia has community notification packages
   - Or use `DesktopNotifications` NuGet package (cross-platform)
 
-#### 2.3 HEIC/HEVC Codec Handling
+**Completed:** The package reference was removed because no production code used UWP toast APIs.
+
+#### 2.3 HEIC/HEVC Codec Handling **DONE**
 
 **Current**: CI installs Windows-specific codec extensions via `winget` and `Add-AppxPackage`
 
@@ -490,7 +496,10 @@ install can be removed from CI.
 **Verify**: Run HEIC-related tests after Phase 1 changes to confirm Magick.NET handles
 everything without OS codecs.
 
-#### 2.4 Single-Instance Application Mutex
+**Completed:** The CI `winget`/`Add-AppxPackage` codec installation was removed after HEIC/metadata tests
+passed through the Magick.NET path.
+
+#### 2.4 Single-Instance Application Mutex **DONE**
 
 **Current**: `new Mutex(true, "PhotoManagerStartup")` in `App.xaml.cs`
 
@@ -500,12 +509,17 @@ alternatives:
 - Platform-agnostic single-instance library
 - Avalonia has community solutions for this
 
-#### 2.5 Fix Windows-Specific Build Commands
+**Completed:** The named mutex was replaced with `ISingleInstanceService`, backed by an app-local lock file and
+disposed through the DI container on application exit.
+
+#### 2.5 Fix Windows-Specific Build Commands **DONE**
 
 | Item | Current | Replacement |
 |------|---------|-------------|
-| Tests `.csproj` post-build | `rmdir /S /Q` | Use MSBuild `RemoveDir` task |
-| `appsettings.json` paths | `C:\Users\...` | Use relative paths or `%USERPROFILE%`/`$HOME` |
+| Tests `.csproj` post-build | `rmdir /S /Q` | ✅ MSBuild `RemoveDir` task |
+| Local coverage helper | `.bat` script | ✅ `pwsh` script with filtered coverage support |
+| `appsettings.json` paths | `C:\Users\...` | ✅ `~`, `%VARIABLE%`, `$VARIABLE`, `${VARIABLE}` expansion |
+| Domain path handling | Windows separators only | ✅ Windows and Unix separators accepted for folder/sync paths |
 
 ---
 
@@ -655,16 +669,16 @@ strategy:
 
 | Platform | FFmpeg Source |
 |----------|-------------|
-| Windows | Bundle in app or install via `winget`/`choco` |
-| Linux | System package (`apt install ffmpeg`) — document as prerequisite |
-| macOS | System package (`brew install ffmpeg`) — document as prerequisite |
+| Windows | ✅ **DONE** — app-local runtime package binary, with override/PATH fallback |
+| Linux | ✅ **DONE** — app-local runtime package binary, with override/PATH fallback |
+| macOS | ✅ **DONE** — app-local runtime package binary, with override/PATH fallback |
 
 #### 4.4 Remove Windows-Only CI Steps
 
-- Remove `winget install` HEIF extensions
-- Remove `Add-AppxPackage` HEVC codec
-- Remove Windows-specific PowerShell scripts
-- Add platform-appropriate FFmpeg installation per matrix OS
+- Remove `winget install` HEIF extensions — **DONE**
+- Remove `Add-AppxPackage` HEVC codec — **DONE**
+- Remove Windows-specific cleanup scripts — **DONE**
+- Add platform-appropriate FFmpeg installation per matrix OS — **DONE** via runtime packages, no CI install needed
 
 ---
 
@@ -715,7 +729,7 @@ strategy:
 | HEIC support via Magick.NET differs from Windows codecs | Low | High | Test with all existing HEIC test files early in Phase 1 |
 | `SortableObservableCollection` behavior differs | Low | Low | Standard `ObservableCollection` — should work identically |
 | Avalonia `DataGrid` lacks WPF `DataGrid` features | Medium | Medium | Evaluate Avalonia `DataGrid` package early; may need custom template |
-| FFmpeg not available on user's system (Linux/macOS) | Medium | Medium | Check at startup, show friendly error with install instructions |
+| FFmpeg runtime package missing for a RID | Low | Medium | Keep override/PATH fallback and fail clearly if no binary is available |
 | Performance regression on Linux/macOS | Low | Medium | Run benchmarks on all platforms; SkiaSharp is typically fast |
 | ~70 test files need updates → risk of test regression | Medium | High | Phase 1 is test-heavy; run full suite after each sub-step |
 | TreeView lazy-loading behaves differently in Avalonia | Low | Medium | Avalonia TreeView supports `HierarchicalDataTemplate` — similar pattern |
@@ -730,9 +744,9 @@ strategy:
 | Image carrier type | **SkiaSharp `SKBitmap`** via `IImageData` abstraction | Integrates natively with Avalonia (Skia-based); cross-platform; MIT license; good performance | ImageSharp (commercial license), raw `byte[]` (too low-level), Magick.NET `MagickImage` (heavier, not display-oriented) |
 | Image processing | **Keep Magick.NET** | Already integrated; cross-platform; handles HEIC, perceptual hashing, advanced operations | SkiaSharp alone (lacks advanced features), ImageSharp (license concern) |
 | EXIF reading | **Unify on Magick.NET** | Already used for HEIC EXIF; more reliable cross-platform than WPF `BitmapMetadata` | SkiaSharp `SKCodec.EncodedOrigin` (less feature-rich), MetadataExtractor NuGet (another dependency) |
-| FFmpeg distribution | **System-installed + PATH detection** | Simplest cross-platform approach; avoids bundling large binaries | Bundle per-platform (complex packaging), Docker-only (limits desktop use) |
+| FFmpeg distribution | **Versioned runtime packages + PATH fallback** | Deterministic frame extraction without user setup; still supports overrides | System-only FFmpeg (version drift), Docker-only (limits desktop use) |
 | Rotation enum | **Custom `ImageRotation` in Domain** | Domain should not depend on any UI framework; clean architecture | Keep WPF `Rotation` (blocks cross-platform), use `int` degrees (less type-safe) |
-| Notifications | **Evaluate usage first** | May not be actively used; remove if unused, replace if needed | `DesktopNotifications` package (cross-platform) |
+| Notifications | **Removed unused UWP package** | No production code used toast APIs | `DesktopNotifications` package if notifications are reintroduced |
 | Migration approach | **New project alongside old** | Allows incremental migration; old UI stays functional until new one is ready | In-place rewrite (risky, breaks `main`), branch-based rewrite (merge conflicts) |
 
 ---
@@ -742,7 +756,7 @@ strategy:
 Key Findings:
 
 - WPF types leak everywhere: BitmapImage and Rotation are globally imported in Common, Domain, Infrastructure, and Tests — ~90+ references outside UI
-- Magick.NET and FFMpegCore are already cross-platform ✅ — the main blockers are WPF types and the RAR-based FFmpeg bundling
+- Magick.NET and FFMpegCore are cross-platform ✅; the RAR-based FFmpeg bundling blocker is resolved
 - ~201 test files, of which ~50-70 will need updates
 
 Recommendation: Avalonia UI
@@ -752,7 +766,7 @@ Closest WPF migration path (nearly identical XAML), native Skia rendering, MIT l
 
  1. Phase 0 — Split Directory.Build.props so non-UI projects target net10.0 (not Windows-specific); define ImageRotation/IImageData abstractions in Domain
  2. Phase 1 (largest) — Remove all WPF types from non-UI layers: rewrite BitmapHelper with SkiaSharp, unify EXIF on Magick.NET, replace Rotation enum, update ~70 test files
- 3. Phase 2 — Fix FFmpeg distribution (system-installed), remove UWP notifications, handle HEIC via Magick.NET only
+ 3. Phase 2 — Fix Windows-specific infrastructure (FFmpeg, notifications, HEIC, single-instance, build paths) — **DONE**
  4. Phase 3 (most visible) — Build new Avalonia UI project alongside old WPF one, migrate 9 XAML files, reuse ViewModels, then swap
  5. Phase 4-5 — Multi-platform CI matrix, packaging, cross-platform validation
 
@@ -772,11 +786,11 @@ Phase 1: Remove WPF from Non-UI Layers (LARGEST PHASE)
   └── 1.7 Update ~50-70 test files
 
 Phase 2: Replace Windows-Specific Infrastructure
-  ├── 2.1 FFmpeg cross-platform distribution
-  ├── 2.2 Replace/remove UWP Notifications
-  ├── 2.3 HEIC codec handling (verify Magick.NET sufficiency)
-  ├── 2.4 Single-instance Mutex portability
-  └── 2.5 Fix Windows-specific build commands
+  ├── 2.1 FFmpeg cross-platform distribution **DONE**
+  ├── 2.2 Replace/remove UWP Notifications **DONE**
+  ├── 2.3 HEIC codec handling (verify Magick.NET sufficiency) **DONE**
+  ├── 2.4 Single-instance Mutex portability **DONE**
+  └── 2.5 Fix Windows-specific build commands **DONE**
 
 Phase 3: Migrate UI to Avalonia (MOST VISIBLE PHASE)
   ├── 3.1 Create Avalonia project structure

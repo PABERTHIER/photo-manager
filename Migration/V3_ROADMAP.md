@@ -12,8 +12,11 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 1.7 Update remaining test files — **DONE**
 
 2. Phase 2 - Replace Windows-Specific Infrastructure
-   - 2.1 FFmpeg cross-platform distribution
-   - 2.2 Replace Windows file system APIs if any
+   - 2.1 FFmpeg cross-platform distribution — **DONE**
+   - 2.2 Remove unused UWP notifications dependency — **DONE**
+   - 2.3 HEIC/HEVC handling without Windows codec installation — **DONE**
+   - 2.4 Replace single-instance named mutex — **DONE**
+   - 2.5 Replace Windows-specific build commands and path assumptions — **DONE**
 
 3. Phase 3 - Migrate the UI Layer (WPF → Avalonia)
    - 3.1 Set up Avalonia project
