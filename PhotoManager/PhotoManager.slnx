@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/Benchmarks/">
     <Project Path="Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj" />
   </Folder>
@@ -8,5 +8,5 @@
   <Project Path="PhotoManager.Infrastructure/PhotoManager.Infrastructure.csproj" />
   <Project Path="PhotoManager.Persistence/PhotoManager.Persistence.csproj" />
   <Project Path="PhotoManager.Tests/PhotoManager.Tests.csproj" />
-  <Project Path="PhotoManager.UI.Avalonia/PhotoManager.UI.Avalonia.csproj" />
+  <Project Path="PhotoManager.UI/PhotoManager.UI.csproj" />
 </Solution>

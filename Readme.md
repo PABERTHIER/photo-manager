@@ -34,10 +34,10 @@ The SQLite database is stored locally on your computer.**
 
 ## Run the application :rocket:
 
-Open the PhotoManager\PhotoManager.UI.Avalonia\appsettings.json and [configure it](#config-file-card_file_box).
+Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-file-card_file_box).
 
 **Basic usage**: run the .exe file.
-**Advanced usage**: open the solution file `PhotoManager\PhotoManager.slnx`, set `PhotoManager\PhotoManager.UI.Avalonia\PhotoManager.UI.Avalonia.csproj` as the project to launch and run it.
+**Advanced usage**: open the solution file `PhotoManager\PhotoManager.slnx`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
 
 ## Installation instructions :man_teacher:
 
@@ -50,7 +50,7 @@ Open the PhotoManager\PhotoManager.UI.Avalonia\appsettings.json and [configure i
 ## Config file :card_file_box:
 
 If you use the .exe file, you can find a appsettings.json file in the same directory.
-You can also find it at `PhotoManager\PhotoManager.UI.Avalonia\appsettings.json`.
+You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
 
 The aim is to let you configure it as you need.
 
@@ -261,7 +261,7 @@ It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests
 I've made a specific repo for the custom dll, injected in the project:
 [photo-manager-tasks][photo-manager-tasks-link]
 
-[app-icon]: PhotoManager/PhotoManager.UI.Avalonia/Assets/AppIcon.png
+[app-icon]: PhotoManager/PhotoManager.UI/Assets/AppIcon.png
 
 [build-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg
 [build-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml

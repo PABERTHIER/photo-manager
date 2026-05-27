@@ -1,4 +1,5 @@
-﻿using PhotoManager.Application;
+﻿using Avalonia.Media.Imaging;
+using PhotoManager.Application;
 using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
@@ -6,8 +7,6 @@ using PhotoManager.UI.Converters;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.ViewModels;
 
@@ -35,7 +34,6 @@ public class ApplicationViewModel : BaseViewModel
             [SortCriteria.ThumbnailCreationDateTime] = "thumbnail creation"
         };
 
-    // TODO: Private set for all props + Update UI to set mode OneWay
     public ApplicationViewModel(IApplication application)
     {
         _application = application;
@@ -65,7 +63,7 @@ public class ApplicationViewModel : BaseViewModel
         private set
         {
             field = value;
-            NotifyPropertyChanged(nameof(AppMode), nameof(ThumbnailsVisible), nameof(ViewerVisible));
+            NotifyPropertyChanged(nameof(AppMode), nameof(IsThumbnailsVisible), nameof(IsViewerVisible));
             UpdateAppTitle();
         }
     }
@@ -82,19 +80,24 @@ public class ApplicationViewModel : BaseViewModel
 
     public bool SortAscending { get; private set; } = true;
 
-    public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
+    public bool IsThumbnailsVisible => AppMode == AppMode.Thumbnails;
 
-    public Visibility ViewerVisible => AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden;
+    public bool IsViewerVisible => AppMode == AppMode.Viewer;
 
-    // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
         get;
-        set
+        private set
         {
-            // TODO: ViewerPosition is reset to -1 when moving and deleting assets from MainWindow
-            // For this case, the best would be keeping the old ViewerPosition so that we can go to the nearest asset
-            field = value < 0 ? 0 : value;
+            int clampedPosition = ClampViewerPosition(value);
+            bool wasCoerced = clampedPosition != value;
+
+            if (field == clampedPosition && !wasCoerced)
+            {
+                return;
+            }
+
+            field = clampedPosition;
 
             NotifyPropertyChanged(
                 nameof(ViewerPosition),
@@ -108,7 +111,7 @@ public class ApplicationViewModel : BaseViewModel
     public Asset[] SelectedAssets
     {
         get => _selectedAssets;
-        set
+        private set
         {
             _selectedAssets = value;
             NotifyPropertyChanged(nameof(SelectedAssets));
@@ -126,14 +129,18 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public bool IsRefreshingFolders { get; set; }
+    public bool IsRefreshingFolders { get; private set; }
 
-    // TODO: Private set + Update UI to set mode OneWay
     public string AppTitle
     {
         get => _appTitle;
-        set
+        private set
         {
+            if (_appTitle == value)
+            {
+                return;
+            }
+
             _appTitle = value;
             NotifyPropertyChanged(nameof(AppTitle));
         }
@@ -142,16 +149,17 @@ public class ApplicationViewModel : BaseViewModel
     public string StatusMessage
     {
         get => _statusMessage;
-        set
+        private set
         {
             _statusMessage = value;
             NotifyPropertyChanged(nameof(StatusMessage));
         }
     }
 
-    public Asset? CurrentAsset => _observableAssets.Count > 0 ? _observableAssets[ViewerPosition] : null;
+    public Asset? CurrentAsset =>
+        ViewerPosition < _observableAssets.Count ? _observableAssets[ViewerPosition] : null;
 
-    public Folder? MoveAssetsLastSelectedFolder { get; set; }
+    public Folder? MoveAssetsLastSelectedFolder { get; private set; }
 
     public bool CanGoToPreviousAsset => ViewerPosition > 0;
 
@@ -194,6 +202,31 @@ public class ApplicationViewModel : BaseViewModel
         AppMode = AppMode == AppMode.Thumbnails ? AppMode.Viewer : AppMode.Thumbnails;
     }
 
+    public void SetViewerPosition(int viewerPosition)
+    {
+        ViewerPosition = viewerPosition;
+    }
+
+    public void SetSelectedAssets(Asset[] selectedAssets)
+    {
+        SelectedAssets = selectedAssets;
+    }
+
+    public void SetStatusMessage(string statusMessage)
+    {
+        StatusMessage = statusMessage;
+    }
+
+    public void SetIsRefreshingFolders(bool isRefreshingFolders)
+    {
+        IsRefreshingFolders = isRefreshingFolders;
+    }
+
+    public void SetMoveAssetsLastSelectedFolder(Folder? folder)
+    {
+        MoveAssetsLastSelectedFolder = folder;
+    }
+
     public void SetAssets(string newCurrentFolderPath, Asset[] assets)
     {
         // .NET 10 changed ReadOnlySpan<char> == ReadOnlySpan<char> to compare references instead of content
@@ -230,57 +263,36 @@ public class ApplicationViewModel : BaseViewModel
 
         if (initialObservableAssetsCount > 0 && assets.Length > 0)
         {
-            for (int i = 0; i < assets.Length; i++)
-            {
-                if (_observableAssets.Remove(assets[i]))
-                {
-                    assets[i].ImageData?.Dispose();
-                    assets[i].ImageData = null;
-                }
+            HashSet<Asset> assetsToRemove = [.. assets];
+            SortableObservableCollection<Asset> remainingAssets = [];
+            List<Asset> removedAssets = [];
 
-                if (ViewerPosition == _observableAssets.Count)
+            for (int i = 0; i < _observableAssets.Count; i++)
+            {
+                Asset observableAsset = _observableAssets[i];
+
+                if (assetsToRemove.Contains(observableAsset))
                 {
-                    GoToPreviousAsset();
+                    removedAssets.Add(observableAsset);
+                }
+                else
+                {
+                    remainingAssets.Add(observableAsset);
                 }
             }
 
-            if (initialObservableAssetsCount != _observableAssets.Count)
+            if (removedAssets.Count > 0)
             {
+                for (int i = 0; i < removedAssets.Count; i++)
+                {
+                    removedAssets[i].ImageData?.Dispose();
+                    removedAssets[i].ImageData = null;
+                }
+
+                _observableAssets = remainingAssets;
+                ViewerPosition = ClampViewerPosition(ViewerPosition);
                 OnObservableAssetsUpdated();
             }
-        }
-    }
-
-    // TODO: Dead code: Delete this method and tests
-    public void GoToAsset(Asset asset)
-    {
-        GoToAsset(asset, AppMode);
-    }
-
-    // TODO: Dead code: Delete this method and tests
-    public void GoToAsset(Asset asset, AppMode newAppMode)
-    {
-        Asset? observableAsset = null;
-        int newViewerPosition = -1;
-
-        for (int i = 0; i < _observableAssets.Count; i++)
-        {
-            if (_observableAssets[i].FileName.AsSpan() == asset.FileName.AsSpan())
-            {
-                observableAsset = _observableAssets[i];
-                newViewerPosition = i;
-                break;
-            }
-        }
-
-        if (observableAsset != null && _application.FileExists(observableAsset.FullPath))
-        {
-            if (AppMode != newAppMode)
-            {
-                ChangeAppMode();
-            }
-
-            ViewerPosition = newViewerPosition;
         }
     }
 
@@ -304,9 +316,8 @@ public class ApplicationViewModel : BaseViewModel
     {
         _previousSortCriteria = SortCriteria;
         SortCriteria = newSortCriteria;
-        SortAscending =
-            (SortCriteria != _previousSortCriteria) ||
-            !SortAscending; // To change ascending order when clicking on the same criteria
+        // To change ascending order when clicking on the same criteria
+        SortAscending = (SortCriteria != _previousSortCriteria) || !SortAscending;
         SortAssets();
     }
 
@@ -377,7 +388,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public Folder[] GetSubFolders(Folder parentFolder) => _application.GetSubFolders(parentFolder);
 
-    public BitmapImage LoadBitmapImageFromPath()
+    public Bitmap? LoadBitmapImageFromPath()
     {
         if (CurrentAsset == null)
         {
@@ -387,7 +398,7 @@ public class ApplicationViewModel : BaseViewModel
         using (IImageData imageData =
                _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation))
         {
-            return BitmapImageFactory.Create(imageData, ImageEncodingFormat.Jpeg) ?? new BitmapImage();
+            return AvaloniaBitmapFactory.Create(imageData, ImageEncodingFormat.Jpeg);
         }
     }
 
@@ -435,7 +446,6 @@ public class ApplicationViewModel : BaseViewModel
         OnObservableAssetsUpdated();
     }
 
-    // TODO: Called to many times, need to rework this (reduce event "AppTitle")
     private void UpdateAppTitle()
     {
         int observableAssetsCount = _observableAssets.Count;
@@ -450,6 +460,17 @@ public class ApplicationViewModel : BaseViewModel
 
     private string GetSortCriteriaDescription() =>
         $"{CriteriaDescriptions[SortCriteria]} {(SortAscending ? "ascending" : "descending")}";
+
+    private int ClampViewerPosition(int position)
+    {
+        if (position < 0 || _observableAssets.Count == 0)
+        {
+            return 0;
+        }
+
+        int maximumPosition = _observableAssets.Count - 1;
+        return position > maximumPosition ? maximumPosition : position;
+    }
 
     private void AddAsset(Asset asset)
     {

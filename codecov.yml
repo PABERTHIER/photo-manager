@@ -29,7 +29,7 @@ component_management:
     - component_id: module_ui
       name: UI
       paths:
-        - PhotoManager/PhotoManager.UI.Avalonia/**
+        - PhotoManager/PhotoManager.UI/**
     - component_id: module_application
       name: Application
       paths:

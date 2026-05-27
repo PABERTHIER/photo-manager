@@ -6,7 +6,7 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Control
+// For STA concern and resources initialization issues, the best choice has been to "mock" the Control
 // The goal is to test what does FolderNavigationControl
 [TestFixture]
 public class FolderNavigationControlTests

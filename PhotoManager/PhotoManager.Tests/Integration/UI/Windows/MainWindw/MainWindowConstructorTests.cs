@@ -5,7 +5,7 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
 // The goal is to test what does MainWindow
 [TestFixture]
 public class MainWindowConstructorTests

@@ -10,7 +10,7 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsse
 
 namespace PhotoManager.Tests.Unit.UI.Windows.FindDuplicatedAssetsWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
 // The goal is to test what does FindDuplicatedAssetsWindow
 [TestFixture]
 public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTests

@@ -5,7 +5,7 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
 // The goal is to test what does SyncAssetsWindow and in this case, BaseProcessViewModel as well
 [TestFixture]
 public class SyncAssetsWindowTests

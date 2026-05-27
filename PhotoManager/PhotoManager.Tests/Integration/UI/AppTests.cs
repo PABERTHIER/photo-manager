@@ -7,7 +7,7 @@ using PhotoManager.UI.Windows;
 
 namespace PhotoManager.Tests.Integration.UI;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" App
+// For STA concern and resources initialization issues, the best choice has been to "mock" App
 // The goal is to test what does App
 [TestFixture]
 public class AppTests

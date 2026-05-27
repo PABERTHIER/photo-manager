@@ -1,18 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+    <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
+    <OutputType Condition="'$(OS)' != 'Windows_NT'">Exe</OutputType>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <AssemblyName>PhotoManager.UI</AssemblyName>
+    <RootNamespace>PhotoManager.UI</RootNamespace>
     <Product>PhotoManager</Product>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+
   <ItemGroup>
-    <None Remove="AppIcon.png" />
-    <None Remove="Readme.md" />
-    <None Remove="Windows\AppIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AppIcon.ico" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
@@ -22,15 +25,28 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Logging" />
     <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Tmds.DBus.Protocol" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\PhotoManager.Application\PhotoManager.Application.csproj" />
     <ProjectReference Include="..\PhotoManager.Domain\PhotoManager.Domain.csproj" />
     <ProjectReference Include="..\PhotoManager.Infrastructure\PhotoManager.Infrastructure.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Windows\AppIcon.png" />
+    <AvaloniaResource Include="Assets\AppIcon.png" Link="Assets\AppIcon.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\AppIcon.ico" />
+    <None Remove="Assets\AppIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\AppIcon.ico" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
