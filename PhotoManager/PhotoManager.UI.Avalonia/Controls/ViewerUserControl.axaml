@@ -1,0 +1,59 @@
+﻿<UserControl
+    x:Class="PhotoManager.UI.Controls.ViewerUserControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{DynamicResource PhotoManagerPanelBrush}">
+    <Grid ColumnDefinitions="80,*,80" RowDefinitions="*,Auto,*">
+        <!-- Displaying the pictures in view mode, main page -->
+        <Image
+            x:Name="BackgroundImage"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Stretch="Fill"
+            Opacity="0.55"
+            RenderOptions.BitmapInterpolationMode="HighQuality">
+            <Image.Effect>
+                <BlurEffect Radius="40" />
+            </Image.Effect>
+        </Image>
+        <!-- Image_PointerPressed will open the image in thumbnail mode in the MainWindow -->
+        <Border
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="1"
+            Padding="16"
+            PointerPressed="Image_PointerPressed">
+            <Image
+                x:Name="Image"
+                Stretch="Uniform"
+                RenderOptions.BitmapInterpolationMode="HighQuality" />
+        </Border>
+        <Button
+            Grid.Row="0"
+            Grid.Column="2"
+            Classes="action"
+            Margin="8"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Content="X"
+            Click="CloseButton_Click" />
+        <Button
+            Grid.Row="1"
+            Grid.Column="0"
+            Classes="viewer-nav"
+            Margin="12"
+            Content="←"
+            IsEnabled="{Binding CanGoToPreviousAsset}"
+            Click="PreviousButton_Click" />
+        <Button
+            Grid.Row="1"
+            Grid.Column="2"
+            Classes="viewer-nav"
+            Margin="12"
+            Content="→"
+            IsEnabled="{Binding CanGoToNextAsset}"
+            Click="NextButton_Click" />
+    </Grid>
+</UserControl>

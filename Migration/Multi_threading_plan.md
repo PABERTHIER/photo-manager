@@ -32,7 +32,8 @@ For each folder:
 
 ### Why Simple Parallel.ForEach Won't Work
 
-1. **WPF BitmapImage requires STA thread** — Current thumbnail pipeline uses WPF-specific types that are thread-affinity-bound
+1. **WPF BitmapImage requires STA thread** — **DONE**: non-UI layers now use `IImageData`, and the
+   Avalonia UI creates `Bitmap` instances only for display.
 2. **SQLite writer serialization** — WAL mode allows concurrent reads but still serializes writes. Naive parallelism creates lock contention
 3. **Callback ordering** — The UI expects callbacks in a predictable order (folder by folder)
 4. **Memory explosion** — Reading 8 files × 20MB simultaneously = 160MB+ of LOH allocations
@@ -426,11 +427,24 @@ public async Task CatalogAssetsAsync(CatalogChangeCallback callback, Cancellatio
 
 The biggest constraint: **`BitmapImage` must be created on an STA thread or Frozen before cross-thread access.**
 
-**Solution:** Replace WPF-based thumbnail generation with ImageMagick in the processing pipeline. Only create `BitmapImage` objects when the UI actually needs to display them (in `LoadThumbnail()` / `GetAssetsByPath()`, which are already called on the UI thread).
+**Solution:** Replace WPF-based thumbnail generation with ImageMagick in the processing pipeline.
+The migrated Avalonia UI now converts `IImageData` to `Avalonia.Media.Imaging.Bitmap` only when
+display code requests it.
 
-> **Note:** The `IImageData` abstraction has been introduced (Phase 1.1/1.2 of the Cross-Platform Migration Plan — **DONE**). All non-UI interfaces now use `IImageData` instead of `BitmapImage`, and `ImageRotation` instead of WPF `Rotation`. The UI layer casts `IImageData` → `BitmapImageData` → `.BitmapImage` at display time only. This unblocks multi-threading in the processing pipeline.
+> **Note:** The `IImageData` abstraction has been introduced (Phase 1.1/1.2 of the Cross-Platform
+> Migration Plan — **DONE**). All non-UI interfaces now use `IImageData` instead of `BitmapImage`,
+> and `ImageRotation` instead of WPF `Rotation`. The UI layer converts `IImageData` to Avalonia
+> `Bitmap` at display time only — **DONE**. This unblocks multi-threading in the processing pipeline.
 
-The stored thumbnail data (in SQLite and cache) is raw `byte[]` — already thread-safe. The WPF decode only happens at display time.
+The stored thumbnail data (in SQLite and cache) is raw `byte[]` — already thread-safe.
+The UI decode only happens at display time.
+
+### Avalonia UI State Ownership — **DONE**
+
+The migrated UI now avoids direct two-way mutation of performance-sensitive `ApplicationViewModel` state from XAML.
+Viewer position, selected assets, refresh status, status text, and move-target history are updated through explicit
+methods, with one-way bindings where the UI should only observe state. This keeps the UI side ready for future
+background cataloging work without reintroducing broad mutable state from controls.
 
 ---
 

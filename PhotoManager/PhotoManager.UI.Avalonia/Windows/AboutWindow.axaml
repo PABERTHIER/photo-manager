@@ -1,0 +1,44 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.AboutWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="600"
+    Height="300"
+    WindowStartupLocation="CenterOwner"
+    CanResize="False">
+    <Grid Background="{DynamicResource PhotoManagerBackgroundBrush}" ColumnDefinitions="220,*" RowDefinitions="*,Auto">
+        <Border Grid.RowSpan="2" Background="{DynamicResource PhotoManagerPanelBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                <Image Width="128" Height="128" Source="avares://PhotoManager.UI/Assets/AppIcon.png" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                    Text="PhotoManager" />
+            </StackPanel>
+        </Border>
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="24" Spacing="12">
+            <TextBlock
+                x:Name="ProductTextBlock"
+                FontSize="24"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                Text="{Binding Product}" />
+            <TextBlock
+                FontSize="18"
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="{Binding Author}" />
+            <TextBlock
+                FontSize="18"
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="{Binding Version}" />
+        </StackPanel>
+        <Button
+            Grid.Row="1"
+            Grid.Column="1"
+            Classes="action"
+            Width="100"
+            Margin="24"
+            HorizontalAlignment="Right"
+            Content="Got it!"
+            Click="ConfirmButton_Click" />
+    </Grid>
+</Window>

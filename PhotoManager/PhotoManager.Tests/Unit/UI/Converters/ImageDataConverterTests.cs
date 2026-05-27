@@ -1,7 +1,6 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Media.Imaging;
 using SkiaSharp;
 using System.Globalization;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Tests.Unit.UI.Converters;
 
@@ -9,20 +8,14 @@ namespace PhotoManager.Tests.Unit.UI.Converters;
 [Apartment(ApartmentState.STA)]
 public class ImageDataConverterTests
 {
-    [Test]
-    public void Convert_BitmapImageData_ReturnsBitmapImage()
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        ImageDataConverter converter = new();
-        BitmapImage bitmapImage = new();
-        BitmapImageData imageData = new(bitmapImage, ImageRotation.Rotate0);
-
-        object? result = converter.Convert(imageData, typeof(object), null, CultureInfo.InvariantCulture);
-
-        Assert.That(result, Is.SameAs(bitmapImage));
+        AvaloniaTestSetup.EnsureInitialized();
     }
 
     [Test]
-    public void Convert_IImageDataNotBitmapImageData_ReturnsNull()
+    public void Convert_IImageDataThatEncodesToEmptyBytes_ReturnsNull()
     {
         ImageDataConverter converter = new();
 
@@ -67,7 +60,7 @@ public class ImageDataConverterTests
     }
 
     [Test]
-    public void Convert_SkiaImageData_ReturnsBitmapImage()
+    public void Convert_SkiaImageData_ReturnsBitmap()
     {
         ImageDataConverter converter = new();
 
@@ -85,8 +78,10 @@ public class ImageDataConverterTests
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(result, Is.Not.Null);
-                    Assert.That(result, Is.TypeOf<BitmapImage>());
+                    Assert.That(result, Is.TypeOf<Bitmap>());
                 }
+
+                ((Bitmap)result!).Dispose();
             }
         }
     }
@@ -95,7 +90,7 @@ public class ImageDataConverterTests
     [TestCase(ImageRotation.Rotate90)]
     [TestCase(ImageRotation.Rotate180)]
     [TestCase(ImageRotation.Rotate270)]
-    public void Convert_RotatedSkiaImageData_ReturnsBitmapImageWithoutApplyingRotation(ImageRotation rotation)
+    public void Convert_RotatedSkiaImageData_ReturnsBitmapWithRotatedDimensions(ImageRotation rotation)
     {
         ImageDataConverter converter = new();
 
@@ -115,18 +110,18 @@ public class ImageDataConverterTests
 
                 using (Assert.EnterMultipleScope())
                 {
-                    Assert.That(result, Is.TypeOf<BitmapImage>());
-                    BitmapImage bitmapImage = (BitmapImage)result!;
-                    Assert.That(bitmapImage.Rotation, Is.EqualTo(Rotation.Rotate0));
-                    Assert.That(bitmapImage.PixelWidth, Is.EqualTo(expectedWidth));
-                    Assert.That(bitmapImage.PixelHeight, Is.EqualTo(expectedHeight));
+                    Assert.That(result, Is.TypeOf<Bitmap>());
+                    Bitmap avaloniaBitmap = (Bitmap)result!;
+                    Assert.That(avaloniaBitmap.PixelSize.Width, Is.EqualTo(expectedWidth));
+                    Assert.That(avaloniaBitmap.PixelSize.Height, Is.EqualTo(expectedHeight));
+                    avaloniaBitmap.Dispose();
                 }
             }
         }
     }
 
     [Test]
-    public void Convert_SkiaImageDataWithInvalidRotation_ReturnsBitmapImageWithRotate0()
+    public void Convert_SkiaImageDataWithInvalidRotation_ReturnsBitmap()
     {
         ImageDataConverter converter = new();
 
@@ -143,9 +138,10 @@ public class ImageDataConverterTests
 
                 using (Assert.EnterMultipleScope())
                 {
-                    Assert.That(result, Is.TypeOf<BitmapImage>());
-                    Assert.That(((BitmapImage)result!).Rotation, Is.EqualTo(Rotation.Rotate0));
+                    Assert.That(result, Is.TypeOf<Bitmap>());
                 }
+
+                ((Bitmap)result!).Dispose();
             }
         }
     }

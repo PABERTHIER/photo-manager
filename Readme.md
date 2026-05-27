@@ -34,10 +34,10 @@ The SQLite database is stored locally on your computer.**
 
 ## Run the application :rocket:
 
-Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-file-card_file_box).
+Open the PhotoManager\PhotoManager.UI.Avalonia\appsettings.json and [configure it](#config-file-card_file_box).
 
 **Basic usage**: run the .exe file.
-**Advanced usage**: open the solution file `PhotoManager\PhotoManager.slnx`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
+**Advanced usage**: open the solution file `PhotoManager\PhotoManager.slnx`, set `PhotoManager\PhotoManager.UI.Avalonia\PhotoManager.UI.Avalonia.csproj` as the project to launch and run it.
 
 ## Installation instructions :man_teacher:
 
@@ -50,7 +50,7 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 ## Config file :card_file_box:
 
 If you use the .exe file, you can find a appsettings.json file in the same directory.
-You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
+You can also find it at `PhotoManager\PhotoManager.UI.Avalonia\appsettings.json`.
 
 The aim is to let you configure it as you need.
 
@@ -167,6 +167,10 @@ Using environment variables:
 - `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
 - `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
 
+**The `Ui` part is about desktop UI settings:** :desktop_computer:
+
+- `ThemeMode = "System"`: Uses the operating system theme. Supported values are `System`, `Light`, and `Dark`.
+
 ## Compatible picture formats :camera:
 
 - .bmp - Windows bitmap
@@ -219,7 +223,7 @@ Improvements **WIP**.
 ## Technologies used :man_technologist:
 
 - [.NET 10.0][dotnet]
-- [Windows Presentation Foundation][wpf]
+- [Avalonia UI][avalonia]
 - [SQLite][sqlite] (via [Microsoft.Data.Sqlite][ms-data-sqlite])
 - [NUnit][nunit]
 - [NSubstitute][nsubstitute]
@@ -257,7 +261,7 @@ It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests
 I've made a specific repo for the custom dll, injected in the project:
 [photo-manager-tasks][photo-manager-tasks-link]
 
-[app-icon]: PhotoManager/Images/AppIcon.png
+[app-icon]: PhotoManager/PhotoManager.UI.Avalonia/Assets/AppIcon.png
 
 [build-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg
 [build-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml
@@ -274,7 +278,7 @@ I've made a specific repo for the custom dll, injected in the project:
 [jp-photo-manager-repo]: https://github.com/jpablodrexler/jp-photo-manager
 
 [dotnet]: https://dotnet.microsoft.com/
-[wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
+[avalonia]: https://avaloniaui.net/
 [sqlite]: https://www.sqlite.org/
 [ms-data-sqlite]: https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/
 [nunit]: https://nunit.org/

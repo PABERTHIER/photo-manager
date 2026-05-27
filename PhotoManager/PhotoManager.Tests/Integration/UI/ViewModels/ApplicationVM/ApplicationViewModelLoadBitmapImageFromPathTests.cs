@@ -1,8 +1,8 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Media.Imaging;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -246,17 +246,12 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
         const string expectedStatusMessage = "The catalog process has ended.";
 
-        BitmapImageData image1 = new(_applicationViewModel!.LoadBitmapImageFromPath());
+        Bitmap? image1 = LoadBitmapImage();
 
         Assert.That(image1, Is.Not.Null);
-        Assert.That(image1.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));
-        Assert.That(image1.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(image1.BitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(image1.BitmapImage.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(image1.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image1.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image1.PixelSize.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
+        Assert.That(image1.PixelSize.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
+        image1.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -303,19 +298,14 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 2 of 4 - sorted by file name ascending";
 
-        _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[1]);
+        _applicationViewModel!.SetViewerPosition(1);
 
-        BitmapImageData image2 = new(_applicationViewModel!.LoadBitmapImageFromPath());
+        Bitmap? image2 = LoadBitmapImage();
 
         Assert.That(image2, Is.Not.Null);
-        Assert.That(image2.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
-        Assert.That(image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
-        Assert.That(image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
-        Assert.That(image2.BitmapImage.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
-        Assert.That(image2.BitmapImage.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
-        Assert.That(image2.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image2.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image2.PixelSize.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
+        Assert.That(image2.PixelSize.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
+        image2.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -347,7 +337,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // First GoToAsset
+        // First SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -368,19 +358,14 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 3 of 4 - sorted by file name ascending";
 
-        _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[2]);
+        _applicationViewModel!.SetViewerPosition(2);
 
-        BitmapImageData image3 = new(_applicationViewModel!.LoadBitmapImageFromPath());
+        Bitmap? image3 = LoadBitmapImage();
 
         Assert.That(image3, Is.Not.Null);
-        Assert.That(image3.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
-        Assert.That(image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
-        Assert.That(image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
-        Assert.That(image3.BitmapImage.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
-        Assert.That(image3.BitmapImage.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
-        Assert.That(image3.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image3.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image3.PixelSize.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
+        Assert.That(image3.PixelSize.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
+        image3.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -412,13 +397,13 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // First GoToAsset
+        // First SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-        // Second GoToAsset
+        // Second SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
@@ -439,19 +424,14 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 4 of 4 - sorted by file name ascending";
 
-        _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[3]);
+        _applicationViewModel!.SetViewerPosition(3);
 
-        BitmapImageData image4 = new(_applicationViewModel!.LoadBitmapImageFromPath());
+        Bitmap? image4 = LoadBitmapImage();
 
         Assert.That(image4, Is.Not.Null);
-        Assert.That(image4.BitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
-        Assert.That(image4.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
-        Assert.That(image4.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
-        Assert.That(image4.BitmapImage.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
-        Assert.That(image4.BitmapImage.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
-        Assert.That(image4.BitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(image4.BitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(image4.PixelSize.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
+        Assert.That(image4.PixelSize.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
+        image4.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -483,19 +463,19 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // First GoToAsset
+        // First SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-        // Second GoToAsset
+        // Second SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
         Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-        // Third GoToAsset
+        // Third SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("CanGoToNextAsset"));
@@ -552,6 +532,13 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(folderRemovedEvents, Is.Empty);
     }
 
+    private Bitmap? LoadBitmapImage()
+    {
+        AvaloniaTestSetup.EnsureInitialized();
+
+        return _applicationViewModel!.LoadBitmapImageFromPath();
+    }
+
     private
         (List<string> notifyPropertyChangedEvents,
         List<ApplicationViewModel> applicationViewModelInstances,
@@ -591,8 +578,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -628,8 +615,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));

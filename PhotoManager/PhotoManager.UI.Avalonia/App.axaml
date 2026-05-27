@@ -1,0 +1,105 @@
+﻿<Application
+    x:Class="PhotoManager.UI.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    RequestedThemeVariant="Default">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerPanelBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PhotoManagerBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="10,4" />
+        </Style>
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerCardBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PhotoManagerAccentBrush}" />
+        </Style>
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.45" />
+        </Style>
+        <Style Selector="Button.action">
+            <Setter Property="MinWidth" Value="92" />
+        </Style>
+        <Style Selector="Button.viewer-nav">
+            <Setter Property="Width" Value="56" />
+            <Setter Property="Height" Value="56" />
+            <Setter Property="MinWidth" Value="56" />
+            <Setter Property="MinHeight" Value="56" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="32" />
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerOverlayBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerViewerButtonForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PhotoManagerViewerButtonBorderBrush}" />
+            <Setter Property="CornerRadius" Value="28" />
+        </Style>
+        <Style Selector="Button.viewer-nav:pointerover">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerOverlayHoverBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PhotoManagerAccentBrush}" />
+        </Style>
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerPanelBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource PhotoManagerBorderBrush}" />
+        </Style>
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerPanelBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+        </Style>
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerSelectionBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerSelectionForegroundBrush}" />
+        </Style>
+        <Style Selector="TextBlock.status">
+            <Setter Property="Background" Value="{DynamicResource PhotoManagerPanelBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+    </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="PhotoManagerBackgroundBrush" Color="#F7F7FA" />
+                    <SolidColorBrush x:Key="PhotoManagerPanelBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerCardBrush" Color="#ECECF2" />
+                    <SolidColorBrush x:Key="PhotoManagerForegroundBrush" Color="#1F1F24" />
+                    <SolidColorBrush x:Key="PhotoManagerMutedForegroundBrush" Color="#5F5F68" />
+                    <SolidColorBrush x:Key="PhotoManagerBorderBrush" Color="#B8B8C2" />
+                    <SolidColorBrush x:Key="PhotoManagerAccentBrush" Color="#6D28D9" />
+                    <SolidColorBrush x:Key="PhotoManagerSelectionBrush" Color="#D8C7FF" />
+                    <SolidColorBrush x:Key="PhotoManagerSelectionForegroundBrush" Color="#1F1F24" />
+                    <SolidColorBrush x:Key="PhotoManagerOverlayBrush" Color="#CCFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerOverlayHoverBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerViewerButtonForegroundBrush" Color="#1F1F24" />
+                    <SolidColorBrush x:Key="PhotoManagerViewerButtonBorderBrush" Color="#8A8A94" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="PhotoManagerBackgroundBrush" Color="#1E1E1E" />
+                    <SolidColorBrush x:Key="PhotoManagerPanelBrush" Color="#2D2D30" />
+                    <SolidColorBrush x:Key="PhotoManagerCardBrush" Color="#333337" />
+                    <SolidColorBrush x:Key="PhotoManagerForegroundBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerMutedForegroundBrush" Color="#C8C8C8" />
+                    <SolidColorBrush x:Key="PhotoManagerBorderBrush" Color="#666666" />
+                    <SolidColorBrush x:Key="PhotoManagerAccentBrush" Color="#A78BFA" />
+                    <SolidColorBrush x:Key="PhotoManagerSelectionBrush" Color="#4C1D95" />
+                    <SolidColorBrush x:Key="PhotoManagerSelectionForegroundBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerOverlayBrush" Color="#663C3C3C" />
+                    <SolidColorBrush x:Key="PhotoManagerOverlayHoverBrush" Color="#993C3C3C" />
+                    <SolidColorBrush x:Key="PhotoManagerViewerButtonForegroundBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="PhotoManagerViewerButtonBorderBrush" Color="#999999" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

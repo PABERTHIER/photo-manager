@@ -272,10 +272,11 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit.Analyzers" />
     <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="Avalonia.Headless" />
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PhotoManager.UI\PhotoManager.UI.csproj" />
+    <ProjectReference Include="..\PhotoManager.UI.Avalonia\PhotoManager.UI.Avalonia.csproj" />
   </ItemGroup>
 
   <!-- Reference the custom MSBuild task -->

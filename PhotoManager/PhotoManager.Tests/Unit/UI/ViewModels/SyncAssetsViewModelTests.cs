@@ -1,7 +1,6 @@
 ﻿using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels;
@@ -56,8 +55,8 @@ public class SyncAssetsViewModelTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -251,6 +250,32 @@ public class SyncAssetsViewModelTests
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
         CheckInstance(syncAssetsViewModelInstances, []);
+    }
+
+    [Test]
+    public void AddDefinition_NoDefinitions_NotifiesChangesAndAddsBlankDefinition()
+    {
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) =
+            NotifyPropertyChangedEvents();
+
+        CheckBeforeChanges();
+
+        _syncAssetsViewModel!.AddDefinition();
+
+        Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(1));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].SourceDirectory, Is.EqualTo(string.Empty));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DestinationDirectory, Is.EqualTo(string.Empty));
+        Assert.That(_syncAssetsViewModel!.Definitions[0].IncludeSubFolders, Is.False);
+        Assert.That(_syncAssetsViewModel!.Definitions[0].DeleteAssetsNotInSource, Is.False);
+
+        CheckAfterChanges(_syncAssetsViewModel, [.. _syncAssetsViewModel.Definitions]);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Definitions"));
+
+        CheckInstance(syncAssetsViewModelInstances, [.. _syncAssetsViewModel.Definitions]);
     }
 
     [Test]
@@ -1639,10 +1664,10 @@ public class SyncAssetsViewModelTests
         Assert.That(_syncAssetsViewModel!.ProcessStatusMessages, Is.Empty);
         Assert.That(_syncAssetsViewModel!.Results, Is.Empty);
         Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewDescription));
-        Assert.That(_syncAssetsViewModel!.DescriptionVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_syncAssetsViewModel!.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_syncAssetsViewModel!.RunVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_syncAssetsViewModel!.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_syncAssetsViewModel!.IsDescriptionVisible, Is.True);
+        Assert.That(_syncAssetsViewModel!.IsConfigurationVisible, Is.False);
+        Assert.That(_syncAssetsViewModel!.IsRunVisible, Is.False);
+        Assert.That(_syncAssetsViewModel!.IsResultsVisible, Is.False);
         Assert.That(_syncAssetsViewModel!.CanViewDescription, Is.True);
         Assert.That(_syncAssetsViewModel!.CanConfigure, Is.False);
         Assert.That(_syncAssetsViewModel!.CanViewResults, Is.False);
@@ -1671,10 +1696,10 @@ public class SyncAssetsViewModelTests
         Assert.That(syncAssetsViewModelInstance.ProcessStatusMessages, Is.Empty);
         Assert.That(syncAssetsViewModelInstance.Results, Is.Empty);
         Assert.That(syncAssetsViewModelInstance.Step, Is.EqualTo(ProcessStep.ViewDescription));
-        Assert.That(syncAssetsViewModelInstance.DescriptionVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(syncAssetsViewModelInstance.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(syncAssetsViewModelInstance.RunVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(syncAssetsViewModelInstance.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(syncAssetsViewModelInstance.IsDescriptionVisible, Is.True);
+        Assert.That(syncAssetsViewModelInstance.IsConfigurationVisible, Is.False);
+        Assert.That(syncAssetsViewModelInstance.IsRunVisible, Is.False);
+        Assert.That(syncAssetsViewModelInstance.IsResultsVisible, Is.False);
         Assert.That(syncAssetsViewModelInstance.CanViewDescription, Is.True);
         Assert.That(syncAssetsViewModelInstance.CanConfigure, Is.False);
         Assert.That(syncAssetsViewModelInstance.CanViewResults, Is.False);

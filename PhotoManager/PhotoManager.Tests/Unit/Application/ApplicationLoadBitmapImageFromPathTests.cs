@@ -84,7 +84,7 @@ public class ApplicationLoadBitmapImageFromPathTests
     [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(ImageRotation rotation,
-        int expectedWith, int expectedHeight)
+        int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -94,7 +94,7 @@ public class ApplicationLoadBitmapImageFromPathTests
 
         Assert.That(image, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWith));
+        Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
     }
 

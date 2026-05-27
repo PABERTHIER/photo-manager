@@ -207,7 +207,7 @@ public sealed class SkiaImageData : IImageData
     }
 
     /// <summary>
-    /// Calculates target dimensions matching WPF DecodePixelWidth/Height semantics:
+    /// Calculates target dimensions matching Bitmap DecodePixelWidth/Height semantics:
     /// - Negative values are treated as their absolute value
     /// - Zero means "auto-calculate preserving aspect ratio"
     /// - Both zero means "use original dimensions"

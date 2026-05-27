@@ -1,6 +1,5 @@
 ﻿using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 
@@ -3283,10 +3282,10 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         Assert.That(_syncAssetsViewModel!.ProcessStatusMessages, Is.Empty);
         Assert.That(_syncAssetsViewModel!.Results, Is.Empty);
         Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewDescription));
-        Assert.That(_syncAssetsViewModel!.DescriptionVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_syncAssetsViewModel!.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_syncAssetsViewModel!.RunVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_syncAssetsViewModel!.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_syncAssetsViewModel!.IsDescriptionVisible, Is.True);
+        Assert.That(_syncAssetsViewModel!.IsConfigurationVisible, Is.False);
+        Assert.That(_syncAssetsViewModel!.IsRunVisible, Is.False);
+        Assert.That(_syncAssetsViewModel!.IsResultsVisible, Is.False);
         Assert.That(_syncAssetsViewModel!.CanViewDescription, Is.True);
         Assert.That(_syncAssetsViewModel!.CanConfigure, Is.False);
         Assert.That(_syncAssetsViewModel!.CanViewResults, Is.False);
@@ -3329,10 +3328,10 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         }
 
         Assert.That(syncAssetsViewModelInstance.Step, Is.EqualTo(ProcessStep.ViewDescription));
-        Assert.That(syncAssetsViewModelInstance.DescriptionVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(syncAssetsViewModelInstance.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(syncAssetsViewModelInstance.RunVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(syncAssetsViewModelInstance.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(syncAssetsViewModelInstance.IsDescriptionVisible, Is.True);
+        Assert.That(syncAssetsViewModelInstance.IsConfigurationVisible, Is.False);
+        Assert.That(syncAssetsViewModelInstance.IsRunVisible, Is.False);
+        Assert.That(syncAssetsViewModelInstance.IsResultsVisible, Is.False);
         Assert.That(syncAssetsViewModelInstance.CanViewDescription, Is.True);
         Assert.That(syncAssetsViewModelInstance.CanConfigure, Is.False);
         Assert.That(syncAssetsViewModelInstance.CanViewResults, Is.False);

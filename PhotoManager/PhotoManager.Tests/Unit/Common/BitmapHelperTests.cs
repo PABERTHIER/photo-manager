@@ -408,7 +408,7 @@ public class BitmapHelperTests
     [TestCase(ImageRotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(ImageRotation rotation,
-        int expectedWith, int expectedHeight)
+        int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
@@ -418,7 +418,7 @@ public class BitmapHelperTests
         Assert.That(image.Bitmap, Is.Not.Null);
         Assert.That(image.Bitmap.IsEmpty, Is.False);
         Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWith));
+        Assert.That(image.Width, Is.EqualTo(expectedWidth));
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
