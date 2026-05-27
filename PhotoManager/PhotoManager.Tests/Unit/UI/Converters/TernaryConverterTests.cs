@@ -71,4 +71,54 @@ public class TernaryConverterTests
         Assert.That(result, Is.EqualTo(expected));
     }
 
+    [Test]
+    public void Convert_EmptyValues_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object[] converterParameters = [];
+
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void Convert_SingleValue_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object[] converterParameters = [true];
+
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void Convert_FirstValueIsNotBoolean_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object[] converterParameters = ["notABoolean", "Message"];
+
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void Convert_NullValues_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object? result = ternaryConverter.Convert(null!, typeof(object[]), null!,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
 }

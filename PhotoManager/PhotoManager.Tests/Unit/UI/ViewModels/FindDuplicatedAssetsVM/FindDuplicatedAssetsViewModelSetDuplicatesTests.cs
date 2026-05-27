@@ -269,6 +269,50 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
     }
 
     [Test]
+    public void DuplicatedAssetSetsPosition_PositionExceedsCount_ClampsToCurrentPosition()
+    {
+        IApplication application = Substitute.For<IApplication>();
+        FindDuplicatedAssetsViewModel viewModel = new(application);
+
+        Asset firstAsset = CreateTestAsset(@"C:\Photos", "first.jpg", "hash1", SkiaImageData.Empty());
+        Asset secondAsset = CreateTestAsset(@"C:\Photos", "second.jpg", "hash1", SkiaImageData.Empty());
+
+        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+
+        viewModel.DuplicatedAssetSetsPosition = 10;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.DuplicatedAssetSetsPosition, Is.Zero);
+            Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
+            Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(firstAsset));
+        }
+    }
+
+    [Test]
+    public void DuplicatedAssetSetsPosition_NegativePosition_ClampsToCurrentPosition()
+    {
+        IApplication application = Substitute.For<IApplication>();
+        FindDuplicatedAssetsViewModel viewModel = new(application);
+
+        Asset firstAsset = CreateTestAsset(@"C:\Photos", "first.jpg", "hash1", SkiaImageData.Empty());
+        Asset secondAsset = CreateTestAsset(@"C:\Photos", "second.jpg", "hash1", SkiaImageData.Empty());
+
+        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+
+        viewModel.DuplicatedAssetSetsPosition = -1;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.DuplicatedAssetSetsPosition, Is.Zero);
+            Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
+            Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(firstAsset));
+        }
+    }
+
+    [Test]
     public void SetDuplicates_AssetsSetsAndDuplicatesHaveSameHash_SetsDuplicates()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
