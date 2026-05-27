@@ -1,6 +1,6 @@
-﻿using PhotoManager.UI.Models;
+﻿using PhotoManager.Application;
+using PhotoManager.UI.Models;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
@@ -204,8 +204,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
@@ -225,6 +225,47 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
         _findDuplicatedAssetsViewModel = new(application);
+    }
+
+    [Test]
+    public void DuplicatedAssetPosition_ThumbnailUnavailable_DoesNotRefreshDuplicateSets()
+    {
+        IApplication application = Substitute.For<IApplication>();
+        FindDuplicatedAssetsViewModel viewModel = new(application);
+
+        Asset firstAsset = CreateTestAsset(@"C:\Photos", "first.jpg", "same-hash", SkiaImageData.Empty());
+        Asset secondAsset = CreateTestAsset(@"C:\Photos", "second.jpg", "same-hash", null);
+        Asset replacementAsset = CreateTestAsset(string.Empty, string.Empty, string.Empty, null);
+        application.GetDuplicatedAssets().Returns([[replacementAsset]]);
+
+        List<string> notifyPropertyChangedEvents = [];
+        viewModel.PropertyChanged += delegate (object? _, PropertyChangedEventArgs e)
+        {
+            notifyPropertyChangedEvents.Add(e.PropertyName!);
+        };
+
+        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+        notifyPropertyChangedEvents.Clear();
+
+        viewModel.DuplicatedAssetPosition = 1;
+
+        application.DidNotReceive().GetDuplicatedAssets();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
+            Assert.That(viewModel.DuplicatedAssetPosition, Is.EqualTo(1));
+            Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(secondAsset));
+            Assert.That(viewModel.CurrentDuplicatedAsset.Asset.FullPath, Is.EqualTo(@"C:\Photos\second.jpg"));
+            Assert.That(viewModel.CurrentDuplicatedAsset.Asset.Pixel.Asset.Width, Is.EqualTo(640));
+            Assert.That(viewModel.CurrentDuplicatedAsset.Asset.FileProperties.Size, Is.EqualTo(2048));
+            Assert.That(notifyPropertyChangedEvents, Is.EqualTo(
+                [
+                    nameof(FindDuplicatedAssetsViewModel.DuplicatedAssetPosition),
+                    nameof(FindDuplicatedAssetsViewModel.CurrentDuplicatedAsset)
+                ]));
+        }
     }
 
     [Test]
@@ -411,7 +452,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Change CurrentDuplicatedAsset Visibility
-        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][0].Visible = Visibility.Collapsed;
+        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][0].IsVisible = false;
 
         duplicatedAssetSet1 = [];
         duplicatedAssetSet2 = [];
@@ -419,7 +460,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetViewModel1 = new()
         {
             Asset = _asset1,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = duplicatedAssetSet1
         };
         duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
@@ -567,8 +608,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Change some DuplicatedAssetViewModel Visibility
-        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][1].Visible = Visibility.Collapsed;
-        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[1][1].Visible = Visibility.Hidden;
+        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][1].IsVisible = false;
+        _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[1][1].IsVisible = false;
 
         duplicatedAssetSet1 = [];
         duplicatedAssetSet2 = [];
@@ -583,7 +624,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetViewModel2 = new()
         {
             Asset = _asset3,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = duplicatedAssetSet1
         };
         duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
@@ -598,7 +639,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetViewModel4 = new()
         {
             Asset = _asset4,
-            Visible = Visibility.Hidden,
+            IsVisible = false,
             ParentViewModel = duplicatedAssetSet2
         };
         duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
@@ -736,7 +777,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
     }
 
     [Test]
-    public void SetDuplicates_AssetsSetsAndCurrentAssetHaveImageDataNotLoaded_SetsDuplicatesAndRefresh()
+    public void
+        SetDuplicates_AssetsSetsAndCurrentAssetHaveImageDataNotLoaded_SetsDuplicatesAndLoadsThumbnailWithoutRefresh()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -855,7 +897,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
     }
 
     [Test]
-    public void SetDuplicates_AssetsSetsAndCurrentAssetHaveNullImageData_SetsDuplicatesAndRefresh()
+    public void
+        SetDuplicates_AssetsSetsAndCurrentAssetHaveNullImageData_SetsDuplicatesAndKeepsDuplicateSetsWithoutRefresh()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -892,19 +935,26 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         DuplicatedSetViewModel duplicatedAssetSet1 = [];
         DuplicatedSetViewModel duplicatedAssetSet2 = [];
 
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
+        {
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
+
         DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
         {
-            Asset = _asset2,
+            Asset = _asset3,
             ParentViewModel = duplicatedAssetSet1
         };
         duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
 
         DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
         {
-            Asset = _asset3,
-            ParentViewModel = duplicatedAssetSet1
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
         };
-        duplicatedAssetSet1.Add(duplicatedAssetViewModel3);
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
 
         DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
         {
@@ -931,18 +981,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             0,
             0,
             duplicatedAssetSet1,
-            duplicatedAssetViewModel2);
+            duplicatedAssetViewModel1);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-        // Refresh called by SetDuplicates
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetSets"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("DuplicatedAssetSetsPosition"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentDuplicatedAssetSet"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatedAssetPosition"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentDuplicatedAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         Assert.That(messagesInformationSent, Is.Empty);
 
@@ -952,7 +998,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             0,
             0,
             duplicatedAssetSet1,
-            duplicatedAssetViewModel2);
+            duplicatedAssetViewModel1);
     }
 
     [Test]
@@ -1529,7 +1575,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatedSetViewModel.DuplicatesCount));
 
-        Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
+        Assert.That(duplicatedSetViewModel.IsVisible, Is.EqualTo(expectedDuplicatedSetViewModel.IsVisible));
     }
 
     private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
@@ -1539,7 +1585,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         {
             AssertAssetPropertyValidity(duplicatedAsset!.Asset, expectedDuplicatedAsset.Asset);
 
-            Assert.That(duplicatedAsset.Visible, Is.EqualTo(expectedDuplicatedAsset.Visible));
+            Assert.That(duplicatedAsset.IsVisible, Is.EqualTo(expectedDuplicatedAsset.IsVisible));
 
             if (expectedDuplicatedAsset.ParentViewModel.Count > 0)
             {
@@ -1547,8 +1593,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
-                    Assert.That(duplicatedAsset.ParentViewModel[i].Visible,
-                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(duplicatedAsset.ParentViewModel[i].IsVisible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].IsVisible));
 
                     AssertAssetPropertyValidity(duplicatedAsset.ParentViewModel[i].Asset,
                         expectedDuplicatedAsset.ParentViewModel[i].Asset);
@@ -1618,5 +1664,37 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
                 expectedCurrentDuplicatedAssetSet,
                 expectedCurrentDuplicatedAsset);
         }
+    }
+
+    private static Asset CreateTestAsset(string folderPath, string fileName, string hash, IImageData? imageData)
+    {
+        Guid folderId = Guid.NewGuid();
+
+        return new()
+        {
+            FolderId = folderId,
+            Folder = new() { Id = folderId, Path = folderPath },
+            FileName = fileName,
+            Pixel = new()
+            {
+                Asset = new() { Width = 640, Height = 480 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 2048,
+                Creation = new(2026, 1, 2, 3, 4, 5),
+                Modification = new(2026, 1, 3, 4, 5, 6)
+            },
+            ThumbnailCreationDateTime = new(2026, 1, 2, 3, 4, 5),
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = hash,
+            ImageData = imageData,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
     }
 }

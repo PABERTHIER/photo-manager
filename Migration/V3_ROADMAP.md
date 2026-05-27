@@ -19,10 +19,13 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 2.5 Replace Windows-specific build commands and path assumptions — **DONE**
 
 3. Phase 3 - Migrate the UI Layer (WPF → Avalonia)
-   - 3.1 Set up Avalonia project
-   - 3.2 Port ViewModels
-   - 3.3 Port XAML Views
-   - 3.4 Port Converters and Behaviors
+   - 3.1 Set up Avalonia project — **DONE**
+   - 3.2 Port ViewModels — **DONE**
+   - 3.3 Port XAML Views — **DONE**
+   - 3.4 Port Converters and Behaviors — **DONE**
+   - 3.5 Port image display pipeline — **DONE**
+   - 3.6 Apply modern Avalonia Fluent theme and app icon — **DONE**
+   - 3.7 Swap solution/tests from WPF UI to Avalonia UI — **DONE**
 
 4. Phase 4 - Multi-Threading Pipeline
    - 4.1 Create IThumbnailGenerator backed by ImageMagick

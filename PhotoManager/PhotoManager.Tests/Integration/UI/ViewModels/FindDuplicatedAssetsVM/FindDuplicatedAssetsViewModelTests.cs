@@ -1,6 +1,5 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -949,7 +948,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
         {
             Asset = _asset2,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -957,7 +956,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
         {
             Asset = _asset3,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -1057,7 +1056,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
         {
             Asset = _asset2,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -1171,7 +1170,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
         {
             Asset = _asset3,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -2641,7 +2640,7 @@ public class FindDuplicatedAssetsViewModelTests
 
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatedSetViewModel.DuplicatesCount));
 
-        Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
+        Assert.That(duplicatedSetViewModel.IsVisible, Is.EqualTo(expectedDuplicatedSetViewModel.IsVisible));
     }
 
     private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
@@ -2651,7 +2650,7 @@ public class FindDuplicatedAssetsViewModelTests
         {
             AssertAssetPropertyValidity(duplicatedAsset!.Asset, expectedDuplicatedAsset.Asset);
 
-            Assert.That(duplicatedAsset.Visible, Is.EqualTo(expectedDuplicatedAsset.Visible));
+            Assert.That(duplicatedAsset.IsVisible, Is.EqualTo(expectedDuplicatedAsset.IsVisible));
 
             if (expectedDuplicatedAsset.ParentViewModel.Count > 0)
             {
@@ -2666,7 +2665,8 @@ public class FindDuplicatedAssetsViewModelTests
                         duplicatedAsset.ParentViewModel.First(x =>
                             x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(actualSibling.IsVisible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].IsVisible));
 
                     AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }

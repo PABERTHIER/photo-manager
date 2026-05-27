@@ -1,11 +1,10 @@
-﻿using PhotoManager.Application;
+﻿using Avalonia.Media.Imaging;
+using PhotoManager.Application;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Media.Imaging;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;
@@ -30,6 +29,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -103,7 +103,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         ThumbnailHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(ImageRotation rotation,
-        int expectedWith, int expectedHeight, int expectedThumbnailPixelWidth, int expectedThumbnailPixelHeight)
+        int expectedWidth, int expectedHeight, int expectedThumbnailPixelWidth, int expectedThumbnailPixelHeight)
     {
         ConfigureApplicationViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -127,7 +127,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileName = fileName,
             Pixel = new()
             {
-                Asset = new() { Width = expectedWith, Height = expectedHeight },
+                Asset = new() { Width = expectedWidth, Height = expectedHeight },
                 Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
             },
             FileProperties = new()
@@ -160,17 +160,12 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        Bitmap image = _applicationViewModel!.LoadBitmapImageFromPath()!;
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWith));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
-        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.Zero);
-        Assert.That(image.DecodePixelHeight, Is.Zero);
+        Assert.That(image.PixelSize.Width, Is.EqualTo(expectedWidth));
+        Assert.That(image.PixelSize.Height, Is.EqualTo(expectedHeight));
+        image.Dispose();
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -256,13 +251,12 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        Bitmap image = _applicationViewModel!.LoadBitmapImageFromPath()!;
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
-        Assert.That(image.DecodePixelWidth, Is.Zero);
-        Assert.That(image.DecodePixelHeight, Is.Zero);
+        Assert.That(image.PixelSize.Width, Is.EqualTo(1));
+        Assert.That(image.PixelSize.Height, Is.EqualTo(1));
+        image.Dispose();
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -344,17 +338,12 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        Bitmap image = _applicationViewModel!.LoadBitmapImageFromPath()!;
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
-        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
-        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
-        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
-        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
-        Assert.That(image.DecodePixelWidth, Is.Zero);
-        Assert.That(image.DecodePixelHeight, Is.Zero);
+        Assert.That(image.PixelSize.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
+        Assert.That(image.PixelSize.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
+        image.Dispose();
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -436,17 +425,12 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-        BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
+        Bitmap image = _applicationViewModel!.LoadBitmapImageFromPath()!;
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(rotation)));
-        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        Assert.That(image.DecodePixelWidth, Is.Zero);
-        Assert.That(image.DecodePixelHeight, Is.Zero);
+        Assert.That(image.PixelSize.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelSize.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        image.Dispose();
 
         string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -521,13 +505,9 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
         applicationMock.LoadBitmapImageFromPath(asset.FullPath, asset.ImageRotation).Returns(emptyEncodingImageData);
 
-        BitmapImage image = applicationViewModel.LoadBitmapImageFromPath();
+        Bitmap? image = applicationViewModel.LoadBitmapImageFromPath();
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(BitmapImageData.ToWpfRotation(ImageRotation.Rotate0)));
-        Assert.That(image.DecodePixelWidth, Is.Zero);
-        Assert.That(image.DecodePixelHeight, Is.Zero);
+        Assert.That(image, Is.Null);
     }
 
     private
@@ -569,8 +549,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -604,8 +584,8 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));

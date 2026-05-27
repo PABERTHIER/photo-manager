@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
@@ -243,8 +242,8 @@ public class FolderNavigationControlTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsRefreshingFolders, Is.False);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsThumbnailsVisible, Is.True);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsViewerVisible, Is.False);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath,
@@ -317,10 +316,10 @@ public class FolderNavigationControlTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria,
             Is.EqualTo(SortCriteria.FileName));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ThumbnailsVisible,
-            Is.EqualTo(Visibility.Visible));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerVisible,
-            Is.EqualTo(Visibility.Hidden));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsThumbnailsVisible,
+            Is.True);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsViewerVisible,
+            Is.False);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath,

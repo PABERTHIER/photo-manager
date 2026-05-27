@@ -1,0 +1,23 @@
+﻿<UserControl
+    x:Class="PhotoManager.UI.Controls.FolderNavigationControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Loaded="UserControl_Loaded">
+    <UserControl.Styles>
+        <Style Selector="TreeViewItem">
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerForegroundBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="MinHeight" Value="28" />
+        </Style>
+        <Style Selector="TreeViewItem:selected">
+            <Setter Property="Foreground" Value="{DynamicResource PhotoManagerSelectionForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
+    <Grid Background="{DynamicResource PhotoManagerPanelBrush}">
+        <TreeView
+            x:Name="FoldersTreeView"
+            Background="{DynamicResource PhotoManagerPanelBrush}"
+            Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+            SelectionChanged="FoldersTreeView_SelectionChanged" />
+    </Grid>
+</UserControl>

@@ -403,7 +403,7 @@ Replace with a simple `Action` callback or `event EventHandler` pattern. Rx adds
 
 ---
 
-### 14. BitmapImage for Thumbnails Stored as byte[] Twice
+### 14. BitmapImage for Thumbnails Stored as byte[] Twice — **DONE**
 
 **Location:** `PhotoManager.Domain/AssetCreationService.cs` (lines 92-93, etc.)
 
@@ -429,6 +429,8 @@ Benefits:
 - Better JPEG quality control
 - Thread-safe (each MagickImage instance is independent)
 - HEIC, PNG, GIF all handled uniformly
+- Phase 3 also removed the UI-side `BitmapImageData` display bridge; the Avalonia UI now creates
+  `Avalonia.Media.Imaging.Bitmap` only when an image is displayed.
 
 ---
 
@@ -461,6 +463,20 @@ public void Initialize(string databasePath)
 
 ---
 
+### 16. Avalonia UI Asset Removal Collection Churn — **DONE**
+
+**Location:** `PhotoManager.UI.Avalonia/ViewModels/ApplicationViewModel.cs`
+
+**Problem:**
+The migrated UI removed deleted assets with repeated `ObservableCollection.Remove()` calls. For large selections,
+that performs one linear search and one collection notification per removed asset.
+
+**Fix:**
+`RemoveAssets()` now builds a `HashSet<Asset>`, creates the remaining asset collection in one pass, disposes image
+data for removed assets, and raises the observable collection update once.
+
+---
+
 ## Performance Improvement Priority Matrix
 
 | # | Bottleneck | Impact | Effort | Priority |
@@ -478,8 +494,9 @@ public void Initialize(string databasePath)
 | 11 | GetFileNames double allocation | Low | Low | P3 |
 | 12 | Double image validation | Low | Medium | P3 |
 | 13 | Reactive Subject overhead | Low | Low | P3 |
-| 14 | WPF thumbnail pipeline | Medium | High | P3 |
+| 14 | WPF thumbnail pipeline | Medium | High | P3 — **DONE** |
 | 15 | Connection string rebuild | Low | Low | P3 |
+| 16 | Avalonia UI asset-removal collection churn | Medium | Low | P2 — **DONE** |
 
 ---
 
@@ -517,7 +534,9 @@ public void Initialize(string databasePath)
 4. Parallelize duplicate detection without `.AsOrdered()`
 
 ### Phase 4: Architecture Evolution
-1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **DONE** (IImageData/ImageRotation replace WPF types in all interfaces; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC fallback)
+1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **DONE** (IImageData/ImageRotation
+   replace WPF types in all interfaces; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC
+   fallback; Avalonia UI display now uses `Bitmap` instead of WPF `BitmapImage`)
 2. Store file properties in SQLite (eliminate startup stats entirely)
 3. Consider memory-mapped thumbnails or separate thumbnail file
 4. Implement FileSystemWatcher for real-time change detection

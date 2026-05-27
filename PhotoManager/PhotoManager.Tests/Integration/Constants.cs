@@ -4,7 +4,7 @@ public static class Constants
 {
     public const string DATABASE_BACKUP_END_PATH = "Backups";
     public const string DATABASE_FILE_NAME = "photomanager.db";
-    public const string VERSION = "v2.0.0";
+    public const string VERSION = "v3.0.0";
 
     public static class Directories
     {

@@ -1,0 +1,138 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.FindDuplicatedAssetsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:PhotoManager.UI.Controls"
+    xmlns:converters="clr-namespace:PhotoManager.UI.Converters"
+    Title="Find Duplicates"
+    Width="1100"
+    Height="700"
+    WindowState="Maximized"
+    Closing="FindDuplicatedAssetsWindow_Closing">
+    <Window.Resources>
+        <converters:FileSizeConverter x:Key="FileSizeConverter" />
+        <converters:ImageDataConverter x:Key="ImageDataConverter" />
+    </Window.Resources>
+    <Grid
+        Background="{DynamicResource PhotoManagerBackgroundBrush}"
+        RowDefinitions="Auto,*,220"
+        ColumnDefinitions="360,Auto,*,Auto">
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="12"
+            Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+            Text="{Binding DuplicatedAssetSets.Count, StringFormat='Duplicated sets: {0}'}" />
+        <Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Classes="action"
+            Margin="8"
+            Content="Refresh"
+            Click="RefreshButton_Click" />
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="2"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Button
+                Classes="action"
+                MinWidth="260"
+                Margin="8"
+                Content="Delete every duplicates linked to exempt folder"
+                Click="DeleteAllNotExemptedButton_Click" />
+            <Button
+                Classes="action"
+                MinWidth="160"
+                Margin="8"
+                Content="Open in file manager"
+                Click="CopyToClipboardOpenInFileExplorerButton_Click" />
+        </StackPanel>
+
+        <DataGrid
+            x:Name="DuplicatedSetsDataGrid"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Margin="12,0,8,12"
+            AutoGenerateColumns="False"
+            GridLinesVisibility="All"
+            IsReadOnly="True"
+            ItemsSource="{Binding DuplicatedAssetSets}"
+            SelectedIndex="{Binding DuplicatedAssetSetsPosition, Mode=TwoWay}"
+            SelectionMode="Single">
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                    <Setter Property="IsVisible" Value="{Binding IsVisible}" />
+                </Style>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="250" />
+                <DataGridTextColumn Header="Duplicates" Binding="{Binding DuplicatesCount}" Width="100" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DataGrid
+            x:Name="DuplicatedAssetsDataGrid"
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Margin="8,0,12,12"
+            AutoGenerateColumns="False"
+            GridLinesVisibility="All"
+            IsReadOnly="True"
+            ItemsSource="{Binding CurrentDuplicatedAssetSet}"
+            SelectedIndex="{Binding DuplicatedAssetPosition, Mode=TwoWay}"
+            SelectionMode="Single">
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow">
+                    <Setter Property="IsVisible" Value="{Binding IsVisible}" />
+                </Style>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Path" Binding="{Binding FullPath}" Width="560" />
+                <DataGridTextColumn Header="Image size" Binding="{Binding PixelSize}" Width="120" />
+                <DataGridTextColumn
+                    Header="File size"
+                    Binding="{Binding FileSize, Converter={StaticResource FileSizeConverter}}"
+                    Width="100" />
+                <DataGridTextColumn
+                    Header="File created"
+                    Binding="{Binding FileCreation}"
+                    Width="150" />
+                <DataGridTextColumn
+                    Header="File last modified"
+                    Binding="{Binding FileModification}"
+                    Width="150" />
+                <DataGridTemplateColumn Header="Actions" Width="350">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Classes="action" MinWidth="80" Content="Delete" Click="DeleteButton_Click" />
+                                <Button Classes="action" MinWidth="120" Content="Delete all and keep this one" Click="DeleteAllButThisButton_Click" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Displaying the pictures in thumbnails mode, at the bottom of the page, FindDuplicatedAssets page -->
+        <Border
+            Grid.Row="2"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Margin="8,0,12,12"
+            Background="{DynamicResource PhotoManagerPanelBrush}"
+            CornerRadius="8">
+            <controls:DisposableImage
+                x:Name="CurrentDuplicatedAssetImage"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="200"
+                Height="150"
+                Source="{Binding CurrentDuplicatedAsset.Asset.ImageData, Converter={StaticResource ImageDataConverter}}"
+                RenderOptions.BitmapInterpolationMode="HighQuality" />
+        </Border>
+    </Grid>
+</Window>

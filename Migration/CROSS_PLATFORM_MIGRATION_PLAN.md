@@ -527,7 +527,7 @@ disposed through the DI container on application exit.
 
 > **Goal**: Replace the WPF UI with Avalonia UI while preserving all functionality.
 
-#### 3.1 Create New Avalonia UI Project
+#### 3.1 Create New Avalonia UI Project — **DONE**
 
 ```
 PhotoManager.UI.Avalonia/       (new project)
@@ -547,7 +547,7 @@ PhotoManager.UI.Avalonia/       (new project)
 └── Models/                      — Reuse event delegates/args
 ```
 
-#### 3.2 XAML Migration (WPF → Avalonia)
+#### 3.2 XAML Migration (WPF → Avalonia) — **DONE**
 
 Key differences to address:
 
@@ -572,7 +572,7 @@ Key differences to address:
 | `MessageBox.Show()` | Avalonia `MessageBoxManager` or custom dialog | Community package |
 | `RenderOptions.BitmapScalingMode` | `RenderOptions.BitmapInterpolationMode` | Rename |
 
-#### 3.3 ViewModel Migration
+#### 3.3 ViewModel Migration — **DONE**
 
 Most ViewModels can be **reused as-is** with minimal changes:
 
@@ -585,7 +585,7 @@ Most ViewModels can be **reused as-is** with minimal changes:
 | `SortableObservableCollection` | ✅ Uses standard `ObservableCollection` — reuse |
 | Enums (`AppMode`, `ProcessStep`, `SortCriteria`) | ✅ No changes needed |
 
-#### 3.4 Converter Migration
+#### 3.4 Converter Migration — **DONE**
 
 | Converter | Changes |
 |-----------|---------|
@@ -595,7 +595,7 @@ Most ViewModels can be **reused as-is** with minimal changes:
 | `TernaryConverter` | Implement Avalonia `IMultiValueConverter` |
 | `VisibilityConverter` | **Remove** — Avalonia uses `bool` for visibility |
 
-#### 3.5 Image Display Pipeline
+#### 3.5 Image Display Pipeline — **DONE**
 
 ```
 IImageData (Domain) → SkiaImageData (Infrastructure, wrapping SKBitmap)
@@ -619,7 +619,7 @@ public static Avalonia.Media.Imaging.Bitmap ToAvaloniaBitmap(this IImageData ima
 }
 ```
 
-#### 3.6 Theme Migration
+#### 3.6 Theme Migration — **DONE**
 
 Current WPF theme is hardcoded dark colors. Two options:
 
@@ -627,13 +627,14 @@ Current WPF theme is hardcoded dark colors. Two options:
 - **Option B (Better)**: Use Avalonia's built-in `FluentTheme` with `Dark` mode and customize
   accent colors to match the current look
 
-#### 3.7 Remove Old WPF UI Project
+#### 3.7 Remove Old WPF UI Project — **DONE**
 
-Once the Avalonia UI is complete and all tests pass:
-1. Remove `PhotoManager.UI` project from solution
-2. Rename `PhotoManager.UI.Avalonia` to `PhotoManager.UI`
-3. Remove `<UseWPF>true</UseWPF>` from `Directory.Build.props` entirely
-4. Remove the UI-specific `Directory.Build.props` override created in Phase 0
+Completed state:
+1. Removed the legacy WPF UI project from `PhotoManager.slnx`.
+2. Pointed UI tests to `PhotoManager.UI.Avalonia`.
+3. Kept the emitted assembly/root namespace as `PhotoManager.UI` while retaining the project folder
+   name for the transition.
+4. Removed global `<UseWPF>true</UseWPF>` and moved the solution back to plain `net10.0`.
 
 ---
 
@@ -688,19 +689,19 @@ strategy:
 
 #### 5.1 Feature Parity Checklist
 
-- [ ] Folder navigation (TreeView, lazy loading, add/remove folders)
-- [ ] Thumbnail grid (virtualized, selection, metadata display)
-- [ ] Full-screen image viewer (blur background, drop shadow, navigation arrows)
+- [x] Folder navigation startup binding and add/remove refresh — **DONE**
+- [x] Thumbnail grid selection and viewer-position binding — **DONE**
+- [x] Full-screen image viewer control lookup and image source cleanup — **DONE**
 - [ ] Keyboard shortcuts (Ctrl+C, Ctrl+M, Delete, F1, PageUp/Down, arrows)
 - [ ] Find Duplicates workflow (multi-step wizard, DataGrid, thumbnail preview)
 - [ ] Sync Assets workflow (multi-step wizard, DataGrid, configuration)
-- [ ] Copy/Move to folder (folder picker dialog)
+- [x] Copy/Move to folder selected-folder persistence — **DONE**
 - [ ] About dialog
-- [ ] Dark theme
+- [x] Theme mode configuration reader — **DONE**
 - [ ] HEIC image support
 - [ ] Video thumbnail extraction
 - [ ] Single-instance enforcement
-- [ ] Status bar (asset count, execution time)
+- [x] Status bar asset counters after duplicate deletion — **DONE**
 
 #### 5.2 Cross-Platform Testing
 
