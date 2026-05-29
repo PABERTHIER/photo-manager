@@ -28,11 +28,11 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 3.7 Swap solution/tests from WPF UI to Avalonia UI — **DONE**
 
 4. Phase 4 - Multi-Threading Pipeline
-   - 4.1 Create IThumbnailGenerator backed by ImageMagick
-   - 4.2 Add Channel-based pipeline infrastructure
-   - 4.3 Implement staged pipeline (File I/O → Image Process → Persistence → Callback)
-   - 4.4 Add batch persistence writes
-   - 4.5 Full pipeline integration
+   - 4.1 Create IThumbnailGenerator backed by ImageMagick — **DONE**
+   - 4.2 Add Channel-based pipeline infrastructure — **DONE**
+   - 4.3 Implement staged pipeline (File I/O → Image Process → Persistence → Callback) — **DONE**
+   - 4.4 Add batch persistence writes — **DONE**
+   - 4.5 Full pipeline integration — **DONE**
 
 5. Phase 5 - Performance Optimization
    - 5.1 Streaming hash computation (avoid full-file byte[])

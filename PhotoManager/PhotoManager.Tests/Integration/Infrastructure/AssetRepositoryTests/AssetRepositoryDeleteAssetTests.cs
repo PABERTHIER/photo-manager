@@ -24,6 +24,7 @@ public class AssetRepositoryDeleteAssetTests
     private IConfigurationRoot? _configurationRootMock;
 
     private Asset? _asset1;
+    private Asset? _asset2;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -79,6 +80,31 @@ public class AssetRepositoryDeleteAssetTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+        _asset2 = new()
+        {
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
+            FileName = FileNames.IMAGE_9_PNG,
+            ImageRotation = ImageRotation.Rotate90,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_9_PNG,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            Hash = Hashes.IMAGE_9_PNG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+            }
+        };
     }
 
     [TearDown]
@@ -87,6 +113,100 @@ public class AssetRepositoryDeleteAssetTests
         _assetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
+    }
+
+    [Test]
+    public void
+        DeleteAssets_FolderAndAssetsExist_ReturnsDeletedAssetsAndAssetsAreDeletedAndAssetsUpdatedIsUpdatedOnce()
+    {
+        string folderPath = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
+        Folder addedFolder = _assetRepository!.AddFolder(folderPath);
+        _asset1 = _asset1!.WithFolder(addedFolder);
+        _asset2 = _asset2!.WithFolder(addedFolder);
+        _assetRepository!.AddAsset(_asset1, [1, 2, 3]);
+        _assetRepository!.AddAsset(_asset2, [4, 5, 6]);
+
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            IReadOnlyList<Asset> deletedAssets =
+                _assetRepository.DeleteAssets(folderPath, [_asset1.FileName, _asset2.FileName]);
+
+            Asset[] assets = _assetRepository.GetCataloguedAssets();
+            string[] expectedFileNames = [_asset1.FileName, _asset2.FileName];
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(deletedAssets, Has.Count.EqualTo(2));
+                Assert.That(deletedAssets.Select(a => a.FileName), Is.EqualTo(expectedFileNames));
+                Assert.That(assets, Is.Empty);
+                Assert.That(_assetRepository.IsAssetCatalogued(folderPath, _asset1.FileName), Is.False);
+                Assert.That(_assetRepository.IsAssetCatalogued(folderPath, _asset2.FileName), Is.False);
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void DeleteAssets_EmptyList_ReturnsEmptyAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            IReadOnlyList<Asset> deletedAssets =
+                _assetRepository.DeleteAssets("non_existent_path", []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(deletedAssets, Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void DeleteAssets_DirectoryDoesNotExist_ReturnsEmptyAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            IReadOnlyList<Asset> deletedAssets =
+                _assetRepository.DeleteAssets("non_existent_path", [FileNames.NON_EXISTENT_FILE_JPG]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(deletedAssets, Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
     }
 
     [Test]

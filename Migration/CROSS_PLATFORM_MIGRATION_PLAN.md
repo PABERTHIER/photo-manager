@@ -748,6 +748,7 @@ strategy:
 | FFmpeg distribution | **Versioned runtime packages + PATH fallback** | Deterministic frame extraction without user setup; still supports overrides | System-only FFmpeg (version drift), Docker-only (limits desktop use) |
 | Rotation enum | **Custom `ImageRotation` in Domain** | Domain should not depend on any UI framework; clean architecture | Keep WPF `Rotation` (blocks cross-platform), use `int` degrees (less type-safe) |
 | Notifications | **Removed unused UWP package** | No production code used toast APIs | `DesktopNotifications` package if notifications are reintroduced |
+| Catalog thumbnail generation — **DONE** | **`IThumbnailGenerator` backed by Magick.NET** | Keeps catalog image processing cross-platform and independent from Avalonia UI types; enables the multi-threaded catalog pipeline | Reuse Avalonia display types in Domain (cross-layer leak), keep per-file persistence (slower) |
 | Migration approach | **New project alongside old** | Allows incremental migration; old UI stays functional until new one is ready | In-place rewrite (risky, breaks `main`), branch-based rewrite (merge conflicts) |
 
 ---

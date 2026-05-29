@@ -116,6 +116,97 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
+    public void AddAssets_FolderAndThumbnailsExist_ReturnsCountAndAssetsUpdatedIsUpdatedOnce()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
+            _asset1 = _asset1!.WithFolder(folder);
+            _asset2 = _asset2!.WithFolder(folder);
+
+            int addedCount = _assetRepository.AddAssets([new(_asset1, [1, 2, 3]), new(_asset2, [4, 5, 6])]);
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.EqualTo(2));
+                Assert.That(assets, Has.Length.EqualTo(2));
+                Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2.FileName]));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void AddAssets_EmptyList_ReturnsZeroAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            int addedCount = _assetRepository!.AddAssets([]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.Zero);
+                Assert.That(_assetRepository.GetCataloguedAssets(), Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void AddAssets_AssetFolderPathIsEmpty_ReturnsZeroAndLogsErrorAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            int addedCount = _assetRepository!.AddAssets([new(_asset1!, [1, 2, 3])]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.Zero);
+                Assert.That(_assetRepository.GetCataloguedAssets(), Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogErrors(
+                [
+                    $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1!.FileName}"
+                ],
+                typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
     public void AddAsset_FolderAndThumbnailsExist_ReturnsTrueAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
@@ -145,8 +236,7 @@ public class AssetRepositoryAddAssetTests
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2!.FileName]));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -190,8 +280,7 @@ public class AssetRepositoryAddAssetTests
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2!.FileName]));
 
             Folder? folder = _assetRepository!.GetFolderByPath(folderPath);
             Assert.That(folder, Is.Not.Null);

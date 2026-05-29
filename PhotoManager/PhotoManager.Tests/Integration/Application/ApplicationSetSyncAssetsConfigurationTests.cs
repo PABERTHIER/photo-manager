@@ -155,11 +155,8 @@ public class ApplicationSetSyncAssetsConfigurationTests
             Assert.That(assets[2].FileName, Is.EqualTo(asset3FileName));
             Assert.That(assets[3].FileName, Is.EqualTo(asset4FileName));
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

@@ -677,10 +677,10 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 
 **Goal:** Prepare infrastructure without changing the cataloging flow.
 
-1. Create `IThumbnailGenerator` backed by ImageMagick (replaces WPF pipeline for cataloging)
+1. Create `IThumbnailGenerator` backed by ImageMagick (replaces WPF pipeline for cataloging) — **DONE**
 2. Add `PipelineOptions` configuration to `appsettings.json`
-3. Add `Channel<T>` infrastructure classes
-4. Add batch thumbnail write method to `ThumbnailPersistence`
+3. Add `Channel<T>` infrastructure classes — **DONE**
+4. Add batch asset+thumbnail write path — **DONE** via atomic persistence context batch APIs
 5. Unit test all new components in isolation
 
 **Risk:** Zero — new code runs alongside old code, old path still active.
@@ -689,12 +689,12 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 
 **Goal:** Replace the inner loop of `CatalogAssets()` with a pipeline for ONE folder.
 
-1. Implement `ParallelFileReader` (Stage 1)
-2. Implement `ParallelImageProcessor` (Stage 2) using new `IThumbnailGenerator`
-3. Implement `BatchedPersistenceWriter` (Stage 3)
-4. Wire stages together in a new `CatalogFolderPipeline` class
-5. Replace `CatalogNewAssets()` call with pipeline invocation
-6. Keep `CatalogUpdatedAssets()` and `CatalogDeletedAssets()` sequential initially
+1. Implement `ParallelFileReader` (Stage 1) — **DONE**
+2. Implement `ParallelImageProcessor` (Stage 2) using new `IThumbnailGenerator` — **DONE**
+3. Implement `BatchedPersistenceWriter` (Stage 3) — **DONE**
+4. Wire stages together in a new `CatalogFolderPipeline` class — **DONE**
+5. Replace `CatalogNewAssets()` call with pipeline invocation — **DONE**
+6. Keep `CatalogUpdatedAssets()` and `CatalogDeletedAssets()` sequential initially — **DONE**
 
 **Risk:** Medium — new processing path, but isolated to one code path. Feature-flag it:
 ```json
@@ -705,8 +705,8 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 
 **Goal:** All cataloging operations (new, updated, deleted) flow through the pipeline.
 
-1. Handle updated assets through pipeline (delete old + create new in one batch)
-2. Handle deleted assets through batched persistence
+1. Handle updated assets through pipeline (delete old + create new in one batch) — **DONE**
+2. Handle deleted assets through batched persistence — **DONE**
 3. Replace folder-level callbacks with batched progress reporting
 4. Remove old sequential path (keep behind feature flag for rollback)
 5. Optimize `ReadCatalog()` startup with parallel file stats

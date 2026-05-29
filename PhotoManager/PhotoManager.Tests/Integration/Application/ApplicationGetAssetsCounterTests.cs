@@ -238,7 +238,8 @@ public class ApplicationGetAssetsCounterTests
 
             Assert.That(assetsCounter, analyseVideos ? Is.EqualTo(52) : Is.EqualTo(51));
 
-            Assert.That(assetsUpdatedEvents, analyseVideos ? Has.Count.EqualTo(52) : Has.Count.EqualTo(51));
+            Assert.That(assetsUpdatedEvents, analyseVideos ? Has.Count.EqualTo(10) : Has.Count.EqualTo(9));
+            Assert.That(assetsUpdatedEvents, Has.All.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

@@ -150,7 +150,8 @@ public class ApplicationGetSubFoldersTests
             Assert.That(childFolders2, Is.Empty);
             Assert.That(childFolders3, Is.Empty);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(31));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(8));
+            Assert.That(assetsUpdatedEvents, Has.All.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

@@ -8,7 +8,10 @@ This document identifies the remaining performance bottlenecks in PhotoManager a
 
 ## Critical Bottlenecks (High Impact)
 
-### 1. Sequential Asset Processing in CatalogAssetsService
+### 1. Sequential Asset Processing in CatalogAssetsService — **DONE**
+
+Image create/update cataloging now uses the bounded channel pipeline with batched persistence; video extraction
+remains on the existing sequential path.
 
 **Location:** `PhotoManager.Domain/CatalogAssetsService.cs` (lines 380-425)
 
@@ -67,7 +70,7 @@ Every image file (JPEG 5-20MB, RAW 25-80MB) is loaded **entirely** into a `byte[
 
 ---
 
-### 3. SQLite Per-Operation Connection & PRAGMA Overhead
+### 3. SQLite Per-Operation Connection & PRAGMA Overhead — **DONE** for catalog asset/thumbnail writes
 
 **Location:** `PhotoManager.Persistence/Sqlite/SqliteConnectionFactory.cs` (lines 21-57)
 
@@ -246,7 +249,7 @@ This is CPU-intensive and cannot be streamed. Each PHash takes ~50-200ms dependi
 
 ---
 
-### 8. GetCataloguedAssets() Full Materialization + Sort
+### 8. GetCataloguedAssets() Full Materialization + Sort — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/AssetRepository.cs` (lines 260-273)
 
@@ -387,7 +390,7 @@ Combine validation with the first decode pass. WPF's `BitmapImage` will throw `N
 
 ---
 
-### 13. Reactive Subject Overhead for Single-Subscriber Pattern
+### 13. Reactive Subject Overhead for Single-Subscriber Pattern — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/AssetRepository.cs` (lines 37-40, 253, 563)
 
@@ -481,19 +484,19 @@ data for removed assets, and raises the observable collection update once.
 
 | # | Bottleneck | Impact | Effort | Priority |
 |---|-----------|--------|--------|----------|
-| 1 | Sequential asset processing | Critical | High | P0 |
+| 1 | Sequential asset processing | Critical | High | P0 — **DONE** |
 | 2 | Full-file read into byte[] | Critical | Medium | P0 |
-| 3 | Per-operation SQLite connections | High | Medium | P1 |
+| 3 | Per-operation SQLite connections | High | Medium | P1 — **DONE for catalog writes** |
 | 4 | Startup file stats (100K) | High | Low | P1 |
 | 5 | Callback list cloning (O(n²)) | High | Low | P1 |
 | 6 | Per-folder file stats during catalog | Medium | Low | P2 |
 | 7 | PHash computation (6× slower) | High (if enabled) | Medium | P2 |
-| 8 | GetCataloguedAssets() sort | Medium | Low | P2 |
+| 8 | GetCataloguedAssets() sort | Medium | Low | P2 — **DONE** |
 | 9 | Thumbnail cache too small | Medium | Low | P2 |
 | 10 | Duplicate detection file checks | Medium | Low | P2 |
 | 11 | GetFileNames double allocation | Low | Low | P3 |
 | 12 | Double image validation | Low | Medium | P3 |
-| 13 | Reactive Subject overhead | Low | Low | P3 |
+| 13 | Reactive Subject overhead | Low | Low | P3 — **DONE** |
 | 14 | WPF thumbnail pipeline | Medium | High | P3 — **DONE** |
 | 15 | Connection string rebuild | Low | Low | P3 |
 | 16 | Avalonia UI asset-removal collection churn | Medium | Low | P2 — **DONE** |
@@ -519,16 +522,16 @@ data for removed assets, and raises the observable collection update once.
 2. Cache connection string in factory
 3. Lazy file property loading at startup (defer to folder access)
 4. Increase thumbnail cache size to 50+ entries
-5. Remove unnecessary sort in `GetCataloguedAssets()` (investigate the TODO)
+5. Remove unnecessary sort in `GetCataloguedAssets()` (investigate the TODO) — **DONE**
 
 ### Phase 2: Batching & I/O Optimization
-1. Batch asset writes (accumulate, use `UpsertMany` + batch thumbnail writes)
+1. Batch asset writes (accumulate, use `UpsertMany` + batch thumbnail writes) — **DONE**
 2. Eliminate redundant PRAGMAs (set WAL once, cache other PRAGMAs on pooled connections)
 3. Streaming hash computation (avoid full-file `byte[]` for SHA512/MD5)
 4. Per-folder change detection via directory timestamp
 
 ### Phase 3: Parallelism (See Multi-Threading Plan)
-1. Implement pipeline architecture in CatalogAssetsService
+1. Implement pipeline architecture in CatalogAssetsService — **DONE**
 2. Parallelize PHash computation
 3. Parallelize startup file stats (if not deferred)
 4. Parallelize duplicate detection without `.AsOrdered()`

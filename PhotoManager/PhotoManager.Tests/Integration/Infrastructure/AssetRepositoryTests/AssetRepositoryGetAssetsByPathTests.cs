@@ -187,12 +187,9 @@ public class AssetRepositoryGetAssetsByPathTests
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset1.FileName).ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset2!.FileName).ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset3!.FileName).ImageData, Is.Null);
 
             Asset[] assets1 = _assetRepository.GetAssetsByPath(folderPath1);
             Asset[] assets2 = _assetRepository.GetAssetsByPath(folderPath2);
@@ -739,12 +736,9 @@ public class AssetRepositoryGetAssetsByPathTests
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Select(a => a.FileName),
+                Is.EquivalentTo([_asset1.FileName, _asset2!.FileName, _asset3!.FileName]));
+            Assert.That(cataloguedAssets, Has.All.Matches<Asset>(a => a.ImageData == null));
 
             Asset[] assets1 = [];
             Asset[] assets2 = [];
@@ -755,16 +749,13 @@ public class AssetRepositoryGetAssetsByPathTests
                 () => assets2 = _assetRepository.GetAssetsByPath(folderPath2)
             );
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets, Has.All.Matches<Asset>(a => a.ImageData != null));
 
             Assert.That(assets1, Has.Length.EqualTo(1));
             Assert.That(assets2, Has.Length.EqualTo(2));
 
             Assert.That(assets1[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets2[0].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets2[1].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(assets2.Select(a => a.FileName), Is.EquivalentTo([_asset2!.FileName, _asset3!.FileName]));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

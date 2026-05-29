@@ -16,7 +16,12 @@ public class FindDuplicatedAssetsService(
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets()
     {
-        Asset[] assets = assetRepository.GetCataloguedAssets();
+        Asset[] assets =
+        [
+            .. assetRepository.GetCataloguedAssets()
+                .OrderBy(static asset => asset.FileName, StringComparer.Ordinal)
+                .ThenBy(static asset => asset.Folder.Path, StringComparer.Ordinal)
+        ];
 
         if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
