@@ -123,6 +123,53 @@ public sealed class SqlitePersistenceContext(
         }
     }
 
+    public void UpsertAssetsWithThumbnails(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails)
+    {
+        EnsureInitialized();
+        ArgumentNullException.ThrowIfNull(assetsWithThumbnails);
+
+        if (assetsWithThumbnails.Count == 0)
+        {
+            return;
+        }
+
+        using (SqliteConnection connection = factory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SqliteCommand assetCommand = connection.CreateCommand())
+                {
+                    assetCommand.Transaction = transaction;
+                    assetCommand.CommandText = AssetPersistence.UPSERT_SQL;
+
+                    using (SqliteCommand thumbnailCommand = connection.CreateCommand())
+                    {
+                        thumbnailCommand.Transaction = transaction;
+                        thumbnailCommand.CommandText = ThumbnailPersistence.UPSERT_SQL;
+
+                        for (int i = 0; i < assetsWithThumbnails.Count; i++)
+                        {
+                            AssetWithThumbnail assetWithThumbnail = assetsWithThumbnails[i];
+                            assetCommand.Parameters.Clear();
+                            AssetPersistence.BindAsset(assetCommand, assetWithThumbnail.Asset);
+                            assetCommand.ExecuteNonQuery();
+
+                            thumbnailCommand.Parameters.Clear();
+                            ThumbnailPersistence.BindUpsert(
+                                thumbnailCommand,
+                                assetWithThumbnail.Asset.FolderId,
+                                assetWithThumbnail.Asset.FileName,
+                                assetWithThumbnail.ThumbnailData);
+                            thumbnailCommand.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+                transaction.Commit();
+            }
+        }
+    }
+
     public void DeleteAssetWithThumbnail(Guid folderId, string fileName)
     {
         EnsureInitialized();
@@ -138,6 +185,55 @@ public sealed class SqlitePersistenceContext(
                 ExecuteNonQuery(connection, transaction,
                     "DELETE FROM Assets WHERE FolderId = $folderId AND FileName = $fileName;",
                     folderId, fileName);
+
+                transaction.Commit();
+            }
+        }
+    }
+
+    public void DeleteAssetsWithThumbnails(Guid folderId, IReadOnlyList<string> fileNames)
+    {
+        EnsureInitialized();
+        ArgumentNullException.ThrowIfNull(fileNames);
+
+        if (fileNames.Count == 0)
+        {
+            return;
+        }
+
+        using (SqliteConnection connection = factory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SqliteCommand thumbnailCommand = connection.CreateCommand())
+                {
+                    thumbnailCommand.Transaction = transaction;
+                    thumbnailCommand.CommandText =
+                        "DELETE FROM Thumbnails WHERE FolderId = $folderId AND FileName = $fileName;";
+
+                    using (SqliteCommand assetCommand = connection.CreateCommand())
+                    {
+                        assetCommand.Transaction = transaction;
+                        assetCommand.CommandText =
+                            "DELETE FROM Assets WHERE FolderId = $folderId AND FileName = $fileName;";
+
+                        for (int i = 0; i < fileNames.Count; i++)
+                        {
+                            string fileName = fileNames[i];
+                            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+                            thumbnailCommand.Parameters.Clear();
+                            thumbnailCommand.Parameters.AddWithValue("$folderId", folderId);
+                            thumbnailCommand.Parameters.AddWithValue("$fileName", fileName);
+                            thumbnailCommand.ExecuteNonQuery();
+
+                            assetCommand.Parameters.Clear();
+                            assetCommand.Parameters.AddWithValue("$folderId", folderId);
+                            assetCommand.Parameters.AddWithValue("$fileName", fileName);
+                            assetCommand.ExecuteNonQuery();
+                        }
+                    }
+                }
 
                 transaction.Commit();
             }

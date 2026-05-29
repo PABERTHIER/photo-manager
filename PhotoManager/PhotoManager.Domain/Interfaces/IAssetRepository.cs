@@ -31,7 +31,9 @@ public interface IAssetRepository
 
     Asset[] GetAssetsByPath(string directory);
     bool AddAsset(Asset asset, byte[] thumbnailData);
+    int AddAssets(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails);
     Asset? DeleteAsset(string directory, string deletedFileName);
+    IReadOnlyList<Asset> DeleteAssets(string directory, IReadOnlyList<string> deletedFileNames);
     Asset[] GetCataloguedAssets();
     Asset[] GetCataloguedAssetsByPath(string directory);
     bool IsAssetCatalogued(string directoryName, string fileName);

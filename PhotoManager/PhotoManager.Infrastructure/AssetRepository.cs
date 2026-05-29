@@ -3,11 +3,10 @@ using PhotoManager.Domain.Interfaces.Persistence;
 using PhotoManager.Persistence.Cache;
 using System.Collections.Concurrent;
 using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 
 namespace PhotoManager.Infrastructure;
 
+// ReSharper disable InconsistentlySynchronizedField
 public class AssetRepository : IAssetRepository, IDisposable
 {
     private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
@@ -31,14 +30,13 @@ public class AssetRepository : IAssetRepository, IDisposable
     private SyncAssetsConfiguration _syncAssetsConfiguration = new();
 
     private readonly Lock _folderCreationLock = new();
+    private readonly Lock _assetMutationLock = new();
     private readonly Lock _recentPathsLock = new();
     private readonly Lock _backupLock = new();
-    private readonly Lock _assetsUpdatedLock = new();
-
-    private readonly Subject<Unit> _assetsUpdatedSubject = new();
+    private readonly AssetsUpdatedObservable _assetsUpdatedObservable = new();
     private bool _disposed;
 
-    public IObservable<Unit> AssetsUpdated { get; }
+    public IObservable<Unit> AssetsUpdated => _assetsUpdatedObservable;
 
     /// <summary>
     /// Convenience constructor that creates the full SQLite chain internally.
@@ -59,8 +57,6 @@ public class AssetRepository : IAssetRepository, IDisposable
         _logger = logger;
 
         _databaseDirectory = pathProviderService.ResolveDatabaseDirectory();
-        AssetsUpdated = _assetsUpdatedSubject.AsObservable();
-
         ushort cacheCapacity = userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
         if (cacheCapacity == 0)
@@ -79,14 +75,9 @@ public class AssetRepository : IAssetRepository, IDisposable
     {
         ThrowIfDisposed();
 
-        if (_foldersByPath.TryGetValue(path, out Folder? existingFolder))
-        {
-            return existingFolder;
-        }
-
         lock (_folderCreationLock)
         {
-            if (_foldersByPath.TryGetValue(path, out existingFolder))
+            if (_foldersByPath.TryGetValue(path, out Folder? existingFolder))
             {
                 return existingFolder;
             }
@@ -151,25 +142,29 @@ public class AssetRepository : IAssetRepository, IDisposable
         {
             ThrowIfDisposed();
 
-            _persistenceContext.DeleteFolderWithAssetsAndThumbnails(folder.Id);
-
             int removedAssetCount = 0;
 
-            if (_assetsByFolderId.TryRemove(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets))
+            lock (_assetMutationLock)
             {
-                removedAssetCount = folderAssets.Count;
-                Interlocked.Add(ref _totalAssetCount, -removedAssetCount);
-                DisposeAssetImageData(folderAssets.Values);
+                _persistenceContext.DeleteFolderWithAssetsAndThumbnails(folder.Id);
+
+                if (_assetsByFolderId.TryRemove(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets))
+                {
+                    removedAssetCount = folderAssets.Count;
+                    Interlocked.Add(ref _totalAssetCount, -removedAssetCount);
+                    DisposeAssetImageData(folderAssets.Values);
+                }
+
+                _thumbnailCache.Remove(folder.Id);
+
+                if (_foldersByPath.TryGetValue(folder.Path, out Folder? folderExisting)
+                    && folderExisting.Id == folder.Id)
+                {
+                    _foldersByPath.TryRemove(folder.Path, out _);
+                }
+
+                _foldersById.TryRemove(folder.Id, out _);
             }
-
-            _thumbnailCache.Remove(folder.Id);
-
-            if (_foldersByPath.TryGetValue(folder.Path, out Folder? folderExisting) && folderExisting.Id == folder.Id)
-            {
-                _foldersByPath.TryRemove(folder.Path, out _);
-            }
-
-            _foldersById.TryRemove(folder.Id, out _);
 
             if (removedAssetCount > 0)
             {
@@ -246,6 +241,66 @@ public class AssetRepository : IAssetRepository, IDisposable
         }
     }
 
+    public int AddAssets(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(assetsWithThumbnails);
+
+        if (assetsWithThumbnails.Count == 0)
+        {
+            return 0;
+        }
+
+        try
+        {
+            for (int i = 0; i < assetsWithThumbnails.Count; i++)
+            {
+                AssetWithThumbnail assetWithThumbnail = assetsWithThumbnails[i];
+
+                if (string.IsNullOrWhiteSpace(assetWithThumbnail.Asset.Folder.Path))
+                {
+                    _logger.LogError(
+                        "The asset could not be added, folder path is null or empty, asset.FileName: {FileName}",
+                        assetWithThumbnail.Asset.FileName);
+                    return 0;
+                }
+
+                ArgumentNullException.ThrowIfNull(assetWithThumbnail.ThumbnailData);
+            }
+
+            AssetWithThumbnail[] canonicalAssetsWithThumbnails;
+
+            lock (_assetMutationLock)
+            {
+                canonicalAssetsWithThumbnails = new AssetWithThumbnail[assetsWithThumbnails.Count];
+
+                for (int i = 0; i < assetsWithThumbnails.Count; i++)
+                {
+                    AssetWithThumbnail assetWithThumbnail = assetsWithThumbnails[i];
+                    Asset canonicalAsset = GetAssetWithCanonicalFolder(assetWithThumbnail.Asset);
+                    canonicalAssetsWithThumbnails[i] = assetWithThumbnail with { Asset = canonicalAsset };
+                }
+
+                _persistenceContext.UpsertAssetsWithThumbnails(canonicalAssetsWithThumbnails);
+
+                for (int i = 0; i < canonicalAssetsWithThumbnails.Length; i++)
+                {
+                    AssetWithThumbnail assetWithThumbnail = canonicalAssetsWithThumbnails[i];
+                    AddAssetToMemory(assetWithThumbnail.Asset, assetWithThumbnail.ThumbnailData);
+                }
+            }
+
+            NotifyAssetsUpdated();
+
+            return canonicalAssetsWithThumbnails.Length;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding asset batch: {AssetCount}", assetsWithThumbnails.Count);
+            throw;
+        }
+    }
+
     public Asset? DeleteAsset(string directory, string deletedFileName)
     {
         Asset? deletedAsset;
@@ -268,19 +323,51 @@ public class AssetRepository : IAssetRepository, IDisposable
         return deletedAsset;
     }
 
+    public IReadOnlyList<Asset> DeleteAssets(string directory, IReadOnlyList<string> deletedFileNames)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(deletedFileNames);
+
+        if (deletedFileNames.Count == 0)
+        {
+            return [];
+        }
+
+        try
+        {
+            Folder? folder = GetFolderByPath(directory);
+
+            if (folder == null)
+            {
+                return [];
+            }
+
+            List<Asset> deletedAssets;
+
+            lock (_assetMutationLock)
+            {
+                _persistenceContext.DeleteAssetsWithThumbnails(folder.Id, deletedFileNames);
+                deletedAssets = RemoveAssetsFromMemory(folder, deletedFileNames);
+            }
+
+            if (deletedAssets.Count > 0)
+            {
+                NotifyAssetsUpdated();
+            }
+
+            return deletedAssets;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting asset batch: {Directory}, {AssetCount}",
+                directory, deletedFileNames.Count);
+            throw;
+        }
+    }
+
     public Asset[] GetCataloguedAssets()
     {
-        Asset[] assets = [.. _assetsByFolderId.Values.SelectMany(static inner => inner.Values)];
-
-        // TODO: Why do we need this sort ?
-        Array.Sort(assets, static (a, b) =>
-        {
-            int compare = string.Compare(a.FileName, b.FileName, StringComparison.Ordinal);
-
-            return compare != 0 ? compare : string.Compare(a.Folder.Path, b.Folder.Path, StringComparison.Ordinal);
-        });
-
-        return assets;
+        return [.. _assetsByFolderId.Values.SelectMany(static inner => inner.Values)];
     }
 
     public Asset[] GetCataloguedAssetsByPath(string directory)
@@ -492,12 +579,12 @@ public class AssetRepository : IAssetRepository, IDisposable
     {
         Volatile.Write(ref _disposed, true);
         DisposeAssetImageData(_assetsByFolderId.Values.SelectMany(static folderAssets => folderAssets.Values));
-        _assetsUpdatedSubject.Dispose();
+        _assetsUpdatedObservable.Dispose();
         (_persistenceContext as IDisposable)?.Dispose();
         GC.SuppressFinalize(this);
     }
 
-    // Standard .NET IDisposable guard: prevents use-after-dispose on the Subject and persistence layer.
+    // Standard .NET IDisposable guard: prevents use-after-dispose on the Subject and persistence layer
     private void ThrowIfDisposed()
     {
         if (Volatile.Read(ref _disposed))
@@ -542,7 +629,7 @@ public class AssetRepository : IAssetRepository, IDisposable
                 }
 
                 ConcurrentDictionary<string, Asset> folderAssets =
-                    _assetsByFolderId.GetOrAdd(
+                        _assetsByFolderId.GetOrAdd(
                         asset.FolderId,
                         static _ => new ConcurrentDictionary<string, Asset>(StringComparer.Ordinal));
 
@@ -572,45 +659,55 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     private void AddAssetCore(Asset asset, byte[] thumbnailData)
     {
-        if (!_foldersById.ContainsKey(asset.FolderId))
+        lock (_assetMutationLock)
         {
-            AddFolder(asset.Folder.Path);
+            Asset canonicalAsset = GetAssetWithCanonicalFolder(asset);
+            _persistenceContext.UpsertAssetWithThumbnail(canonicalAsset, thumbnailData);
+            AddAssetToMemory(canonicalAsset, thumbnailData);
         }
 
-        _persistenceContext.UpsertAssetWithThumbnail(asset, thumbnailData);
+        NotifyAssetsUpdated();
+    }
 
+    private Asset GetAssetWithCanonicalFolder(Asset asset)
+    {
+        if (_foldersById.TryGetValue(asset.FolderId, out Folder? existingFolderById))
+        {
+            asset.Folder = existingFolderById;
+            return asset;
+        }
+
+        AddFolder(asset.Folder.Path);
+
+        return asset;
+    }
+
+    private void AddAssetToMemory(Asset asset, byte[] thumbnailData)
+    {
         ConcurrentDictionary<string, Asset> folderAssets =
             _assetsByFolderId.GetOrAdd(
                 asset.FolderId,
                 static _ => new ConcurrentDictionary<string, Asset>(StringComparer.Ordinal));
 
-        // Standard lock-free CAS (Compare-And-Swap) pattern
-        while (true)
+        lock (folderAssets)
         {
             if (folderAssets.TryGetValue(asset.FileName, out Asset? existingAsset))
             {
-                if (ReferenceEquals(existingAsset, asset))
+                if (!ReferenceEquals(existingAsset, asset))
                 {
-                    break;
-                }
-
-                if (folderAssets.TryUpdate(asset.FileName, asset, existingAsset))
-                {
+                    folderAssets[asset.FileName] = asset;
                     DisposeAssetImageData(existingAsset);
-                    break;
                 }
             }
-            else if (folderAssets.TryAdd(asset.FileName, asset))
+            else
             {
+                folderAssets[asset.FileName] = asset;
                 Interlocked.Increment(ref _totalAssetCount);
-                break;
             }
+
+            ConcurrentDictionary<string, byte[]> thumbnails = GetOrLoadThumbnails(asset.Folder);
+            thumbnails[asset.FileName] = thumbnailData;
         }
-
-        ConcurrentDictionary<string, byte[]> thumbnails = GetOrLoadThumbnails(asset.Folder);
-        thumbnails[asset.FileName] = thumbnailData;
-
-        NotifyAssetsUpdated();
     }
 
     private Asset? RemoveAsset(string directory, string deletedFileName)
@@ -622,27 +719,76 @@ public class AssetRepository : IAssetRepository, IDisposable
             return null;
         }
 
-        _persistenceContext.DeleteAssetWithThumbnail(folder.Id, deletedFileName);
-
-        if (_thumbnailCache.TryGet(folder.Id, out ConcurrentDictionary<string, byte[]> thumbnails))
+        lock (_assetMutationLock)
         {
-            thumbnails.TryRemove(deletedFileName, out _);
+            _persistenceContext.DeleteAssetWithThumbnail(folder.Id, deletedFileName);
 
-            if (thumbnails.IsEmpty)
+            if (!_assetsByFolderId.TryGetValue(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets))
             {
-                _thumbnailCache.Remove(folder.Id);
+                return null;
             }
-        }
 
-        if (_assetsByFolderId.TryGetValue(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets)
-            && folderAssets.TryRemove(deletedFileName, out Asset? assetToDelete))
-        {
-            Interlocked.Decrement(ref _totalAssetCount);
+            Asset? assetToDelete;
+
+            lock (folderAssets)
+            {
+                if (!folderAssets.TryRemove(deletedFileName, out assetToDelete))
+                {
+                    return null;
+                }
+
+                RemoveThumbnailFromCache(folder.Id, deletedFileName);
+                Interlocked.Decrement(ref _totalAssetCount);
+            }
+
             DisposeAssetImageData(assetToDelete);
             return assetToDelete;
         }
+    }
 
-        return null;
+    private List<Asset> RemoveAssetsFromMemory(Folder folder, IReadOnlyList<string> deletedFileNames)
+    {
+        List<Asset> deletedAssets = new(deletedFileNames.Count);
+
+        if (!_assetsByFolderId.TryGetValue(folder.Id, out ConcurrentDictionary<string, Asset>? folderAssets))
+        {
+            return deletedAssets;
+        }
+
+        lock (folderAssets)
+        {
+            for (int i = 0; i < deletedFileNames.Count; i++)
+            {
+                if (folderAssets.TryRemove(deletedFileNames[i], out Asset? deletedAsset))
+                {
+                    RemoveThumbnailFromCache(folder.Id, deletedFileNames[i]);
+                    Interlocked.Decrement(ref _totalAssetCount);
+                    deletedAssets.Add(deletedAsset);
+                }
+            }
+        }
+
+        for (int i = 0; i < deletedAssets.Count; i++)
+        {
+            DisposeAssetImageData(deletedAssets[i]);
+        }
+
+        return deletedAssets;
+    }
+
+    private void RemoveThumbnailFromCache(Guid folderId, string fileName)
+    {
+        if (!_thumbnailCache.TryGet(folderId, out ConcurrentDictionary<string, byte[]> thumbnails))
+        {
+            return;
+        }
+
+        thumbnails.TryRemove(fileName, out _);
+
+        if (thumbnails.IsEmpty)
+        {
+            _thumbnailCache.Remove(folderId);
+        }
     }
 
     private Asset[] GetAssetsByFolderId(Guid folderId)
@@ -665,7 +811,7 @@ public class AssetRepository : IAssetRepository, IDisposable
 
             if (thumbnails.TryGetValue(asset.FileName, out byte[]? buffer))
             {
-                // Stored thumbnail bytes were already orientation-normalized when the asset was created.
+                // Stored thumbnail bytes were already orientation-normalized when the asset was created
                 IImageData imageData = _imageProcessingService.LoadBitmapThumbnailImage(
                     buffer, ImageRotation.Rotate0, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
                 asset.ImageData?.Dispose();
@@ -740,9 +886,92 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     private void NotifyAssetsUpdated()
     {
-        lock (_assetsUpdatedLock)
+        _assetsUpdatedObservable.Notify();
+    }
+
+    private sealed class AssetsUpdatedObservable : IObservable<Unit>, IDisposable
+    {
+        private readonly Lock _lock = new();
+        private readonly List<IObserver<Unit>> _observers = [];
+        private bool _disposed;
+
+        public IDisposable Subscribe(IObserver<Unit> observer)
         {
-            _assetsUpdatedSubject.OnNext(Unit.Default);
+            ArgumentNullException.ThrowIfNull(observer);
+
+            lock (_lock)
+            {
+                if (_disposed)
+                {
+                    observer.OnCompleted();
+                    return EmptyDisposable.Instance;
+                }
+
+                _observers.Add(observer);
+            }
+
+            return new Subscription(this, observer);
+        }
+
+        public void Notify()
+        {
+            lock (_lock)
+            {
+                for (int i = 0; i < _observers.Count; i++)
+                {
+                    _observers[i].OnNext(Unit.Default);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            IObserver<Unit>[] observers;
+
+            lock (_lock)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                _disposed = true;
+                observers = [.. _observers];
+                _observers.Clear();
+            }
+
+            for (int i = 0; i < observers.Length; i++)
+            {
+                observers[i].OnCompleted();
+            }
+        }
+
+        private void Unsubscribe(IObserver<Unit> observer)
+        {
+            lock (_lock)
+            {
+                _observers.Remove(observer);
+            }
+        }
+
+        private sealed class Subscription(AssetsUpdatedObservable owner, IObserver<Unit> observer) : IDisposable
+        {
+            private AssetsUpdatedObservable? _owner = owner;
+
+            public void Dispose()
+            {
+                AssetsUpdatedObservable? currentOwner = Interlocked.Exchange(ref _owner, null);
+                currentOwner?.Unsubscribe(observer);
+            }
+        }
+
+        private sealed class EmptyDisposable : IDisposable
+        {
+            public static readonly EmptyDisposable Instance = new();
+
+            public void Dispose()
+            {
+            }
         }
     }
 }

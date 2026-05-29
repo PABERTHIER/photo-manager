@@ -325,6 +325,85 @@ public class SqlitePersistenceContextTests
     }
 
     [Test]
+    public void UpsertAssetsWithThumbnails_ValidAssets_PersistsAssetsAndThumbnails()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Folder folder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos");
+        Asset asset1 = CreateAsset(folder);
+        Asset asset2 = CreateAsset(folder, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG);
+        byte[] thumbnailData1 = [1, 2, 3];
+        byte[] thumbnailData2 = [4, 5, 6];
+
+        _sqlitePersistenceContext.UpsertAssetsWithThumbnails(
+            [new(asset1, thumbnailData1), new(asset2, thumbnailData2)]);
+
+        Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset1.FileName), Is.Not.Null);
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset2.FileName), Is.Not.Null);
+            Assert.That(thumbnails[asset1.FileName], Is.EqualTo(thumbnailData1));
+            Assert.That(thumbnails[asset2.FileName], Is.EqualTo(thumbnailData2));
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void UpsertAssetsWithThumbnails_EmptyList_DoesNothing()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Assert.DoesNotThrow(() => _sqlitePersistenceContext.UpsertAssetsWithThumbnails([]));
+
+        Assert.That(_sqlitePersistenceContext.Assets.Count(), Is.Zero);
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void UpsertAssetsWithThumbnails_ThumbnailInsertFails_RollsBackAssets()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Folder folder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos");
+        Asset asset1 = CreateAsset(folder);
+        Asset asset2 = CreateAsset(folder, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG);
+
+        CreateAbortTrigger("FailBatchThumbnailInsert", "Thumbnails", "INSERT", "thumbnail batch failure");
+
+        SqliteException? exception = Assert.Throws<SqliteException>(() =>
+            _sqlitePersistenceContext.UpsertAssetsWithThumbnails([new(asset1, [1]), new(asset2, [2])]));
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(exception?.Message, Does.Contain("thumbnail batch failure"));
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset1.FileName), Is.Null);
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset2.FileName), Is.Null);
+            Assert.That(_sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id), Is.Empty);
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void UpsertAssetsWithThumbnails_NotInitialized_ThrowsInvalidOperationException()
+    {
+        const string expectedMessage = "Db context has not been initialized.";
+
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
+            _sqlitePersistenceContext!.UpsertAssetsWithThumbnails([]));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger.AssertLogExceptions(
+            [new InvalidOperationException(expectedMessage)],
+            typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
     public void UpsertAssetWithThumbnail_NotInitialized_ThrowsInvalidOperationException()
     {
         const string expectedMessage = "Db context has not been initialized.";
@@ -357,6 +436,69 @@ public class SqlitePersistenceContextTests
         {
             Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset.FileName), Is.Null);
             Assert.That(_sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id), Is.Empty);
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void DeleteAssetsWithThumbnails_ExistingAssets_DeletesAssetsAndThumbnails()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Folder folder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos");
+        Asset asset1 = CreateAsset(folder);
+        Asset asset2 = CreateAsset(folder, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG);
+        _sqlitePersistenceContext.UpsertAssetsWithThumbnails([new(asset1, [1]), new(asset2, [2])]);
+
+        _sqlitePersistenceContext.DeleteAssetsWithThumbnails(folder.Id, [asset1.FileName, asset2.FileName]);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset1.FileName), Is.Null);
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset2.FileName), Is.Null);
+            Assert.That(_sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id), Is.Empty);
+        }
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void DeleteAssetsWithThumbnails_EmptyList_DoesNothing()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Assert.DoesNotThrow(() => _sqlitePersistenceContext.DeleteAssetsWithThumbnails(Guid.NewGuid(), []));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void DeleteAssetsWithThumbnails_AssetDeleteFails_RollsBackAssetsAndThumbnails()
+    {
+        _sqlitePersistenceContext!.Initialize(_databaseDirectory!);
+
+        Folder folder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos");
+        Asset asset1 = CreateAsset(folder);
+        Asset asset2 = CreateAsset(folder, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG);
+        byte[] thumbnailData1 = [1];
+        byte[] thumbnailData2 = [2];
+        _sqlitePersistenceContext.UpsertAssetsWithThumbnails(
+            [new(asset1, thumbnailData1), new(asset2, thumbnailData2)]);
+
+        CreateAbortTrigger("FailBatchAssetDelete", "Assets", "DELETE", "asset batch delete failure");
+
+        SqliteException? exception = Assert.Throws<SqliteException>(() =>
+            _sqlitePersistenceContext.DeleteAssetsWithThumbnails(folder.Id, [asset1.FileName, asset2.FileName]));
+        Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(exception?.Message, Does.Contain("asset batch delete failure"));
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset1.FileName), Is.Not.Null);
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset2.FileName), Is.Not.Null);
+            Assert.That(thumbnails[asset1.FileName], Is.EqualTo(thumbnailData1));
+            Assert.That(thumbnails[asset2.FileName], Is.EqualTo(thumbnailData2));
         }
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
@@ -447,6 +589,21 @@ public class SqlitePersistenceContextTests
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
             _sqlitePersistenceContext!.DeleteAssetWithThumbnail(Guid.NewGuid(), "image.jpg"));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger.AssertLogExceptions(
+            [new InvalidOperationException(expectedMessage)],
+            typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void DeleteAssetsWithThumbnails_NotInitialized_ThrowsInvalidOperationException()
+    {
+        const string expectedMessage = "Db context has not been initialized.";
+
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
+            _sqlitePersistenceContext!.DeleteAssetsWithThumbnails(Guid.NewGuid(), []));
 
         Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
 
@@ -730,13 +887,14 @@ public class SqlitePersistenceContextTests
         }
     }
 
-    private static Asset CreateAsset(Folder folder)
+    private static Asset CreateAsset(Folder folder, string fileName = FileNames.IMAGE_1_JPG,
+        string hash = Hashes.IMAGE_1_JPG)
     {
         return new()
         {
             FolderId = folder.Id,
             Folder = folder,
-            FileName = FileNames.IMAGE_1_JPG,
+            FileName = fileName,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -750,7 +908,7 @@ public class SqlitePersistenceContextTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
+            Hash = hash,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },

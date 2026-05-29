@@ -28,8 +28,14 @@ public interface IPersistenceContext
     /// <summary>Inserts or updates one asset and its thumbnail atomically.</summary>
     void UpsertAssetWithThumbnail(Asset asset, byte[] thumbnailData);
 
+    /// <summary>Inserts or updates assets and thumbnails atomically in one transaction.</summary>
+    void UpsertAssetsWithThumbnails(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails);
+
     /// <summary>Deletes one asset and its thumbnail atomically.</summary>
     void DeleteAssetWithThumbnail(Guid folderId, string fileName);
+
+    /// <summary>Deletes assets and their thumbnails atomically in one transaction.</summary>
+    void DeleteAssetsWithThumbnails(Guid folderId, IReadOnlyList<string> fileNames);
 
     /// <summary>Deletes one folder, its assets, and their thumbnails atomically.</summary>
     void DeleteFolderWithAssetsAndThumbnails(Guid folderId);

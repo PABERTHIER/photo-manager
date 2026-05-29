@@ -229,8 +229,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public void SetAssets(string newCurrentFolderPath, Asset[] assets)
     {
-        // .NET 10 changed ReadOnlySpan<char> == ReadOnlySpan<char> to compare references instead of content
-        if (!CurrentFolderPath.AsSpan().SequenceEqual(newCurrentFolderPath.AsSpan()))
+        if (string.Compare(CurrentFolderPath, newCurrentFolderPath, StringComparison.OrdinalIgnoreCase) != 0)
         {
             CurrentFolderPath = newCurrentFolderPath;
         }

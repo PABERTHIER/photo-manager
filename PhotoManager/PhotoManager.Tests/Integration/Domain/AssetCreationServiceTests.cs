@@ -80,8 +80,9 @@ public class AssetCreationServiceTests
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
+            imageMetadataService, assetHashCalculatorService, thumbnailGenerator, _userConfigurationService,
             _testLogger!);
     }
 
@@ -309,6 +310,51 @@ public class AssetCreationServiceTests
                 rotatedMessage);
 
             AssertCataloguedAssetValidity(asset!);
+        }
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+    }
+
+    [Test]
+    public void CreateAssetWithThumbnail_PictureAndBasicHashType_ReturnsAssetWithoutPersistingIt()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        string folderPath = _assetsDirectory!;
+        Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+        string imagePath = Path.Combine(folderPath, FileNames.IMAGE_1_JPG);
+        byte[] imageBytes = File.ReadAllBytes(imagePath);
+
+        AssetWithThumbnail? assetWithThumbnail = _assetCreationService!.CreateAssetWithThumbnail(
+            folderPath,
+            FileNames.IMAGE_1_JPG,
+            imageBytes,
+            skipCatalogCheck: true);
+
+        Assert.That(assetWithThumbnail, Is.Not.Null);
+
+        using (Assert.EnterMultipleScope())
+        {
+            AssertAssetPropertyValidity(
+                assetWithThumbnail!.Asset,
+                FileNames.IMAGE_1_JPG,
+                imagePath,
+                folderPath,
+                folder,
+                FileSize.IMAGE_1_JPG,
+                PixelWidthAsset.IMAGE_1_JPG,
+                PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG,
+                ThumbnailHeightAsset.IMAGE_1_JPG,
+                ModificationDate.Default,
+                ImageRotation.Rotate0,
+                Hashes.IMAGE_1_JPG,
+                false,
+                null,
+                false,
+                null);
+            Assert.That(assetWithThumbnail.ThumbnailData, Is.Not.Empty);
+            Assert.That(_testableAssetRepository.GetCataloguedAssets(), Is.Empty);
         }
 
         _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
@@ -2952,6 +2998,79 @@ public class AssetCreationServiceTests
         finally
         {
             Directory.Delete(_userConfigurationService!.PathSettings.FirstFrameVideosPath, true);
+        }
+    }
+
+    [Test]
+    public void CreateAssetWithThumbnail_FileDoesNotExist_LogsItAndReturnsNull()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        const string fileName = FileNames.NON_EXISTENT_FILE_JPG;
+        string imagePath = Path.Combine(_assetsDirectory!, fileName);
+        FileNotFoundException expectedException = new($"The file {imagePath} does not exist.");
+
+        AssetWithThumbnail? assetWithThumbnail = _assetCreationService!.CreateAssetWithThumbnail(_assetsDirectory!,
+            fileName, [1, 2, 3]);
+
+        Assert.That(assetWithThumbnail, Is.Null);
+
+        _testLogger!.AssertLogExceptions([expectedException], typeof(AssetCreationService));
+    }
+
+    [Test]
+    public void CreateAssetWithThumbnail_AssetIsAlreadyCatalogued_ReturnsNull()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
+
+        const string fileName = FileNames.IMAGE_1_JPG;
+        string imagePath = Path.Combine(_assetsDirectory!, fileName);
+        byte[] imageBytes = File.ReadAllBytes(imagePath);
+        _testableAssetRepository!.AddFolder(_assetsDirectory!);
+        Asset? cataloguedAsset = _assetCreationService!.CreateAsset(_assetsDirectory!, fileName);
+
+        AssetWithThumbnail? assetWithThumbnail = _assetCreationService.CreateAssetWithThumbnail(_assetsDirectory!,
+            fileName, imageBytes);
+
+        Assert.That(cataloguedAsset, Is.Not.Null);
+        Assert.That(assetWithThumbnail, Is.Null);
+
+        _testLogger!.AssertLogExceptions([], typeof(AssetCreationService));
+    }
+
+    [Test]
+    public void CreateAssetWithThumbnail_VideoAndAnalyseVideosIsTrue_ReturnsNullAndCreatesFirstFrame()
+    {
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
+
+        const string fileName = FileNames.HOMER_MP4;
+        const string firstFrameFileName = FileNames.HOMER_JPG;
+        string videoPath = Path.Combine(_assetsDirectory!, fileName);
+        string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+        string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
+
+        try
+        {
+            Assert.That(File.Exists(videoPath), Is.True);
+            Assert.That(File.Exists(imagePath), Is.False);
+            _testableAssetRepository!.AddFolder(_assetsDirectory!);
+
+            AssetWithThumbnail? assetWithThumbnail = _assetCreationService!.CreateAssetWithThumbnail(_assetsDirectory!,
+                fileName, [1, 2, 3], isVideo: true);
+
+            Assert.That(assetWithThumbnail, Is.Null);
+            Assert.That(File.Exists(imagePath), Is.True);
+            Assert.That(_testableAssetRepository.GetCataloguedAssets(), Is.Empty);
+
+            _testLogger!.AssertLogInfos(
+            [
+                $"First frame extracted successfully for: {videoPath}",
+                $"First frame saved at: {imagePath}"
+            ], typeof(AssetCreationService));
+        }
+        finally
+        {
+            Directory.Delete(firstFrameVideosPath, true);
         }
     }
 

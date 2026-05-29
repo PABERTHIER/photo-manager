@@ -393,7 +393,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -448,7 +448,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -510,12 +510,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         if (expected > 0)
         {
             IList<string> assetsNameList1 = [.. assetsName1];
-            Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList1));
         }
         if (expected > 1)
         {
             IList<string> assetsNameList2 = [.. assetsName2];
-            Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[1].Select(y => y.FileName), Is.EquivalentTo(assetsNameList2));
         }
     }
 
@@ -633,7 +633,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 }

@@ -8,10 +8,31 @@ public class AssetCreationService(
     IImageProcessingService imageProcessingService,
     IImageMetadataService imageMetadataService,
     IAssetHashCalculatorService assetHashCalculatorService,
+    IThumbnailGenerator thumbnailGenerator,
     IUserConfigurationService userConfigurationService,
     ILogger<AssetCreationService> logger)
     : IAssetCreationService
 {
+    public AssetCreationService(
+        IAssetRepository assetRepository,
+        IFileOperationsService fileOperationsService,
+        IImageProcessingService imageProcessingService,
+        IImageMetadataService imageMetadataService,
+        IAssetHashCalculatorService assetHashCalculatorService,
+        IUserConfigurationService userConfigurationService,
+        ILogger<AssetCreationService> logger)
+        : this(
+            assetRepository,
+            fileOperationsService,
+            imageProcessingService,
+            imageMetadataService,
+            assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService,
+            logger)
+    {
+    }
+
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false,
         bool skipCatalogCheck = false)
     {
@@ -44,7 +65,59 @@ public class AssetCreationService(
                 return null;
             }
 
-            byte[] imageBytes = fileOperationsService.GetFileBytes(imagePath);
+            AssetWithThumbnail? assetWithThumbnail = CreateAssetWithThumbnail(directoryName, fileName,
+                fileOperationsService.GetFileBytes(imagePath), isVideo, skipCatalogCheck: true);
+
+            if (assetWithThumbnail == null)
+            {
+                return null;
+            }
+
+            bool result = assetRepository.AddAsset(assetWithThumbnail.Asset, assetWithThumbnail.ThumbnailData);
+
+            if (!result)
+            {
+                logger.LogError("The asset {AssetPath} could not be added.", assetWithThumbnail.Asset.FullPath);
+            }
+
+            return assetWithThumbnail.Asset;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{ExMessage}", ex.Message);
+            return null;
+        }
+    }
+
+    public AssetWithThumbnail? CreateAssetWithThumbnail(string directoryName, string fileName, byte[] imageBytes,
+        bool isVideo = false, bool skipCatalogCheck = false)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(directoryName);
+            ArgumentNullException.ThrowIfNull(fileName);
+            ArgumentNullException.ThrowIfNull(imageBytes);
+
+            if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
+            {
+                VideoHelper.GetFirstFramePath(directoryName, fileName,
+                    userConfigurationService.PathSettings.FirstFrameVideosPath, logger);
+                return null;
+            }
+
+            string imagePath = Path.Combine(directoryName, fileName);
+
+            if (!File.Exists(imagePath))
+            {
+                FileNotFoundException exception = new($"The file {imagePath} does not exist.");
+                logger.LogError(exception, "{ExMessage}", exception.Message);
+                return null;
+            }
+
+            if (!skipCatalogCheck && assetRepository.IsAssetCatalogued(directoryName, fileName))
+            {
+                return null;
+            }
 
             ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
 
@@ -72,7 +145,7 @@ public class AssetCreationService(
         }
     }
 
-    private Asset? CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail? CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)
     {
         if (!imageProcessingService.IsValidImage(imageBytes))
         {
@@ -87,10 +160,8 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        using IImageData thumbnailImage =
-            imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
-                thumbnailDecodeHeight);
-        byte[] thumbnailBuffer = imageProcessingService.GetPngBitmapImage(thumbnailImage);
+        byte[] thumbnailBuffer = thumbnailGenerator.GenerateThumbnail(imageBytes, rotation, thumbnailDecodeWidth,
+            thumbnailDecodeHeight, ImageEncodingFormat.Png);
 
         return CreateAssetWithProperties(
             imagePath,
@@ -106,7 +177,7 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private Asset? CreateAssetFromGif(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail? CreateAssetFromGif(string imagePath, string directoryName, byte[] imageBytes)
     {
         if (!imageProcessingService.IsValidImage(imageBytes))
         {
@@ -121,10 +192,8 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        using IImageData thumbnailImage =
-            imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
-                thumbnailDecodeHeight);
-        byte[] thumbnailBuffer = imageProcessingService.GetGifBitmapImage(thumbnailImage);
+        byte[] thumbnailBuffer = thumbnailGenerator.GenerateThumbnail(imageBytes, rotation, thumbnailDecodeWidth,
+            thumbnailDecodeHeight, ImageEncodingFormat.Gif);
 
         return CreateAssetWithProperties(
             imagePath,
@@ -140,7 +209,7 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private Asset? CreateAssetFromHeic(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail? CreateAssetFromHeic(string imagePath, string directoryName, byte[] imageBytes)
     {
         if (!imageProcessingService.IsValidHeic(imageBytes))
         {
@@ -155,10 +224,8 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        using IImageData thumbnailImage =
-            imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
-                thumbnailDecodeHeight);
-        byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);
+        byte[] thumbnailBuffer = thumbnailGenerator.GenerateThumbnail(imageBytes, rotation, thumbnailDecodeWidth,
+            thumbnailDecodeHeight, ImageEncodingFormat.Jpeg);
 
         return CreateAssetWithProperties(
             imagePath,
@@ -174,7 +241,7 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private Asset? CreateAssetFromOtherFormat(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail? CreateAssetFromOtherFormat(string imagePath, string directoryName, byte[] imageBytes)
     {
         if (!imageProcessingService.IsValidImage(imageBytes))
         {
@@ -191,10 +258,8 @@ public class AssetCreationService(
             imageProcessingService.GetImageDimensions(imageBytes, rotation);
         (int thumbnailDecodeWidth, int thumbnailDecodeHeight) =
             GetThumbnailDimensions(originalDecodeWidth, originalDecodeHeight);
-        using IImageData thumbnailImage =
-            imageProcessingService.LoadBitmapThumbnailImage(imageBytes, rotation, thumbnailDecodeWidth,
-                thumbnailDecodeHeight);
-        byte[] thumbnailBuffer = imageProcessingService.GetJpegBitmapImage(thumbnailImage);
+        byte[] thumbnailBuffer = thumbnailGenerator.GenerateThumbnail(imageBytes, rotation, thumbnailDecodeWidth,
+            thumbnailDecodeHeight, ImageEncodingFormat.Jpeg);
 
         return CreateAssetWithProperties(
             imagePath,
@@ -246,7 +311,7 @@ public class AssetCreationService(
         return (thumbnailDecodeWidth, thumbnailDecodeHeight);
     }
 
-    private Asset CreateAssetWithProperties(string imagePath, string directoryName, byte[] imageBytes,
+    private AssetWithThumbnail CreateAssetWithProperties(string imagePath, string directoryName, byte[] imageBytes,
         ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated, int originalDecodeWidth,
         int originalDecodeHeight, int thumbnailDecodeWidth, int thumbnailDecodeHeight, byte[] thumbnailBuffer)
     {
@@ -283,13 +348,6 @@ public class AssetCreationService(
 
         imageMetadataService.UpdateAssetFileProperties(asset);
 
-        bool result = assetRepository.AddAsset(asset, thumbnailBuffer);
-
-        if (!result)
-        {
-            logger.LogError("The asset {AssetPath} could not be added.", asset.FullPath);
-        }
-
-        return asset;
+        return new(asset, thumbnailBuffer);
     }
 }

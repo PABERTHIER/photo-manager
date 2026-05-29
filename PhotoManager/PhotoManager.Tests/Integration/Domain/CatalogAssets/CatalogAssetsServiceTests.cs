@@ -6636,17 +6636,21 @@ public class CatalogAssetsServiceTests
         Assert.That(folder, Is.Not.Null);
 
         _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
+        List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
         Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
 
         assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(expectedAssets.Count));
 
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(expectedAssets.Count));
 
-        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0],
-            _asset1!, imagePath1, assetsDirectory, folder!);
+        CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+            expectedAssets, assetPaths, assetsDirectory, folder!);
 
         CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
@@ -6658,8 +6662,14 @@ public class CatalogAssetsServiceTests
 
         CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
             assetsDirectory, ref increment);
+
+        CatalogChangeCallbackEventArgs assetCreatedChange =
+            catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetCreated);
+        Asset expectedCreatedAsset = expectedAssets.Single(asset =>
+            asset.FileName == assetCreatedChange.Asset!.FileName);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory,
-            [_asset1], _asset1, folder!, ref increment);
+            [expectedCreatedAsset], expectedCreatedAsset, folder!, ref increment);
+
         CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
