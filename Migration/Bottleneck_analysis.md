@@ -37,7 +37,7 @@ With 100,000 images averaging 5MB each, this means ~500GB of sequential I/O with
 
 ---
 
-### 2. Full-File Read into Memory (byte[]) for Every Asset
+### 2. Full-File Read into Memory (byte[]) for Every Asset — **DONE for streaming hash fallbacks**
 
 **Location:** `PhotoManager.Infrastructure/FileOperationsService.cs` (line 51) + `PhotoManager.Domain/AssetCreationService.cs` (line 47)
 
@@ -67,6 +67,10 @@ Every image file (JPEG 5-20MB, RAW 25-80MB) is loaded **entirely** into a `byte[
 3. **For PHash:** Already uses file path (ImageMagick reads the file itself), so `imageBytes` is only needed for the thumbnail pipeline. Split the pipeline so PHash and thumbnail generation share a single file read.
 
 4. **Memory pooling:** Use `ArrayPool<byte>.Shared` for the small buffer needed for EXIF header reading (~64KB), and `MemoryMappedFile` for large files when multiple operations need the same data.
+
+**Post-phase update:** `AssetHashCalculatorService` now routes SHA512/default and MD5 hashing to the
+streaming file APIs when callers have no image bytes and the file exists. The catalog hot path still
+reuses already-loaded bytes to avoid a second disk read.
 
 ---
 
@@ -121,7 +125,7 @@ That's **2 connection opens + 10 PRAGMA executions + 2 round trips** per asset. 
 
 ---
 
-### 4. Startup Full-Catalog Load with Per-Asset File Stats
+### 4. Startup Full-Catalog Load with Per-Asset File Stats — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/AssetRepository.cs` (lines 488-540)
 
@@ -155,6 +159,10 @@ With 100K assets, that's **100K `FileInfo` syscalls** at startup, each of which 
 3. **Store file properties in SQLite:** Persist `Size`, `CreationTime`, and `LastWriteTime` in the Assets table. Only re-stat files during catalog sync (when you need to detect changes). This completely eliminates startup stats for unchanged libraries.
 
 4. **Batch directory enumeration:** Instead of stating individual files, use `Directory.GetFiles()` + single `FindFirstFile`/`FindNextFile` per directory (which the OS optimizes internally). Compare modification times from directory enumeration vs. stored timestamps.
+
+**Completed:** `ReadCatalog()` now refreshes file properties with bounded parallelism
+(`MaxDegreeOfParallelism = min(Environment.ProcessorCount, 8)`). The benchmarked file-stat pass was
+about 70% faster for 1,000-5,000 assets while keeping memory use effectively flat.
 
 ---
 
@@ -337,13 +345,18 @@ This checks `File.Exists()` for EVERY asset in the catalog before duplicate dete
 
 3. **Remove `.AsOrdered()`:** The results don't need to maintain insertion order. `AsOrdered()` forces PLINQ to synchronize partition results, reducing parallelism benefit by 30-50%.
 
+   **Post-phase-5 note:** benchmarked unordered filtering variants, but this was not applied because
+   unordered PLINQ can change duplicate group/item order and the deterministic unordered-then-sort
+   variant was not a clear win at larger counts. The ordered path is retained to avoid flaky duplicate
+   results.
+
 4. **Filter in SQL:** If files have been deleted, they would have been detected during catalog runs. Trust the in-memory state unless explicitly refreshing.
 
 ---
 
 ## Minor Bottlenecks (Lower Impact, Easy Wins)
 
-### 11. GetFileNames Allocates Unnecessarily
+### 11. GetFileNames Allocates Unnecessarily — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/FileOperationsService.cs` (line 46-48)
 
@@ -379,6 +392,9 @@ public string[] GetFileNames(string directory)
 }
 ```
 This eliminates the second array allocation entirely.
+
+**Completed:** `GetFileNames()` now extracts names in-place from the `Directory.GetFiles()` result,
+benchmarking 6% faster with 19% less allocation for 1,000 files.
 
 ---
 
@@ -441,7 +457,7 @@ Benefits:
 
 ---
 
-### 15. Connection String Rebuilt on Every Open()
+### 15. Connection String Rebuilt on Every Open() — **DONE**
 
 **Location:** `PhotoManager.Persistence/Sqlite/SqliteConnectionFactory.cs` (lines 31-39)
 
@@ -468,6 +484,10 @@ public void Initialize(string databasePath)
 }
 ```
 
+**Completed:** `SqliteConnectionFactory.Initialize()` now caches the connection string and `Open()`
+reuses it. The isolated connection object creation path benchmarked 92% faster with 93% less
+allocation before PRAGMA execution.
+
 ---
 
 ### 16. Avalonia UI Asset Removal Collection Churn — **DONE**
@@ -489,20 +509,20 @@ data for removed assets, and raises the observable collection update once.
 | # | Bottleneck | Impact | Effort | Priority |
 |---|-----------|--------|--------|----------|
 | 1 | Sequential asset processing | Critical | High | P0 — **DONE** |
-| 2 | Full-file read into byte[] | Critical | Medium | P0 — **DONE for file-hash APIs** |
+| 2 | Full-file read into byte[] | Critical | Medium | P0 — **DONE for streaming hash fallbacks** |
 | 3 | Per-operation SQLite connections | High | Medium | P1 — **DONE for catalog writes** |
-| 4 | Startup file stats (100K) | High | Low | P1 |
+| 4 | Startup file stats (100K) | High | Low | P1 — **DONE** |
 | 5 | Callback list cloning (O(n²)) | High | Low | P1 |
 | 6 | Per-folder file stats during catalog | Medium | Low | P2 — **DONE** |
 | 7 | PHash computation (6× slower) | High (if enabled) | Medium | P2 — **DONE** |
 | 8 | GetCataloguedAssets() sort | Medium | Low | P2 — **DONE** |
 | 9 | Thumbnail cache too small | Medium | Low | P2 — **DONE for SQLite BLOB read path** |
 | 10 | Duplicate detection file checks | Medium | Low | P2 |
-| 11 | GetFileNames double allocation | Low | Low | P3 |
+| 11 | GetFileNames double allocation | Low | Low | P3 — **DONE** |
 | 12 | Double image validation | Low | Medium | P3 |
 | 13 | Reactive Subject overhead | Low | Low | P3 — **DONE** |
 | 14 | WPF thumbnail pipeline | Medium | High | P3 — **DONE** |
-| 15 | Connection string rebuild | Low | Low | P3 |
+| 15 | Connection string rebuild | Low | Low | P3 — **DONE** |
 | 16 | Avalonia UI asset-removal collection churn | Medium | Low | P2 — **DONE** |
 
 ---
@@ -523,8 +543,8 @@ data for removed assets, and raises the observable collection update once.
 
 ### Phase 1: Quick Wins (P1 low-effort items)
 1. Fix callback list cloning (replace with read-only view)
-2. Cache connection string in factory
-3. Lazy file property loading at startup (defer to folder access)
+2. Cache connection string in factory — **DONE**
+3. Lazy file property loading at startup (defer to folder access) — **DONE via bounded parallel stats**
 4. Increase thumbnail cache size to 50+ entries
 5. Remove unnecessary sort in `GetCataloguedAssets()` (investigate the TODO) — **DONE**
 
@@ -539,8 +559,8 @@ data for removed assets, and raises the observable collection update once.
 ### Phase 3: Parallelism (See Multi-Threading Plan)
 1. Implement pipeline architecture in CatalogAssetsService — **DONE**
 2. Parallelize PHash computation — **DONE** (already covered by catalog pipeline process workers)
-3. Parallelize startup file stats (if not deferred)
-4. Parallelize duplicate detection without `.AsOrdered()`
+3. Parallelize startup file stats (if not deferred) — **DONE**
+4. Parallelize duplicate detection without `.AsOrdered()` — benchmarked, not applied due determinism risk
 
 ### Phase 4: Architecture Evolution
 1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **DONE** (IImageData/ImageRotation

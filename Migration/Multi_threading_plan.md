@@ -709,7 +709,7 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 2. Handle deleted assets through batched persistence — **DONE**
 3. Replace folder-level callbacks with batched progress reporting
 4. Remove old sequential path (keep behind feature flag for rollback)
-5. Optimize `ReadCatalog()` startup with parallel file stats
+5. Optimize `ReadCatalog()` startup with parallel file stats — **DONE**
 
 **Risk:** Higher — full behavioral change. Requires thorough integration testing.
 
@@ -718,7 +718,8 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 **Goal:** Squeeze remaining performance.
 
 1. Streaming hash (avoid full-file `byte[]` when not using PHash) — **DONE for standalone file-hash APIs**
-   (catalog still reuses loaded image bytes when downstream processing already needs them)
+   (catalog still reuses loaded image bytes when downstream processing already needs them; no-bytes
+   callers now use the streaming file APIs)
 2. Adaptive concurrency (detect SSD vs HDD, adjust `ReadConcurrency`)
 3. Memory-mapped file reading for very large files — **DONE for thumbnail storage evaluation** (separate
    thumbnail files were deferred; SQLite BLOB reads were optimized instead)

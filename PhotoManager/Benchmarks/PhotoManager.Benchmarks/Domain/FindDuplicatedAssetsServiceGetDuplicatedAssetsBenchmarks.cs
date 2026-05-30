@@ -21,6 +21,7 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
     private const int HASH_LENGTH = 210;
 
     private Asset[] _assets = null!;
+    private Asset[] _duplicateAssets = null!;
 
     [Params(100, 500, 2000)] public int AssetCount { get; set; }
 
@@ -28,6 +29,7 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
     public void Setup()
     {
         _assets = GenerateAssets(AssetCount);
+        _duplicateAssets = GenerateStandardDuplicateAssets(AssetCount);
     }
 
     [Benchmark(Baseline = true)]
@@ -82,6 +84,74 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
         return [.. bkTree.GetAllGroups().Where(g => g.Count > 1)];
     }
 
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_AsOrdered()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .AsOrdered()
+            .Where(static _ => true)
+            .ToList();
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Unordered()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .Where(static _ => true)
+            .ToList();
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_UnorderedThenSort()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .Where(static _ => true)
+            .ToList();
+
+        validAssets.Sort(CompareByFileNameThenFolderPath);
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Sequential()
+    {
+        List<Asset> validAssets = [.. _duplicateAssets.Where(static _ => true)];
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
     private static Asset[] GenerateAssets(int count)
     {
         // Each "original" has up to 4 near-duplicate variants (distance 5-9, within threshold=10)
@@ -110,6 +180,27 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
         {
             assets[index] = CreateAsset($"singleton_{index}.jpg", GenerateSingletonHash(index));
             index++;
+        }
+
+        return assets;
+    }
+
+    private static int CompareByFileNameThenFolderPath(Asset left, Asset right)
+    {
+        int fileNameComparison = string.CompareOrdinal(left.FileName, right.FileName);
+
+        return fileNameComparison != 0
+            ? fileNameComparison
+            : string.CompareOrdinal(left.Folder.Path, right.Folder.Path);
+    }
+
+    private static Asset[] GenerateStandardDuplicateAssets(int count)
+    {
+        Asset[] assets = new Asset[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            assets[i] = CreateAsset($"asset_{i:D5}.jpg", $"hash_{i / 5:D5}");
         }
 
         return assets;

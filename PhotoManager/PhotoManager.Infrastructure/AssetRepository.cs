@@ -617,30 +617,14 @@ public class AssetRepository : IAssetRepository, IDisposable
 
             IReadOnlyList<Asset> assets = _persistenceContext.Assets.GetAll();
 
-            int count = 0;
-
-            for (int i = 0; i < assets.Count; i++)
+            ParallelOptions readCatalogOptions = new()
             {
-                Asset asset = assets[i];
+                MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount, 8)
+            };
 
-                if (_foldersById.TryGetValue(asset.FolderId, out Folder? existingFolder))
-                {
-                    asset.Folder = existingFolder;
-                }
+            Parallel.For(0, assets.Count, readCatalogOptions, i => AddCatalogAssetToMemory(assets[i]));
 
-                ConcurrentDictionary<string, Asset> folderAssets =
-                        _assetsByFolderId.GetOrAdd(
-                        asset.FolderId,
-                        static _ => new ConcurrentDictionary<string, Asset>(StringComparer.Ordinal));
-
-                folderAssets.TryAdd(asset.FileName, asset);
-
-                _imageMetadataService.UpdateAssetFileProperties(asset);
-
-                count++;
-            }
-
-            _totalAssetCount = count;
+            _totalAssetCount = assets.Count;
 
             SyncAssetsConfiguration config = new();
             config.Definitions.AddRange(_persistenceContext.SyncDefinitions.GetAll());
@@ -653,6 +637,23 @@ public class AssetRepository : IAssetRepository, IDisposable
             _logger.LogError(ex, "Error reading catalog");
             throw;
         }
+    }
+
+    private void AddCatalogAssetToMemory(Asset asset)
+    {
+        if (_foldersById.TryGetValue(asset.FolderId, out Folder? existingFolder))
+        {
+            asset.Folder = existingFolder;
+        }
+
+        ConcurrentDictionary<string, Asset> folderAssets =
+            _assetsByFolderId.GetOrAdd(
+                asset.FolderId,
+                static _ => new ConcurrentDictionary<string, Asset>(StringComparer.Ordinal));
+
+        folderAssets.TryAdd(asset.FileName, asset);
+
+        _imageMetadataService.UpdateAssetFileProperties(asset);
     }
 
     // ------------------------------------------------------------ Internals

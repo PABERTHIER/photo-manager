@@ -44,12 +44,11 @@ public class FileOperationsService(
 
     public string[] GetFileNames(string directory)
     {
-        FileInfo[] files = GetFileInfos(directory);
-        string[] fileNames = new string[files.Length];
+        string[] fileNames = Directory.GetFiles(directory);
 
-        for (int i = 0; i < files.Length; i++)
+        for (int i = 0; i < fileNames.Length; i++)
         {
-            fileNames[i] = files[i].Name;
+            fileNames[i] = Path.GetFileName(fileNames[i]);
         }
 
         return fileNames;

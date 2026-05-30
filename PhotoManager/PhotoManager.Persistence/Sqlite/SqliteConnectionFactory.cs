@@ -11,11 +11,14 @@ public sealed class SqliteConnectionFactory(ILogger<SqliteConnectionFactory> log
 {
     private const int BUSY_TIMEOUT_MS = 5000;
 
+    private string _connectionString = string.Empty;
+
     public string DatabasePath { get; private set; } = string.Empty;
 
     public void Initialize(string databasePath)
     {
         DatabasePath = databasePath;
+        _connectionString = BuildConnectionString(databasePath);
     }
 
     public SqliteConnection Open()
@@ -28,17 +31,7 @@ public sealed class SqliteConnectionFactory(ILogger<SqliteConnectionFactory> log
             throw new InvalidOperationException(exceptionMessage);
         }
 
-        SqliteConnectionStringBuilder builder = new()
-        {
-            DataSource = DatabasePath,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            Cache = SqliteCacheMode.Default,
-            Pooling = true,
-            ForeignKeys = true,
-            DefaultTimeout = 30
-        };
-
-        SqliteConnection connection = new(builder.ConnectionString);
+        SqliteConnection connection = new(_connectionString);
         connection.Open();
 
         using (SqliteCommand command = connection.CreateCommand())
@@ -54,5 +47,20 @@ public sealed class SqliteConnectionFactory(ILogger<SqliteConnectionFactory> log
 
             return connection;
         }
+    }
+
+    private static string BuildConnectionString(string databasePath)
+    {
+        SqliteConnectionStringBuilder builder = new()
+        {
+            DataSource = databasePath,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Cache = SqliteCacheMode.Default,
+            Pooling = true,
+            ForeignKeys = true,
+            DefaultTimeout = 30
+        };
+
+        return builder.ConnectionString;
     }
 }
