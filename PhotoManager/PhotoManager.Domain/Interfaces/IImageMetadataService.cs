@@ -6,5 +6,6 @@ public interface IImageMetadataService
     ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation);
     ImageRotation GetImageRotation(ushort exifOrientation);
     void UpdateAssetsFileProperties(List<Asset> assets);
+    void UpdateAssetsFileProperties(List<Asset> assets, IReadOnlyDictionary<string, FileProperties> filePropertiesByName);
     void UpdateAssetFileProperties(Asset asset);
 }

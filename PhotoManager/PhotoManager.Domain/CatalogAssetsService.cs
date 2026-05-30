@@ -313,11 +313,12 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             Message = $"Inspecting folder {directory}."
         });
 
-        string[] fileNames = _fileOperationsService.GetFileNames(directory);
+        FileInfo[] fileInfos = _fileOperationsService.GetFileInfos(directory);
+        (string[] fileNames, Dictionary<string, FileProperties> filePropertiesByName) = CreateFileSnapshot(fileInfos);
 
         CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, fileNames, token);
 
-        _imageMetadataService.UpdateAssetsFileProperties(_cataloguedAssetsByPath);
+        _imageMetadataService.UpdateAssetsFileProperties(_cataloguedAssetsByPath, filePropertiesByName);
         string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(_cataloguedAssetsByPath);
 
         CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, updatedFileNames, token);
@@ -663,6 +664,48 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 throw new OperationCanceledException(token);
             }
         }
+    }
+
+    private (string[] FileNames, Dictionary<string, FileProperties> FilePropertiesByName) CreateFileSnapshot(
+        FileInfo[] fileInfos)
+    {
+        List<string> fileNames = new(fileInfos.Length);
+        Dictionary<string, FileProperties> filePropertiesByName = new(fileInfos.Length, StringComparer.Ordinal);
+
+        for (int i = 0; i < fileInfos.Length; i++)
+        {
+            FileInfo fileInfo = fileInfos[i];
+
+            if (TryCreateFileProperties(fileInfo, out FileProperties fileProperties))
+            {
+                fileNames.Add(fileInfo.Name);
+                filePropertiesByName[fileInfo.Name] = fileProperties;
+            }
+        }
+
+        return ([.. fileNames], filePropertiesByName);
+    }
+
+    private bool TryCreateFileProperties(FileInfo fileInfo, out FileProperties fileProperties)
+    {
+        try
+        {
+            fileProperties = new()
+            {
+                Size = fileInfo.Length,
+                Creation = fileInfo.CreationTime,
+                Modification = fileInfo.LastWriteTime
+            };
+
+            return true;
+        }
+        catch (IOException ex)
+        {
+            _logger.LogInformation(ex, "Skipped file metadata snapshot for {FilePath}.", fileInfo.FullName);
+        }
+
+        fileProperties = default;
+        return false;
     }
 
     #endregion

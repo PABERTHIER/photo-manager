@@ -7,6 +7,7 @@ public interface IFileOperationsService
     void CreateDirectory(string directory);
     void DeleteFile(string directory, string fileName);
     string[] GetFileNames(string directory);
+    FileInfo[] GetFileInfos(string directory);
     byte[] GetFileBytes(string filePath);
     bool FileExists(Folder folder, Asset asset);
     bool FileExists(string fullPath);

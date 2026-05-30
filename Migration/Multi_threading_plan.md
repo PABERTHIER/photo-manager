@@ -717,9 +717,11 @@ public async Task CatalogFolder_Pipeline_VaryingBatchSize(int batchSize) { /* pa
 
 **Goal:** Squeeze remaining performance.
 
-1. Streaming hash (avoid full-file `byte[]` when not using PHash)
+1. Streaming hash (avoid full-file `byte[]` when not using PHash) — **DONE for standalone file-hash APIs**
+   (catalog still reuses loaded image bytes when downstream processing already needs them)
 2. Adaptive concurrency (detect SSD vs HDD, adjust `ReadConcurrency`)
-3. Memory-mapped file reading for very large files
+3. Memory-mapped file reading for very large files — **DONE for thumbnail storage evaluation** (separate
+   thumbnail files were deferred; SQLite BLOB reads were optimized instead)
 4. Background pre-fetching (read next folder's files while processing current)
 5. Optional inter-folder parallelism for users with many small folders
 

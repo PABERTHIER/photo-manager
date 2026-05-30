@@ -44,8 +44,20 @@ public class FileOperationsService(
 
     public string[] GetFileNames(string directory)
     {
-        string[] files = Directory.GetFiles(directory);
-        return [.. files.Select(f => Path.GetFileName(f))];
+        FileInfo[] files = GetFileInfos(directory);
+        string[] fileNames = new string[files.Length];
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            fileNames[i] = files[i].Name;
+        }
+
+        return fileNames;
+    }
+
+    public FileInfo[] GetFileInfos(string directory)
+    {
+        return [.. new DirectoryInfo(directory).EnumerateFiles()];
     }
 
     public byte[] GetFileBytes(string filePath)

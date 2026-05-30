@@ -13,18 +13,19 @@ public static class HashingHelper
         Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
         SHA512.HashData(imageBytes, hash);
 
-        return string.Create(128, hash, static (chars, hashBytes) =>
-        {
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                byte b = hashBytes[i];
-                chars[i * 2] = GetHexChar(b >> 4);
-                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
-            }
-        });
+        return ToLowerHex(hash);
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
+    public static string CalculateHash(string filePath)
+    {
+        Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
+
+        using (FileStream stream = OpenSequentialRead(filePath))
+        {
+            SHA512.HashData(stream, hash);
+        }
+
+        return ToLowerHex(hash);
     }
 
     // Performances are decreased by 6 times with CalculatePHash
@@ -100,18 +101,19 @@ public static class HashingHelper
         Span<byte> hash = stackalloc byte[MD5.HashSizeInBytes];
         MD5.HashData(imageBytes, hash);
 
-        return string.Create(32, hash, static (chars, hashBytes) =>
-        {
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                byte b = hashBytes[i];
-                chars[i * 2] = GetHexChar(b >> 4);
-                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
-            }
-        });
+        return ToLowerHex(hash);
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
+    public static string CalculateMD5Hash(string filePath)
+    {
+        Span<byte> hash = stackalloc byte[MD5.HashSizeInBytes];
+
+        using (FileStream stream = OpenSequentialRead(filePath))
+        {
+            MD5.HashData(stream, hash);
+        }
+
+        return ToLowerHex(hash);
     }
 
     // The best use is for PHash method, the most accurate
@@ -127,4 +129,26 @@ public static class HashingHelper
 
         return TensorPrimitives.HammingDistance(hash1.AsSpan(), hash2.AsSpan());
     }
+
+    private static FileStream OpenSequentialRead(string filePath)
+    {
+        return new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920,
+            FileOptions.SequentialScan);
+    }
+
+    private static string ToLowerHex(ReadOnlySpan<byte> hash)
+    {
+        return string.Create(hash.Length * 2, hash, static (chars, hashBytes) =>
+        {
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                byte b = hashBytes[i];
+                chars[i * 2] = GetHexChar(b >> 4);
+                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
+            }
+        });
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
 }

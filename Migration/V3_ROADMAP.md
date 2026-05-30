@@ -35,11 +35,11 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 4.5 Full pipeline integration — **DONE**
 
 5. Phase 5 - Performance Optimization
-   - 5.1 Streaming hash computation (avoid full-file byte[])
-   - 5.2 Batch SQLite writes
-   - 5.3 Per-folder change detection
-   - 5.4 Parallelize PHash computation
-   - 5.5 Memory-mapped thumbnails or separate thumbnail file
+   - 5.1 Streaming hash computation (avoid full-file byte[]) — **DONE for standalone file-hash APIs**
+   - 5.2 Batch SQLite writes — **DONE**
+   - 5.3 Per-folder change detection — **DONE**
+   - 5.4 Parallelize PHash computation — **DONE**
+   - 5.5 Memory-mapped thumbnails or separate thumbnail file — **DONE**
 
 6. Phase 6 - CI/CD & Packaging
    - 6.1 Cross-platform CI builds

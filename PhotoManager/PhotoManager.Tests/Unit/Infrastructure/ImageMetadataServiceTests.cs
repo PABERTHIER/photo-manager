@@ -88,4 +88,64 @@ public class ImageMetadataServiceTests
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
+
+    [Test]
+    public void UpdateAssetsFileProperties_FilePropertiesByName_UpdatesMatchingAssets()
+    {
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
+        Asset matchingAsset = CreateAsset(folder, "existing.jpg");
+        Asset missingAsset = CreateAsset(folder, "missing.jpg");
+        FileProperties expectedFileProperties = new()
+        {
+            Size = 42,
+            Creation = new(2026, 01, 02, 03, 04, 05),
+            Modification = new(2026, 02, 03, 04, 05, 06)
+        };
+        Dictionary<string, FileProperties> filePropertiesByName = new(StringComparer.Ordinal)
+        {
+            [matchingAsset.FileName] = expectedFileProperties
+        };
+
+        _imageMetadataService!.UpdateAssetsFileProperties([matchingAsset, missingAsset], filePropertiesByName);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(matchingAsset.FileProperties.Size, Is.EqualTo(expectedFileProperties.Size));
+            Assert.That(matchingAsset.FileProperties.Creation, Is.EqualTo(expectedFileProperties.Creation));
+            Assert.That(matchingAsset.FileProperties.Modification, Is.EqualTo(expectedFileProperties.Modification));
+            Assert.That(missingAsset.FileProperties.Size, Is.Zero);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+        }
+    }
+
+    [Test]
+    public void UpdateAssetsFileProperties_NullFilePropertiesByName_ThrowsArgumentNullException()
+    {
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _imageMetadataService!.UpdateAssetsFileProperties([], null!));
+
+        Assert.That(exception?.ParamName, Is.EqualTo("filePropertiesByName"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+    }
+
+    private static Asset CreateAsset(Folder folder, string fileName)
+    {
+        return new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
+            {
+                Asset = new() { Width = 100, Height = 100 },
+                Thumbnail = new() { Width = 50, Height = 50 }
+            },
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = fileName,
+            ThumbnailCreationDateTime = DateTime.UnixEpoch,
+            Metadata = new()
+        };
+    }
 }
