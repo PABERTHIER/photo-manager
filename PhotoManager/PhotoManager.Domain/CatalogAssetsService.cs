@@ -18,6 +18,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     private string _currentFolderPath = string.Empty;
     private readonly HashSet<string> _directories = [];
     private List<Asset> _cataloguedAssetsByPath = [];
+    private IReadOnlyList<Asset> _cataloguedAssetsByPathView = [];
     private readonly IDisposable _assetsUpdatedSubscription;
     private bool _suppressReactiveUpdates;
 
@@ -56,7 +57,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        _cataloguedAssetsByPath = [.. _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath)];
+        SetCataloguedAssetsByPath(_assetRepository.GetCataloguedAssetsByPath(_currentFolderPath));
     }
 
     public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default)
@@ -266,7 +267,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
         _currentFolderPath = directory;
         // Explicit refresh for the new folder (not suppressed by the reactive guard)
-        _cataloguedAssetsByPath = [.. _assetRepository.GetCataloguedAssetsByPath(_currentFolderPath)];
+        SetCataloguedAssetsByPath(_assetRepository.GetCataloguedAssetsByPath(_currentFolderPath));
 
         if (_fileOperationsService.FolderExists(directory))
         {
@@ -362,9 +363,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         // If the directory has been manually deleted during the EnumerateDirectories, we want to throw an exception
         Folder folder = _assetRepository.GetFolderByPath(directory)!;
 
-        List<Asset> assetsToProcess = [.. _cataloguedAssetsByPath];
+        int assetIndex = 0;
 
-        foreach (Asset asset in assetsToProcess)
+        while (assetIndex < _cataloguedAssetsByPath.Count)
         {
             token.ThrowIfCancellationRequested();
 
@@ -373,15 +374,16 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 break;
             }
 
+            Asset asset = _cataloguedAssetsByPath[assetIndex];
             _ = _assetRepository.DeleteAsset(directory, asset.FileName);
-            _cataloguedAssetsByPath.Remove(asset);
+            _cataloguedAssetsByPath.RemoveAt(assetIndex);
             _backupHasSameContent = false;
             cataloguedAssetsBatchCount++;
 
             callback(new()
             {
                 Asset = asset,
-                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                 Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
             });
@@ -419,7 +421,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         }
     }
 
-    private void CatalogAssets(IEnumerable<string> fileNames, bool isAssetVideo, string directory,
+    private void CatalogAssets(string[] fileNames, bool isAssetVideo, string directory,
         CatalogChangeCallback callback, ref int cataloguedAssetsBatchCount, int batchSize,
         CatalogAssetPipelineOperation operation, CancellationToken token = default)
     {
@@ -432,18 +434,16 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        string[] fileNamesToProcess = [.. fileNames];
-
-        if (fileNamesToProcess.Length == 0)
+        if (fileNames.Length == 0)
         {
             return;
         }
 
-        Array.Sort(fileNamesToProcess, StringComparer.Ordinal);
+        Array.Sort(fileNames, StringComparer.Ordinal);
 
         int cataloguedCount = _catalogFolderPipeline.CatalogAsync(
                 directory,
-                fileNamesToProcess,
+                fileNames,
                 isAssetVideo,
                 remainingBatchCount,
                 operation,
@@ -482,7 +482,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             callback(new()
             {
                 Asset = newAsset,
-                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                 Reason = CatalogChangeReason.AssetCreated,
                 Message = $"Image {fullPath} added to catalog."
             });
@@ -510,7 +510,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                     callback(new()
                     {
                         Asset = deletedAsset,
-                        CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                        CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                         Reason = CatalogChangeReason.AssetDeleted,
                         Message = $"Image {fullPath} deleted from catalog (corrupted)."
                     });
@@ -520,7 +520,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             {
                 callback(new()
                 {
-                    CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                    CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                     Reason = CatalogChangeReason.AssetNotCreated,
                     Message = $"Image {fullPath} not added to catalog (corrupted)."
                 });
@@ -546,7 +546,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         callback(new()
         {
             Asset = result.Asset,
-            CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+            CataloguedAssetsByPath = _cataloguedAssetsByPathView,
             Reason = reason,
             Message = message
         });
@@ -557,17 +557,15 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     }
 
     private void CatalogUpdatedAssets(string directory, CatalogChangeCallback callback,
-        ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> updatedFileNames,
+        ref int cataloguedAssetsBatchCount, int batchSize, string[] updatedFileNames,
         CancellationToken token = default)
     {
-        string[] updatedFileNamesArray = [.. updatedFileNames];
-
-        if (updatedFileNamesArray.Length == 0)
+        if (updatedFileNames.Length == 0)
         {
             return;
         }
 
-        (string[] imageNames, string[] videoNames) = _assetsComparator.GetImageAndVideoNames(updatedFileNamesArray);
+        (string[] imageNames, string[] videoNames) = _assetsComparator.GetImageAndVideoNames(updatedFileNames);
 
         CatalogAssets(imageNames, false, directory, callback, ref cataloguedAssetsBatchCount, batchSize,
             CatalogAssetPipelineOperation.Update, token);
@@ -611,7 +609,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             callback(new()
             {
                 Asset = updatedAsset,
-                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                 Reason = CatalogChangeReason.AssetUpdated,
                 Message = $"Image {fullPath} updated in catalog."
             });
@@ -621,7 +619,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
     }
 
     private void CatalogDeletedAssets(string directory, CatalogChangeCallback callback,
-        ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> deletedFileNames,
+        ref int cataloguedAssetsBatchCount, int batchSize, string[] deletedFileNames,
         CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
@@ -633,7 +631,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             return;
         }
 
-        string[] fileNamesToDelete = [.. deletedFileNames.Take(remainingBatchCount)];
+        string[] fileNamesToDelete = deletedFileNames.Length <= remainingBatchCount
+            ? deletedFileNames
+            : CopyTakeToArray(deletedFileNames, remainingBatchCount);
 
         if (fileNamesToDelete.Length == 0)
         {
@@ -652,7 +652,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             callback(new()
             {
                 Asset = deletedAsset,
-                CataloguedAssetsByPath = [.. _cataloguedAssetsByPath],
+                CataloguedAssetsByPath = _cataloguedAssetsByPathView,
                 Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {fullPath} deleted from catalog."
             });
@@ -683,7 +683,33 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
         }
 
-        return ([.. fileNames], filePropertiesByName);
+        return (CopyToArray(fileNames), filePropertiesByName);
+    }
+
+    private void SetCataloguedAssetsByPath(Asset[] cataloguedAssets)
+    {
+        _cataloguedAssetsByPath = new(cataloguedAssets.Length);
+
+        for (int i = 0; i < cataloguedAssets.Length; i++)
+        {
+            _cataloguedAssetsByPath.Add(cataloguedAssets[i]);
+        }
+
+        _cataloguedAssetsByPathView = _cataloguedAssetsByPath.AsReadOnly();
+    }
+
+    private static string[] CopyToArray(List<string> values)
+    {
+        string[] result = new string[values.Count];
+        values.CopyTo(result);
+        return result;
+    }
+
+    private static string[] CopyTakeToArray(string[] values, int count)
+    {
+        string[] result = new string[count];
+        Array.Copy(values, result, count);
+        return result;
     }
 
     private bool TryCreateFileProperties(FileInfo fileInfo, out FileProperties fileProperties)

@@ -138,6 +138,15 @@ public class AssetCreationService(
 
             return CreateAssetFromOtherFormat(imagePath, directoryName, imageBytes);
         }
+        catch (NotSupportedException ex)
+        {
+            if (IsValidImageForExtension(fileName, imageBytes))
+            {
+                logger.LogError(ex, "{ExMessage}", ex.Message);
+            }
+
+            return null;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "{ExMessage}", ex.Message);
@@ -145,13 +154,8 @@ public class AssetCreationService(
         }
     }
 
-    private AssetWithThumbnail? CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidImage(imageBytes))
-        {
-            return null;
-        }
-
         // GetExifOrientation is not handled by Png
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
         (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
@@ -177,13 +181,8 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private AssetWithThumbnail? CreateAssetFromGif(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail CreateAssetFromGif(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidImage(imageBytes))
-        {
-            return null;
-        }
-
         // GetExifOrientation is not handled by GIF
         ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation;
         (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
@@ -209,13 +208,8 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private AssetWithThumbnail? CreateAssetFromHeic(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail CreateAssetFromHeic(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidHeic(imageBytes))
-        {
-            return null;
-        }
-
         ushort exifOrientation = imageMetadataService.GetHeicExifOrientation(imageBytes,
             userConfigurationService.AssetSettings.CorruptedImageOrientation);
         (ImageRotation rotation, bool isAssetCorrupted, bool isAssetRotated) =
@@ -241,13 +235,8 @@ public class AssetCreationService(
             thumbnailBuffer);
     }
 
-    private AssetWithThumbnail? CreateAssetFromOtherFormat(string imagePath, string directoryName, byte[] imageBytes)
+    private AssetWithThumbnail CreateAssetFromOtherFormat(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidImage(imageBytes))
-        {
-            return null;
-        }
-
         ushort exifOrientation = imageMetadataService.GetExifOrientation(
             imageBytes,
             userConfigurationService.AssetSettings.DefaultExifOrientation,
@@ -349,5 +338,14 @@ public class AssetCreationService(
         imageMetadataService.UpdateAssetFileProperties(asset);
 
         return new(asset, thumbnailBuffer);
+    }
+
+    private bool IsValidImageForExtension(string fileName, byte[] imageBytes)
+    {
+        ReadOnlySpan<char> extension = Path.GetExtension(fileName.AsSpan());
+
+        return extension.Equals(".heic", StringComparison.OrdinalIgnoreCase)
+            ? imageProcessingService.IsValidHeic(imageBytes)
+            : imageProcessingService.IsValidImage(imageBytes);
     }
 }

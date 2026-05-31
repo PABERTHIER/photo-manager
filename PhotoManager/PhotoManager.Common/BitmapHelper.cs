@@ -33,34 +33,29 @@ public static class BitmapHelper
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public static SkiaImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation, ILogger logger)
     {
-        if (File.Exists(imagePath))
+        if (!File.Exists(imagePath))
         {
-            byte[] buffer = File.ReadAllBytes(imagePath);
-
-            return LoadBitmapOriginalImage(buffer, rotation, logger);
+            return SkiaImageData.Empty();
         }
 
-        return SkiaImageData.Empty();
+        return LoadBitmapOriginalImage(imagePath, rotation, logger);
     }
 
     // From HashingHelper.CalculateDHash for loading any image file to SKBitmap for pixel access
     public static SkiaImageData? LoadBitmapFromPath(string imagePath)
     {
-        if (File.Exists(imagePath))
+        if (!File.Exists(imagePath))
         {
-            byte[] buffer = File.ReadAllBytes(imagePath);
+            return null;
+        }
 
-            if (IsHeicFormat(buffer))
+        using (FileStream fileStream = File.OpenRead(imagePath))
+        {
+            if (IsHeicFormat(fileStream))
             {
                 try
                 {
-                    using (MemoryStream stream = new(buffer))
-                    {
-                        using (MagickImage magickImage = new(stream))
-                        {
-                            return new(MagickImageToSkBitmap(magickImage), ImageRotation.Rotate0);
-                        }
-                    }
+                    return LoadHeicImageFromFile(imagePath);
                 }
                 catch (MagickException)
                 {
@@ -68,18 +63,17 @@ public static class BitmapHelper
                 }
             }
 
+            fileStream.Position = 0;
+
             try
             {
-                SKBitmap decoded = SKBitmap.Decode(buffer);
-                return new(decoded, ImageRotation.Rotate0);
+                return SkiaImageData.FromEncodedStreamWithRotation(fileStream, ImageRotation.Rotate0);
             }
-            catch (ArgumentNullException)
+            catch (Exception)
             {
                 return null;
             }
         }
-
-        return null;
     }
 
     public static byte[] GetJpegBitmapImage(IImageData image)
@@ -157,11 +151,6 @@ public static class BitmapHelper
 
         try
         {
-            if (IsHeicFormat(buffer))
-            {
-                return LoadHeicOriginalImage(buffer, rotation);
-            }
-
             return SkiaImageData.FromEncodedBytesWithRotation(buffer, rotation, logger);
         }
         catch (Exception ex) when (ex is not OverflowException)
@@ -173,18 +162,47 @@ public static class BitmapHelper
         }
     }
 
-    private static SkiaImageData LoadHeicOriginalImage(byte[] buffer, ImageRotation rotation)
+    private static SkiaImageData LoadBitmapOriginalImage(string imagePath, ImageRotation rotation, ILogger logger)
     {
-        using (MemoryStream stream = new(buffer))
+        try
         {
-            MagickReadSettings settings = new();
-            settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
-
-            using (MagickImage magickImage = new(stream, settings))
+            using (FileStream fileStream = File.OpenRead(imagePath))
             {
-                SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
-                return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
+                if (IsHeicFormat(fileStream))
+                {
+                    return LoadHeicOriginalImageFromFile(imagePath, rotation);
+                }
+
+                fileStream.Position = 0;
+                return SkiaImageData.FromEncodedStreamWithRotation(fileStream, rotation);
             }
+        }
+        catch (Exception ex) when (ex is not OverflowException)
+        {
+            NotSupportedException exception =
+                new("No imaging component suitable to complete this operation was found.");
+            logger.LogError(exception, "{ExMessage}", exception.Message);
+            throw exception;
+        }
+    }
+
+    private static SkiaImageData LoadHeicOriginalImageFromFile(string imagePath, ImageRotation rotation)
+    {
+        MagickReadSettings settings = new();
+        settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+
+        using (MagickImage magickImage = new(imagePath, settings))
+        {
+            SKBitmap bitmap = MagickImageToSkBitmap(magickImage);
+            return SkiaImageData.FromBitmapWithRotation(bitmap, rotation);
+        }
+    }
+
+    private static SkiaImageData LoadHeicImageFromFile(string imagePath)
+    {
+        using (MagickImage magickImage = new(imagePath))
+        {
+            return new(MagickImageToSkBitmap(magickImage), ImageRotation.Rotate0);
         }
     }
 
@@ -338,7 +356,7 @@ public static class BitmapHelper
         return SKBitmap.Decode(bmpData);
     }
 
-    private static bool IsHeicFormat(byte[] buffer)
+    private static bool IsHeicFormat(ReadOnlySpan<byte> buffer)
     {
         // HEIC/HEIF container: bytes 4-7 are "ftyp" (ISO base media file format box)
         if (buffer.Length < 12)
@@ -347,6 +365,13 @@ public static class BitmapHelper
         }
 
         return buffer[4] == 0x66 && buffer[5] == 0x74 && buffer[6] == 0x79 && buffer[7] == 0x70;
+    }
+
+    private static bool IsHeicFormat(Stream stream)
+    {
+        Span<byte> header = stackalloc byte[12];
+        int bytesRead = stream.Read(header);
+        return bytesRead >= 12 && IsHeicFormat(header);
     }
 
     private static readonly SKSamplingOptions ResizeSamplingOptions = new(SKFilterMode.Linear, SKMipmapMode.Linear);

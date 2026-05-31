@@ -41,7 +41,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], videoFileNames));
         assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>())
@@ -87,7 +87,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], videoFileNames));
         assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
@@ -137,7 +137,7 @@ public class CatalogAssetsServiceTests
         CancellationTokenSource cancellationTokenSource = new();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
         Action cancel = cancellationTokenSource.Cancel;
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         try
         {
@@ -180,6 +180,55 @@ public class CatalogAssetsServiceTests
         finally
         {
             cancellationTokenSource.Dispose();
+            catalogAssetsService.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_DeletedAssetsAboveBatchLimit_DeletesOnlyRemainingBatch()
+    {
+        const string firstDeletedFileName = "deleted-1.jpg";
+        const string secondDeletedFileName = "deleted-2.jpg";
+        Folder folder = CreateFolder();
+        Asset firstDeletedAsset = CreateAsset(folder, firstDeletedFileName);
+        Asset secondDeletedAsset = CreateAsset(folder, secondDeletedFileName);
+        IAssetRepository assetRepository = CreateAssetRepository(folder, [firstDeletedAsset, secondDeletedAsset]);
+        IFileOperationsService fileOperationsService = CreateFileOperationsService([]);
+        IAssetCreationService assetCreationService = Substitute.For<IAssetCreationService>();
+        IAssetsComparator assetsComparator = Substitute.For<IAssetsComparator>();
+        IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
+        CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
+            assetCreationService, assetsComparator, userConfigurationService);
+        CatalogChangeRecorder catalogChanges = [];
+
+        assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], []));
+        assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>())
+            .Returns([firstDeletedFileName, secondDeletedFileName]);
+        assetRepository.DeleteAssets(AssetsDirectory, Arg.Any<IReadOnlyList<string>>()).Returns([firstDeletedAsset]);
+
+        try
+        {
+            await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetDeleted),
+                    Is.EqualTo(1));
+                Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetDeleted).Asset,
+                    Is.SameAs(firstDeletedAsset));
+                assetRepository.Received(1).DeleteAssets(
+                    AssetsDirectory,
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 1
+                                                               && fileNames[0] == firstDeletedFileName));
+                assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, secondDeletedFileName);
+
+                _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+            }
+        }
+        finally
+        {
             catalogAssetsService.Dispose();
         }
     }
@@ -277,7 +326,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 10);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>())
             .Returns(call => call.ArgAt<string[]>(0).Contains(updatedFileName) ? ([updatedFileName], []) : ([], []));

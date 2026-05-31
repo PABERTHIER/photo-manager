@@ -146,7 +146,7 @@ record PersistedAsset(
 
 **Key decisions:**
 - Callbacks are batched/debounced (e.g., one callback per folder or every 100 assets)
-- The heavy `CataloguedAssetsByPath` list is passed as a lazy snapshot, not cloned per callback
+- The heavy `CataloguedAssetsByPath` list is passed as a lazy snapshot, not cloned per callback — **DONE**
 - Progress percentage is calculated from `processedCount / totalFilesInFolder`
 
 ---

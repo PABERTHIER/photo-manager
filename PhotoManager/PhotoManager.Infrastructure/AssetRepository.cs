@@ -98,36 +98,27 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     public Folder[] GetFolders()
     {
-        return [.. _foldersById.Values];
+        return CopyToArray(_foldersById.Values);
     }
 
     public HashSet<string> GetFoldersPath()
     {
-        string[] paths = [.. _foldersByPath.Keys];
-        HashSet<string> foldersSet = new(paths.Length, StringComparer.Ordinal);
-
-        foreach (string path in paths)
-        {
-            foldersSet.Add(path);
-        }
-
-        return foldersSet;
+        return new(_foldersByPath.Keys, StringComparer.Ordinal);
     }
 
     public Folder[] GetSubFolders(Folder parentFolder)
     {
-        Folder[] folders = [.. _foldersById.Values];
         List<Folder> result = [];
 
-        for (int i = 0; i < folders.Length; i++)
+        foreach (Folder folder in _foldersById.Values)
         {
-            if (parentFolder.IsParentOf(folders[i]))
+            if (parentFolder.IsParentOf(folder))
             {
-                result.Add(folders[i]);
+                result.Add(folder);
             }
         }
 
-        return [.. result];
+        return CopyToArray(result);
     }
 
     public Folder? GetFolderByPath(string path)
@@ -367,7 +358,14 @@ public class AssetRepository : IAssetRepository, IDisposable
 
     public Asset[] GetCataloguedAssets()
     {
-        return [.. _assetsByFolderId.Values.SelectMany(static inner => inner.Values)];
+        List<Asset> result = new(Math.Max(0, Volatile.Read(ref _totalAssetCount)));
+
+        foreach (ConcurrentDictionary<string, Asset> folderAssets in _assetsByFolderId.Values)
+        {
+            result.AddRange(folderAssets.Values);
+        }
+
+        return CopyToArray(result);
     }
 
     public Asset[] GetCataloguedAssetsByPath(string directory)
@@ -384,7 +382,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             return [];
         }
 
-        return [.. folderAssets.Values];
+        return CopyToArray(folderAssets.Values);
     }
 
     public bool IsAssetCatalogued(string directoryName, string fileName)
@@ -519,7 +517,7 @@ public class AssetRepository : IAssetRepository, IDisposable
                 }
             }
 
-            string[] result = [.. updatedRecentTargetPaths];
+            string[] result = CopyToArray(updatedRecentTargetPaths);
             Volatile.Write(ref _recentTargetPaths, result);
 
             _persistenceContext.RecentPaths.Replace(result);
@@ -630,7 +628,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             config.Definitions.AddRange(_persistenceContext.SyncDefinitions.GetAll());
             _syncAssetsConfiguration = config;
 
-            _recentTargetPaths = [.. _persistenceContext.RecentPaths.GetAll()];
+            _recentTargetPaths = CopyReadOnlyListToArray(_persistenceContext.RecentPaths.GetAll());
         }
         catch (Exception ex)
         {
@@ -799,7 +797,7 @@ public class AssetRepository : IAssetRepository, IDisposable
             return [];
         }
 
-        return [.. folderAssets.Values];
+        return CopyToArray(folderAssets.Values);
     }
 
     private void LoadOrFetchThumbnails(Folder folder, Asset[] assets)
@@ -937,7 +935,7 @@ public class AssetRepository : IAssetRepository, IDisposable
                 }
 
                 _disposed = true;
-                observers = [.. _observers];
+                observers = CopyToArray(_observers);
                 _observers.Clear();
             }
 
@@ -974,5 +972,24 @@ public class AssetRepository : IAssetRepository, IDisposable
             {
             }
         }
+    }
+
+    private static T[] CopyToArray<T>(ICollection<T> values)
+    {
+        T[] result = new T[values.Count];
+        values.CopyTo(result, 0);
+        return result;
+    }
+
+    private static T[] CopyReadOnlyListToArray<T>(IReadOnlyList<T> values)
+    {
+        T[] result = new T[values.Count];
+
+        for (int i = 0; i < values.Count; i++)
+        {
+            result[i] = values[i];
+        }
+
+        return result;
     }
 }

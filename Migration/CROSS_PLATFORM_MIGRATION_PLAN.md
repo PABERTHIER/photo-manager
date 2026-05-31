@@ -394,6 +394,9 @@ This is the most complex change. Current `BitmapHelper` creates WPF `BitmapImage
 | `GifBitmapEncoder` | `SKImage.Encode(SKEncodedImageFormat.Gif, 100)` |
 | `BitmapFrame.Create(image)` | `SKImage.FromBitmap(bitmap)` |
 
+**DONE update:** viewer/DHash image loading now detects HEIC with a small header read and decodes
+non-HEIC images directly from a stream, avoiding full managed file-buffer allocation on the hot path.
+
 #### 1.4 Rewrite `ExifHelper.cs` EXIF Reading **DONE**
 
 | Current WPF API | Replacement |

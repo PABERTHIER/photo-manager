@@ -35,7 +35,8 @@ public class FolderNavigationViewModel(
 
     public bool HasConfirmed { get; set; }
 
-    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [.. recentTargetPaths];
+    public ObservableCollection<string> RecentTargetPaths { get; private set; } =
+        CreateObservableCollection(recentTargetPaths);
 
     public string? TargetPath
     {
@@ -74,5 +75,17 @@ public class FolderNavigationViewModel(
         }
 
         return new() { Id = Guid.NewGuid(), Path = targetPath };
+    }
+
+    private static ObservableCollection<string> CreateObservableCollection(List<string> values)
+    {
+        ObservableCollection<string> result = [];
+
+        for (int i = 0; i < values.Count; i++)
+        {
+            result.Add(values[i]);
+        }
+
+        return result;
     }
 }

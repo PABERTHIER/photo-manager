@@ -42,9 +42,12 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 5.4 Parallelize PHash computation — **DONE**
    - 5.5 Memory-mapped thumbnails or separate thumbnail file — **DONE**
    - 5.6 Parallel startup file-stat refresh — **DONE**
-   - 5.7 Exact duplicate detection without ordered PLINQ — benchmarked, not applied due determinism risk
+   - 5.7 Exact duplicate detection without ordered PLINQ — **DONE for exact-hash duplicates**
    - 5.8 File-name enumeration allocation cleanup — **DONE**
    - 5.9 SQLite connection-string caching — **DONE**
+   - 5.10 Catalog callback snapshot allocation removal — **DONE**
+   - 5.11 Bitmap/viewer decode allocation cleanup — **DONE**
+   - 5.12 Asset creation double-validation removal — **DONE**
 
 6. Phase 6 - CI/CD & Packaging
    - 6.1 Cross-platform CI builds

@@ -47,9 +47,7 @@ public partial class UserConfigurationService : IUserConfigurationService
 
     public string[] GetRootCatalogFolderPaths()
     {
-        List<string> rootPaths = [PathSettings.AssetsDirectory];
-
-        return [.. rootPaths];
+        return [PathSettings.AssetsDirectory];
     }
 
     private void InitializeConfigValues()
