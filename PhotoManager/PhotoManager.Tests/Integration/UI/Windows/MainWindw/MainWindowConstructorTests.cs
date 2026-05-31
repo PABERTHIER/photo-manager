@@ -1,13 +1,18 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.Application;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
+using PhotoManager.UI.Windows;
 using System.ComponentModel;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowConstructorTests
 {
     private string? _assetsDirectory;
@@ -15,11 +20,13 @@ public class MainWindowConstructorTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
+    private IApplication? _application;
     private TestableAssetRepository? _testableAssetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -58,11 +65,14 @@ public class MainWindowConstructorTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -70,16 +80,16 @@ public class MainWindowConstructorTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+        _application = new PhotoManager.Application.Application(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
-        _applicationViewModel = new(application);
+        _applicationViewModel = new(_application);
     }
 
     [Test]
     [TestCase("PhotoManager", "Toto", "PhotoManager", "Toto")]
     [TestCase("Photo Toto", "Tutu", "PhotoManager", "Tutu")]
-    public void Constructor_WithValidAssembly_SetsCancellationTokenSourceAndAboutInformation(
+    public async Task Constructor_WithValidAssembly_SetsCancellationTokenSourceAndAboutInformation(
         string projectName,
         string projectOwner,
         string expectedProjectName,
@@ -95,15 +105,30 @@ public class MainWindowConstructorTests
 
         CheckBeforeChanges(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
 
-        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
+        await AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            MainWindow? window = null;
 
-        _folderNavigationViewModel = new(_applicationViewModel!, sourceFolder, []);
+            try
+            {
+                window = new(_applicationViewModel!, _application!, NullLoggerFactory.Instance);
+                FolderNavigationControl folderNavigationControl = window.FindControl<FolderNavigationControl>("FolderTreeView")
+                    ?? throw new InvalidOperationException("FolderTreeView was not found.");
+                _folderNavigationViewModel = (FolderNavigationViewModel?)folderNavigationControl.DataContext;
 
-        CancellationTokenSource cancellationTokenSource = new();
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(_folderNavigationViewModel, Is.Not.Null);
+                    Assert.That(folderNavigationControl.SelectedPath, Is.EqualTo(_assetsDirectory));
+                }
+            }
+            finally
+            {
+                window?.Close();
+            }
+        });
 
-        Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
-        Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
-        Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
+        Folder sourceFolder = _folderNavigationViewModel!.SourceFolder;
 
         CheckAfterChanges(
             _applicationViewModel!,

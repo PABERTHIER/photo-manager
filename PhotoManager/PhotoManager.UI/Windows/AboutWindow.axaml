@@ -32,6 +32,7 @@
                 Text="{Binding Version}" />
         </StackPanel>
         <Button
+            x:Name="ConfirmButton"
             Grid.Row="1"
             Grid.Column="1"
             Classes="action"

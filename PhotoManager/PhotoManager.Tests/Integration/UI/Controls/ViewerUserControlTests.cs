@@ -1,4 +1,6 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
+using PhotoManager.UI.Controls;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
@@ -15,9 +17,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Control
-// The goal is to test what does ViewerUserControl
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class ViewerUserControlTests
 {
     private string? _assetsDirectory;
@@ -36,6 +38,7 @@ public class ViewerUserControlTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -207,11 +210,14 @@ public class ViewerUserControlTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -466,7 +472,7 @@ public class ViewerUserControlTests
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
         // First ShowImage (jpg)
-        Bitmap? bitmap = ShowImage();
+        Bitmap? bitmap = await ShowImage();
 
         Assert.That(bitmap, Is.Not.Null);
         Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
@@ -512,7 +518,7 @@ public class ViewerUserControlTests
 
         _applicationViewModel!.SetViewerPosition(expectedViewerPosition);
 
-        bitmap = ShowImage();
+        bitmap = await ShowImage();
 
         Assert.That(bitmap, Is.Not.Null);
         Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
@@ -607,7 +613,7 @@ public class ViewerUserControlTests
 
         _applicationViewModel!.SetViewerPosition(-1);
 
-        Bitmap? bitmap = ShowImage();
+        Bitmap? bitmap = await ShowImage();
 
         Assert.That(bitmap, Is.Not.Null);
         Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
@@ -694,7 +700,7 @@ public class ViewerUserControlTests
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
-            Bitmap? bitmap = ShowImage();
+            Bitmap? bitmap = await ShowImage();
 
             Assert.That(bitmap, Is.Null);
 
@@ -930,16 +936,27 @@ public class ViewerUserControlTests
         }
     }
 
-    private Bitmap? ShowImage()
+    private Task<Bitmap?> ShowImage()
     {
-        Bitmap? bitmap = null;
-
-        if (_applicationViewModel is { CurrentAsset: not null })
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
         {
-            AvaloniaTestSetup.EnsureInitialized();
-            bitmap = _applicationViewModel.LoadBitmapImageFromPath();
-        }
+            ViewerUserControl control = new()
+            {
+                DataContext = _applicationViewModel
+            };
 
-        return bitmap;
+            try
+            {
+                control.ShowImage();
+                Image image = control.FindControl<Image>("Image")
+                    ?? throw new InvalidOperationException("Image was not found.");
+
+                return image.Source as Bitmap;
+            }
+            finally
+            {
+                control.DataContext = null;
+            }
+        });
     }
 }

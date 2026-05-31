@@ -43,6 +43,10 @@ public class InfrastructureServiceCollectionExtensionsTests
             x.ServiceType == typeof(IThumbnailGenerator));
         Assert.That(thumbnailGeneratorDescriptor, Is.Null);
 
+        ServiceDescriptor? imageMagickThumbnailGeneratorDescriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(ImageMagickThumbnailGenerator));
+        Assert.That(imageMagickThumbnailGeneratorDescriptor, Is.Null);
+
         ServiceDescriptor? imageMetadataServiceDescriptor = services.FirstOrDefault(x =>
             x.ServiceType == typeof(IImageMetadataService));
         Assert.That(imageMetadataServiceDescriptor, Is.Null);
@@ -59,7 +63,7 @@ public class InfrastructureServiceCollectionExtensionsTests
 
         services.AddInfrastructure();
 
-        Assert.That(services, Has.Count.EqualTo(11));
+        Assert.That(services, Has.Count.EqualTo(12));
 
         sqliteConnectionFactoryDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(ISqliteConnectionFactory));
@@ -126,16 +130,25 @@ public class InfrastructureServiceCollectionExtensionsTests
         Assert.That(thumbnailGeneratorDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(thumbnailGeneratorDescriptor.ImplementationType, Is.EqualTo(typeof(ImageMagickThumbnailGenerator)));
 
+        imageMagickThumbnailGeneratorDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(ImageMagickThumbnailGenerator));
+        Assert.That(imageMagickThumbnailGeneratorDescriptor, Is.Not.Null);
+        Assert.That(imageMagickThumbnailGeneratorDescriptor, Is.EqualTo(services[8]));
+        Assert.That(imageMagickThumbnailGeneratorDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(imageMagickThumbnailGeneratorDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(imageMagickThumbnailGeneratorDescriptor.ImplementationFactory, Is.Not.Null);
+        Assert.That(imageMagickThumbnailGeneratorDescriptor.ImplementationType, Is.Null);
+
         imageMetadataServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IImageMetadataService));
         Assert.That(imageMetadataServiceDescriptor, Is.Not.Null);
-        Assert.That(imageMetadataServiceDescriptor, Is.EqualTo(services[8]));
+        Assert.That(imageMetadataServiceDescriptor, Is.EqualTo(services[9]));
         Assert.That(imageMetadataServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(imageMetadataServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(imageMetadataServiceDescriptor.ImplementationType, Is.EqualTo(typeof(ImageMetadataService)));
 
         assetRepositoryDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetRepository));
         Assert.That(assetRepositoryDescriptor, Is.Not.Null);
-        Assert.That(assetRepositoryDescriptor, Is.EqualTo(services[9]));
+        Assert.That(assetRepositoryDescriptor, Is.EqualTo(services[10]));
         Assert.That(assetRepositoryDescriptor.ImplementationInstance, Is.Null);
         Assert.That(assetRepositoryDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(assetRepositoryDescriptor.ImplementationType, Is.EqualTo(typeof(AssetRepository)));
@@ -143,7 +156,7 @@ public class InfrastructureServiceCollectionExtensionsTests
         assetHashCalculatorServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IAssetHashCalculatorService));
         Assert.That(assetHashCalculatorServiceDescriptor, Is.Not.Null);
-        Assert.That(assetHashCalculatorServiceDescriptor, Is.EqualTo(services[10]));
+        Assert.That(assetHashCalculatorServiceDescriptor, Is.EqualTo(services[11]));
         Assert.That(assetHashCalculatorServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(assetHashCalculatorServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(assetHashCalculatorServiceDescriptor.ImplementationType,

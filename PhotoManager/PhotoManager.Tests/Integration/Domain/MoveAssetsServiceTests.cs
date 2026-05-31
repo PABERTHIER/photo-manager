@@ -51,9 +51,10 @@ public class MoveAssetsServiceTests
             imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        _assetCreationService = new(_testableAssetRepository, _fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+        _assetCreationService = new(_testableAssetRepository, _fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         _testLogger = new();
         _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, _assetCreationService, _testLogger);
     }

@@ -1,5 +1,8 @@
-﻿using PhotoManager.UI.Models;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.Application;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
+using PhotoManager.UI.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
@@ -14,9 +17,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowSortAssetsTests
 {
     private string? _assetsDirectory;
@@ -24,6 +27,8 @@ public class MainWindowSortAssetsTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
+    private IApplication? _application;
+    private MainWindow? _window;
     private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
 
@@ -37,6 +42,7 @@ public class MainWindowSortAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -175,10 +181,16 @@ public class MainWindowSortAssetsTests
     [TearDown]
     public void TearDown()
     {
+        if (_window != null)
+        {
+            AvaloniaTestSetup.RunOnUiThreadAsync(() => _window.Close()).GetAwaiter().GetResult();
+        }
+
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
+        _window = null;
     }
 
     private void ConfigureApplicationViewModel(
@@ -221,11 +233,14 @@ public class MainWindowSortAssetsTests
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -233,10 +248,10 @@ public class MainWindowSortAssetsTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+        _application = new PhotoManager.Application.Application(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService,
             fileOperationsService, imageProcessingService);
-        _applicationViewModel = new(application);
+        _applicationViewModel = new(_application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel.CurrentFolderPath };
     }
@@ -1039,36 +1054,42 @@ public class MainWindowSortAssetsTests
     private void MainWindowsInit()
     {
         _folderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
-
-        CancellationTokenSource cancellationTokenSource = new();
-
-        Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
-        Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
-        Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            _window = new(_applicationViewModel!, _application!, NullLoggerFactory.Instance))
+            .GetAwaiter()
+            .GetResult();
     }
 
     private void SortAssetsByFileName()
     {
-        _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
+        InvokeMainWindowHandler("SortAssetsByFileName_Click");
     }
 
     private void SortAssetsByFileSize()
     {
-        _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
+        InvokeMainWindowHandler("SortAssetsByFileSize_Click");
     }
 
     private void SortAssetsByFileCreationDateTime()
     {
-        _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
+        InvokeMainWindowHandler("SortAssetsByFileCreationDateTime_Click");
     }
 
     private void SortAssetsByFileModificationDateTime()
     {
-        _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
+        InvokeMainWindowHandler("SortAssetsByFileModificationDateTime_Click");
     }
 
     private void SortAssetsByThumbnailCreationDateTime()
     {
-        _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
+        InvokeMainWindowHandler("SortAssetsByThumbnailCreationDateTime_Click");
+    }
+
+    private void InvokeMainWindowHandler(string methodName)
+    {
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(_window!, methodName, null, null))
+            .GetAwaiter()
+            .GetResult();
     }
 }

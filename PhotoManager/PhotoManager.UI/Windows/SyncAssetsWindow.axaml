@@ -15,6 +15,7 @@
                 Text="{Binding Description}"
                 TextWrapping="Wrap" />
             <Button
+                x:Name="ContinueFromDescriptionButton"
                 Grid.Row="1"
                 Classes="action"
                 Width="120"
@@ -83,8 +84,8 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="8">
-                <Button Classes="action" Width="100" Content="Save" Click="SaveButton_Click" />
-                <Button Classes="action" Width="100" Content="Run" Click="RunButton_Click" />
+                <Button x:Name="SaveButton" Classes="action" Width="100" Content="Save" Click="SaveButton_Click" />
+                <Button x:Name="RunButton" Classes="action" Width="100" Content="Run" Click="RunButton_Click" />
             </StackPanel>
         </Grid>
 
@@ -96,6 +97,7 @@
                 Foreground="{DynamicResource PhotoManagerForegroundBrush}"
                 ItemsSource="{Binding ProcessStatusMessages}" />
             <Button
+                x:Name="ViewResultsButton"
                 Grid.Row="1"
                 Classes="action"
                 Width="120"
@@ -127,6 +129,7 @@
                 </DataGrid.Columns>
             </DataGrid>
             <Button
+                x:Name="CloseResultsButton"
                 Grid.Row="2"
                 Classes="action"
                 Width="100"

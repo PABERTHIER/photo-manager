@@ -695,15 +695,15 @@ strategy:
 - [x] Folder navigation startup binding and add/remove refresh — **DONE**
 - [x] Thumbnail grid selection and viewer-position binding — **DONE**
 - [x] Full-screen image viewer control lookup and image source cleanup — **DONE**
-- [ ] Keyboard shortcuts (Ctrl+C, Ctrl+M, Delete, F1, PageUp/Down, arrows)
-- [ ] Find Duplicates workflow (multi-step wizard, DataGrid, thumbnail preview)
-- [ ] Sync Assets workflow (multi-step wizard, DataGrid, configuration)
+- [x] Keyboard shortcuts (Ctrl+C, Ctrl+M, Delete, F1, PageUp/Down, arrows) — **DONE**
+- [x] Find Duplicates workflow (multi-step wizard, DataGrid, thumbnail preview) — **DONE**
+- [x] Sync Assets workflow (multi-step wizard, DataGrid, configuration) — **DONE**
 - [x] Copy/Move to folder selected-folder persistence — **DONE**
-- [ ] About dialog
+- [x] About dialog — **DONE**
 - [x] Theme mode configuration reader — **DONE**
-- [ ] HEIC image support
-- [ ] Video thumbnail extraction
-- [ ] Single-instance enforcement
+- [x] HEIC image support — **DONE**
+- [x] Video thumbnail extraction — **DONE**
+- [x] Single-instance enforcement — **DONE**
 - [x] Status bar asset counters after duplicate deletion — **DONE**
 
 #### 5.2 Cross-Platform Testing
@@ -778,18 +778,18 @@ Closest WPF migration path (nearly identical XAML), native Skia rendering, MIT l
 
 ```
 Phase 0: Preparation & Abstraction
-  ├── 0.1 Split Directory.Build.props (UI-specific vs cross-platform)
+  ├── 0.1 Split Directory.Build.props (UI-specific vs cross-platform) **DONE**
   ├── 0.2 Define Domain abstractions (ImageRotation, IImageData, ImageFormat) **DONE**
-  └── 0.3 Set up feature branch
+  └── 0.3 Set up feature branch **DONE**
 
 Phase 1: Remove WPF from Non-UI Layers (LARGEST PHASE)
   ├── 1.1 Replace Rotation enum everywhere (~83 test files) **DONE**
   ├── 1.2 Replace BitmapImage in Domain interfaces **DONE**
   ├── 1.3 Rewrite BitmapHelper.cs with SkiaSharp **DONE**
-  ├── 1.4 Rewrite ExifHelper.cs EXIF reading (unify on Magick.NET)
-  ├── 1.5 Remove System.Drawing usage
-  ├── 1.6 Remove WPF GlobalUsings from non-UI projects
-  └── 1.7 Update ~50-70 test files
+  ├── 1.4 Rewrite ExifHelper.cs EXIF reading (unify on Magick.NET) **DONE**
+  ├── 1.5 Remove System.Drawing usage **DONE**
+  ├── 1.6 Remove WPF GlobalUsings from non-UI projects **DONE**
+  └── 1.7 Update ~50-70 test files **DONE**
 
 Phase 2: Replace Windows-Specific Infrastructure
   ├── 2.1 FFmpeg cross-platform distribution **DONE**
@@ -799,13 +799,13 @@ Phase 2: Replace Windows-Specific Infrastructure
   └── 2.5 Fix Windows-specific build commands **DONE**
 
 Phase 3: Migrate UI to Avalonia (MOST VISIBLE PHASE)
-  ├── 3.1 Create Avalonia project structure
-  ├── 3.2 Migrate XAML (9 files)
-  ├── 3.3 Migrate ViewModels (mostly reuse)
-  ├── 3.4 Migrate Converters (5 → 4)
-  ├── 3.5 Image display pipeline (IImageData → Avalonia Bitmap)
-  ├── 3.6 Theme migration (dark theme)
-  └── 3.7 Remove old WPF UI project
+  ├── 3.1 Create Avalonia project structure **DONE**
+  ├── 3.2 Migrate XAML (9 files) **DONE**
+  ├── 3.3 Migrate ViewModels (mostly reuse) **DONE**
+  ├── 3.4 Migrate Converters (5 → 4) **DONE**
+  ├── 3.5 Image display pipeline (IImageData → Avalonia Bitmap) **DONE**
+  ├── 3.6 Theme migration (dark theme) **DONE**
+  └── 3.7 Remove old WPF UI project **DONE**
 
 Phase 4: CI/CD & Packaging
   ├── 4.1 Multi-platform CI matrix

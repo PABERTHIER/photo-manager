@@ -25,7 +25,8 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Logging" />
     <PackageReference Include="Serilog.Sinks.File" />
-    <PackageReference Include="Tmds.DBus.Protocol" />
+    <!-- Pins Avalonia's transitive DBus dependency to a non-vulnerable version; UI code does not use it directly. -->
+    <PackageReference Include="Tmds.DBus.Protocol" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

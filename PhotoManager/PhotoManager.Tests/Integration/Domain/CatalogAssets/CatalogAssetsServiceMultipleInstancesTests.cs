@@ -347,11 +347,15 @@ public class CatalogAssetsServiceMultipleInstancesTests
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, _testLogger);
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
+            _testLogger);
     }
 
     [Test]
@@ -494,9 +498,11 @@ public class CatalogAssetsServiceMultipleInstancesTests
         IAssetCreationService assetCreationServiceMock = Substitute.For<IAssetCreationService>();
         IAssetsComparator assetsComparatorMock = Substitute.For<IAssetsComparator>();
 
-        using (CatalogAssetsService catalogService = new(assetRepositoryMock, fileOperationsServiceMock,
-                   imageMetadataServiceMock, assetCreationServiceMock, userConfigurationServiceMock,
-                   assetsComparatorMock, _testLogger))
+        using (CatalogAssetsService catalogService = new(assetRepositoryMock, fileOperationsServiceMock, imageMetadataServiceMock,
+            assetCreationServiceMock, userConfigurationServiceMock, assetsComparatorMock,
+            new CatalogFolderPipeline(fileOperationsServiceMock, assetCreationServiceMock,
+                assetRepositoryMock),
+            _testLogger))
         {
             CatalogChangeRecorder catalogChanges = [];
             await catalogService.CatalogAssetsAsync(catalogChanges.Add);
