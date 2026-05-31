@@ -50,8 +50,8 @@ V3 focuses on moving the UI to a cross-platform stack, adding multi-threading fo
    - 5.12 Asset creation double-validation removal — **DONE**
 
 6. Phase 6 - CI/CD & Packaging
-   - 6.1 Cross-platform CI builds
-   - 6.2 Platform-specific packaging
+   - 6.1 Cross-platform CI builds — **DONE**
+   - 6.2 Platform-specific packaging — **DONE**
 
 7. Phase 7 - Validation & Polish
    - 7.1 Full regression testing

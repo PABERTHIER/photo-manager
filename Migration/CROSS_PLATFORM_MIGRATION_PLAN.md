@@ -645,29 +645,27 @@ Completed state:
 
 > **Goal**: Build, test, and package for all three platforms.
 
-#### 4.1 Multi-Platform CI Matrix
+#### 4.1 Multi-Platform CI Matrix — **DONE**
+
+Implemented as separate workflow files per platform (not matrix) for independent badge reporting:
+- `build-windows.yml`, `build-linux.yml`, `build-macos.yml`
+- `codeql-windows.yml`, `codeql-linux.yml`, `codeql-macos.yml`
+- `release-windows.yml`, `release-linux.yml`, `release-macos.yml`
 
 ```yaml
-strategy:
-  matrix:
-    include:
-      - os: windows-latest
-        rid: win-x64
-      - os: ubuntu-latest
-        rid: linux-x64
-      - os: macos-latest
-        rid: osx-x64
-      - os: macos-latest
-        rid: osx-arm64
+# Each platform has its own workflow file targeting:
+# - windows-latest (win-x64)
+# - ubuntu-latest (linux-x64)
+# - macos-latest (osx-x64, osx-arm64)
 ```
 
-#### 4.2 Platform-Specific Packaging
+#### 4.2 Platform-Specific Packaging — **DONE**
 
 | Platform | Format | Tool |
 |----------|--------|------|
-| Windows | `.msix` or self-contained `.exe` | `dotnet publish -r win-x64` |
-| Linux | `.AppImage`, `.deb`, or `.tar.gz` | Avalonia packaging tools |
-| macOS | `.app` bundle / `.dmg` | Avalonia packaging tools |
+| Windows | `.zip` (self-contained publish) | `dotnet publish -r win-x64` + `Compress-Archive` |
+| Linux | `.tar.gz` | `dotnet publish -r linux-x64` + `tar -czf` |
+| macOS | `.tar.gz` (x64 + arm64) | `dotnet publish -r osx-x64` / `osx-arm64` + `tar -czf` |
 
 #### 4.3 FFmpeg Distribution Strategy
 
@@ -717,10 +715,10 @@ strategy:
 
 #### 5.3 Documentation Updates
 
-- Update `README.md` with cross-platform build/run instructions
-- Update `AGENTS.md` with new project structure
+- Update `README.md` with cross-platform build/run instructions — **DONE**
+- Update `AGENTS.md` with new project structure — **DONE**
 - Update `appsettings.json` examples for each platform
-- Add platform-specific installation instructions
+- Add platform-specific installation instructions — **DONE**
 
 ---
 
@@ -808,10 +806,10 @@ Phase 3: Migrate UI to Avalonia (MOST VISIBLE PHASE)
   └── 3.7 Remove old WPF UI project **DONE**
 
 Phase 4: CI/CD & Packaging
-  ├── 4.1 Multi-platform CI matrix
-  ├── 4.2 Platform-specific packaging
-  ├── 4.3 FFmpeg distribution per platform
-  └── 4.4 Remove Windows-only CI steps
+  ├── 4.1 Multi-platform CI matrix **DONE**
+  ├── 4.2 Platform-specific packaging **DONE**
+  ├── 4.3 FFmpeg distribution per platform **DONE**
+  └── 4.4 Remove Windows-only CI steps **DONE**
 
 Phase 5: Validation & Polish
   ├── 5.1 Feature parity verification

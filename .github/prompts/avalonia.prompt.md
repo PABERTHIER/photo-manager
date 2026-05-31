@@ -1,10 +1,10 @@
----
-description: "Guide for WPF work in PhotoManager: UI conventions and cross-layer WPF types"
+﻿---
+description: "Guide for Avalonia UI work in PhotoManager: UI conventions and MVVM patterns"
 ---
 
-# WPF Reference Guide for PhotoManager
+# Avalonia UI Reference Guide for PhotoManager
 
-Answer the following about WPF in this project: ${input:question:What do you want to know or do with WPF in this project?}
+Answer the following about Avalonia UI in this project: ${input:question:What do you want to know or do with Avalonia UI in this project?}
 
 ---
 
@@ -23,39 +23,41 @@ Answer the following about WPF in this project: ${input:question:What do you wan
 Windows/      — {Feature}Window (modal: ShowDialog, modeless: Show)
 Controls/     — {Feature}UserControl (reusable composed controls)
 ViewModels/   — {Feature}ViewModel, base classes, Enums/
-Converters/   — {Feature}Converter : IValueConverter or IMultiValueConverter
+Converters/   — {Feature}Converter : IValueConverter
 Models/       — {Action}EventHandler delegates + {Action}EventArgs classes
+Services/     — UI-layer services (single-instance, theme)
+Configuration/ — UI settings classes
 ```
 
 ### DI Wiring
 
-- `App.xaml.cs` builds the DI container, exposes `static IServiceProvider? App.ServiceProvider`
+- `App.axaml.cs` builds the DI container, exposes `static IServiceProvider? App.ServiceProvider`
 - Singletons in DI: `MainWindow`, `ApplicationViewModel` (registered in `UiServiceCollectionExtensions`)
-- XAML-instantiated UserControls resolve services via `App.ServiceProvider?.GetService<T>()`
+- AXAML-instantiated UserControls resolve services via `App.ServiceProvider?.GetService<T>()`
 - Dialog windows + their VMs are created on-demand in code-behind (not via DI)
 
-### Async in WPF
+### Async in Avalonia
 
-- Always use `Dispatcher.InvokeAsync()` to marshal domain callbacks to the UI thread
-- Always use `.ConfigureAwait(true)` in WPF async methods (preserves UI sync context)
+- Always use `Dispatcher.UIThread.InvokeAsync()` to marshal domain callbacks to the UI thread
+- Always use `.ConfigureAwait(true)` in UI async methods (preserves synchronization context)
 
 ### Converters
 
 - `ConvertBack` must `throw new NotImplementedException()` for read-only converters
-- Register as `StaticResource` in the consuming XAML resources section
+- Register as resources in the consuming AXAML file
 
 ### Styles
 
-- Global styles live in `App.xaml` Application.Resources
-- Use `<Style.Triggers>` with `<Trigger Property="IsMouseOver">` for hover effects
-- Reference with `Style="{StaticResource StyleName}"`
+- Avalonia Fluent theme with System/Light/Dark mode support
+- Global styles live in `App.axaml` Application.Styles
+- Use Avalonia `Styles` and `ControlTheme` for custom styling
 
 ### Visibility Pattern
 
-Prefer computed properties over converters for visibility:
+Prefer computed `bool` properties for `IsVisible` bindings (not WPF's Visibility enum):
 
 ```csharp
-public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
+public bool IsThumbnailsVisible => AppMode == AppMode.Thumbnails;
 ```
 
 ### Naming Conventions

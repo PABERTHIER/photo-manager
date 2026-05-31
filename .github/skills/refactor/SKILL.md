@@ -25,7 +25,7 @@ Follow this workflow in order:
 5. **Check `GlobalUsings.cs`** before adding any `using` directives.
 
 6. **Update DI registration** in `{Layer}ServiceCollectionExtensions.cs` if services move or rename.
-   Verify the chain in `App.xaml.cs`: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`
+   Verify the chain in `App.axaml.cs`: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`
 
 7. **Final verification**:
    - `dotnet build PhotoManager/PhotoManager.slnx` — zero warnings

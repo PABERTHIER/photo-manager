@@ -2,9 +2,12 @@
 
 ![PhotoManager][app-icon]
 
-[![Build & Test][build-badge]][build-link]
-[![Release][release-badge]][release-link]
-[![CodeQL][code-ql-badge]][code-ql-link]
+| | Windows | Linux | macOS |
+|--|---------|-------|-------|
+| **Build** | [![Build - Windows][build-windows-badge]][build-windows-link] | [![Build - Linux][build-linux-badge]][build-linux-link] | [![Build - macOS][build-macos-badge]][build-macos-link] |
+| **CodeQL** | [![CodeQL - Windows][codeql-windows-badge]][codeql-windows-link] | [![CodeQL - Linux][codeql-linux-badge]][codeql-linux-link] | [![CodeQL - macOS][codeql-macos-badge]][codeql-macos-link] |
+| **Release** | [![Release - Windows][release-windows-badge]][release-windows-link] | [![Release - Linux][release-linux-badge]][release-linux-link] | [![Release - macOS][release-macos-badge]][release-macos-link] |
+
 [![Coverage Status][coverage-status-badge]][coverage-status-link]
 
 **I used this [repo][jp-photo-manager-repo] as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
@@ -41,11 +44,17 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 
 ## Installation instructions :man_teacher:
 
-- Download the zip file with the compiled application files (`publish.zip` or `photo-manager-{version}.zip`) for the latest release.
-- Unzip the content of the zip file to a new folder.
+- Download the archive for your platform from the latest release:
+  - **Windows**: `photo-manager-{version}-win-x64.zip`
+  - **Linux**: `photo-manager-{version}-linux-x64.tar.gz`
+  - **macOS (Intel)**: `photo-manager-{version}-osx-x64.tar.gz`
+  - **macOS (Apple Silicon)**: `photo-manager-{version}-osx-arm64.tar.gz`
+- Extract the archive to a new folder.
 - [Configure the appsettings.json file](#config-file-card_file_box)
-- Run `PhotoManager.UI.exe`.
-- The application automatically creates a `Database/` folder next to the `.exe` to store the database and backups.
+- Run the application:
+  - **Windows**: Run `PhotoManager.UI.exe`
+  - **Linux / macOS**: Run `./PhotoManager.UI` (you may need to `chmod +x PhotoManager.UI` first)
+- The application automatically creates a `Database/` folder next to the executable to store the database and backups.
 
 ## Config file :card_file_box:
 
@@ -263,14 +272,32 @@ I've made a specific repo for the custom dll, injected in the project:
 
 [app-icon]: PhotoManager/PhotoManager.UI/Assets/AppIcon.png
 
-[build-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg
-[build-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml
+[build-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-windows.yml/badge.svg
+[build-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-windows.yml
 
-[release-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml/badge.svg
-[release-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml
+[build-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-linux.yml/badge.svg
+[build-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-linux.yml
 
-[code-ql-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg
-[code-ql-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml
+[build-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-macos.yml/badge.svg
+[build-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-macos.yml
+
+[codeql-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-windows.yml/badge.svg
+[codeql-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-windows.yml
+
+[codeql-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-linux.yml/badge.svg
+[codeql-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-linux.yml
+
+[codeql-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-macos.yml/badge.svg
+[codeql-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-macos.yml
+
+[release-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-windows.yml/badge.svg
+[release-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-windows.yml
+
+[release-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-linux.yml/badge.svg
+[release-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-linux.yml
+
+[release-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-macos.yml/badge.svg
+[release-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-macos.yml
 
 [coverage-status-badge]: https://codecov.io/gh/PABERTHIER/photo-manager/graph/badge.svg?token=DILR0QRXVN
 [coverage-status-link]: https://codecov.io/gh/PABERTHIER/photo-manager

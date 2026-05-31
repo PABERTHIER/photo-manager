@@ -1,0 +1,86 @@
+﻿name: Release - Windows
+
+on:
+  workflow_dispatch: # Manual trigger for a release
+  push:
+    tags:
+      - "v*" # Trigger on tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    name: Windows Release
+    runs-on: windows-latest
+
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.slnx
+      DOTNET_VERSION: 10.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Ensures full history is fetched
+
+      # Step 2: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 3: Restore dependencies
+      - name: 🛠️ Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_NAME }}
+
+      # Step 4: Build the project for release
+      - name: 🔨 Build
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
+
+      # Step 5: Publish the project
+      - name: 📦 Publish
+        run: dotnet publish --configuration Release --runtime win-x64 --output ./output/win-x64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+
+      # Step 6: Compress output into a ZIP file
+      - name: 📂 Create ZIP File
+        run: |
+          Compress-Archive -Path ./output/win-x64/* -DestinationPath ./photo-manager-${{ github.ref_name }}-win-x64.zip
+
+      # Step 7: Create Release with GitHub CLI
+      - name: 🏷️ Create Release
+        run: |
+          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes 2>$null
+          if ($LASTEXITCODE -ne 0) { Write-Host "Release already exists or creation skipped, continuing..." }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      # Step 8: Wait for Release availability
+      - name: ⏳ Wait for Release availability
+        run: |
+          for ($i = 0; $i -lt 10; $i++) {
+            $result = gh release view ${{ github.ref_name }} 2>$null
+            if ($LASTEXITCODE -eq 0) { Write-Host "Release found"; exit 0 }
+            Write-Host "Waiting for release... attempt $($i + 1)/10"
+            Start-Sleep -Seconds 5
+          }
+          Write-Error "Release ${{ github.ref_name }} not found after retries"
+          exit 1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 9: Upload File as Artifact
+      - name: 📤 Upload Release Asset
+        run: |
+          gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-win-x64.zip --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 10: Upload Build Artifacts
+      - name: 💾 Upload Build Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: photo-manager-win-x64
+          path: ./output/win-x64

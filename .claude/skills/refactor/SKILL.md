@@ -32,7 +32,7 @@ Follow this workflow in order:
 
 6. **Update DI registration** if you move or rename services:
    - Check `{Layer}ServiceCollectionExtensions.cs` in the affected project
-   - Verify `App.xaml.cs` chains: `AddInfrastructure()` → `AddDomain()` →
+   - Verify `App.axaml.cs` chains: `AddInfrastructure()` → `AddDomain()` →
      `AddApplication()` → `AddUi()`
 
 7. **Final verification**:
