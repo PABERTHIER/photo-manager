@@ -28,6 +28,22 @@ public class ImageMetadataService(IFileOperationsService fileOperationsService, 
         }
     }
 
+    public void UpdateAssetsFileProperties(List<Asset> assets,
+        IReadOnlyDictionary<string, FileProperties> filePropertiesByName)
+    {
+        ArgumentNullException.ThrowIfNull(filePropertiesByName);
+
+        for (int i = 0; i < assets.Count; i++)
+        {
+            Asset asset = assets[i];
+
+            if (filePropertiesByName.TryGetValue(asset.FileName, out FileProperties fileProperties))
+            {
+                asset.FileProperties = fileProperties;
+            }
+        }
+    }
+
     public void UpdateAssetFileProperties(Asset asset)
     {
         if (!fileOperationsService.FileExists(asset.FullPath))

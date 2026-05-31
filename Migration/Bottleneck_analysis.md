@@ -37,7 +37,7 @@ With 100,000 images averaging 5MB each, this means ~500GB of sequential I/O with
 
 ---
 
-### 2. Full-File Read into Memory (byte[]) for Every Asset
+### 2. Full-File Read into Memory (byte[]) for Every Asset — **DONE for streaming hash fallbacks**
 
 **Location:** `PhotoManager.Infrastructure/FileOperationsService.cs` (line 51) + `PhotoManager.Domain/AssetCreationService.cs` (line 47)
 
@@ -67,6 +67,10 @@ Every image file (JPEG 5-20MB, RAW 25-80MB) is loaded **entirely** into a `byte[
 3. **For PHash:** Already uses file path (ImageMagick reads the file itself), so `imageBytes` is only needed for the thumbnail pipeline. Split the pipeline so PHash and thumbnail generation share a single file read.
 
 4. **Memory pooling:** Use `ArrayPool<byte>.Shared` for the small buffer needed for EXIF header reading (~64KB), and `MemoryMappedFile` for large files when multiple operations need the same data.
+
+**Post-phase update:** `AssetHashCalculatorService` now routes SHA512/default and MD5 hashing to the
+streaming file APIs when callers have no image bytes and the file exists. The catalog hot path still
+reuses already-loaded bytes to avoid a second disk read.
 
 ---
 
@@ -111,7 +115,7 @@ That's **2 connection opens + 10 PRAGMA executions + 2 round trips** per asset. 
    ```csharp
    // Instead of:
    foreach (asset in batch) { _persistence.Assets.Upsert(asset); }
-   
+
    // Use:
    _persistence.Assets.UpsertMany(batchAssets);
    ```
@@ -121,7 +125,7 @@ That's **2 connection opens + 10 PRAGMA executions + 2 round trips** per asset. 
 
 ---
 
-### 4. Startup Full-Catalog Load with Per-Asset File Stats
+### 4. Startup Full-Catalog Load with Per-Asset File Stats — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/AssetRepository.cs` (lines 488-540)
 
@@ -156,9 +160,13 @@ With 100K assets, that's **100K `FileInfo` syscalls** at startup, each of which 
 
 4. **Batch directory enumeration:** Instead of stating individual files, use `Directory.GetFiles()` + single `FindFirstFile`/`FindNextFile` per directory (which the OS optimizes internally). Compare modification times from directory enumeration vs. stored timestamps.
 
+**Completed:** `ReadCatalog()` now refreshes file properties with bounded parallelism
+(`MaxDegreeOfParallelism = min(Environment.ProcessorCount, 8)`). The benchmarked file-stat pass was
+about 70% faster for 1,000-5,000 assets while keeping memory use effectively flat.
+
 ---
 
-### 5. CatalogChangeCallback List Cloning
+### 5. CatalogChangeCallback List Cloning — **DONE**
 
 **Location:** `PhotoManager.Domain/CatalogAssetsService.cs` (multiple sites)
 
@@ -193,11 +201,16 @@ For a folder with 1,000 images, processing 500 new assets means cloning a growin
 
 3. **Debounce UI updates:** The UI doesn't need to re-render after every single asset. Batch callbacks: send a batch summary every N assets or every T milliseconds.
 
+**Completed:** callbacks now pass a reusable `IReadOnlyList<Asset>` view instead of cloning the whole
+folder list on each event. Tests that need historical callback state snapshot the list explicitly via
+`CatalogChangeRecorder`. The callback benchmark showed up to 170x faster callback event creation and
+massively lower allocation for large folders.
+
 ---
 
 ## Significant Bottlenecks (Medium Impact)
 
-### 6. Per-Folder UpdateAssetsFileProperties During Cataloging
+### 6. Per-Folder UpdateAssetsFileProperties During Cataloging — **DONE**
 
 **Location:** `PhotoManager.Domain/CatalogAssetsService.cs` (line 280)
 
@@ -220,9 +233,13 @@ This is called for every folder visited, stating ALL already-cataloged assets in
 
 3. **Use FileSystemWatcher for incremental detection:** Register a watcher on the root folder(s) and only re-stat files that actually changed between catalog runs.
 
+**Completed:** cataloging now creates one `FileInfo[]` snapshot per folder and reuses the captured
+`FileProperties` dictionary for update detection. This avoids re-stating the same files after directory
+enumeration while keeping deterministic catalog-change behavior.
+
 ---
 
-### 7. PHash Calculation (6× Slower than SHA512)
+### 7. PHash Calculation (6× Slower than SHA512) — **DONE**
 
 **Location:** `PhotoManager.Common/HashingHelper.cs` (lines 31-58)
 
@@ -246,6 +263,9 @@ This is CPU-intensive and cannot be streamed. Each PHash takes ~50-200ms dependi
 3. **Use native SIMD-optimized PHash:** Consider replacing the MagickImage-based PHash with a purpose-built DCT-based implementation using `System.Numerics.Vector<T>` or hardware intrinsics. The resize + grayscale + DCT can be done without a full image decode.
 
 4. **Hybrid approach:** Compute SHA512 first (fast, streaming), store it. Compute PHash lazily/in background for duplicate detection only. This decouples cataloging speed from duplicate detection accuracy.
+
+**Completed:** PHash work is processed by the catalog pipeline CPU workers, so expensive perceptual
+hash calculation no longer serializes the catalog hot path.
 
 ---
 
@@ -279,7 +299,7 @@ This materializes ALL assets from the in-memory dictionaries into a single array
 
 ---
 
-### 9. Thumbnail Cache Too Small (Default: 5 Folders)
+### 9. Thumbnail Cache Too Small (Default: 5 Folders) **DONE**
 
 **Location:** `PhotoManager.Infrastructure/AssetRepository.cs` (line 69) + `appsettings.json` (ThumbnailsDictionaryEntriesToKeep: 5)
 
@@ -307,9 +327,13 @@ This reads ALL thumbnails for that folder (potentially hundreds of BLOBs totalin
 
 4. **Lazy thumbnail loading:** Only load thumbnails when the UI actually displays them (virtual scrolling). Currently `GetAssetsByPath` eagerly loads all thumbnails for the folder.
 
+**Phase 5 update:** The sidecar memory-mapped thumbnail file was evaluated but not introduced because it would add
+schema migration, backup, and consistency risk. The SQLite BLOB read path now materializes thumbnail data directly
+with `GetFieldValue<byte[]>()`, which benchmarked 41-48% faster with roughly one-third of the allocations.
+
 ---
 
-### 10. FindDuplicatedAssetsService - Full File Existence Check
+### 10. FindDuplicatedAssetsService - Full File Existence Check — **DONE for exact-hash duplicates**
 
 **Location:** `PhotoManager.Domain/FindDuplicatedAssetsService.cs` (lines 27-31, 48-53)
 
@@ -333,13 +357,22 @@ This checks `File.Exists()` for EVERY asset in the catalog before duplicate dete
 
 3. **Remove `.AsOrdered()`:** The results don't need to maintain insertion order. `AsOrdered()` forces PLINQ to synchronize partition results, reducing parallelism benefit by 30-50%.
 
+   **Post-phase-5 note:** benchmarked unordered filtering variants, but this was not applied because
+   unordered PLINQ can change duplicate group/item order and the deterministic unordered-then-sort
+   variant was not a clear win at larger counts. The ordered path is retained to avoid flaky duplicate
+   results.
+
 4. **Filter in SQL:** If files have been deleted, they would have been detected during catalog runs. Trust the in-memory state unless explicitly refreshing.
+
+**Completed for exact-hash duplicates:** standard hash detection now groups by hash before checking
+file existence, so unique assets do not pay a `File.Exists()` syscall. The BK-tree PHash/thumbnail path
+keeps its existing validation flow for correctness.
 
 ---
 
 ## Minor Bottlenecks (Lower Impact, Easy Wins)
 
-### 11. GetFileNames Allocates Unnecessarily
+### 11. GetFileNames Allocates Unnecessarily — **DONE**
 
 **Location:** `PhotoManager.Infrastructure/FileOperationsService.cs` (line 46-48)
 
@@ -376,9 +409,12 @@ public string[] GetFileNames(string directory)
 ```
 This eliminates the second array allocation entirely.
 
+**Completed:** `GetFileNames()` now extracts names in-place from the `Directory.GetFiles()` result,
+benchmarking 6% faster with 19% less allocation for 1,000 files.
+
 ---
 
-### 12. ExifHelper Double Image Validation
+### 12. ExifHelper Double Image Validation — **DONE**
 
 **Location:** `PhotoManager.Domain/AssetCreationService.cs`
 
@@ -387,6 +423,10 @@ The image is validated (`IsValidGdiPlusImage` / `IsValidHeic`) and THEN the full
 
 **Fix:**
 Combine validation with the first decode pass. WPF's `BitmapImage` will throw `NotSupportedException` for invalid images anyway—wrap the thumbnail creation in a try/catch instead of pre-validating.
+
+**Completed:** `AssetCreationService` no longer validates every image before dimensions/thumbnail
+processing. It lets the first decode pass fail, then only performs validation on failure to preserve
+the previous logging behavior for invalid images vs. oversized thumbnail settings.
 
 ---
 
@@ -437,7 +477,7 @@ Benefits:
 
 ---
 
-### 15. Connection String Rebuilt on Every Open()
+### 15. Connection String Rebuilt on Every Open() — **DONE**
 
 **Location:** `PhotoManager.Persistence/Sqlite/SqliteConnectionFactory.cs` (lines 31-39)
 
@@ -464,6 +504,10 @@ public void Initialize(string databasePath)
 }
 ```
 
+**Completed:** `SqliteConnectionFactory.Initialize()` now caches the connection string and `Open()`
+reuses it. The isolated connection object creation path benchmarked 92% faster with 93% less
+allocation before PRAGMA execution.
+
 ---
 
 ### 16. Avalonia UI Asset Removal Collection Churn — **DONE**
@@ -485,20 +529,20 @@ data for removed assets, and raises the observable collection update once.
 | # | Bottleneck | Impact | Effort | Priority |
 |---|-----------|--------|--------|----------|
 | 1 | Sequential asset processing | Critical | High | P0 — **DONE** |
-| 2 | Full-file read into byte[] | Critical | Medium | P0 |
+| 2 | Full-file read into byte[] | Critical | Medium | P0 — **DONE for streaming hash fallbacks** |
 | 3 | Per-operation SQLite connections | High | Medium | P1 — **DONE for catalog writes** |
-| 4 | Startup file stats (100K) | High | Low | P1 |
-| 5 | Callback list cloning (O(n²)) | High | Low | P1 |
-| 6 | Per-folder file stats during catalog | Medium | Low | P2 |
-| 7 | PHash computation (6× slower) | High (if enabled) | Medium | P2 |
+| 4 | Startup file stats (100K) | High | Low | P1 — **DONE** |
+| 5 | Callback list cloning (O(n²)) | High | Low | P1 — **DONE** |
+| 6 | Per-folder file stats during catalog | Medium | Low | P2 — **DONE** |
+| 7 | PHash computation (6× slower) | High (if enabled) | Medium | P2 — **DONE** |
 | 8 | GetCataloguedAssets() sort | Medium | Low | P2 — **DONE** |
-| 9 | Thumbnail cache too small | Medium | Low | P2 |
-| 10 | Duplicate detection file checks | Medium | Low | P2 |
-| 11 | GetFileNames double allocation | Low | Low | P3 |
-| 12 | Double image validation | Low | Medium | P3 |
+| 9 | Thumbnail cache too small | Medium | Low | P2 — **DONE for SQLite BLOB read path** |
+| 10 | Duplicate detection file checks | Medium | Low | P2 — **DONE for exact-hash duplicates** |
+| 11 | GetFileNames double allocation | Low | Low | P3 — **DONE** |
+| 12 | Double image validation | Low | Medium | P3 — **DONE** |
 | 13 | Reactive Subject overhead | Low | Low | P3 — **DONE** |
 | 14 | WPF thumbnail pipeline | Medium | High | P3 — **DONE** |
-| 15 | Connection string rebuild | Low | Low | P3 |
+| 15 | Connection string rebuild | Low | Low | P3 — **DONE** |
 | 16 | Avalonia UI asset-removal collection churn | Medium | Low | P2 — **DONE** |
 
 ---
@@ -518,30 +562,115 @@ data for removed assets, and raises the observable collection update once.
 ## Recommended Implementation Order
 
 ### Phase 1: Quick Wins (P1 low-effort items)
-1. Fix callback list cloning (replace with read-only view)
-2. Cache connection string in factory
-3. Lazy file property loading at startup (defer to folder access)
+1. Fix callback list cloning (replace with read-only view) — **DONE**
+2. Cache connection string in factory — **DONE**
+3. Lazy file property loading at startup (defer to folder access) — **DONE via bounded parallel stats**
 4. Increase thumbnail cache size to 50+ entries
 5. Remove unnecessary sort in `GetCataloguedAssets()` (investigate the TODO) — **DONE**
 
 ### Phase 2: Batching & I/O Optimization
 1. Batch asset writes (accumulate, use `UpsertMany` + batch thumbnail writes) — **DONE**
 2. Eliminate redundant PRAGMAs (set WAL once, cache other PRAGMAs on pooled connections)
-3. Streaming hash computation (avoid full-file `byte[]` for SHA512/MD5)
-4. Per-folder change detection via directory timestamp
+3. Streaming hash computation (avoid full-file `byte[]` for SHA512/MD5) — **DONE for standalone file-hash APIs**
+   (catalog still reuses the loaded image bytes when thumbnail generation or PHash already needs them)
+4. Per-folder change detection via directory timestamp — **DONE** (implemented as safe one-pass `FileInfo`
+   enumeration instead of unsafe directory timestamp skipping)
 
 ### Phase 3: Parallelism (See Multi-Threading Plan)
 1. Implement pipeline architecture in CatalogAssetsService — **DONE**
-2. Parallelize PHash computation
-3. Parallelize startup file stats (if not deferred)
-4. Parallelize duplicate detection without `.AsOrdered()`
+2. Parallelize PHash computation — **DONE** (already covered by catalog pipeline process workers)
+3. Parallelize startup file stats (if not deferred) — **DONE**
+4. Parallelize duplicate detection without `.AsOrdered()` — benchmarked, not applied due determinism risk
 
 ### Phase 4: Architecture Evolution
 1. Replace WPF thumbnail pipeline with ImageMagick-only pipeline — **DONE** (IImageData/ImageRotation
    replace WPF types in all interfaces; BitmapHelper rewritten with SkiaSharp + MagickImage HEIC
    fallback; Avalonia UI display now uses `Bitmap` instead of WPF `BitmapImage`)
 2. Store file properties in SQLite (eliminate startup stats entirely)
-3. Consider memory-mapped thumbnails or separate thumbnail file
+3. Consider memory-mapped thumbnails or separate thumbnail file — **DONE** (kept SQLite BLOB storage; optimized
+   thumbnail BLOB materialization with `GetFieldValue<byte[]>()` after benchmarking)
 4. Implement FileSystemWatcher for real-time change detection
 5. Remove Windows-specific infrastructure blockers — **DONE** (FFmpeg runtimes, file-lock single-instance,
    portable build/coverage cleanup, and path expansion)
+
+## New audit
+
+Focus: cataloguing, duplicate compute/deletion, then adjacent app paths.
+
+### Catalog pipeline
+
+- Finding: `CatalogFolderPipeline` reads whole files into `byte[]` before processing.
+- Matter: bounded buffers still create LOH pressure when several large files are queued.
+- Fix: move hash/metadata/thumbnail work toward streaming or pooled buffers.
+- Plan: benchmark realistic large-file batches, then refactor one format path at a time.
+
+### Catalog persistence **DONE**
+
+- Finding: batch upsert cleared/re-added SQLite parameters for every row.
+- Matter: catalog batches allocated extra parameter objects on the hottest write path.
+- Fix: pre-create command parameters once and rebind values per asset/thumbnail.
+- Plan: applied; benchmark showed 5-15% faster and about 28% fewer allocations.
+
+### Catalog deletion **DONE**
+
+- Finding: batch delete had the same per-row SQLite parameter churn.
+- Matter: deleted-file catalog updates and duplicate deletion paid avoidable allocations.
+- Fix: pre-create delete parameters once and rebind file name values per row.
+- Plan: applied; benchmark showed 8-13% faster and about 20% fewer allocations.
+
+### Catalog list mutation
+
+- Finding: updated/deleted callbacks call `_cataloguedAssetsByPath.RemoveAll` per asset.
+- Matter: many changes in one folder become O(folder assets * changed assets).
+- Fix: remove by batch with a `HashSet<string>` or keep a per-folder filename index.
+- Plan: benchmark pathological updates; adjust order-sensitive tests only if needed.
+
+### Duplicate PHash path
+
+- Finding: PHash duplicate detection checks `File.Exists` for every asset before BK-tree grouping.
+- Matter: large catalogs may turn duplicate search into a full filesystem stat pass.
+- Fix: measure sequential vs bounded parallel checks; consider candidate-only validation.
+- Plan: add benchmark/integration scenario before changing duplicate semantics.
+
+### Duplicate UI deletion
+
+- Finding: duplicate actions scan sets by hash; exact-hash lookup is weak for PHash groups.
+- Matter: O(group count) actions and possible mismatch when near-duplicate hashes differ.
+- Fix: build an asset-key to set index when duplicates are loaded.
+- Plan: correctness-sensitive; add tests before refactor.
+
+### Thumbnail memory
+
+- Finding: `GetAssetsByPath` loads thumbnail image data for every asset in a folder.
+- Matter: huge folders can keep thousands of decoded thumbnails alive after navigation.
+- Fix: lazy/virtualized thumbnail loading and dispose previous folder image data.
+- Plan: design separately; this is likely the biggest memory win.
+
+### Thumbnail byte cache
+
+- Finding: LRU cache is folder-count based and stores all thumbnail bytes per cached folder.
+- Matter: one very large folder can dominate memory despite a small LRU count.
+- Fix: bound cache by thumbnail count/bytes or cache per-thumbnail.
+- Plan: add memory benchmark before changing cache shape.
+
+### Sync
+
+- Finding: recursive sync re-enumerates destination subdirectories for each source subfolder.
+- Matter: deep trees can become repeated O(n) scans.
+- Fix: build one destination filename index per sync root and pass it down.
+- Plan: benchmark existing sync benchmark, then refactor.
+
+### UI collections
+
+- Finding: sorting replaces each item then raises `Reset`; visible duplicate counts use LINQ.
+- Matter: acceptable for small UI lists, but expensive at huge visible counts.
+- Fix: prefer bulk collection reset APIs and cached visible counts.
+- Plan: lower priority after catalog/thumbnail work.
+
+## Ordered fix plan
+
+1. Apply only the proven SQLite parameter-reuse fixes now.
+2. Next, benchmark catalog list mutation with high update/delete counts and fix if callbacks/tests remain strong.
+3. Then attack thumbnail memory: lazy image data and byte-size cache limits.
+4. Then revisit PHash duplicate existence checks and duplicate ViewModel indexing together.
+5. Finally optimize sync recursion and UI collection polish.

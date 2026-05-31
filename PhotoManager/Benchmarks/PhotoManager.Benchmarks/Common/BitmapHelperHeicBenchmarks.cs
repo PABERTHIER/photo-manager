@@ -2,7 +2,6 @@
 
 namespace PhotoManager.Benchmarks.Common;
 
-// TODO: Rework file + clean up
 internal static class BitmapHelperHeicBenchmarkHelper
 {
     private static readonly string[] HeicFileNames =

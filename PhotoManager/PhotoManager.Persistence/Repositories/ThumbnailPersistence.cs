@@ -27,14 +27,7 @@ internal sealed class ThumbnailPersistence(ISqliteConnectionFactory connectionFa
                     while (reader.Read())
                     {
                         string fileName = reader.GetString(0);
-                        using (Stream stream = reader.GetStream(1))
-                        {
-                            using (MemoryStream memoryStream = new())
-                            {
-                                stream.CopyTo(memoryStream);
-                                result[fileName] = memoryStream.ToArray();
-                            }
-                        }
+                        result[fileName] = reader.GetFieldValue<byte[]>(1);
                     }
 
                     return result;

@@ -421,7 +421,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -563,7 +563,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -737,7 +737,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -868,7 +868,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1000,7 +1000,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1124,7 +1124,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1215,7 +1215,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1437,7 +1437,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1701,7 +1701,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1919,7 +1919,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2131,7 +2131,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2357,7 +2357,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2566,7 +2566,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2790,7 +2790,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3056,7 +3056,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3277,7 +3277,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3562,7 +3562,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3772,7 +3772,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3982,7 +3982,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4195,7 +4195,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4468,7 +4468,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4919,7 +4919,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -5427,7 +5427,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -5914,7 +5914,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -6334,7 +6334,7 @@ public class ApplicationViewModelCatalogAssetsTests
         Assert.That(assetsFromRepository, Is.Empty);
 
         CancellationTokenSource cancellationTokenSource = new();
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(e =>
@@ -6442,7 +6442,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+        CatalogChangeRecorder firstSyncChanges = [];
 
         await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -6503,7 +6503,7 @@ public class ApplicationViewModelCatalogAssetsTests
         // Second sync (cancelled)
 
         CancellationTokenSource cancellationTokenSource = new();
-        List<CatalogChangeCallbackEventArgs> cancelledChanges = [];
+        CatalogChangeRecorder cancelledChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(e =>
@@ -6602,7 +6602,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+            CatalogChangeRecorder firstSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -6698,7 +6698,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             Directory.Delete(tempDirectory, true);
 
-            List<CatalogChangeCallbackEventArgs> secondSyncChanges = [];
+            CatalogChangeRecorder secondSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(secondSyncChanges.Add);
 
@@ -6811,7 +6811,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+            CatalogChangeRecorder firstSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -6915,7 +6915,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             Directory.Delete(tempDirectory, true);
 
-            List<CatalogChangeCallbackEventArgs> secondSyncChanges = [];
+            CatalogChangeRecorder secondSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(secondSyncChanges.Add);
 
@@ -7010,7 +7010,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7086,7 +7086,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7159,7 +7159,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7230,7 +7230,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7312,7 +7312,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
             CancellationToken cancellationToken = new(true);
 
             Assert.CatchAsync<OperationCanceledException>(async () =>
@@ -7394,7 +7394,7 @@ public class ApplicationViewModelCatalogAssetsTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7579,7 +7579,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7782,7 +7782,7 @@ public class ApplicationViewModelCatalogAssetsTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7974,7 +7974,7 @@ public class ApplicationViewModelCatalogAssetsTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationTokenSource.Token));
@@ -8046,7 +8046,7 @@ public class ApplicationViewModelCatalogAssetsTests
 
             DirectoryHelper.DenyAccess(assetsDirectory);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 

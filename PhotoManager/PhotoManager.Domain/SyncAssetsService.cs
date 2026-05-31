@@ -137,6 +137,21 @@ public class SyncAssetsService(
             allDestinationFileNames.UnionWith(destinationFileNames);
         }
 
-        return [.. newFileNames.Except(allDestinationFileNames)];
+        List<string> result = new(newFileNames.Length);
+        HashSet<string> resultSet = [];
+
+        for (int i = 0; i < newFileNames.Length; i++)
+        {
+            string fileName = newFileNames[i];
+
+            if (!allDestinationFileNames.Contains(fileName) && resultSet.Add(fileName))
+            {
+                result.Add(fileName);
+            }
+        }
+
+        string[] resultArray = new string[result.Count];
+        result.CopyTo(resultArray);
+        return resultArray;
     }
 }

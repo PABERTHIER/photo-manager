@@ -41,7 +41,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], videoFileNames));
         assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>())
@@ -51,19 +51,24 @@ public class CatalogAssetsServiceTests
         assetCreationService.CreateAsset(AssetsDirectory, "broken.mp4", true, true).Returns((Asset?)null);
         assetCreationService.CreateAsset(AssetsDirectory, "created.mp4", true, true).Returns(createdAsset);
 
-        await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
-
-        using (Assert.EnterMultipleScope())
+        try
         {
-            Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetCreated),
-                Is.EqualTo(1));
-            Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetCreated).Asset,
-                Is.SameAs(createdAsset));
-            assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
-            _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
-        }
+            await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
 
-        catalogAssetsService.Dispose();
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetCreated),
+                    Is.EqualTo(1));
+                Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetCreated).Asset,
+                    Is.SameAs(createdAsset));
+                assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
+                _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+            }
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
     }
 
     [Test]
@@ -82,7 +87,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], videoFileNames));
         assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
@@ -93,20 +98,25 @@ public class CatalogAssetsServiceTests
         assetCreationService.CreateAsset(AssetsDirectory, "broken.mp4", true, true).Returns((Asset?)null);
         assetCreationService.CreateAsset(AssetsDirectory, "updated.mp4", true, true).Returns(updatedAsset);
 
-        await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
-
-        using (Assert.EnterMultipleScope())
+        try
         {
-            Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetUpdated),
-                Is.EqualTo(1));
-            Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetUpdated).Asset,
-                Is.SameAs(updatedAsset));
-            assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, "skipped.mp4");
-            assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
-            _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
-        }
+            await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
 
-        catalogAssetsService.Dispose();
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetUpdated),
+                    Is.EqualTo(1));
+                Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetUpdated).Asset,
+                    Is.SameAs(updatedAsset));
+                assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, "skipped.mp4");
+                assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
+                _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+            }
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
     }
 
     [Test]
@@ -127,7 +137,7 @@ public class CatalogAssetsServiceTests
         CancellationTokenSource cancellationTokenSource = new();
         CancellationToken cancellationToken = cancellationTokenSource.Token;
         Action cancel = cancellationTokenSource.Cancel;
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         try
         {
@@ -175,6 +185,134 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
+    public async Task CatalogAssetsAsync_DeletedAssetsAboveBatchLimit_DeletesOnlyRemainingBatch()
+    {
+        const string firstDeletedFileName = "deleted-1.jpg";
+        const string secondDeletedFileName = "deleted-2.jpg";
+        Folder folder = CreateFolder();
+        Asset firstDeletedAsset = CreateAsset(folder, firstDeletedFileName);
+        Asset secondDeletedAsset = CreateAsset(folder, secondDeletedFileName);
+        IAssetRepository assetRepository = CreateAssetRepository(folder, [firstDeletedAsset, secondDeletedAsset]);
+        IFileOperationsService fileOperationsService = CreateFileOperationsService([]);
+        IAssetCreationService assetCreationService = Substitute.For<IAssetCreationService>();
+        IAssetsComparator assetsComparator = Substitute.For<IAssetsComparator>();
+        IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 1);
+        CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
+            assetCreationService, assetsComparator, userConfigurationService);
+        CatalogChangeRecorder catalogChanges = [];
+
+        assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], []));
+        assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>())
+            .Returns([firstDeletedFileName, secondDeletedFileName]);
+        assetRepository.DeleteAssets(AssetsDirectory, Arg.Any<IReadOnlyList<string>>()).Returns([firstDeletedAsset]);
+
+        try
+        {
+            await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetDeleted),
+                    Is.EqualTo(1));
+                Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetDeleted).Asset,
+                    Is.SameAs(firstDeletedAsset));
+                assetRepository.Received(1).DeleteAssets(
+                    AssetsDirectory,
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 1
+                                                               && fileNames[0] == firstDeletedFileName));
+                assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, secondDeletedFileName);
+
+                _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+            }
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_ExistingFolder_UpdatesFilePropertiesFromEnumeratedFileInfos()
+    {
+        const string fileName = "existing.jpg";
+        Folder folder = CreateFolder();
+        Asset existingAsset = CreateAsset(folder, fileName);
+        IAssetRepository assetRepository = CreateAssetRepository(folder, [existingAsset]);
+        IFileOperationsService fileOperationsService = CreateFileOperationsService([fileName]);
+        IAssetCreationService assetCreationService = Substitute.For<IAssetCreationService>();
+        IAssetsComparator assetsComparator = Substitute.For<IAssetsComparator>();
+        IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 10);
+        IImageMetadataService imageMetadataService = Substitute.For<IImageMetadataService>();
+        CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
+            assetCreationService, assetsComparator, userConfigurationService, imageMetadataService);
+
+        assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([fileName], []));
+        assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+
+        try
+        {
+            await catalogAssetsService.CatalogAssetsAsync(_ => { });
+
+            imageMetadataService.Received(1).UpdateAssetsFileProperties(
+                Arg.Is<List<Asset>>(assets => assets.Count == 1 && assets[0] == existingAsset),
+                Arg.Is<IReadOnlyDictionary<string, FileProperties>>(filePropertiesByName =>
+                    ContainsFileProperties(filePropertiesByName, fileName, 3)));
+
+            _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsAsync_FileInfoCannotBeRead_SkipsFileAndLogs()
+    {
+        const string fileName = "missing.jpg";
+        Folder folder = CreateFolder();
+        IAssetRepository assetRepository = CreateAssetRepository(folder, []);
+        IFileOperationsService fileOperationsService = Substitute.For<IFileOperationsService>();
+        IAssetCreationService assetCreationService = Substitute.For<IAssetCreationService>();
+        IAssetsComparator assetsComparator = Substitute.For<IAssetsComparator>();
+        IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 10);
+        IImageMetadataService imageMetadataService = Substitute.For<IImageMetadataService>();
+        CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
+            assetCreationService, assetsComparator, userConfigurationService, imageMetadataService);
+        FileInfo missingFileInfo = new(Path.Combine(AssetsDirectory, fileName));
+
+        fileOperationsService.FolderExists(AssetsDirectory).Returns(true);
+        fileOperationsService.GetFileInfos(AssetsDirectory).Returns([missingFileInfo]);
+        assetsComparator.GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames.Length == 0)).Returns(([], []));
+        assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
+        assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+
+        try
+        {
+            await catalogAssetsService.CatalogAssetsAsync(_ => { });
+
+            imageMetadataService.Received(1).UpdateAssetsFileProperties(
+                Arg.Any<List<Asset>>(),
+                Arg.Is<IReadOnlyDictionary<string, FileProperties>>(filePropertiesByName =>
+                    filePropertiesByName.Count == 0));
+            assetsComparator.Received(1).GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames.Length == 0));
+
+            _testLogger.AssertLogInfos(
+                [$"Skipped file metadata snapshot for {missingFileInfo.FullName}."],
+                typeof(CatalogAssetsService));
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
+    }
+
+    [Test]
     public async Task CatalogAssetsAsync_UpdatedImageCannotBeRecreatedAndDeleteReturnsNull_DoesNotRaiseDeleteChange()
     {
         const string updatedFileName = "updated.jpg";
@@ -188,7 +326,7 @@ public class CatalogAssetsServiceTests
         IUserConfigurationService userConfigurationService = CreateUserConfigurationService(catalogBatchSize: 10);
         CatalogAssetsService catalogAssetsService = CreateService(assetRepository, fileOperationsService,
             assetCreationService, assetsComparator, userConfigurationService);
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>())
             .Returns(call => call.ArgAt<string[]>(0).Contains(updatedFileName) ? ([updatedFileName], []) : ([], []));
@@ -200,17 +338,22 @@ public class CatalogAssetsServiceTests
             .Returns((AssetWithThumbnail?)null);
         assetRepository.DeleteAsset(AssetsDirectory, updatedFileName).Returns((Asset?)null);
 
-        await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
-
-        using (Assert.EnterMultipleScope())
+        try
         {
-            Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetDeleted), Is.False);
-            Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetUpdated), Is.False);
-            assetRepository.Received(1).DeleteAsset(AssetsDirectory, updatedFileName);
-            _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
-        }
+            await catalogAssetsService.CatalogAssetsAsync(catalogChanges.Add);
 
-        catalogAssetsService.Dispose();
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetDeleted), Is.False);
+                Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetUpdated), Is.False);
+                assetRepository.Received(1).DeleteAsset(AssetsDirectory, updatedFileName);
+                _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
+            }
+        }
+        finally
+        {
+            catalogAssetsService.Dispose();
+        }
     }
 
     [Test]
@@ -264,7 +407,7 @@ public class CatalogAssetsServiceTests
                 .Do(call => foldersByPath.Remove(call.Arg<Folder>().Path));
             fileOperationsService.FolderExists(Arg.Any<string>())
                 .Returns(call => Directory.Exists(call.ArgAt<string>(0)));
-            fileOperationsService.GetFileNames(Arg.Any<string>()).Returns([]);
+            fileOperationsService.GetFileInfos(Arg.Any<string>()).Returns([]);
             assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], []));
             assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
             assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
@@ -291,7 +434,7 @@ public class CatalogAssetsServiceTests
             await catalogAssetsService.CatalogAssetsAsync(_ => { });
             await catalogAssetsService.CatalogAssetsAsync(_ => { });
 
-            fileOperationsService.Received(2).GetFileNames(firstSubfolderPath);
+            fileOperationsService.Received(2).GetFileInfos(firstSubfolderPath);
             _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally
@@ -302,9 +445,10 @@ public class CatalogAssetsServiceTests
 
     private CatalogAssetsService CreateService(IAssetRepository assetRepository,
         IFileOperationsService fileOperationsService, IAssetCreationService assetCreationService,
-        IAssetsComparator assetsComparator, IUserConfigurationService userConfigurationService)
+        IAssetsComparator assetsComparator, IUserConfigurationService userConfigurationService,
+        IImageMetadataService? imageMetadataService = null)
     {
-        IImageMetadataService imageMetadataService = Substitute.For<IImageMetadataService>();
+        imageMetadataService ??= Substitute.For<IImageMetadataService>();
         CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
             assetRepository);
 
@@ -340,9 +484,31 @@ public class CatalogAssetsServiceTests
     {
         IFileOperationsService fileOperationsService = Substitute.For<IFileOperationsService>();
         fileOperationsService.FolderExists(AssetsDirectory).Returns(true);
-        fileOperationsService.GetFileNames(AssetsDirectory).Returns(fileNames);
+        fileOperationsService.GetFileInfos(AssetsDirectory).Returns(_ => CreateFileInfos(AssetsDirectory, fileNames));
 
         return fileOperationsService;
+    }
+
+    private static FileInfo[] CreateFileInfos(string directory, string[] fileNames)
+    {
+        FileInfo[] fileInfos = new FileInfo[fileNames.Length];
+
+        for (int i = 0; i < fileNames.Length; i++)
+        {
+            string filePath = Path.Combine(directory, fileNames[i]);
+            Directory.CreateDirectory(directory);
+            File.WriteAllBytes(filePath, [1, 2, 3]);
+            fileInfos[i] = new(filePath);
+        }
+
+        return fileInfos;
+    }
+
+    private static bool ContainsFileProperties(IReadOnlyDictionary<string, FileProperties> filePropertiesByName,
+        string fileName, long expectedSize)
+    {
+        return filePropertiesByName.TryGetValue(fileName, out FileProperties fileProperties)
+               && fileProperties.Size == expectedSize;
     }
 
     private IUserConfigurationService CreateUserConfigurationService(int catalogBatchSize)

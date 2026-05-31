@@ -498,7 +498,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                    imageMetadataServiceMock, assetCreationServiceMock, userConfigurationServiceMock,
                    assetsComparatorMock, _testLogger))
         {
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
             await catalogService.CatalogAssetsAsync(catalogChanges.Add);
         }
 
@@ -686,7 +686,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
@@ -1088,7 +1088,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 

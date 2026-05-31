@@ -21,6 +21,9 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
     private const int HASH_LENGTH = 210;
 
     private Asset[] _assets = null!;
+    private Asset[] _duplicateAssets = null!;
+    private Asset[] _sparseDuplicateAssets = null!;
+    private HashSet<string> _existingFullPaths = null!;
 
     [Params(100, 500, 2000)] public int AssetCount { get; set; }
 
@@ -28,6 +31,14 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
     public void Setup()
     {
         _assets = GenerateAssets(AssetCount);
+        _duplicateAssets = GenerateStandardDuplicateAssets(AssetCount);
+        _sparseDuplicateAssets = GenerateSparseStandardDuplicateAssets(AssetCount);
+        _existingFullPaths = new(AssetCount, StringComparer.Ordinal);
+
+        for (int i = 0; i < _sparseDuplicateAssets.Length; i++)
+        {
+            _existingFullPaths.Add(_sparseDuplicateAssets[i].FullPath);
+        }
     }
 
     [Benchmark(Baseline = true)]
@@ -82,6 +93,159 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
         return [.. bkTree.GetAllGroups().Where(g => g.Count > 1)];
     }
 
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_AsOrdered()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .AsOrdered()
+            .Where(static _ => true)
+            .ToList();
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Unordered()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .Where(static _ => true)
+            .ToList();
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_UnorderedThenSort()
+    {
+        List<Asset> validAssets = _duplicateAssets
+            .AsParallel()
+            .Where(static _ => true)
+            .ToList();
+
+        validAssets.Sort(CompareByFileNameThenFolderPath);
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Sequential()
+    {
+        List<Asset> validAssets = [.. _duplicateAssets.Where(static _ => true)];
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Current_CheckExistsBeforeGrouping()
+    {
+        Asset[] assets = CopyAndSort(_sparseDuplicateAssets);
+        List<Asset> validAssets = new(assets.Length);
+
+        for (int i = 0; i < assets.Length; i++)
+        {
+            Asset asset = assets[i];
+
+            if (_existingFullPaths.Contains(asset.FullPath))
+            {
+                validAssets.Add(asset);
+            }
+        }
+
+        return
+        [
+            .. validAssets
+                .GroupBy(static asset => asset.Hash)
+                .Where(static group => group.Count() > 1)
+                .Select(static group => group.ToList())
+        ];
+    }
+
+    [Benchmark]
+    public List<List<Asset>> StandardDuplicates_Optimized_GroupBeforeExists()
+    {
+        Asset[] assets = CopyAndSort(_sparseDuplicateAssets);
+        Dictionary<string, HashGroup> groupsByHash = new(assets.Length, StringComparer.Ordinal);
+        List<HashGroup> duplicateGroupsInOrder = [];
+
+        for (int i = 0; i < assets.Length; i++)
+        {
+            Asset asset = assets[i];
+
+            if (!groupsByHash.TryGetValue(asset.Hash, out HashGroup? group))
+            {
+                group = new(asset);
+                groupsByHash.Add(asset.Hash, group);
+                continue;
+            }
+
+            if (group.Assets is null)
+            {
+                group.Assets = [group.FirstAsset];
+                duplicateGroupsInOrder.Add(group);
+            }
+
+            group.Assets.Add(asset);
+        }
+
+        List<List<Asset>> duplicateGroups = [];
+
+        for (int i = 0; i < duplicateGroupsInOrder.Count; i++)
+        {
+            List<Asset> group = duplicateGroupsInOrder[i].Assets!;
+
+            List<Asset> existingAssets = new(group.Count);
+
+            for (int j = 0; j < group.Count; j++)
+            {
+                Asset asset = group[j];
+
+                if (_existingFullPaths.Contains(asset.FullPath))
+                {
+                    existingAssets.Add(asset);
+                }
+            }
+
+            if (existingAssets.Count > 1)
+            {
+                duplicateGroups.Add(existingAssets);
+            }
+        }
+
+        return duplicateGroups;
+    }
+
+    private sealed class HashGroup(Asset firstAsset)
+    {
+        public Asset FirstAsset { get; } = firstAsset;
+        public List<Asset>? Assets { get; set; }
+    }
+
     private static Asset[] GenerateAssets(int count)
     {
         // Each "original" has up to 4 near-duplicate variants (distance 5-9, within threshold=10)
@@ -113,6 +277,58 @@ public class FindDuplicatedAssetsServiceGetDuplicatedAssetsBenchmarks
         }
 
         return assets;
+    }
+
+    private static int CompareByFileNameThenFolderPath(Asset left, Asset right)
+    {
+        int fileNameComparison = string.CompareOrdinal(left.FileName, right.FileName);
+
+        return fileNameComparison != 0
+            ? fileNameComparison
+            : string.CompareOrdinal(left.Folder.Path, right.Folder.Path);
+    }
+
+    private static Asset[] GenerateStandardDuplicateAssets(int count)
+    {
+        Asset[] assets = new Asset[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            assets[i] = CreateAsset($"asset_{i:D5}.jpg", $"hash_{i / 5:D5}");
+        }
+
+        return assets;
+    }
+
+    private static Asset[] GenerateSparseStandardDuplicateAssets(int count)
+    {
+        Asset[] assets = new Asset[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            int duplicateGroupIndex = i / 20;
+            int duplicatePosition = i % 20;
+            string hash = duplicatePosition is 0 or 1
+                ? $"duplicate_hash_{duplicateGroupIndex:D5}"
+                : $"unique_hash_{i:D5}";
+
+            assets[i] = CreateAsset($"asset_{i:D5}.jpg", hash);
+        }
+
+        return assets;
+    }
+
+    private static Asset[] CopyAndSort(Asset[] assets)
+    {
+        Asset[] sortedAssets = new Asset[assets.Length];
+
+        for (int i = 0; i < assets.Length; i++)
+        {
+            sortedAssets[i] = assets[i];
+        }
+
+        Array.Sort(sortedAssets, CompareByFileNameThenFolderPath);
+        return sortedAssets;
     }
 
     /// <summary>

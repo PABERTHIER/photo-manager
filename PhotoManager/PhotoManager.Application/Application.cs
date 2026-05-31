@@ -66,7 +66,18 @@ public class Application(
 
     public Folder[] GetSubFolders(Folder parentFolder) => assetRepository.GetSubFolders(parentFolder);
 
-    public List<string> GetRecentTargetPaths() => [.. assetRepository.GetRecentTargetPaths()];
+    public List<string> GetRecentTargetPaths()
+    {
+        string[] recentTargetPaths = assetRepository.GetRecentTargetPaths();
+        List<string> result = new(recentTargetPaths.Length);
+
+        for (int i = 0; i < recentTargetPaths.Length; i++)
+        {
+            result.Add(recentTargetPaths[i]);
+        }
+
+        return result;
+    }
 
     public int GetAssetsCounter() => assetRepository.GetAssetsCounter();
 

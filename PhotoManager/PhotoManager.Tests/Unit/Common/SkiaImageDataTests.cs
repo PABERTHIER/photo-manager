@@ -1,6 +1,8 @@
 ﻿using SkiaSharp;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 
 namespace PhotoManager.Tests.Unit.Common;
 
@@ -181,6 +183,40 @@ public class SkiaImageDataTests
     }
 
     [Test]
+    public void ToByteArray_JpegWithUnsupportedColorType_ReturnsEmptyArray()
+    {
+        // Rg88 color type causes SKImage.Encode to return null for JPEG
+        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
+        {
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Jpeg);
+
+                Assert.That(result, Is.Empty);
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
+    public void ToByteArray_PngWithUnsupportedColorType_ReturnsEmptyArray()
+    {
+        // Rg88 color type causes SKImage.Encode to return null for PNG
+        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
+        {
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Png);
+
+                Assert.That(result, Is.Empty);
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
     public void ToStream_JpegFormat_ReturnsReadableStream()
     {
         using (SkiaImageData imageData = CreateTestImageData())
@@ -307,6 +343,32 @@ public class SkiaImageDataTests
 
         _testLogger!.AssertLogExceptions(
             [new ArgumentException("Value cannot be empty. (Parameter 'buffer')")], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytes_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
+    {
+        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 1*1/200 = 0
+        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
+
+        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
+            SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
+
+        Assert.That(exception.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedBytes_WithResizeInvalidBuffer_ThrowsException()
+    {
+        byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
+
+        Assert.Throws<ArgumentNullException>(() =>
+            SkiaImageData.FromEncodedBytes(invalidBuffer, ImageRotation.Rotate0, 100, 100, _testLogger!));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
 
     [Test]
@@ -454,12 +516,16 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytes_WithResizeInvalidBuffer_ThrowsException()
+    public void FromEncodedBytesWithRotation_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
     {
-        byte[] invalidBuffer = [0x00, 0x01, 0x02, 0x03];
+        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 0
+        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
 
-        Assert.Throws<ArgumentNullException>(() =>
-            SkiaImageData.FromEncodedBytes(invalidBuffer, ImageRotation.Rotate0, 100, 100, _testLogger!));
+        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
+            SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
+
+        Assert.That(exception.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
@@ -579,46 +645,21 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytes_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
+    public void FromEncodedStreamWithRotation_Rotate0_ReturnsUnrotatedImageWithRotate0()
     {
-        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 1*1/200 = 0
-        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
+        byte[] buffer = File.ReadAllBytes(filePath);
 
-        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
-            SkiaImageData.FromEncodedBytes(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
-
-        Assert.That(exception.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
-
-        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
-    }
-
-    [Test]
-    public void FromEncodedBytesWithRotation_WithResizeCausingZeroWidth_ThrowsNotSupportedException()
-    {
-        // Create a 1x200 image so that CalculateTargetDimensions(0, 1, 1, 200) yields width = 0
-        byte[] buffer = CreateNarrowTallImageBuffer(1, 200);
-
-        NotSupportedException exception = Assert.Throws<NotSupportedException>(() =>
-            SkiaImageData.FromEncodedBytesWithRotation(buffer, ImageRotation.Rotate0, 0, 1, _testLogger!))!;
-
-        Assert.That(exception.Message,
-            Is.EqualTo("No imaging component suitable to complete this operation was found."));
-
-        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
-    }
-
-    [Test]
-    public void ToByteArray_JpegWithUnsupportedColorType_ReturnsEmptyArray()
-    {
-        // Rg88 color type causes SKImage.Encode to return null for JPEG
-        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
+        using (MemoryStream stream = new(buffer))
         {
-            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            using (SkiaImageData imageData = SkiaImageData.FromEncodedStreamWithRotation(stream, ImageRotation.Rotate0))
             {
-                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Jpeg);
-
-                Assert.That(result, Is.Empty);
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(imageData.Width, Is.EqualTo(PixelWidthAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Height, Is.EqualTo(PixelHeightAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                }
 
                 _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
             }
@@ -626,20 +667,95 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void ToByteArray_PngWithUnsupportedColorType_ReturnsEmptyArray()
+    public void FromEncodedStreamWithRotation_Rotate90_ReturnsRotatedImageWithSwappedDimensionsAndRotate0()
     {
-        // Rg88 color type causes SKImage.Encode to return null for PNG
-        using (SKBitmap bitmap = new(2, 2, SKColorType.Rg88, SKAlphaType.Premul))
-        {
-            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
-            {
-                byte[] result = imageData.ToByteArray(ImageEncodingFormat.Png);
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
+        byte[] buffer = File.ReadAllBytes(filePath);
 
-                Assert.That(result, Is.Empty);
+        using (MemoryStream stream = new(buffer))
+        {
+            using (SkiaImageData imageData =
+                   SkiaImageData.FromEncodedStreamWithRotation(stream, ImageRotation.Rotate90))
+            {
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(imageData.Width, Is.EqualTo(PixelHeightAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Height, Is.EqualTo(PixelWidthAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                }
 
                 _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
             }
         }
+    }
+
+    [Test]
+    public void FromEncodedStreamWithRotation_Rotate180_ReturnsSameDimensionsWithRotate0()
+    {
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        using (MemoryStream stream = new(buffer))
+        {
+            using (SkiaImageData imageData =
+                   SkiaImageData.FromEncodedStreamWithRotation(stream, ImageRotation.Rotate180))
+            {
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(imageData.Width, Is.EqualTo(PixelWidthAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Height, Is.EqualTo(PixelHeightAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                }
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
+    public void FromEncodedStreamWithRotation_Rotate270_ReturnsRotatedImageWithSwappedDimensionsAndRotate0()
+    {
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_8_JPEG);
+        byte[] buffer = File.ReadAllBytes(filePath);
+
+        using (MemoryStream stream = new(buffer))
+        {
+            using (SkiaImageData imageData =
+                   SkiaImageData.FromEncodedStreamWithRotation(stream, ImageRotation.Rotate270))
+            {
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(imageData.Width, Is.EqualTo(PixelHeightAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Height, Is.EqualTo(PixelWidthAsset.IMAGE_8_JPEG));
+                    Assert.That(imageData.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                }
+
+                _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+            }
+        }
+    }
+
+    [Test]
+    public void FromEncodedStreamWithRotation_NullStream_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            SkiaImageData.FromEncodedStreamWithRotation(null!, ImageRotation.Rotate0));
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
+    }
+
+    [Test]
+    public void FromEncodedStreamWithRotation_InvalidStream_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+        {
+            using (MemoryStream stream = new([0x00, 0x01, 0x02, 0x03]))
+            {
+                SkiaImageData.FromEncodedStreamWithRotation(stream, ImageRotation.Rotate0);
+            }
+        });
+
+        _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
     }
 
     private static SkiaImageData CreateTestImageData()

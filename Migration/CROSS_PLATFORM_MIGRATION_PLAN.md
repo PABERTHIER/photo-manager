@@ -394,6 +394,9 @@ This is the most complex change. Current `BitmapHelper` creates WPF `BitmapImage
 | `GifBitmapEncoder` | `SKImage.Encode(SKEncodedImageFormat.Gif, 100)` |
 | `BitmapFrame.Create(image)` | `SKImage.FromBitmap(bitmap)` |
 
+**DONE update:** viewer/DHash image loading now detects HEIC with a small header read and decodes
+non-HEIC images directly from a stream, avoiding full managed file-buffer allocation on the hot path.
+
 #### 1.4 Rewrite `ExifHelper.cs` EXIF Reading **DONE**
 
 | Current WPF API | Replacement |
@@ -749,6 +752,7 @@ strategy:
 | Rotation enum | **Custom `ImageRotation` in Domain** | Domain should not depend on any UI framework; clean architecture | Keep WPF `Rotation` (blocks cross-platform), use `int` degrees (less type-safe) |
 | Notifications | **Removed unused UWP package** | No production code used toast APIs | `DesktopNotifications` package if notifications are reintroduced |
 | Catalog thumbnail generation — **DONE** | **`IThumbnailGenerator` backed by Magick.NET** | Keeps catalog image processing cross-platform and independent from Avalonia UI types; enables the multi-threaded catalog pipeline | Reuse Avalonia display types in Domain (cross-layer leak), keep per-file persistence (slower) |
+| Thumbnail persistence — **DONE** | **Keep SQLite BLOB storage and optimize BLOB reads** | Avoids a risky schema/file-format split while improving cached-folder thumbnail loading after benchmarking | Memory-mapped sidecar file (more migration, backup, and consistency risk) |
 | Migration approach | **New project alongside old** | Allows incremental migration; old UI stays functional until new one is ready | In-place rewrite (risky, breaks `main`), branch-based rewrite (merge conflicts) |
 
 ---

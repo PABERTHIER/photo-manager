@@ -244,7 +244,7 @@ public class ApplicationViewModel : BaseViewModel
             }
         }
 
-        _observableAssets = [.. filteredAssets];
+        _observableAssets = CreateSortableObservableCollection(filteredAssets);
 
         if (_observableAssets.Count == 0)
         {
@@ -262,7 +262,7 @@ public class ApplicationViewModel : BaseViewModel
 
         if (initialObservableAssetsCount > 0 && assets.Length > 0)
         {
-            HashSet<Asset> assetsToRemove = [.. assets];
+            HashSet<Asset> assetsToRemove = CreateAssetSet(assets);
             SortableObservableCollection<Asset> remainingAssets = [];
             List<Asset> removedAssets = [];
 
@@ -499,4 +499,28 @@ public class ApplicationViewModel : BaseViewModel
 
     private void RemoveFolder(Folder folder) =>
         FolderRemoved?.Invoke(this, new() { Folder = folder });
+
+    private static SortableObservableCollection<Asset> CreateSortableObservableCollection(List<Asset> values)
+    {
+        SortableObservableCollection<Asset> result = [];
+
+        for (int i = 0; i < values.Count; i++)
+        {
+            result.Add(values[i]);
+        }
+
+        return result;
+    }
+
+    private static HashSet<Asset> CreateAssetSet(Asset[] values)
+    {
+        HashSet<Asset> result = new(values.Length);
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            result.Add(values[i]);
+        }
+
+        return result;
+    }
 }

@@ -127,7 +127,9 @@ public class SqliteBackupServiceTests
                 {
                     using FileStream lockStream = new(snapshotPath, FileMode.Open, FileAccess.Read,
                         FileShare.ReadWrite);
+                    // ReSharper disable once AccessToDisposedClosure
                     lockAcquired.Set();
+                    // ReSharper disable once AccessToDisposedClosure
                     releaseLock.Wait(lockToken);
                     return;
                 }

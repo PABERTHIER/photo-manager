@@ -42,7 +42,20 @@ public partial class SyncAssetsWindow : Window
     private void Initialize()
     {
         SyncAssetsConfiguration configuration = ViewModel.GetProcessConfiguration();
-        ViewModel.Definitions = [.. configuration.Definitions];
+        ViewModel.Definitions = CreateObservableCollection(configuration.Definitions);
+    }
+
+    private static ObservableCollection<SyncAssetsDirectoriesDefinition> CreateObservableCollection(
+        List<SyncAssetsDirectoriesDefinition> definitions)
+    {
+        ObservableCollection<SyncAssetsDirectoriesDefinition> result = [];
+
+        for (int i = 0; i < definitions.Count; i++)
+        {
+            result.Add(definitions[i]);
+        }
+
+        return result;
     }
 
     private void InitializeComponent()

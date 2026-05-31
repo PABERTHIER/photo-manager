@@ -85,6 +85,54 @@ public class HashingHelperTests
     }
 
     [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, Hashes.IMAGE_1_90_DEG_JPG)]
+    [TestCase(FileNames.IMAGE_8_JPEG, Hashes.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, Hashes.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF, Hashes.HOMER_GIF)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC)]
+    public void CalculateHash_ValidImagePath_ReturnsCorrectHash(string fileName, string expectedHash)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        string hash = HashingHelper.CalculateHash(filePath);
+
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+    }
+
+    [Test]
+    public void CalculateHash_EmptyFile_ReturnsDefaultHash()
+    {
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+        string filePath = Path.Combine(testDirectory, "empty-sha512.bin");
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+            File.WriteAllBytes(filePath, []);
+
+            string hash = HashingHelper.CalculateHash(filePath);
+
+            Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+            Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+            Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
+
+            _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    [Test]
     [TestCase(FileNames.IMAGE_1_JPG, PHashes.IMAGE_1_JPG)]
     [TestCase(FileNames.IMAGE_1_90_DEG_JPG, PHashes.IMAGE_1_90_DEG_JPG)]
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, PHashes.IMAGE_1_180_DEG_JPG)]
@@ -326,6 +374,54 @@ public class HashingHelperTests
         Assert.That(hash.ToLower(), Is.EqualTo(MD5Hashes.EMPTY_IMAGE));
 
         _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, MD5Hashes.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, MD5Hashes.IMAGE_1_90_DEG_JPG)]
+    [TestCase(FileNames.IMAGE_8_JPEG, MD5Hashes.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, MD5Hashes.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF, MD5Hashes.HOMER_GIF)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, MD5Hashes.IMAGE_11_90_DEG_HEIC)]
+    public void CalculateMD5Hash_ValidImagePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        string md5Hash = HashingHelper.CalculateMD5Hash(filePath);
+
+        Assert.That(string.IsNullOrWhiteSpace(md5Hash), Is.False);
+        Assert.That(md5Hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
+        Assert.That(md5Hash, Is.EqualTo(expectedHash));
+
+        _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+    }
+
+    [Test]
+    public void CalculateMD5Hash_EmptyFile_ReturnsDefaultMd5Hash()
+    {
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+        string filePath = Path.Combine(testDirectory, "empty-md5.bin");
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+            File.WriteAllBytes(filePath, []);
+
+            string hash = HashingHelper.CalculateMD5Hash(filePath);
+
+            Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+            Assert.That(hash, Has.Length.EqualTo(MD5Hashes.LENGTH));
+            Assert.That(hash.ToLower(), Is.EqualTo(MD5Hashes.EMPTY_IMAGE));
+
+            _testLogger!.AssertLogExceptions([], typeof(HashingHelperTests));
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
     }
 
     [Test]

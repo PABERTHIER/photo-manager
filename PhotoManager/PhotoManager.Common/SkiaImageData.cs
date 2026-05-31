@@ -178,6 +178,31 @@ public sealed class SkiaImageData : IImageData
     }
 
     /// <summary>
+    /// Creates a rotated <see cref="SkiaImageData"/> from an encoded image stream.
+    /// </summary>
+    public static SkiaImageData FromEncodedStreamWithRotation(Stream stream, ImageRotation rotation)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        SKBitmap decoded = SKBitmap.Decode(stream);
+
+        if (rotation == ImageRotation.Rotate0)
+        {
+            return new(decoded, ImageRotation.Rotate0);
+        }
+
+        try
+        {
+            SKBitmap rotated = ApplyRotation(decoded, rotation);
+            return new(rotated, ImageRotation.Rotate0);
+        }
+        finally
+        {
+            decoded.Dispose();
+        }
+    }
+
+    /// <summary>
     /// Creates an empty <see cref="SkiaImageData"/> representing a failed or missing image.
     /// </summary>
     public static SkiaImageData Empty()

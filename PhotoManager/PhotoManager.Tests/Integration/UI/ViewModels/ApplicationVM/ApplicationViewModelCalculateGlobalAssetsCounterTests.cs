@@ -469,25 +469,35 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     {
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
+        object eventsLock = new();
 
         _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
-            notifyPropertyChangedEvents.Add(e.PropertyName!);
-            applicationViewModelInstances.Add((ApplicationViewModel)sender!);
+            lock (eventsLock)
+            {
+                notifyPropertyChangedEvents.Add(e.PropertyName!);
+                applicationViewModelInstances.Add((ApplicationViewModel)sender!);
+            }
         };
 
         List<Folder> folderAddedEvents = [];
 
         _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
-            folderAddedEvents.Add(e.Folder);
+            lock (eventsLock)
+            {
+                folderAddedEvents.Add(e.Folder);
+            }
         };
 
         List<Folder> folderRemovedEvents = [];
 
         _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
-            folderRemovedEvents.Add(e.Folder);
+            lock (eventsLock)
+            {
+                folderRemovedEvents.Add(e.Folder);
+            }
         };
 
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);

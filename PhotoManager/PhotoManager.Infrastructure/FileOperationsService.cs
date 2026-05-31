@@ -10,14 +10,18 @@ public class FileOperationsService(
 {
     public DirectoryInfo[] GetSubDirectories(string directoryPath)
     {
-        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()
-            .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)];
+        DirectoryInfo[] directories = new DirectoryInfo(directoryPath).GetDirectories();
+        Array.Sort(directories,
+            static (left, right) => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase));
+        return directories;
     }
 
     public DirectoryInfo[] GetRecursiveSubDirectories(string directoryPath)
     {
-        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories("*", SearchOption.AllDirectories)
-            .OrderBy(d => d.FullName, StringComparer.OrdinalIgnoreCase)];
+        DirectoryInfo[] directories = new DirectoryInfo(directoryPath).GetDirectories("*", SearchOption.AllDirectories);
+        Array.Sort(directories,
+            static (left, right) => string.Compare(left.FullName, right.FullName, StringComparison.OrdinalIgnoreCase));
+        return directories;
     }
 
     public void CreateDirectory(string directory)
@@ -44,8 +48,19 @@ public class FileOperationsService(
 
     public string[] GetFileNames(string directory)
     {
-        string[] files = Directory.GetFiles(directory);
-        return [.. files.Select(f => Path.GetFileName(f))];
+        string[] fileNames = Directory.GetFiles(directory);
+
+        for (int i = 0; i < fileNames.Length; i++)
+        {
+            fileNames[i] = Path.GetFileName(fileNames[i]);
+        }
+
+        return fileNames;
+    }
+
+    public FileInfo[] GetFileInfos(string directory)
+    {
+        return new DirectoryInfo(directory).GetFiles();
     }
 
     public byte[] GetFileBytes(string filePath)

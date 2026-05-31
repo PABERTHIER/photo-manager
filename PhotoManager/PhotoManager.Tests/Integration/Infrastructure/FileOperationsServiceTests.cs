@@ -205,6 +205,18 @@ public class FileOperationsServiceTests
     }
 
     [Test]
+    public void GetFileInfos_ReturnsFileInfos()
+    {
+        FileInfo[] fileInfos = _fileOperationsService!.GetFileInfos(_assetsDirectory!);
+
+        Assert.That(fileInfos, Has.Length.GreaterThanOrEqualTo(2));
+        Assert.That(fileInfos.Select(static fileInfo => fileInfo.Name), Does.Contain(FileNames.IMAGE_2_JPG));
+        Assert.That(fileInfos.Select(static fileInfo => fileInfo.Name), Does.Contain(FileNames.IMAGE_1_JPG));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+    }
+
+    [Test]
     public void GetFileBytes_FileExists_ReturnsFileBytes()
     {
         string testFilePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
