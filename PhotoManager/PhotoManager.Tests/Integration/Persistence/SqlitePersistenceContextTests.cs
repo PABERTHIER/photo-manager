@@ -332,11 +332,13 @@ public class SqlitePersistenceContextTests
         Folder folder = _sqlitePersistenceContext.Folders.Insert(@"C:\Photos");
         Asset asset1 = CreateAsset(folder);
         Asset asset2 = CreateAsset(folder, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG);
+        Asset asset3 = CreateAsset(folder, FileNames.HOMER_GIF, Hashes.HOMER_GIF, true, true);
         byte[] thumbnailData1 = [1, 2, 3];
         byte[] thumbnailData2 = [4, 5, 6];
+        byte[] thumbnailData3 = [7, 8, 9];
 
         _sqlitePersistenceContext.UpsertAssetsWithThumbnails(
-            [new(asset1, thumbnailData1), new(asset2, thumbnailData2)]);
+            [new(asset1, thumbnailData1), new(asset2, thumbnailData2),  new(asset3, thumbnailData3)]);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id);
 
@@ -344,8 +346,10 @@ public class SqlitePersistenceContextTests
         {
             Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset1.FileName), Is.Not.Null);
             Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset2.FileName), Is.Not.Null);
+            Assert.That(_sqlitePersistenceContext.Assets.Get(folder.Id, asset3.FileName), Is.Not.Null);
             Assert.That(thumbnails[asset1.FileName], Is.EqualTo(thumbnailData1));
             Assert.That(thumbnails[asset2.FileName], Is.EqualTo(thumbnailData2));
+            Assert.That(thumbnails[asset3.FileName], Is.EqualTo(thumbnailData3));
         }
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
@@ -888,7 +892,7 @@ public class SqlitePersistenceContextTests
     }
 
     private static Asset CreateAsset(Folder folder, string fileName = FileNames.IMAGE_1_JPG,
-        string hash = Hashes.IMAGE_1_JPG)
+        string hash = Hashes.IMAGE_1_JPG, bool isCorrupted = false, bool isRotated = false)
     {
         return new()
         {
@@ -911,8 +915,8 @@ public class SqlitePersistenceContextTests
             Hash = hash,
             Metadata = new()
             {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
+                Corrupted = new() { IsTrue = isCorrupted, Message = isCorrupted ? "The asset is corrupted" : null },
+                Rotated = new() { IsTrue = isRotated, Message = isRotated ? "The asset has been rotated" : null }
             }
         };
     }
