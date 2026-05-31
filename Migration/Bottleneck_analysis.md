@@ -592,3 +592,85 @@ data for removed assets, and raises the observable collection update once.
 4. Implement FileSystemWatcher for real-time change detection
 5. Remove Windows-specific infrastructure blockers — **DONE** (FFmpeg runtimes, file-lock single-instance,
    portable build/coverage cleanup, and path expansion)
+
+## New audit
+
+Focus: cataloguing, duplicate compute/deletion, then adjacent app paths.
+
+### Catalog pipeline
+
+- Finding: `CatalogFolderPipeline` reads whole files into `byte[]` before processing.
+- Matter: bounded buffers still create LOH pressure when several large files are queued.
+- Fix: move hash/metadata/thumbnail work toward streaming or pooled buffers.
+- Plan: benchmark realistic large-file batches, then refactor one format path at a time.
+
+### Catalog persistence **DONE**
+
+- Finding: batch upsert cleared/re-added SQLite parameters for every row.
+- Matter: catalog batches allocated extra parameter objects on the hottest write path.
+- Fix: pre-create command parameters once and rebind values per asset/thumbnail.
+- Plan: applied; benchmark showed 5-15% faster and about 28% fewer allocations.
+
+### Catalog deletion **DONE**
+
+- Finding: batch delete had the same per-row SQLite parameter churn.
+- Matter: deleted-file catalog updates and duplicate deletion paid avoidable allocations.
+- Fix: pre-create delete parameters once and rebind file name values per row.
+- Plan: applied; benchmark showed 8-13% faster and about 20% fewer allocations.
+
+### Catalog list mutation
+
+- Finding: updated/deleted callbacks call `_cataloguedAssetsByPath.RemoveAll` per asset.
+- Matter: many changes in one folder become O(folder assets * changed assets).
+- Fix: remove by batch with a `HashSet<string>` or keep a per-folder filename index.
+- Plan: benchmark pathological updates; adjust order-sensitive tests only if needed.
+
+### Duplicate PHash path
+
+- Finding: PHash duplicate detection checks `File.Exists` for every asset before BK-tree grouping.
+- Matter: large catalogs may turn duplicate search into a full filesystem stat pass.
+- Fix: measure sequential vs bounded parallel checks; consider candidate-only validation.
+- Plan: add benchmark/integration scenario before changing duplicate semantics.
+
+### Duplicate UI deletion
+
+- Finding: duplicate actions scan sets by hash; exact-hash lookup is weak for PHash groups.
+- Matter: O(group count) actions and possible mismatch when near-duplicate hashes differ.
+- Fix: build an asset-key to set index when duplicates are loaded.
+- Plan: correctness-sensitive; add tests before refactor.
+
+### Thumbnail memory
+
+- Finding: `GetAssetsByPath` loads thumbnail image data for every asset in a folder.
+- Matter: huge folders can keep thousands of decoded thumbnails alive after navigation.
+- Fix: lazy/virtualized thumbnail loading and dispose previous folder image data.
+- Plan: design separately; this is likely the biggest memory win.
+
+### Thumbnail byte cache
+
+- Finding: LRU cache is folder-count based and stores all thumbnail bytes per cached folder.
+- Matter: one very large folder can dominate memory despite a small LRU count.
+- Fix: bound cache by thumbnail count/bytes or cache per-thumbnail.
+- Plan: add memory benchmark before changing cache shape.
+
+### Sync
+
+- Finding: recursive sync re-enumerates destination subdirectories for each source subfolder.
+- Matter: deep trees can become repeated O(n) scans.
+- Fix: build one destination filename index per sync root and pass it down.
+- Plan: benchmark existing sync benchmark, then refactor.
+
+### UI collections
+
+- Finding: sorting replaces each item then raises `Reset`; visible duplicate counts use LINQ.
+- Matter: acceptable for small UI lists, but expensive at huge visible counts.
+- Fix: prefer bulk collection reset APIs and cached visible counts.
+- Plan: lower priority after catalog/thumbnail work.
+
+## Ordered fix plan
+
+1. Apply only the proven SQLite parameter-reuse fixes now.
+2. Next, benchmark catalog list mutation with high update/delete counts and fix if callbacks/tests remain strong.
+3. Then attack thumbnail memory: lazy image data and byte-size cache limits.
+4. Then revisit PHash duplicate existence checks and duplicate ViewModel indexing together.
+5. Finally optimize sync recursion and UI collection polish.

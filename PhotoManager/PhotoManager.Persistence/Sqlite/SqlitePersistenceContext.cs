@@ -142,24 +142,56 @@ public sealed class SqlitePersistenceContext(
                     assetCommand.Transaction = transaction;
                     assetCommand.CommandText = AssetPersistence.UPSERT_SQL;
 
+                    SqliteParameter assetFolderId = assetCommand.Parameters.Add("$folderId", SqliteType.Text);
+                    SqliteParameter assetFileName = assetCommand.Parameters.Add("$fileName", SqliteType.Text);
+                    SqliteParameter imageRotation = assetCommand.Parameters.Add("$imageRotation", SqliteType.Integer);
+                    SqliteParameter pixelWidth = assetCommand.Parameters.Add("$pixelWidth", SqliteType.Integer);
+                    SqliteParameter pixelHeight = assetCommand.Parameters.Add("$pixelHeight", SqliteType.Integer);
+                    SqliteParameter thumbWidth =
+                        assetCommand.Parameters.Add("$thumbnailPixelWidth", SqliteType.Integer);
+                    SqliteParameter thumbHeight =
+                        assetCommand.Parameters.Add("$thumbnailPixelHeight", SqliteType.Integer);
+                    SqliteParameter thumbCreated =
+                        assetCommand.Parameters.Add("$thumbnailCreationDateTime", SqliteType.Integer);
+                    SqliteParameter hash = assetCommand.Parameters.Add("$hash", SqliteType.Text);
+                    SqliteParameter corruptedMessage =
+                        assetCommand.Parameters.Add("$corruptedMessage", SqliteType.Text);
+                    SqliteParameter isCorrupted = assetCommand.Parameters.Add("$isCorrupted", SqliteType.Integer);
+                    SqliteParameter rotatedMessage = assetCommand.Parameters.Add("$rotatedMessage", SqliteType.Text);
+                    SqliteParameter isRotated = assetCommand.Parameters.Add("$isRotated", SqliteType.Integer);
+
                     using (SqliteCommand thumbnailCommand = connection.CreateCommand())
                     {
                         thumbnailCommand.Transaction = transaction;
                         thumbnailCommand.CommandText = ThumbnailPersistence.UPSERT_SQL;
+                        SqliteParameter thumbnailFolderId =
+                            thumbnailCommand.Parameters.Add("$folderId", SqliteType.Text);
+                        SqliteParameter thumbnailFileName =
+                            thumbnailCommand.Parameters.Add("$fileName", SqliteType.Text);
+                        SqliteParameter thumbnailData = thumbnailCommand.Parameters.Add("$data", SqliteType.Blob);
 
                         for (int i = 0; i < assetsWithThumbnails.Count; i++)
                         {
-                            AssetWithThumbnail assetWithThumbnail = assetsWithThumbnails[i];
-                            assetCommand.Parameters.Clear();
-                            AssetPersistence.BindAsset(assetCommand, assetWithThumbnail.Asset);
+                            (Asset asset, byte[] bytes) = assetsWithThumbnails[i];
+
+                            assetFolderId.Value = asset.FolderId;
+                            assetFileName.Value = asset.FileName;
+                            imageRotation.Value = (int)asset.ImageRotation;
+                            pixelWidth.Value = asset.Pixel.Asset.Width;
+                            pixelHeight.Value = asset.Pixel.Asset.Height;
+                            thumbWidth.Value = asset.Pixel.Thumbnail.Width;
+                            thumbHeight.Value = asset.Pixel.Thumbnail.Height;
+                            thumbCreated.Value = asset.ThumbnailCreationDateTime.Ticks;
+                            hash.Value = asset.Hash;
+                            corruptedMessage.Value = (object?)asset.Metadata.Corrupted.Message ?? DBNull.Value;
+                            isCorrupted.Value = asset.Metadata.Corrupted.IsTrue ? 1 : 0;
+                            rotatedMessage.Value = (object?)asset.Metadata.Rotated.Message ?? DBNull.Value;
+                            isRotated.Value = asset.Metadata.Rotated.IsTrue ? 1 : 0;
                             assetCommand.ExecuteNonQuery();
 
-                            thumbnailCommand.Parameters.Clear();
-                            ThumbnailPersistence.BindUpsert(
-                                thumbnailCommand,
-                                assetWithThumbnail.Asset.FolderId,
-                                assetWithThumbnail.Asset.FileName,
-                                assetWithThumbnail.ThumbnailData);
+                            thumbnailFolderId.Value = asset.FolderId;
+                            thumbnailFileName.Value = asset.FileName;
+                            thumbnailData.Value = bytes;
                             thumbnailCommand.ExecuteNonQuery();
                         }
                     }
@@ -211,25 +243,30 @@ public sealed class SqlitePersistenceContext(
                     thumbnailCommand.CommandText =
                         "DELETE FROM Thumbnails WHERE FolderId = $folderId AND FileName = $fileName;";
 
+                    SqliteParameter thumbnailFolderId =
+                        thumbnailCommand.Parameters.Add("$folderId", SqliteType.Text);
+                    SqliteParameter thumbnailFileName =
+                        thumbnailCommand.Parameters.Add("$fileName", SqliteType.Text);
+                    thumbnailFolderId.Value = folderId;
+
                     using (SqliteCommand assetCommand = connection.CreateCommand())
                     {
                         assetCommand.Transaction = transaction;
                         assetCommand.CommandText =
                             "DELETE FROM Assets WHERE FolderId = $folderId AND FileName = $fileName;";
+                        SqliteParameter assetFolderId = assetCommand.Parameters.Add("$folderId", SqliteType.Text);
+                        SqliteParameter assetFileName = assetCommand.Parameters.Add("$fileName", SqliteType.Text);
+                        assetFolderId.Value = folderId;
 
                         for (int i = 0; i < fileNames.Count; i++)
                         {
                             string fileName = fileNames[i];
                             ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
 
-                            thumbnailCommand.Parameters.Clear();
-                            thumbnailCommand.Parameters.AddWithValue("$folderId", folderId);
-                            thumbnailCommand.Parameters.AddWithValue("$fileName", fileName);
+                            thumbnailFileName.Value = fileName;
                             thumbnailCommand.ExecuteNonQuery();
 
-                            assetCommand.Parameters.Clear();
-                            assetCommand.Parameters.AddWithValue("$folderId", folderId);
-                            assetCommand.Parameters.AddWithValue("$fileName", fileName);
+                            assetFileName.Value = fileName;
                             assetCommand.ExecuteNonQuery();
                         }
                     }
