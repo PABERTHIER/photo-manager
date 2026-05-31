@@ -338,7 +338,7 @@ public class SqlitePersistenceContextTests
         byte[] thumbnailData3 = [7, 8, 9];
 
         _sqlitePersistenceContext.UpsertAssetsWithThumbnails(
-            [new(asset1, thumbnailData1), new(asset2, thumbnailData2),  new(asset3, thumbnailData3)]);
+            [new(asset1, thumbnailData1), new(asset2, thumbnailData2), new(asset3, thumbnailData3)]);
 
         Dictionary<string, byte[]> thumbnails = _sqlitePersistenceContext.Thumbnails.GetByFolderId(folder.Id);
 
@@ -416,13 +416,13 @@ public class SqlitePersistenceContextTests
         Asset asset = CreateAsset(folder);
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
-        _sqlitePersistenceContext!.UpsertAssetWithThumbnail(asset, [1, 2, 3]));
+            _sqlitePersistenceContext!.UpsertAssetWithThumbnail(asset, [1, 2, 3]));
 
         Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
 
         _testLogger.AssertLogExceptions(
-        [new InvalidOperationException(expectedMessage)],
-        typeof(SqlitePersistenceContext));
+            [new InvalidOperationException(expectedMessage)],
+            typeof(SqlitePersistenceContext));
     }
 
     [Test]
@@ -880,12 +880,12 @@ public class SqlitePersistenceContextTests
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandText = $"""
-                                      CREATE TRIGGER {triggerName}
-                                      BEFORE {operation} ON {tableName}
-                                      BEGIN
-                                          SELECT RAISE(ABORT, '{message}');
-                                      END;
-                                      """;
+                                       CREATE TRIGGER {triggerName}
+                                       BEFORE {operation} ON {tableName}
+                                       BEGIN
+                                           SELECT RAISE(ABORT, '{message}');
+                                       END;
+                                       """;
                 command.ExecuteNonQuery();
             }
         }
