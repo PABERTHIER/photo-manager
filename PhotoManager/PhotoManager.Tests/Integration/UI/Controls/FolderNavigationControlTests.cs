@@ -1,4 +1,7 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,9 +9,9 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Control
-// The goal is to test what does FolderNavigationControl
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class FolderNavigationControlTests
 {
     private string? _assetsDirectory;
@@ -23,6 +26,7 @@ public class FolderNavigationControlTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -67,11 +71,14 @@ public class FolderNavigationControlTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -86,7 +93,7 @@ public class FolderNavigationControlTests
     }
 
     [Test]
-    public void FoldersTreeViewSelectedItemChanged_SelectedPathIsNotSameAsSource_UpdatesSelectedPath()
+    public async Task FoldersTreeViewSelectedItemChanged_SelectedPathIsNotSameAsSource_UpdatesSelectedPath()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
@@ -110,14 +117,14 @@ public class FolderNavigationControlTests
         CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
         // First SelectedItemChanged
-        string newSelectedPath = SelectedItemChanged(folder2);
+        string newSelectedPath = await SelectedItemChanged(folder2);
 
         Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
         CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
         // Second SelectedItemChanged
-        newSelectedPath = SelectedItemChanged(folder1);
+        newSelectedPath = await SelectedItemChanged(folder1);
 
         Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
@@ -137,7 +144,7 @@ public class FolderNavigationControlTests
     }
 
     [Test]
-    public void FoldersTreeViewSelectedItemChanged_SelectedPathIsSameAsSource_UpdatesSelectedPath()
+    public async Task FoldersTreeViewSelectedItemChanged_SelectedPathIsSameAsSource_UpdatesSelectedPath()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string otherDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
@@ -161,14 +168,14 @@ public class FolderNavigationControlTests
         CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
         // First SelectedItemChanged
-        string newSelectedPath = SelectedItemChanged(folder2);
+        string newSelectedPath = await SelectedItemChanged(folder2);
 
         Assert.That(newSelectedPath, Is.EqualTo(otherDirectory));
 
         CheckAfterChanges(_folderNavigationViewModel, assetsDirectory, null, folder1, null, []);
 
         // Second SelectedItemChanged
-        newSelectedPath = SelectedItemChanged(folder1);
+        newSelectedPath = await SelectedItemChanged(folder1);
 
         Assert.That(newSelectedPath, Is.EqualTo(assetsDirectory));
 
@@ -401,11 +408,53 @@ public class FolderNavigationControlTests
         Assert.That(folderNavigationViewModelInstance.TargetPath, Is.Null);
     }
 
-    private string SelectedItemChanged(Folder selectedFolder)
+    private Task<string> SelectedItemChanged(Folder selectedFolder)
     {
-        string newSelectedPath = selectedFolder.Path;
-        FolderSelected?.Invoke(this, EventArgs.Empty);
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            FolderNavigationControl control = new()
+            {
+                DataContext = _folderNavigationViewModel,
+                SelectedPath = string.Empty
+            };
+            control.FolderSelected += (_, _) => FolderSelected?.Invoke(this, EventArgs.Empty);
+            control.Initialize();
 
-        return newSelectedPath;
+            TreeView treeView = control.FindControl<TreeView>("FoldersTreeView")
+                ?? throw new InvalidOperationException("FoldersTreeView was not found.");
+            TreeViewItem item = FindFolderItem(treeView.Items, selectedFolder)
+                ?? throw new InvalidOperationException("Folder item was not found.");
+
+            item.IsSelected = true;
+            treeView.SelectedItem = item;
+            Dispatcher.UIThread.RunJobs();
+
+            return control.SelectedPath;
+        });
+    }
+
+    private static TreeViewItem? FindFolderItem(IEnumerable<object?> items, Folder selectedFolder)
+    {
+        foreach (object? item in items)
+        {
+            if (item is not TreeViewItem treeViewItem)
+            {
+                continue;
+            }
+
+            if (treeViewItem.Tag is Folder folder && folder.Id == selectedFolder.Id)
+            {
+                return treeViewItem;
+            }
+
+            TreeViewItem? childItem = FindFolderItem(treeViewItem.Items, selectedFolder);
+
+            if (childItem != null)
+            {
+                return childItem;
+            }
+        }
+
+        return null;
     }
 }

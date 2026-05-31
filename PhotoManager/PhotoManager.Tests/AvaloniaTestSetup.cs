@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Headless;
+using Avalonia.Threading;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
 
 namespace PhotoManager.Tests;
@@ -79,6 +81,108 @@ public static class AvaloniaTestSetup
         });
 
         return taskCompletionSource.Task;
+    }
+
+    public static Task RunOnUiThreadAsync(Func<Task> action)
+    {
+        EnsureInitialized();
+
+        if (_workItems == null)
+        {
+            throw new InvalidOperationException("Avalonia test application has not been initialized.");
+        }
+
+        TaskCompletionSource taskCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _workItems.Add(() =>
+        {
+            try
+            {
+                WaitForUiTask(action());
+                taskCompletionSource.SetResult();
+            }
+            catch (Exception ex)
+            {
+                taskCompletionSource.SetException(ex);
+            }
+        });
+
+        return taskCompletionSource.Task;
+    }
+
+    public static Task<T> RunOnUiThreadAsync<T>(Func<T> action)
+    {
+        EnsureInitialized();
+
+        if (_workItems == null)
+        {
+            throw new InvalidOperationException("Avalonia test application has not been initialized.");
+        }
+
+        TaskCompletionSource<T> taskCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _workItems.Add(() =>
+        {
+            try
+            {
+                taskCompletionSource.SetResult(action());
+            }
+            catch (Exception ex)
+            {
+                taskCompletionSource.SetException(ex);
+            }
+        });
+
+        return taskCompletionSource.Task;
+    }
+
+    public static Task<T> RunOnUiThreadAsync<T>(Func<Task<T>> action)
+    {
+        EnsureInitialized();
+
+        if (_workItems == null)
+        {
+            throw new InvalidOperationException("Avalonia test application has not been initialized.");
+        }
+
+        TaskCompletionSource<T> taskCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _workItems.Add(() =>
+        {
+            try
+            {
+                Task<T> task = action();
+                WaitForUiTask(task);
+                taskCompletionSource.SetResult(task.GetAwaiter().GetResult());
+            }
+            catch (Exception ex)
+            {
+                taskCompletionSource.SetException(ex);
+            }
+        });
+
+        return taskCompletionSource.Task;
+    }
+
+    public static object? InvokeNonPublicInstanceMethod(object target, string methodName, params object?[] parameters)
+    {
+        MethodInfo methodInfo = target.GetType().GetMethod(
+            methodName,
+            BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new MissingMethodException(target.GetType().FullName, methodName);
+
+        return methodInfo.Invoke(target, parameters);
+    }
+
+    private static void WaitForUiTask(Task task)
+    {
+        while (!task.IsCompleted)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(1);
+        }
+
+        task.GetAwaiter().GetResult();
     }
 
     private static void RunUiThread(ManualResetEventSlim initializedEvent, BlockingCollection<Action> workItems)

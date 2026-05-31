@@ -13,26 +13,6 @@ public class AssetCreationService(
     ILogger<AssetCreationService> logger)
     : IAssetCreationService
 {
-    public AssetCreationService(
-        IAssetRepository assetRepository,
-        IFileOperationsService fileOperationsService,
-        IImageProcessingService imageProcessingService,
-        IImageMetadataService imageMetadataService,
-        IAssetHashCalculatorService assetHashCalculatorService,
-        IUserConfigurationService userConfigurationService,
-        ILogger<AssetCreationService> logger)
-        : this(
-            assetRepository,
-            fileOperationsService,
-            imageProcessingService,
-            imageMetadataService,
-            assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
-            userConfigurationService,
-            logger)
-    {
-    }
-
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false,
         bool skipCatalogCheck = false)
     {

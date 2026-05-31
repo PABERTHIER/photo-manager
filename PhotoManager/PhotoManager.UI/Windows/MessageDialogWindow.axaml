@@ -14,6 +14,7 @@
             Foreground="{DynamicResource PhotoManagerForegroundBrush}"
             TextWrapping="Wrap" />
         <Button
+            x:Name="OkButton"
             Grid.Row="1"
             Classes="action"
             Width="100"

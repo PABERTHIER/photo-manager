@@ -1,4 +1,6 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,9 +16,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowToggleImageViewTests
 {
     private string? _assetsDirectory;
@@ -36,6 +38,7 @@ public class MainWindowToggleImageViewTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -220,11 +223,14 @@ public class MainWindowToggleImageViewTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -273,7 +279,7 @@ public class MainWindowToggleImageViewTests
         string expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset1.FileName} - image 1 of 4 - sorted by file name ascending";
 
-        string result = ToggleImageView();
+        string result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -333,7 +339,7 @@ public class MainWindowToggleImageViewTests
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -400,7 +406,7 @@ public class MainWindowToggleImageViewTests
 
         _applicationViewModel!.SetViewerPosition(3);
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -478,7 +484,7 @@ public class MainWindowToggleImageViewTests
 
         _applicationViewModel!.GoToPreviousAsset();
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -606,7 +612,7 @@ public class MainWindowToggleImageViewTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
 
-            string result = ToggleImageView();
+            string result = await ToggleImageView();
 
             Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -654,7 +660,7 @@ public class MainWindowToggleImageViewTests
             expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            result = ToggleImageView();
+            result = await ToggleImageView();
 
             Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -959,16 +965,33 @@ public class MainWindowToggleImageViewTests
         Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
     }
 
-    private string ToggleImageView()
+    private async Task<string> ToggleImageView()
     {
         _applicationViewModel!.ChangeAppMode();
-        return ShowImage();
+        return await ShowImage();
     }
 
-    private string ShowImage()
+    private Task<string> ShowImage()
     {
-        return _applicationViewModel!.AppMode == AppMode.Viewer
-            ? "ShowImage for ViewerUserControl"
-            : "ShowImage for ThumbnailsUserControl";
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            if (_applicationViewModel!.AppMode == AppMode.Viewer)
+            {
+                ViewerUserControl viewerUserControl = new()
+                {
+                    DataContext = _applicationViewModel
+                };
+
+                viewerUserControl.ShowImage();
+                Image image = viewerUserControl.FindControl<Image>("Image")
+                    ?? throw new InvalidOperationException("Image was not found.");
+                Assert.That(image.Source, _applicationViewModel.CurrentAsset == null ? Is.Null : Is.Not.Null);
+                return "ShowImage for ViewerUserControl";
+            }
+
+            ThumbnailsUserControl thumbnailsUserControl = new();
+            thumbnailsUserControl.ScrollSelectedThumbnailIntoView();
+            return "ShowImage for ThumbnailsUserControl";
+        });
     }
 }

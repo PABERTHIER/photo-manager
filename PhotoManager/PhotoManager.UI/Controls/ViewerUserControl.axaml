@@ -20,6 +20,7 @@
         </Image>
         <!-- Image_PointerPressed will open the image in thumbnail mode in the MainWindow -->
         <Border
+            x:Name="ImageContainer"
             Grid.Row="0"
             Grid.RowSpan="3"
             Grid.Column="1"
@@ -31,6 +32,7 @@
                 RenderOptions.BitmapInterpolationMode="HighQuality" />
         </Border>
         <Button
+            x:Name="CloseButton"
             Grid.Row="0"
             Grid.Column="2"
             Classes="action"
@@ -40,6 +42,7 @@
             Content="X"
             Click="CloseButton_Click" />
         <Button
+            x:Name="PreviousButton"
             Grid.Row="1"
             Grid.Column="0"
             Classes="viewer-nav"
@@ -48,6 +51,7 @@
             IsEnabled="{Binding CanGoToPreviousAsset}"
             Click="PreviousButton_Click" />
         <Button
+            x:Name="NextButton"
             Grid.Row="1"
             Grid.Column="2"
             Classes="viewer-nav"

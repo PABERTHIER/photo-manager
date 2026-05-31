@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain.Pipeline;
-
-namespace PhotoManager.Tests.Unit.Domain;
+﻿namespace PhotoManager.Tests.Unit.Domain;
 
 [TestFixture]
 public class CatalogAssetsServiceTests
@@ -453,7 +451,7 @@ public class CatalogAssetsServiceTests
             assetRepository);
 
         return new(assetRepository, fileOperationsService, imageMetadataService, assetCreationService,
-            userConfigurationService, assetsComparator, _testLogger, catalogFolderPipeline);
+            userConfigurationService, assetsComparator, catalogFolderPipeline, _testLogger);
     }
 
     private IAssetRepository CreateAssetRepository(Folder folder, Asset[] cataloguedAssets)

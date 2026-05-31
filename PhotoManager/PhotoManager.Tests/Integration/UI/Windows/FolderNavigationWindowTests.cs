@@ -1,5 +1,9 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
+using PhotoManager.UI.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
@@ -14,9 +18,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does FolderNavigationWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class FolderNavigationWindowTests
 {
     private string? _assetsDirectory;
@@ -25,6 +29,8 @@ public class FolderNavigationWindowTests
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private TestableAssetRepository? _testableAssetRepository;
+    private FolderNavigationWindow? _window;
+    private FolderNavigationControl? _folderTreeView;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -34,6 +40,7 @@ public class FolderNavigationWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -166,9 +173,16 @@ public class FolderNavigationWindowTests
     [TearDown]
     public void TearDown()
     {
+        if (_window != null)
+        {
+            AvaloniaTestSetup.RunOnUiThreadAsync(() => _window.Close()).GetAwaiter().GetResult();
+        }
+
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _folderNavigationViewModel = null;
+        _window = null;
+        _folderTreeView = null;
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -204,11 +218,14 @@ public class FolderNavigationWindowTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -695,7 +712,7 @@ public class FolderNavigationWindowTests
 
     [Test]
     public void
-        Constructor_SourceFolderIsNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_ThrowsNullReferenceException()
+        Constructor_SourceFolderIsNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_DoesNotThrow()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -715,9 +732,7 @@ public class FolderNavigationWindowTests
         string expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => Init());
-
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.DoesNotThrow(() => Init());
 
         CheckAfterChanges(
             _folderNavigationViewModel!,
@@ -1767,26 +1782,42 @@ public class FolderNavigationWindowTests
 
     private string Init()
     {
-        return _folderNavigationViewModel!.LastSelectedFolder != null
-            ? _folderNavigationViewModel!.LastSelectedFolder.Path
-            : _folderNavigationViewModel!.SourceFolder.Path;
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            _window = new(_folderNavigationViewModel!, NullLogger<FolderNavigationWindow>.Instance);
+            _folderTreeView = _window.FindControl<FolderNavigationControl>("FolderTreeView")
+                ?? throw new InvalidOperationException("FolderTreeView was not found.");
+
+            return _folderTreeView.SelectedPath;
+        }).GetAwaiter().GetResult();
     }
 
     private void FolderSelected(string selectedPath)
     {
-        _folderNavigationViewModel!.TargetPath = selectedPath;
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            _folderTreeView!.SelectedPath = selectedPath;
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(
+                _window!,
+                "FolderTreeView_FolderSelected",
+                _folderTreeView,
+                EventArgs.Empty);
+        }).GetAwaiter().GetResult();
     }
 
     private void Confirm()
     {
-        if (_folderNavigationViewModel!.CanConfirm)
-        {
-            _folderNavigationViewModel!.HasConfirmed = true;
-        }
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(_window!, "Confirm"))
+            .GetAwaiter()
+            .GetResult();
     }
 
     private void Cancel()
     {
-        _folderNavigationViewModel!.HasConfirmed = false;
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(_window!, "Cancel"))
+            .GetAwaiter()
+            .GetResult();
     }
 }

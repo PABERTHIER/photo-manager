@@ -81,9 +81,10 @@ public class AssetCreationServiceTests
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
-        _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, thumbnailGenerator, _userConfigurationService,
-            _testLogger!);
+        _assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            thumbnailGenerator,
+            _userConfigurationService, _testLogger!);
     }
 
     [Test]
@@ -1915,6 +1916,7 @@ public class AssetCreationServiceTests
 
         AssetCreationService assetCreationService = new(assetRepositoryMock, fileOperationsService,
             imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
             _userConfigurationService!, _testLogger!);
 
         Asset? asset = assetCreationService.CreateAsset(_assetsDirectory!, assetName);
@@ -2298,9 +2300,10 @@ public class AssetCreationServiceTests
             new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            _testLogger!);
+        _assetCreationService = new(_testableAssetRepository, fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, _testLogger!);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 

@@ -277,16 +277,14 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
         };
     }
 
-    // TODO: To remove when v3 is out, would need to clean up DB
-    // Maps DB integer to ImageRotation, supporting both legacy (0-3) and new (0,90,180,270) formats
     private static ImageRotation MapRotationFromDb(int value)
     {
         return value switch
         {
             0 => ImageRotation.Rotate0,
-            1 or 90 => ImageRotation.Rotate90,
-            2 or 180 => ImageRotation.Rotate180,
-            3 or 270 => ImageRotation.Rotate270,
+            90 => ImageRotation.Rotate90,
+            180 => ImageRotation.Rotate180,
+            270 => ImageRotation.Rotate270,
             _ => ImageRotation.Rotate0
         };
     }

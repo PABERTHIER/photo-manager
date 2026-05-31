@@ -24,6 +24,7 @@
             Foreground="{DynamicResource PhotoManagerForegroundBrush}"
             Text="{Binding DuplicatedAssetSets.Count, StringFormat='Duplicated sets: {0}'}" />
         <Button
+            x:Name="RefreshButton"
             Grid.Row="0"
             Grid.Column="1"
             Classes="action"
@@ -36,12 +37,14 @@
             Orientation="Horizontal"
             Spacing="8">
             <Button
+                x:Name="DeleteAllNotExemptedButton"
                 Classes="action"
                 MinWidth="260"
                 Margin="8"
                 Content="Delete every duplicates linked to exempt folder"
                 Click="DeleteAllNotExemptedButton_Click" />
             <Button
+                x:Name="OpenInFileManagerButton"
                 Classes="action"
                 MinWidth="160"
                 Margin="8"
@@ -79,6 +82,7 @@
             Grid.ColumnSpan="3"
             Margin="8,0,12,12"
             AutoGenerateColumns="False"
+            CanUserResizeColumns="True"
             GridLinesVisibility="All"
             IsReadOnly="True"
             ItemsSource="{Binding CurrentDuplicatedAssetSet}"

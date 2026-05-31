@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain.Pipeline;
-
-namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class CatalogFolderPipelineTests

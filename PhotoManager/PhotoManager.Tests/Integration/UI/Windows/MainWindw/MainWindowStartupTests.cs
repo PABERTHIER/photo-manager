@@ -237,6 +237,88 @@ public class MainWindowStartupTests
     }
 
     [Test]
+    public async Task GoToFolderAsync_SelectedPath_LoadsAssetsAndSelectsFirstAsset()
+    {
+        const string initialFolderPath = @"C:\Photos";
+        const string selectedFolderPath = @"C:\Photos\Child";
+        IApplication application = CreateApplication(initialFolderPath);
+        Asset firstAsset = CreateAsset(selectedFolderPath, "first.jpg");
+        Asset secondAsset = CreateAsset(selectedFolderPath, "second.jpg");
+        application.GetAssetsByPath(selectedFolderPath).Returns([firstAsset, secondAsset]);
+        ApplicationViewModel applicationViewModel = new(application);
+
+        await AvaloniaTestSetup.RunOnUiThreadAsync(async () =>
+        {
+            ThumbnailsUserControl control = new()
+            {
+                DataContext = applicationViewModel
+            };
+
+            try
+            {
+                await control.GoToFolderAsync(application, selectedFolderPath);
+                ListBox listBox = control.FindControl<ListBox>("ThumbnailsListBox")
+                    ?? throw new InvalidOperationException("ThumbnailsListBox was not found.");
+                Asset[] expectedAssets = [firstAsset, secondAsset];
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(applicationViewModel.ObservableAssets, Is.EqualTo(expectedAssets));
+                    Assert.That(applicationViewModel.CurrentFolderPath, Is.EqualTo(selectedFolderPath));
+                    Assert.That(applicationViewModel.ViewerPosition, Is.Zero);
+                    Assert.That(listBox.ItemsSource, Is.SameAs(applicationViewModel.ObservableAssets));
+                }
+            }
+            finally
+            {
+                control.DataContext = null;
+            }
+        });
+    }
+
+    [Test]
+    public async Task NextButton_Click_CurrentAsset_ShowsNextImage()
+    {
+        const string initialFolderPath = @"C:\Photos";
+        IApplication application = CreateApplication(initialFolderPath);
+        Asset firstAsset = CreateAsset(initialFolderPath, "first.jpg");
+        Asset secondAsset = CreateAsset(initialFolderPath, "second.jpg");
+        application.LoadBitmapImageFromPath(firstAsset.FullPath, firstAsset.ImageRotation)
+            .Returns(SkiaImageData.Empty());
+        application.LoadBitmapImageFromPath(secondAsset.FullPath, secondAsset.ImageRotation)
+            .Returns(SkiaImageData.Empty());
+        ApplicationViewModel applicationViewModel = new(application);
+        applicationViewModel.SetAssets(initialFolderPath, [firstAsset, secondAsset]);
+
+        await AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            ViewerUserControl control = new()
+            {
+                DataContext = applicationViewModel
+            };
+
+            try
+            {
+                Button nextButton = control.FindControl<Button>("NextButton")
+                    ?? throw new InvalidOperationException("NextButton was not found.");
+
+                nextButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(applicationViewModel.ViewerPosition, Is.EqualTo(1));
+                    Assert.That(applicationViewModel.CurrentAsset, Is.SameAs(secondAsset));
+                    Assert.That(control.FindControl<Image>("Image")?.Source, Is.Not.Null);
+                }
+            }
+            finally
+            {
+                control.DataContext = null;
+            }
+        });
+    }
+
+    [Test]
     public async Task Initialize_RootAndChildFolders_SelectsRequestedPath()
     {
         const string initialFolderPath = @"C:\Photos";

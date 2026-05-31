@@ -10,9 +10,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsse
 
 namespace PhotoManager.Tests.Unit.UI.Windows.FindDuplicatedAssetsWindw;
 
-// For STA concern and resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does FindDuplicatedAssetsWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTests
 {
     private string? _assetsDirectory;
@@ -245,11 +245,14 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());

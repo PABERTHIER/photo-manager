@@ -29,8 +29,8 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         IAssetCreationService assetCreationService,
         IUserConfigurationService userConfigurationService,
         IAssetsComparator assetsComparator,
-        ILogger<CatalogAssetsService> logger,
-        CatalogFolderPipeline? catalogFolderPipeline = null)
+        CatalogFolderPipeline catalogFolderPipeline,
+        ILogger<CatalogAssetsService> logger)
     {
         _assetRepository = assetRepository;
         _fileOperationsService = fileOperationsService;
@@ -38,8 +38,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         _assetCreationService = assetCreationService;
         _userConfigurationService = userConfigurationService;
         _assetsComparator = assetsComparator;
-        _catalogFolderPipeline = catalogFolderPipeline ?? new(fileOperationsService, assetCreationService,
-            assetRepository);
+        _catalogFolderPipeline = catalogFolderPipeline;
         _logger = logger;
 
         _assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(_ => UpdateAssets());

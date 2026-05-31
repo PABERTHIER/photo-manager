@@ -8,6 +8,7 @@ global using PhotoManager.Common;
 global using PhotoManager.Common.Imaging;
 global using PhotoManager.Domain;
 global using PhotoManager.Domain.Interfaces;
+global using PhotoManager.Domain.Pipeline;
 global using PhotoManager.Domain.UserConfigurationSettings;
 global using PhotoManager.Infrastructure;
 global using PhotoManager.Persistence.Sqlite;
