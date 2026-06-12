@@ -136,7 +136,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -234,7 +234,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             FileProperties = new()
             {
                 Size = expectedFileSize,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -325,7 +325,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.NON_EXISTENT_IMAGE_HEIC,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -412,7 +412,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -501,7 +501,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,

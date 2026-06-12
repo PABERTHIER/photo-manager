@@ -137,18 +137,26 @@ public class SingleInstanceServiceTests
     [Test]
     public void TryAcquire_LockDirectoryCannotBeCreated_ThrowsIOException()
     {
-        // Use an invalid path that will always fail on Windows
-        // The colon is invalid in directory names (except as drive letter prefix)
-        string lockFilePath = Path.Combine(
-            TestContext.CurrentContext.TestDirectory, "Invalid:Dir", "PhotoManager.lock");
+        // The lock directory cannot be created below an existing file, on any OS
+        string blockingFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "BlockingFile.tmp");
+        File.WriteAllText(blockingFilePath, string.Empty);
 
-        Assert.Throws<IOException>(() =>
+        string lockFilePath = Path.Combine(blockingFilePath, "SubDir", "PhotoManager.lock");
+
+        try
         {
-            using (SingleInstanceService service = new(lockFilePath))
+            Assert.Throws<IOException>(() =>
             {
-                service.TryAcquire();
-            }
-        });
+                using (SingleInstanceService service = new(lockFilePath))
+                {
+                    service.TryAcquire();
+                }
+            });
+        }
+        finally
+        {
+            File.Delete(blockingFilePath);
+        }
     }
 
     [Test]

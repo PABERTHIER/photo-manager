@@ -8,6 +8,33 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class ImageProcessingServiceTests
 {
+    // Skia encodes thumbnails slightly differently on macOS (arm64 build); values come from the macOS pipeline.
+    // The duplicate files share the bytes of their original, so they share its macOS thumbnail size as well.
+    // Files missing from this map either match the Windows/Linux size or have not been measured on macOS yet.
+    private static readonly Dictionary<string, int> _macOsImageByteSizes = new()
+    {
+        { FileNames.IMAGE_1_JPG, 2029 },
+        { FileNames.IMAGE_1_DUPLICATE_JPG, 2029 },
+        { FileNames.IMAGE_1_180_DEG_JPG, 2038 },
+        { FileNames.IMAGE_2_JPG, 2049 },
+        { FileNames.IMAGE_2_DUPLICATED_JPG, 2049 },
+        { FileNames.IMAGE_3_JPG, 2048 },
+        { FileNames.IMAGE_4_JPG, 2039 },
+        { FileNames.IMAGE_5_JPG, 2046 },
+        { FileNames.IMAGE_6_JPG, 2055 },
+        { FileNames.IMAGE_7_JPG, 2029 },
+        { FileNames.IMAGE_8_JPEG, 2048 },
+        { FileNames.IMAGE_9_PNG, 12835 },
+        { FileNames.IMAGE_9_DUPLICATE_PNG, 12835 },
+        { FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, 3049 },
+        { FileNames.HOMER_GIF, 6107 }
+    };
+
+    private static int GetExpectedImageByteSize(string fileName, int imageByteSize) =>
+        OperatingSystem.IsMacOS() && _macOsImageByteSizes.TryGetValue(fileName, out int macOsImageByteSize)
+            ? macOsImageByteSize
+            : imageByteSize;
+
     private string? _assetsDirectory;
 
     private ImageProcessingService? _imageProcessingService;
@@ -495,9 +522,11 @@ public class ImageProcessingServiceTests
     public void LoadBitmapThumbnailImage_ValidImage_ReturnsValidBitmapImage(
         string fileName, ImageRotation rotation, int imageByteSize, string additionalPath)
     {
+        imageByteSize = GetExpectedImageByteSize(fileName, imageByteSize);
+
         string folderPath = string.IsNullOrEmpty(additionalPath)
             ? _assetsDirectory!
-            : Path.Combine(_assetsDirectory!, additionalPath);
+            : Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
 
         string filePath = Path.Combine(folderPath, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -646,9 +675,11 @@ public class ImageProcessingServiceTests
     public void LoadBitmapThumbnailImage_StoredThumbnailWithRotation_ReturnsValidBitmapImage(
         string fileName, ImageRotation rotation, int imageByteSize, string additionalPath)
     {
+        imageByteSize = GetExpectedImageByteSize(fileName, imageByteSize);
+
         string folderPath = string.IsNullOrEmpty(additionalPath)
             ? _assetsDirectory!
-            : Path.Combine(_assetsDirectory!, additionalPath);
+            : Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
 
         string filePath = Path.Combine(folderPath, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);

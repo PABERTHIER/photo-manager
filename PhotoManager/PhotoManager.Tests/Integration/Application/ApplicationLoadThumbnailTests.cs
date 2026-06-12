@@ -171,7 +171,7 @@ public class ApplicationLoadThumbnailTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
@@ -250,7 +250,7 @@ public class ApplicationLoadThumbnailTests
     public async Task LoadThumbnail_CataloguedAssets_SetsBitmapImageToTheAsset()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -364,7 +364,7 @@ public class ApplicationLoadThumbnailTests
     public void LoadThumbnail_ThumbnailExists_SetsBitmapImageToTheAsset()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -440,7 +440,7 @@ public class ApplicationLoadThumbnailTests
     public void LoadThumbnail_FolderDoesNotExist_DoesNotSetBitmapImageToTheAsset()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -521,7 +521,7 @@ public class ApplicationLoadThumbnailTests
     public void LoadThumbnail_FolderPathIsNull_ThrowsArgumentNullException()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -558,7 +558,7 @@ public class ApplicationLoadThumbnailTests
     public void LoadThumbnail_FileNameIsNull_ThrowsArgumentNullException()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -619,7 +619,7 @@ public class ApplicationLoadThumbnailTests
     public void LoadThumbnail_ConcurrentAccess_BitmapImageAreSetToEachAssetSafely()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

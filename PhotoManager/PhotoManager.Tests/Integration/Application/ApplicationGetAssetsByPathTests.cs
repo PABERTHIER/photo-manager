@@ -224,7 +224,7 @@ public class ApplicationGetAssetsByPathTests
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExists_ReturnsAssetsArray()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -322,9 +322,9 @@ public class ApplicationGetAssetsByPathTests
         string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string testFolderDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
@@ -532,7 +532,7 @@ public class ApplicationGetAssetsByPathTests
     public async Task GetAssetsByPath_ValidDirectoryAndFolderDoesNotExist_AddsFolderAndReturnsAssetsArray()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

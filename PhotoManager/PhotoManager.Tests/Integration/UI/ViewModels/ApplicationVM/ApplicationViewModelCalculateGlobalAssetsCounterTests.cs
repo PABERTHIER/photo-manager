@@ -273,7 +273,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     public void CalculateGlobalAssetsCounter_AssetsExist_SetsGlobalAssetsCounterWording()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -418,7 +418,7 @@ public class ApplicationViewModelCalculateGlobalAssetsCounterTests
     public void CalculateGlobalAssetsCounter_ConcurrentAccess_SetsGlobalAssetsCounterWordingSafely()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 

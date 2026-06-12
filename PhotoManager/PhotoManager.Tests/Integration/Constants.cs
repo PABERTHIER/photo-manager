@@ -379,6 +379,17 @@ public static class Constants
         public const long HOMER_GIF = 64123;
         public const long HOMER_JPG = 6600;
         public const long HOMER_DUPLICATED_JPG = 6600;
+
+        // ffmpeg's bundled macOS build encodes the extracted video first frame slightly differently.
+        // The consts above stay usable in TestCase attributes; runtime expectations must use these values.
+        public const long HOMER_JPG_MAC_OS = 6595;
+
+        public static readonly long HOMER_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_JPG;
+
+        public static readonly long HOMER_DUPLICATED_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_DUPLICATED_JPG;
+
         public const long IMAGE_1_JPG = 29857;
         public const long IMAGE_1_90_DEG_JPG = 31535;
         public const long IMAGE_1_180_DEG_JPG = 31535;

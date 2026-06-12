@@ -260,7 +260,7 @@ public class ApplicationGetAssetsCounterTests
     public void GetAssetsCounter_AssetsExist_ReturnsNumberOfAssets()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -373,7 +373,7 @@ public class ApplicationGetAssetsCounterTests
     public void GetAssetsCounter_ConcurrentAccess_AssetsAreHandledSafely()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

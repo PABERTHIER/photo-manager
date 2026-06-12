@@ -263,7 +263,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = ModificationDate.Default
             },
@@ -295,7 +295,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_DUPLICATED_JPG,
+                Size = FileSize.HOMER_DUPLICATED_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = ModificationDate.Default
             },

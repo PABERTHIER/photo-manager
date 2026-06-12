@@ -79,6 +79,8 @@ public class ApplicationViewModelGetExemptedFolderPathTests
     [TestCase("E:\\Workspace\\PhotoManager\\Test\\test2")]
     public void GetExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue(string expectedExemptedFolderPath)
     {
+        expectedExemptedFolderPath = PathHelper.ToPlatformAbsolutePath(expectedExemptedFolderPath);
+
         ConfigureApplicationViewModel(_assetsDirectory!, expectedExemptedFolderPath);
 
         (

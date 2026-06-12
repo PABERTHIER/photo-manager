@@ -158,7 +158,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     [Test]
     public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmpty_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -294,7 +294,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         RunProcessAsync_SourceIsEmptyAndDestinationIsNotEmpty_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceToCopyPath =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceDirectory = Path.Combine(sourceToCopyPath, Directories.SOURCE);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
@@ -454,7 +454,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -593,7 +593,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     [Test]
     public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyOneNewImage_NotifiesAndStatusChangesAndImageAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -736,9 +736,9 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         RunProcessAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string firstSourceDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string secondSourceDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
         string firstDestinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC_1);
         string secondDestinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC_2);
 
@@ -969,7 +969,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
@@ -1159,7 +1159,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_NotifiesAndStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
@@ -1351,10 +1351,10 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
-        string sourceToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string sourceToCopy = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.PART);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
@@ -1543,10 +1543,10 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
-        string sourceToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string sourceToCopy = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.PART);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
@@ -1768,10 +1768,10 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
-        string sourceToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string sourceToCopy = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.PART);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
@@ -2001,12 +2001,12 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory,
-            $"{Directories.SUB_DIRECTORY_2}\\{Directories.SUB_DIRECTORY_2}");
+            Directories.SUB_DIRECTORY_2, Directories.SUB_DIRECTORY_2);
         string destinationSubDirectory2 = Path.Combine(destinationDirectory,
-            $"{Directories.SUB_DIRECTORY_3}\\{Directories.SUB_DIRECTORY_4}\\{Directories.SUB_DIRECTORY_5}");
+            Directories.SUB_DIRECTORY_3, Directories.SUB_DIRECTORY_4, Directories.SUB_DIRECTORY_5);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -2193,11 +2193,11 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string sourceSubDirectory2 = Path.Combine(sourceSubDirectory1, Directories.SUB_DIRECTORY_2);
         string sourceSubDirectory3 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_3);
-        string sourceToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string sourceToCopy = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.PART);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
         string destinationSubDirectory2 = Path.Combine(destinationSubDirectory1, Directories.SUB_DIRECTORY_2);
@@ -2440,7 +2440,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
@@ -2619,9 +2619,9 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
-        string destinationToCopy = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
+        string destinationToCopy = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -2796,7 +2796,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -2894,7 +2894,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -2989,7 +2989,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsDefault_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -3138,7 +3138,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
     public async Task
         RunProcessAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_NotifiesAndStatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);

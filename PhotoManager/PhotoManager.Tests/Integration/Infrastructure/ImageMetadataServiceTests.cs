@@ -2,6 +2,7 @@
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
 using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
@@ -271,7 +272,9 @@ public class ImageMetadataServiceTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
-            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
+            // The copies originate from test files pinned to the fixed date; macOS keeps that origin as birth time
+            DateTime expectedCreationDate =
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default, oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath1, oldDateTime);
             File.SetLastWriteTime(destinationFilePath2, oldDateTime);
@@ -621,7 +624,9 @@ public class ImageMetadataServiceTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
-            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
+            // The copies originate from test files pinned to the fixed date; macOS keeps that origin as birth time
+            DateTime expectedCreationDate =
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default, oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath1, oldDateTime);
             File.SetLastWriteTime(destinationFilePath2, oldDateTime);
@@ -752,7 +757,9 @@ public class ImageMetadataServiceTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
-            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
+            // The copies originate from test files pinned to the fixed date; macOS keeps that origin as birth time
+            DateTime expectedCreationDate =
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default, oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 

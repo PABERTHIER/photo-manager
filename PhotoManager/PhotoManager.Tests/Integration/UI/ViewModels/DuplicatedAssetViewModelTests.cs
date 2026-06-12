@@ -78,7 +78,7 @@ public class DuplicatedAssetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -104,7 +104,7 @@ public class DuplicatedAssetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -138,7 +138,7 @@ public class DuplicatedAssetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -168,7 +168,7 @@ public class DuplicatedAssetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,

@@ -136,7 +136,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -227,7 +227,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.NON_EXISTENT_IMAGE_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -314,7 +314,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -401,7 +401,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -490,7 +490,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,

@@ -83,7 +83,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
     public async Task SetSyncAssetsConfiguration_CataloguedAssetsAndValidDefinitions_SavesConfiguration()
     {
         string assetsDirectory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

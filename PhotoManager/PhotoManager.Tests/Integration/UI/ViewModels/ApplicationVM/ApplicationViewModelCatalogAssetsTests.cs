@@ -272,7 +272,7 @@ public class ApplicationViewModelCatalogAssetsTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
@@ -304,7 +304,7 @@ public class ApplicationViewModelCatalogAssetsTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_DUPLICATED_JPG,
+                Size = FileSize.HOMER_DUPLICATED_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
@@ -1282,7 +1282,11 @@ public class ApplicationViewModelCatalogAssetsTests
 
             // Second sync
 
-            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];
@@ -1986,7 +1990,11 @@ public class ApplicationViewModelCatalogAssetsTests
 
             List<string> assetPathsUpdated = [imagePath1ToCopy, imagePath2ToCopy];
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -2205,8 +2213,11 @@ public class ApplicationViewModelCatalogAssetsTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
 
             // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
-            _asset2Temp!.FileProperties =
-                _asset2Temp.FileProperties with { Modification = DateTime.Now.AddMinutes(-10) };
+            _asset2Temp!.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The recreated file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddMinutes(-10)
+            };
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
@@ -2426,7 +2437,11 @@ public class ApplicationViewModelCatalogAssetsTests
 
             CatalogAssetsAsyncAsserts.RemoveDatabaseBackup(backupFilePath);
 
-            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];

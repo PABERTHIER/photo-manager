@@ -109,7 +109,8 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(asset.FullPath, Is.EqualTo(assetPath));
         Assert.That(asset.Folder.Path, Is.EqualTo(folderPath));
         Assert.That(asset.FileProperties.Creation.Date,
-            Is.EqualTo(FileDatesHelper.GetExpectedCreationDate(expectedAsset.FileProperties.Modification)));
+            Is.EqualTo(FileDatesHelper.GetExpectedCreationDate(
+                expectedAsset.FileProperties.Creation, expectedAsset.FileProperties.Modification)));
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
     }
 
