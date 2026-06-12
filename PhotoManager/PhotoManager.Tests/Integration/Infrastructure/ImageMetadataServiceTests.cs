@@ -270,8 +270,8 @@ public class ImageMetadataServiceTests
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
-            DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
+            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath1, oldDateTime);
             File.SetLastWriteTime(destinationFilePath2, oldDateTime);
@@ -378,16 +378,16 @@ public class ImageMetadataServiceTests
             _imageMetadataService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]);
 
             Assert.That(asset1.FileProperties.Size, Is.EqualTo(FileSize.HOMER_GIF));
-            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset2.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
-            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset3.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_9_PNG));
-            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset4.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_11_HEIC));
-            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset5.FileProperties.Size, Is.EqualTo(FileSize.NON_EXISTENT_IMAGE_JPG));
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
@@ -620,8 +620,8 @@ public class ImageMetadataServiceTests
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
-            DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
+            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath1, oldDateTime);
             File.SetLastWriteTime(destinationFilePath2, oldDateTime);
@@ -713,10 +713,10 @@ public class ImageMetadataServiceTests
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
             Assert.That(asset1.FileProperties.Size, Is.EqualTo(FileSize.HOMER_GIF));
-            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset2.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
-            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
@@ -751,8 +751,8 @@ public class ImageMetadataServiceTests
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
-            DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
+            DateTime expectedCreationDate = FileDatesHelper.GetExpectedCreationDate(oldDateTime);
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
@@ -780,7 +780,7 @@ public class ImageMetadataServiceTests
             _imageMetadataService!.UpdateAssetFileProperties(asset);
 
             Assert.That(asset.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
-            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(expectedCreationDate));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
 
             _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));

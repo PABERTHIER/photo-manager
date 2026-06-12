@@ -3116,7 +3116,8 @@ public class AssetCreationServiceTests
         Assert.That(asset.FullPath, Is.EqualTo(imagePath));
         Assert.That(asset.Folder.Path, Is.EqualTo(folderPath));
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
-        Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate));
+        Assert.That(asset.FileProperties.Creation.Date,
+            Is.EqualTo(FileDatesHelper.GetExpectedCreationDate(fileModificationDateTime)));
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(fileModificationDateTime.Date));
     }
 

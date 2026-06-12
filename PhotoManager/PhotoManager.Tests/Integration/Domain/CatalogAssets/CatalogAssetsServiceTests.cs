@@ -7432,7 +7432,8 @@ public class CatalogAssetsServiceTests
         Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(expectedAsset.Metadata.Rotated.Message));
         Assert.That(asset.FullPath, Is.EqualTo(assetPath));
         Assert.That(asset.Folder.Path, Is.EqualTo(folderPath));
-        Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate));
+        Assert.That(asset.FileProperties.Creation.Date,
+            Is.EqualTo(FileDatesHelper.GetExpectedCreationDate(expectedAsset.FileProperties.Modification)));
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(expectedAsset.FileProperties.Modification.Date));
 
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
