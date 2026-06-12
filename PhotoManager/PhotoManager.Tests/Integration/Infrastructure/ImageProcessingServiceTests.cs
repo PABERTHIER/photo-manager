@@ -27,7 +27,11 @@ public class ImageProcessingServiceTests
         { FileNames.IMAGE_9_PNG, 12835 },
         { FileNames.IMAGE_9_DUPLICATE_PNG, 12835 },
         { FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, 3049 },
-        { FileNames.HOMER_GIF, 6107 }
+        { FileNames.HOMER_GIF, 6107 },
+        { FileNames._1336_1_K_JPG, 10168 },
+        { FileNames._1336_2_K_JPG, 10044 },
+        { FileNames._1336_8_K_JPG, 9995 },
+        { FileNames._1336_TOP_PART_JPG, 5591 }
     };
 
     private static int GetExpectedImageByteSize(string fileName, int imageByteSize) =>

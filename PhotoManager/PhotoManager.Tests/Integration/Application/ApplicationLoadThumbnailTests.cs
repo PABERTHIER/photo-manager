@@ -177,7 +177,7 @@ public class ApplicationLoadThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.HOMER_JPG,
+            Hash = Hashes.HOMER_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },

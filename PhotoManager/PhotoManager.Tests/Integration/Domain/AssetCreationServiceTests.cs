@@ -2190,6 +2190,7 @@ public class AssetCreationServiceTests
         {
             // ffmpeg's bundled macOS build encodes the extracted first frame slightly differently
             fileSize = FileSize.HOMER_JPG_MAC_OS;
+            hash = Hashes.HOMER_JPG_MAC_OS;
         }
 
         ConfigureAssetCreationService(200, 150, false, false, false, true);
@@ -2443,6 +2444,7 @@ public class AssetCreationServiceTests
         {
             // ffmpeg's bundled macOS build encodes the extracted first frame slightly differently
             fileSize = FileSize.HOMER_JPG_MAC_OS;
+            hash = Hashes.HOMER_JPG_MAC_OS;
         }
 
         ConfigureAssetCreationService(200, 150, false, false, false, true);

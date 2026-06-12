@@ -145,7 +145,8 @@ public class SingleInstanceServiceTests
 
         try
         {
-            Assert.Throws<IOException>(() =>
+            // Windows throws IOException; Unix throws DirectoryNotFoundException, which derives from it
+            Assert.Catch<IOException>(() =>
             {
                 using (SingleInstanceService service = new(lockFilePath))
                 {
