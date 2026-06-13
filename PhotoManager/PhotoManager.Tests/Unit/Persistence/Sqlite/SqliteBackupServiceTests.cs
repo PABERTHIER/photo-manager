@@ -99,6 +99,7 @@ public class SqliteBackupServiceTests
     }
 
     [Test]
+    [Platform("Win", Reason = "Only Windows blocks deleting a file that another stream holds open")]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetriesAndSucceeds()
     {
         string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
@@ -174,6 +175,8 @@ public class SqliteBackupServiceTests
 
     [Test]
     [Retry(3)]
+    [Platform(Exclude = "MacOsX",
+        Reason = "On macOS, the lock stream interferes with SQLite's own file locking and fails the backup")]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetrySucceedsAfterLockReleased()
     {
         string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);

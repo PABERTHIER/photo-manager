@@ -260,7 +260,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
             Assert.That(viewModel.DuplicatedAssetPosition, Is.EqualTo(1));
             Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(secondAsset));
-            Assert.That(viewModel.CurrentDuplicatedAsset.Asset.FullPath, Is.EqualTo(@"C:\Photos\second.jpg"));
+            Assert.That(viewModel.CurrentDuplicatedAsset.Asset.FullPath,
+                Is.EqualTo(Path.Combine(@"C:\Photos", "second.jpg")));
             Assert.That(viewModel.CurrentDuplicatedAsset.Asset.Pixel.Asset.Width, Is.EqualTo(640));
             Assert.That(viewModel.CurrentDuplicatedAsset.Asset.FileProperties.Size, Is.EqualTo(2048));
             Assert.That(notifyPropertyChangedEvents, Is.EqualTo(

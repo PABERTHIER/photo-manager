@@ -184,7 +184,8 @@ public class UserConfigurationServiceTests
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
         Assert.That(assetsDirectory, Is.Not.Null);
-        Assert.That(assetsDirectory, Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets"));
+        Assert.That(assetsDirectory,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets")));
     }
 
     [Test]
@@ -193,7 +194,8 @@ public class UserConfigurationServiceTests
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
         Assert.That(exemptedFolderPath, Is.Not.Null);
-        Assert.That(exemptedFolderPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted"));
+        Assert.That(exemptedFolderPath,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
     }
 
     [Test]
@@ -208,7 +210,8 @@ public class UserConfigurationServiceTests
         Assert.That(firstFrameVideosPath,
             Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
         Assert.That(firstFrameVideosPath,
-            Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\TestAssets", Directories.OUTPUT_VIDEO_FIRST_FRAME)));
+            Is.EqualTo(Path.Combine(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets"),
+                Directories.OUTPUT_VIDEO_FIRST_FRAME)));
     }
 
     [Test]
@@ -305,7 +308,7 @@ public class UserConfigurationServiceTests
         string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
 
         Assert.That(paths, Has.Length.EqualTo(1));
-        Assert.That(paths[0], Is.EqualTo("E:\\Workspace\\PhotoManager\\TestAssets"));
+        Assert.That(paths[0], Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets")));
     }
 
     [Test]
@@ -324,8 +327,18 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    [TestCase("~/Pictures", "C:\\Users\\Test", "C:\\Users\\Test\\Pictures")]
-    [TestCase("~\\Documents", "C:\\Users\\Test", "C:\\Users\\Test\\Documents")]
+    [TestCase("~/Pictures", "C:\\Users\\Test", "Pictures")]
+    [TestCase("~\\Documents", "C:\\Users\\Test", "Documents")]
+    public void ExpandHomeDirectory_HomeRelativePath_JoinsHomeDirectoryAndSubPath(
+        string path, string homeDirectory, string expectedSubPath)
+    {
+        string result = UserConfigurationService.ExpandHomeDirectory(path, homeDirectory);
+
+        // The sub path is joined with the OS separator, so the expected value is built the same way
+        Assert.That(result, Is.EqualTo(Path.Combine(homeDirectory, expectedSubPath)));
+    }
+
+    [Test]
     [TestCase("~", "C:\\Users\\Test", "C:\\Users\\Test")]
     [TestCase("/absolute/path", "C:\\Users\\Test", "/absolute/path")]
     [TestCase("C:\\absolute\\path", "C:\\Users\\Test", "C:\\absolute\\path")]

@@ -1,6 +1,6 @@
-# WPF Reference for PhotoManager
+﻿# Avalonia UI Reference for PhotoManager
 
-Answer the following WPF question or perform the WPF task for this project: $ARGUMENTS
+Answer the following Avalonia UI question or perform the UI task for this project: $ARGUMENTS
 
 Use the facts below to guide your answer or implementation.
 
@@ -13,8 +13,10 @@ PhotoManager.UI/
 ├── Windows/      — {Feature}Window (modal: ShowDialog, modeless: Show)
 ├── Controls/     — {Feature}UserControl (reusable composed controls)
 ├── ViewModels/   — {Feature}ViewModel, base classes, Enums/
-├── Converters/   — {Feature}Converter : IValueConverter or IMultiValueConverter
-└── Models/       — {Action}EventHandler delegates + {Action}EventArgs classes
+├── Converters/   — {Feature}Converter : IValueConverter
+├── Models/       — {Action}EventHandler delegates + {Action}EventArgs classes
+├── Services/     — UI-layer services (single-instance, theme)
+└── Configuration/ — UI settings classes
 ```
 
 ## MVVM
@@ -29,27 +31,27 @@ PhotoManager.UI/
 
 ## DI Wiring
 
-- `App.xaml.cs` builds the container; exposes `static IServiceProvider? App.ServiceProvider`
+- `App.axaml.cs` builds the container; exposes `static IServiceProvider? App.ServiceProvider`
 - Registered as singletons: `MainWindow`, `ApplicationViewModel` (in `UiServiceCollectionExtensions`)
-- XAML-instantiated UserControls → use `App.ServiceProvider?.GetService<T>() ?? NullLogger.Instance`
+- AXAML-instantiated UserControls → use `App.ServiceProvider?.GetService<T>() ?? NullLogger.Instance`
 - Dialog windows + ViewModels → created on-demand in code-behind (not from DI)
 
 ## Async Rules
 
-- Use `Dispatcher.InvokeAsync()` to marshal domain callbacks onto the UI thread
-- Use `.ConfigureAwait(true)` in all WPF async methods (preserves UI synchronization context)
+- Use `Dispatcher.UIThread.InvokeAsync()` to marshal domain callbacks onto the UI thread
+- Use `.ConfigureAwait(true)` in all UI async methods (preserves synchronization context)
 
 ## Converters
 
-- Implement `IValueConverter` or `IMultiValueConverter`
+- Implement `IValueConverter` (Avalonia's `Avalonia.Data.Converters.IValueConverter`)
 - `ConvertBack` → `throw new NotImplementedException()` for read-only converters
-- Register as `StaticResource` in the relevant XAML resources section
+- Register as resources in the relevant AXAML file
 
 ## Visibility Pattern
 
-Prefer computed properties returning `Visibility` over converter bindings:
+Prefer computed `bool` properties for `IsVisible` bindings:
 ```csharp
-public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
+public bool IsThumbnailsVisible => AppMode == AppMode.Thumbnails;
 ```
 
 ## Custom Events
@@ -73,6 +75,6 @@ public class FolderAddedEventArgs : EventArgs { public required Folder Folder { 
 
 ## Styles
 
-- Global styles in `App.xaml` under `Application.Resources`
-- Hover effects via `<Style.Triggers>` with `Trigger Property="IsMouseOver"`
-- Reference styles with `Style="{StaticResource StyleName}"`
+- Avalonia Fluent theme with System/Light/Dark mode support
+- Global styles in `App.axaml` under `Application.Styles`
+- Use Avalonia `Styles` and `ControlTheme` for custom styling

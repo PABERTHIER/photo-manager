@@ -379,6 +379,17 @@ public static class Constants
         public const long HOMER_GIF = 64123;
         public const long HOMER_JPG = 6600;
         public const long HOMER_DUPLICATED_JPG = 6600;
+
+        // ffmpeg's bundled macOS build encodes the extracted video first frame slightly differently.
+        // The consts above stay usable in TestCase attributes; runtime expectations must use these values.
+        public const long HOMER_JPG_MAC_OS = 6595;
+
+        public static readonly long HOMER_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_JPG;
+
+        public static readonly long HOMER_DUPLICATED_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_DUPLICATED_JPG;
+
         public const long IMAGE_1_JPG = 29857;
         public const long IMAGE_1_90_DEG_JPG = 31535;
         public const long IMAGE_1_180_DEG_JPG = 31535;
@@ -495,6 +506,17 @@ public static class Constants
             "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
         public const string HOMER_DUPLICATED_JPG =
             "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
+
+        // ffmpeg's bundled macOS build encodes the extracted video first frame slightly differently.
+        // The consts above stay usable in TestCase attributes; runtime expectations must use these values.
+        public const string HOMER_JPG_MAC_OS =
+            "0b7dc6b4c64d29b8b5d65789dc5bfe5cd578b662210978aa08ba0f8cf90cfd7800c37693ffe1cf2e77045855416d94ac32e7d256a45f33997e26483ce6db7cc0";
+
+        public static readonly string HOMER_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_JPG;
+
+        public static readonly string HOMER_DUPLICATED_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_DUPLICATED_JPG;
         public const string IMAGE_1_JPG =
             "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
         public const string IMAGE_1_90_DEG_JPG =

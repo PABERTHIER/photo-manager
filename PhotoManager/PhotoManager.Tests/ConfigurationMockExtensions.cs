@@ -33,9 +33,10 @@ public static class ConfigurationMockExtensions
                 .MockGetValue(UserConfigurationKeys.USING_DHASH, "false")
                 .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, "false")
                 .MockGetValue(UserConfigurationKeys.USING_PHASH, "false")
-                .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "E:\\Workspace\\PhotoManager\\TestAssets")
+                .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY,
+                    PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets"))
                 .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH,
-                    "E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")
+                    PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted"))
                 .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME,
                     Directories.OUTPUT_VIDEO_FIRST_FRAME)
                 .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")

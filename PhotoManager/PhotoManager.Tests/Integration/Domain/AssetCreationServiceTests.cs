@@ -276,7 +276,7 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        string folderPath = Path.Combine(_assetsDirectory!, additionalPath);
+        string folderPath = Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
         Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
 
         string imagePath = Path.Combine(folderPath, fileName);
@@ -550,7 +550,7 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, true, false);
 
-        string folderPath = Path.Combine(_assetsDirectory!, additionalPath);
+        string folderPath = Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
         Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
 
         string imagePath = Path.Combine(folderPath, fileName);
@@ -779,7 +779,7 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, true, false, false, false);
 
-        string folderPath = Path.Combine(_assetsDirectory!, additionalPath);
+        string folderPath = Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
         Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
 
         string imagePath = Path.Combine(folderPath, fileName);
@@ -1013,7 +1013,7 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, true, false, false);
 
-        string folderPath = Path.Combine(_assetsDirectory!, additionalPath);
+        string folderPath = Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
         Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
 
         string imagePath = Path.Combine(folderPath, fileName);
@@ -1074,7 +1074,7 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        string folderPath = Path.Combine(_assetsDirectory!, additionalPath);
+        string folderPath = Path.Combine(_assetsDirectory!, additionalPath.Replace('\\', Path.DirectorySeparatorChar));
         Folder folder = _testableAssetRepository!.AddFolder(folderPath); // Set above, not in this method
 
         string imagePath = Path.Combine(folderPath, fileName);
@@ -2186,6 +2186,13 @@ public class AssetCreationServiceTests
         bool isRotated,
         string? rotatedMessage)
     {
+        if (OperatingSystem.IsMacOS())
+        {
+            // ffmpeg's bundled macOS build encodes the extracted first frame slightly differently
+            fileSize = FileSize.HOMER_JPG_MAC_OS;
+            hash = Hashes.HOMER_JPG_MAC_OS;
+        }
+
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
@@ -2433,6 +2440,13 @@ public class AssetCreationServiceTests
         bool isRotated,
         string? rotatedMessage)
     {
+        if (OperatingSystem.IsMacOS())
+        {
+            // ffmpeg's bundled macOS build encodes the extracted first frame slightly differently
+            fileSize = FileSize.HOMER_JPG_MAC_OS;
+            hash = Hashes.HOMER_JPG_MAC_OS;
+        }
+
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
@@ -3116,7 +3130,8 @@ public class AssetCreationServiceTests
         Assert.That(asset.FullPath, Is.EqualTo(imagePath));
         Assert.That(asset.Folder.Path, Is.EqualTo(folderPath));
         Assert.That(asset.ImageData, Is.Null); // Set above, not in this method
-        Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(actualDate));
+        Assert.That(asset.FileProperties.Creation.Date,
+            Is.EqualTo(FileDatesHelper.GetExpectedCreationDate(fileModificationDateTime)));
         Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(fileModificationDateTime.Date));
     }
 

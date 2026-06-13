@@ -1159,7 +1159,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = actualDate,
                 Modification = actualDate
             },

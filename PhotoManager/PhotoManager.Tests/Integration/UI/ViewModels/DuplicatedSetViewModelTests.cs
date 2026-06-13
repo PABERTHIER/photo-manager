@@ -68,7 +68,7 @@ public class DuplicatedSetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -102,7 +102,7 @@ public class DuplicatedSetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,

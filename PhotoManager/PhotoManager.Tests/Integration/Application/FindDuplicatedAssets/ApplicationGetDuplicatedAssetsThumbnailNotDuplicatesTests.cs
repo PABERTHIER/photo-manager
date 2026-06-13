@@ -364,12 +364,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -428,12 +428,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -485,8 +485,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
@@ -526,8 +526,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -567,8 +567,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -671,12 +671,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };

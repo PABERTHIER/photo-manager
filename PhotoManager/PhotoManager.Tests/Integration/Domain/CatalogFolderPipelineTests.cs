@@ -69,6 +69,35 @@ public class CatalogFolderPipelineTests
     }
 
     [Test]
+    public void CatalogAsync_FileReadCanceled_PropagatesOperationCanceledExceptionWithoutDeadlock()
+    {
+        // An OperationCanceledException is not reported as a failed item: it escapes the per-file handler,
+        // faults the whole read stage and completes the channel with the error
+        OperationCanceledException expectedException = new("Read canceled.");
+        CatalogFolderPipeline pipeline = CreatePipeline(fileBytesFactory: _ => throw expectedException);
+        List<CatalogPipelineResult> results = [];
+        string directory = TestContext.CurrentContext.TestDirectory;
+
+        OperationCanceledException? exception = Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await pipeline.CatalogAsync(
+                directory,
+                ["first.jpg"],
+                false,
+                1,
+                CatalogAssetPipelineOperation.Create,
+                (result, _) =>
+                {
+                    results.Add(result);
+
+                    return ValueTask.FromResult(true);
+                },
+                CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)));
+
+        Assert.That(exception, Is.SameAs(expectedException));
+        Assert.That(results, Is.Empty);
+    }
+
+    [Test]
     public async Task CatalogAsync_CorruptFileBeforeSuccessLimit_AttemptsLaterValidFile()
     {
         CatalogFolderPipeline pipeline = CreatePipeline(assetFactory: (directory, fileName) =>

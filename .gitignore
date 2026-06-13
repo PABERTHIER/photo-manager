@@ -254,6 +254,9 @@ paket-files/
 __pycache__/
 *.pyc
 
+# MacOs
+.DS_Store
+
 PhotoManager/tools
 
 # Benchmark results

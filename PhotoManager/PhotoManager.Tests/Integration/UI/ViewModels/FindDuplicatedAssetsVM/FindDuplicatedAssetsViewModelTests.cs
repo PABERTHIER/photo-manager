@@ -63,7 +63,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -89,7 +89,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -123,7 +123,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
@@ -149,7 +149,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -174,7 +174,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
@@ -207,7 +207,7 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,

@@ -9,6 +9,11 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
     private const int SharingViolationHResult = unchecked((int)0x80070020);
     private const int LockViolationHResult = unchecked((int)0x80070021);
 
+    // On Unix, .NET sets IOException.HResult to the raw errno value, not a Win32-packed HResult
+    private const int AccessDeniedErrno = 13; // EACCES
+    private const int ResourceUnavailableLinuxErrno = 11; // EAGAIN / EWOULDBLOCK on Linux
+    private const int ResourceUnavailableMacOsErrno = 35; // EAGAIN / EWOULDBLOCK on macOS
+
     private readonly string _lockFilePath;
 
     private FileStream? _lockFileStream;
@@ -60,7 +65,8 @@ public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
         }
 
         return !OperatingSystem.IsWindows()
-               && exception.HResult is UnixAccessDeniedHResult or UnixResourceUnavailableHResult;
+               && exception.HResult is UnixAccessDeniedHResult or UnixResourceUnavailableHResult
+                   or AccessDeniedErrno or ResourceUnavailableLinuxErrno or ResourceUnavailableMacOsErrno;
     }
 
     public void Dispose()

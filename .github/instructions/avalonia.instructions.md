@@ -1,8 +1,8 @@
----
-applyTo: "**/PhotoManager.UI/**/*.cs,**/PhotoManager.UI/**/*.xaml"
+﻿---
+applyTo: "**/PhotoManager.UI/**/*.cs,**/PhotoManager.UI/**/*.axaml"
 ---
 
-# WPF Code Standards for PhotoManager
+# Avalonia UI Code Standards for PhotoManager
 
 ## Project Structure
 
@@ -11,8 +11,11 @@ PhotoManager.UI/
 ├── Windows/       — Main window + dialog windows ({Feature}Window)
 ├── Controls/      — Reusable UserControls ({Feature}UserControl)
 ├── ViewModels/    — MVVM ViewModels ({Feature}ViewModel), base classes, enums
-├── Converters/    — IValueConverter / IMultiValueConverter implementations
-└── Models/        — Custom event delegates and EventArgs
+├── Converters/    — IValueConverter implementations
+├── Models/        — Custom event delegates and EventArgs
+├── Services/      — UI-layer services (single-instance, theme)
+├── Configuration/ — UI settings classes
+└── Assets/        — Application icons and resources
 ```
 
 ## MVVM Patterns
@@ -37,10 +40,10 @@ public string Title
 
 ### Computed Visibility Properties
 
-Use computed properties returning `Visibility` directly — do not rely on converters for simple show/hide:
+Use computed properties returning `bool` for `IsVisible` bindings — do not rely on converters for simple show/hide:
 
 ```csharp
-public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
+public bool IsThumbnailsVisible => AppMode == AppMode.Thumbnails;
 ```
 
 ### Collections
@@ -61,15 +64,15 @@ public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibilit
 
 ## Value Converters
 
-- Implement `IValueConverter` or `IMultiValueConverter`
+- Implement `IValueConverter` (Avalonia's `Avalonia.Data.Converters.IValueConverter`)
 - `ConvertBack` must `throw new NotImplementedException()` for read-only converters
-- Register converters as `StaticResource` in the relevant `Resources` section
+- Register converters as resources in the relevant AXAML file
 
 ```csharp
 public class FileSizeConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) { ... }
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) { ... }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
 }
 ```
@@ -90,7 +93,7 @@ public class FolderAddedEventArgs : EventArgs
 ## Dependency Injection
 
 - `MainWindow` and `ApplicationViewModel` are registered as **singletons** in `UiServiceCollectionExtensions`
-- XAML-instantiated controls (UserControls) resolve services from the static `App.ServiceProvider`:
+- AXAML-instantiated controls resolve services from the static `App.ServiceProvider`:
 
 ```csharp
 _logger = App.ServiceProvider?.GetService<ILogger<ThumbnailsUserControl>>()
@@ -102,31 +105,27 @@ _logger = App.ServiceProvider?.GetService<ILogger<ThumbnailsUserControl>>()
 ```csharp
 FindDuplicatedAssetsViewModel vm = new(_application);
 FindDuplicatedAssetsWindow window = new(vm, _loggerFactory.CreateLogger<FindDuplicatedAssetsWindow>());
-window.ShowDialog();
+window.ShowDialog(this);
 ```
 
 ## Async & Thread Safety
 
-- Use `Dispatcher.InvokeAsync()` to marshal domain callbacks back to the UI thread
-- Always use `.ConfigureAwait(true)` in WPF async methods to preserve the UI synchronization context
+- Use `Dispatcher.UIThread.InvokeAsync()` to marshal domain callbacks back to the UI thread
+- Always use `.ConfigureAwait(true)` in UI async methods to preserve the synchronization context
 
 ```csharp
 _catalogTask = ViewModel.CatalogAssets(
-    e => Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e)),
+    e => Dispatcher.UIThread.InvokeAsync(() => ViewModel.NotifyCatalogChange(e)),
     _cancellationTokenSource.Token);
 
 await _catalogTask.ConfigureAwait(true);
 ```
 
-## WPF Types Used Across All Layers
+## Avalonia-Specific Patterns
 
-The following WPF types from `System.Windows.Media.Imaging` are used throughout **all layers** (not just UI):
-
-- `BitmapImage` — used as image data carrier in `Asset.ImageData`, service interfaces, and repository
-- `Rotation` — WPF enum used for image rotation in `Asset.ImageRotation`, service signatures, and DB mapping
-
-These are **intentionally present** in Domain, Application, Infrastructure, and Common via `GlobalUsings.cs`.
-Do **not** remove or replace them with non-WPF abstractions unless performing an explicit architectural refactor.
-
-When adding new image-related methods to interfaces or services, use `BitmapImage` and `Rotation` consistently
-with the existing codebase pattern.
+- Use `IsVisible` (bool) instead of WPF's `Visibility` enum
+- Use Avalonia Fluent theme (`FluentTheme`) with configurable theme mode (System/Light/Dark)
+- AXAML files use `.axaml` extension (not `.xaml`)
+- Code-behind uses `.axaml.cs` extension
+- Use `Avalonia.Controls.DataGrid` for tabular data display
+- Use `VirtualizingStackPanel` in `ItemsControl` for large lists (performance)

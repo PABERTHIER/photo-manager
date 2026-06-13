@@ -90,7 +90,7 @@ When a day passes without rebuilding, the creation dates of the copied files bec
 
 ## Project Overview
 
-PhotoManager is a WPF desktop application for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a SQLite database for local persistence.
+PhotoManager is a cross-platform desktop application (Windows, Linux, macOS) built with Avalonia UI for managing photo/video collections, detecting duplicates, and syncing assets across folders. It targets .NET 10.0 and uses a Clean Architecture approach with a SQLite database for local persistence.
 
 ## Build and Test Commands
 
@@ -165,7 +165,7 @@ PhotoManager.slnx
 ├── PhotoManager.Infrastructure/# External concerns (file system, image processing)
 ├── PhotoManager.Persistence/   # SQLite database, repositories, backup service
 ├── PhotoManager.Common/        # Shared utilities (hashing, image/video helpers)
-├── PhotoManager.UI/            # WPF presentation layer (ViewModels, Views)
+├── PhotoManager.UI/            # Avalonia UI presentation layer (ViewModels, Views)
 ├── PhotoManager.Tests/         # NUnit tests with NSubstitute
 └── PhotoManager.Benchmarks/    # BenchmarkDotNet performance benchmarks
 ```
@@ -178,17 +178,17 @@ UI → Application → Domain ← Infrastructure ← Persistence
 
 1. **SQLite Persistence**: The project uses SQLite (`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`) in the `PhotoManager.Persistence` project. The database is a single `photomanager.db` file with WAL mode for concurrent reads. Schema is defined in `SqliteSchema.cs` with tables: Folders, Assets, Thumbnails, RecentPaths, SyncDefinitions.
 
-2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.xaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`. `AddInfrastructure()` calls `AddPersistence()` internally.
+2. **Service Collection Extensions**: Each layer has a `{Layer}ServiceCollectionExtensions.cs` that registers its services. The UI layer (`App.axaml.cs`) chains them: `AddInfrastructure()` → `AddDomain()` → `AddApplication()` → `AddUi()`. `AddInfrastructure()` calls `AddPersistence()` internally.
 
 3. **Hash-Based Duplicate Detection**: The `HashingHelper` supports multiple algorithms (PHash, DHash, MD5, SHA512). PHash is the most advanced and can detect duplicates between rotated images, thumbnails, and different resolutions. Controlled by `HashSettings` in `appsettings.json`.
 
-4. **Microsoft Extensions Logging**: The application uses `ILogger<T>` throughout. The UI layer configures Serilog for file logging and console output in `App.xaml.cs`.
+4. **Microsoft Extensions Logging**: The application uses `ILogger<T>` throughout. The UI layer configures Serilog for file logging and console output in `App.axaml.cs`.
 
 5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings). The database directory is **not** configurable — it is always resolved at runtime as `AppContext.BaseDirectory + "Database"` by `PathProviderService`.
 
 ## Important Files
 
-- `PhotoManager/PhotoManager.UI/App.xaml.cs` - Application startup, DI container setup
+- `PhotoManager/PhotoManager.UI/App.axaml.cs` - Application startup, DI container setup
 - `PhotoManager/PhotoManager.Application/Application.cs` - Main application facade
 - `PhotoManager/PhotoManager.Domain/Asset.cs` - Core domain entity
 - `PhotoManager/PhotoManager.Persistence/Sqlite/SqlitePersistenceContext.cs` - Database initialization, backup, dispose
@@ -306,9 +306,11 @@ finally
 
 ## External Dependencies
 
+- **Avalonia UI** - Cross-platform desktop UI framework (Windows, Linux, macOS)
 - **Microsoft.Data.Sqlite** + **SQLitePCLRaw.bundle_e_sqlite3** - SQLite database
 - **Magick.NET** (ImageMagick) - Image processing
 - **FFMpegCore** - Video processing; versioned FFmpeg runtime packages copy app-local binaries at build time
+- **SkiaSharp** - Cross-platform image decoding (thumbnails, EXIF, hashing)
 - **Serilog** - File logging
 - **Microsoft.Extensions.Logging** - Logging abstraction
 - **NSubstitute** - Test mocking

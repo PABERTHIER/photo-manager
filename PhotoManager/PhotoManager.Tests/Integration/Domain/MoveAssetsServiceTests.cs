@@ -1727,7 +1727,7 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationFilePathIsADirectory_LogsItAndDoesNotCopyAndThrowsIOException()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         try
