@@ -1,6 +1,5 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -64,13 +63,13 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -90,13 +89,13 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -124,13 +123,13 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -150,11 +149,11 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -175,11 +174,11 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -208,11 +207,11 @@ public class FindDuplicatedAssetsViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = DateTime.Now,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -270,11 +269,14 @@ public class FindDuplicatedAssetsViewModelTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -949,7 +951,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
         {
             Asset = _asset2,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -957,7 +959,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
         {
             Asset = _asset3,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -1057,7 +1059,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
         {
             Asset = _asset2,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -1171,7 +1173,7 @@ public class FindDuplicatedAssetsViewModelTests
         DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
         {
             Asset = _asset3,
-            Visible = Visibility.Collapsed,
+            IsVisible = false,
             ParentViewModel = expectedDuplicatedAssetSet
         };
         expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -1832,13 +1834,13 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
 
             List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(3));
             Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName, _asset3Temp!.FileName }));
 
             List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
@@ -1855,7 +1857,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new();
+            _asset1Temp.ImageData = SkiaImageData.Empty();
             _asset3Temp = _asset3Temp.WithFolder(exemptedFolder!);
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
@@ -2002,13 +2004,13 @@ public class FindDuplicatedAssetsViewModelTests
             Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(2));
 
             List<Asset> duplicatedAssetsSet1 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset1!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset1!.FileName));
             Assert.That(duplicatedAssetsSet1, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet1.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset1!.FileName, _asset1Temp!.FileName }));
 
             List<Asset> duplicatedAssetsSet2 = duplicatedAssetsSets
-               .First(s => s.Any(a => a.FileName == _asset2!.FileName));
+                .First(s => s.Any(a => a.FileName == _asset2!.FileName));
             Assert.That(duplicatedAssetsSet2, Has.Count.EqualTo(2));
             Assert.That(duplicatedAssetsSet2.Select(a => a.FileName),
                 Is.EquivalentTo(new[] { _asset2!.FileName, _asset3!.FileName }));
@@ -2025,7 +2027,7 @@ public class FindDuplicatedAssetsViewModelTests
 
             _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
             // Because _asset1Temp became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset1Temp.ImageData = new();
+            _asset1Temp.ImageData = SkiaImageData.Empty();
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
@@ -2597,8 +2599,8 @@ public class FindDuplicatedAssetsViewModelTests
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {
                 DuplicatedSetViewModel actualSet =
-                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(
-                        x => x[0].Asset.Hash == expectedDuplicatedAssetSets[i][0].Asset.Hash);
+                    findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets.First(x =>
+                        x[0].Asset.Hash == expectedDuplicatedAssetSets[i][0].Asset.Hash);
 
                 AssertDuplicatedAssetsSet(actualSet, expectedDuplicatedAssetSets[i]);
             }
@@ -2641,7 +2643,7 @@ public class FindDuplicatedAssetsViewModelTests
 
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatedSetViewModel.DuplicatesCount));
 
-        Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
+        Assert.That(duplicatedSetViewModel.IsVisible, Is.EqualTo(expectedDuplicatedSetViewModel.IsVisible));
     }
 
     private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
@@ -2651,7 +2653,7 @@ public class FindDuplicatedAssetsViewModelTests
         {
             AssertAssetPropertyValidity(duplicatedAsset!.Asset, expectedDuplicatedAsset.Asset);
 
-            Assert.That(duplicatedAsset.Visible, Is.EqualTo(expectedDuplicatedAsset.Visible));
+            Assert.That(duplicatedAsset.IsVisible, Is.EqualTo(expectedDuplicatedAsset.IsVisible));
 
             if (expectedDuplicatedAsset.ParentViewModel.Count > 0)
             {
@@ -2663,10 +2665,11 @@ public class FindDuplicatedAssetsViewModelTests
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
                     DuplicatedAssetViewModel actualSibling =
-                        duplicatedAsset.ParentViewModel.First(
-                            x => x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
+                        duplicatedAsset.ParentViewModel.First(x =>
+                            x.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(actualSibling.IsVisible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].IsVisible));
 
                     AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }

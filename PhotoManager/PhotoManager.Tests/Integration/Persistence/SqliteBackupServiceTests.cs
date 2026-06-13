@@ -145,33 +145,33 @@ public class SqliteBackupServiceTests
             vacationFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_JPG,
             PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
             ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG,
-            Rotation.Rotate0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             vacationFolder.Id, FileNames.IMAGE_1_JPG, Hashes.IMAGE_1_90_DEG_JPG,
             PixelWidthAsset.IMAGE_1_90_DEG_JPG, PixelHeightAsset.IMAGE_1_90_DEG_JPG,
             ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG,
-            Rotation.Rotate90, false, null, true, "The asset has been rotated"));
+            ImageRotation.Rotate90, false, null, true, "The asset has been rotated"));
 
         // PNG in Vacation folder
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             vacationFolder.Id, FileNames.IMAGE_9_PNG, Hashes.IMAGE_9_PNG,
             PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
             ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG,
-            Rotation.Rotate0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         // GIF in Vacation folder
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             vacationFolder.Id, FileNames.HOMER_GIF, Hashes.HOMER_GIF,
             PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
             ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF,
-            Rotation.Rotate0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         // HEIC in Archive folder
         _sqlitePersistenceContext.Assets.Upsert(CreateAsset(
             archiveFolder.Id, FileNames.IMAGE_11_HEIC, Hashes.IMAGE_11_HEIC,
             PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
             ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC,
-            Rotation.Rotate0, false, null, false, null));
+            ImageRotation.Rotate0, false, null, false, null));
 
         // ─── Thumbnails ────────────────────────────────────────────────────────
         byte[] jpgThumbnailData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG));
@@ -302,7 +302,7 @@ public class SqliteBackupServiceTests
 
                     Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
                     Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_1_JPG));
-                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate90));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)ImageRotation.Rotate90));
                     Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_1_90_DEG_JPG));
                     Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_1_90_DEG_JPG));
                     Assert.That((long)reader["ThumbnailPixelWidth"],
@@ -330,7 +330,7 @@ public class SqliteBackupServiceTests
 
                     Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
                     Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_9_PNG));
-                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)ImageRotation.Rotate0));
                     Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_9_PNG));
                     Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_9_PNG));
                     Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.IMAGE_9_PNG));
@@ -356,7 +356,7 @@ public class SqliteBackupServiceTests
 
                     Assert.That(reader["FolderId"].ToString(), Is.EqualTo(vacationFolderId));
                     Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.HOMER_GIF));
-                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)ImageRotation.Rotate0));
                     Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.HOMER_GIF));
                     Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.HOMER_GIF));
                     Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.HOMER_GIF));
@@ -382,7 +382,7 @@ public class SqliteBackupServiceTests
 
                     Assert.That(reader["FolderId"].ToString(), Is.EqualTo(archiveFolderId));
                     Assert.That(reader["FileName"].ToString(), Is.EqualTo(FileNames.IMAGE_11_HEIC));
-                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)Rotation.Rotate0));
+                    Assert.That((long)reader["ImageRotation"], Is.EqualTo((int)ImageRotation.Rotate0));
                     Assert.That((long)reader["PixelWidth"], Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
                     Assert.That((long)reader["PixelHeight"], Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
                     Assert.That((long)reader["ThumbnailPixelWidth"], Is.EqualTo(ThumbnailWidthAsset.IMAGE_11_HEIC));
@@ -656,7 +656,7 @@ public class SqliteBackupServiceTests
     }
 
     private static Asset CreateAsset(Guid folderId, string fileName, string hash, int pixelWidth, int pixelHeight,
-        int thumbnailWidth, int thumbnailHeight, Rotation rotation, bool isCorrupted, string? corruptedMessage,
+        int thumbnailWidth, int thumbnailHeight, ImageRotation rotation, bool isCorrupted, string? corruptedMessage,
         bool isRotated, string? rotatedMessage)
     {
         return new()

@@ -212,6 +212,28 @@ public class SqliteConnectionFactoryTests
     }
 
     [Test]
+    public void Open_AfterInitializeCalledTwice_ReturnsConnectionToLatestPath()
+    {
+        Directory.CreateDirectory(_databaseDirectory!);
+        string firstPath = Path.Combine(_databaseDirectory!, "first_connection.db");
+        string secondPath = Path.Combine(_databaseDirectory!, "second_connection.db");
+
+        _sqliteConnectionFactory!.Initialize(firstPath);
+        _sqliteConnectionFactory!.Initialize(secondPath);
+
+        using (SqliteConnection connection = _sqliteConnectionFactory!.Open())
+        {
+            Assert.That(connection.State, Is.EqualTo(ConnectionState.Open));
+            Assert.That(connection.DataSource, Is.EqualTo(secondPath));
+        }
+
+        Assert.That(File.Exists(firstPath), Is.False);
+        Assert.That(File.Exists(secondPath), Is.True);
+
+        _testLogger!.AssertLogExceptions([], typeof(SqliteConnectionFactory));
+    }
+
+    [Test]
     public void Open_CreatesDbFileIfNotExists()
     {
         Directory.CreateDirectory(_databaseDirectory!);

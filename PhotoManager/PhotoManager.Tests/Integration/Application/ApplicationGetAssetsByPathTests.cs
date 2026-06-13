@@ -63,7 +63,7 @@ public class ApplicationGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -88,7 +88,7 @@ public class ApplicationGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -121,7 +121,7 @@ public class ApplicationGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -150,7 +150,7 @@ public class ApplicationGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -195,15 +195,19 @@ public class ApplicationGetAssetsByPathTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetCreationService,
@@ -219,7 +223,8 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExists_ReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -317,9 +322,9 @@ public class ApplicationGetAssetsByPathTests
         string rootDirectory = _assetsDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string duplicatesNewFolder1Directory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
         string duplicatesNewFolder2Directory =
-            Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string testFolderDirectory = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER);
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
@@ -526,7 +531,8 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderDoesNotExist_AddsFolderAndReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -570,7 +576,7 @@ public class ApplicationGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -742,12 +748,13 @@ public class ApplicationGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock);
 
-        BitmapImage? bitmapImage = null;
+        IImageData? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
@@ -764,11 +771,14 @@ public class ApplicationGetAssetsByPathTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -812,7 +822,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1032,7 +1042,8 @@ public class ApplicationGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
@@ -1049,11 +1060,14 @@ public class ApplicationGetAssetsByPathTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -1110,7 +1124,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

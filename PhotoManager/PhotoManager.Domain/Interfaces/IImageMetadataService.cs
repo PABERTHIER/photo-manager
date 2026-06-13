@@ -4,7 +4,8 @@ public interface IImageMetadataService
 {
     ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation);
     ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation);
-    Rotation GetImageRotation(ushort exifOrientation);
+    ImageRotation GetImageRotation(ushort exifOrientation);
     void UpdateAssetsFileProperties(List<Asset> assets);
+    void UpdateAssetsFileProperties(List<Asset> assets, IReadOnlyDictionary<string, FileProperties> filePropertiesByName);
     void UpdateAssetFileProperties(Asset asset);
 }

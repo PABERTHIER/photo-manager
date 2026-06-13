@@ -15,7 +15,7 @@ public class ImageMetadataService(IFileOperationsService fileOperationsService, 
         return ExifHelper.GetHeicExifOrientation(buffer, corruptedImageOrientation, logger);
     }
 
-    public Rotation GetImageRotation(ushort exifOrientation)
+    public ImageRotation GetImageRotation(ushort exifOrientation)
     {
         return ExifHelper.GetImageRotation(exifOrientation);
     }
@@ -25,6 +25,22 @@ public class ImageMetadataService(IFileOperationsService fileOperationsService, 
         for (int i = 0; i < assets.Count; i++)
         {
             UpdateAssetFileProperties(assets[i]);
+        }
+    }
+
+    public void UpdateAssetsFileProperties(List<Asset> assets,
+        IReadOnlyDictionary<string, FileProperties> filePropertiesByName)
+    {
+        ArgumentNullException.ThrowIfNull(filePropertiesByName);
+
+        for (int i = 0; i < assets.Count; i++)
+        {
+            Asset asset = assets[i];
+
+            if (filePropertiesByName.TryGetValue(asset.FileName, out FileProperties fileProperties))
+            {
+                asset.FileProperties = fileProperties;
+            }
         }
     }
 

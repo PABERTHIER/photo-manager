@@ -6,6 +6,7 @@
 public class FileOperationsServiceBenchmarks
 {
     private string _testDirectory = null!;
+    private string _fileNamesDirectory = null!;
     private FileOperationsService _fileOperationsService = null!;
 
     [GlobalSetup]
@@ -14,6 +15,8 @@ public class FileOperationsServiceBenchmarks
         _testDirectory = Path.Combine(Path.GetTempPath(),
             "FileOperationsServiceBenchmark_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDirectory);
+        _fileNamesDirectory = Path.Combine(_testDirectory, "FileNames");
+        Directory.CreateDirectory(_fileNamesDirectory);
 
         // Create nested directory structure for recursive tests
         // Root: 5 subDirs, each with 3 files
@@ -41,6 +44,11 @@ public class FileOperationsServiceBenchmarks
                     File.WriteAllText(Path.Combine(subDir2, $"file{f}.txt"), "test");
                 }
             }
+        }
+
+        for (int i = 0; i < 1_000; i++)
+        {
+            File.WriteAllText(Path.Combine(_fileNamesDirectory, $"file_{i:D4}.txt"), "test");
         }
 
         Dictionary<string, string?> configDict = new()
@@ -116,5 +124,24 @@ public class FileOperationsServiceBenchmarks
     private List<DirectoryInfo> GetSubDirectories(string directoryPath)
     {
         return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()];
+    }
+
+    [Benchmark]
+    public string[] GetFileNames_Current()
+    {
+        return _fileOperationsService.GetFileNames(_fileNamesDirectory);
+    }
+
+    [Benchmark]
+    public string[] GetFileNames_InPlaceFromPaths()
+    {
+        string[] filePaths = Directory.GetFiles(_fileNamesDirectory);
+
+        for (int i = 0; i < filePaths.Length; i++)
+        {
+            filePaths[i] = Path.GetFileName(filePaths[i]);
+        }
+
+        return filePaths;
     }
 }

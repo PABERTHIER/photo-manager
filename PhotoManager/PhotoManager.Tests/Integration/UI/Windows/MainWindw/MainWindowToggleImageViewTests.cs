@@ -1,8 +1,9 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +16,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowToggleImageViewTests
 {
     private string? _assetsDirectory;
@@ -37,6 +38,7 @@ public class MainWindowToggleImageViewTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -71,9 +73,9 @@ public class MainWindowToggleImageViewTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -97,9 +99,9 @@ public class MainWindowToggleImageViewTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -131,9 +133,9 @@ public class MainWindowToggleImageViewTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -161,9 +163,9 @@ public class MainWindowToggleImageViewTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -216,15 +218,19 @@ public class MainWindowToggleImageViewTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -273,7 +279,7 @@ public class MainWindowToggleImageViewTests
         string expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset1.FileName} - image 1 of 4 - sorted by file name ascending";
 
-        string result = ToggleImageView();
+        string result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -281,8 +287,8 @@ public class MainWindowToggleImageViewTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -294,8 +300,8 @@ public class MainWindowToggleImageViewTests
             _folderNavigationViewModel!,
             assetsDirectory,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -325,15 +331,15 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
         // Second ToggleImageView
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -341,8 +347,8 @@ public class MainWindowToggleImageViewTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -354,8 +360,8 @@ public class MainWindowToggleImageViewTests
             _folderNavigationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             0,
             expectedAppTitle,
             expectedAssets,
@@ -385,22 +391,22 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
         // ChangeAppMode 2
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
 
         // Third ToggleImageView
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - {_asset4.FileName} - image 4 of 4 - sorted by file name ascending";
 
-        _applicationViewModel!.ViewerPosition = 3;
+        _applicationViewModel!.SetViewerPosition(3);
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -408,8 +414,8 @@ public class MainWindowToggleImageViewTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             3,
             expectedAppTitle,
             expectedAssets,
@@ -421,8 +427,8 @@ public class MainWindowToggleImageViewTests
             _folderNavigationViewModel!,
             assetsDirectory,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             3,
             expectedAppTitle,
             expectedAssets,
@@ -452,13 +458,13 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
         // ChangeAppMode 2
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
         // ViewerPosition update 1
         Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
@@ -468,8 +474,8 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
         // ChangeAppMode 3
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
 
         // Fourth ToggleImageView
@@ -478,7 +484,7 @@ public class MainWindowToggleImageViewTests
 
         _applicationViewModel!.GoToPreviousAsset();
 
-        result = ToggleImageView();
+        result = await ToggleImageView();
 
         Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -486,8 +492,8 @@ public class MainWindowToggleImageViewTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             2,
             expectedAppTitle,
             expectedAssets,
@@ -499,8 +505,8 @@ public class MainWindowToggleImageViewTests
             _folderNavigationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             2,
             expectedAppTitle,
             expectedAssets,
@@ -530,13 +536,13 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
         // ChangeAppMode 2
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
         // ViewerPosition update 1
         Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
@@ -546,8 +552,8 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
         // ChangeAppMode 3
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
         // GoToPreviousAsset
         Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("ViewerPosition"));
@@ -557,16 +563,16 @@ public class MainWindowToggleImageViewTests
         Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("AppTitle"));
         // ChangeAppMode 4
         Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             2,
             expectedAppTitle,
             expectedAssets,
@@ -606,7 +612,7 @@ public class MainWindowToggleImageViewTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
 
-            string result = ToggleImageView();
+            string result = await ToggleImageView();
 
             Assert.That(result, Is.EqualTo("ShowImage for ViewerUserControl"));
 
@@ -614,8 +620,8 @@ public class MainWindowToggleImageViewTests
                 _applicationViewModel!,
                 assetsDirectory,
                 AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
+                false,
+                true,
                 0,
                 expectedAppTitle,
                 [],
@@ -627,8 +633,8 @@ public class MainWindowToggleImageViewTests
                 _folderNavigationViewModel!,
                 assetsDirectory,
                 AppMode.Viewer,
-                Visibility.Hidden,
-                Visibility.Visible,
+                false,
+                true,
                 0,
                 expectedAppTitle,
                 [],
@@ -646,15 +652,15 @@ public class MainWindowToggleImageViewTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             // ChangeAppMode 1
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
 
             // Second ToggleImageView
             expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            result = ToggleImageView();
+            result = await ToggleImageView();
 
             Assert.That(result, Is.EqualTo("ShowImage for ThumbnailsUserControl"));
 
@@ -662,8 +668,8 @@ public class MainWindowToggleImageViewTests
                 _applicationViewModel!,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 0,
                 expectedAppTitle,
                 [],
@@ -675,8 +681,8 @@ public class MainWindowToggleImageViewTests
                 _folderNavigationViewModel!,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 0,
                 expectedAppTitle,
                 [],
@@ -694,21 +700,21 @@ public class MainWindowToggleImageViewTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             // ChangeAppMode 1
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
             // ChangeAppMode 2
             Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppMode"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ThumbnailsVisible"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("IsThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("IsViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 0,
                 expectedAppTitle,
                 [],
@@ -765,8 +771,8 @@ public class MainWindowToggleImageViewTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -791,8 +797,8 @@ public class MainWindowToggleImageViewTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -804,8 +810,8 @@ public class MainWindowToggleImageViewTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -838,8 +844,8 @@ public class MainWindowToggleImageViewTests
         FolderNavigationViewModel folderNavigationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -875,8 +881,8 @@ public class MainWindowToggleImageViewTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -959,16 +965,33 @@ public class MainWindowToggleImageViewTests
         Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
     }
 
-    private string ToggleImageView()
+    private async Task<string> ToggleImageView()
     {
         _applicationViewModel!.ChangeAppMode();
-        return ShowImage();
+        return await ShowImage();
     }
 
-    private string ShowImage()
+    private Task<string> ShowImage()
     {
-        return _applicationViewModel!.AppMode == AppMode.Viewer
-            ? "ShowImage for ViewerUserControl"
-            : "ShowImage for ThumbnailsUserControl";
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            if (_applicationViewModel!.AppMode == AppMode.Viewer)
+            {
+                ViewerUserControl viewerUserControl = new()
+                {
+                    DataContext = _applicationViewModel
+                };
+
+                viewerUserControl.ShowImage();
+                Image image = viewerUserControl.FindControl<Image>("Image")
+                    ?? throw new InvalidOperationException("Image was not found.");
+                Assert.That(image.Source, _applicationViewModel.CurrentAsset == null ? Is.Null : Is.Not.Null);
+                return "ShowImage for ViewerUserControl";
+            }
+
+            ThumbnailsUserControl thumbnailsUserControl = new();
+            thumbnailsUserControl.ScrollSelectedThumbnailIntoView();
+            return "ShowImage for ThumbnailsUserControl";
+        });
     }
 }

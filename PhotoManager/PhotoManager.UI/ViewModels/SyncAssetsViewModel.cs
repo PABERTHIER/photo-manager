@@ -22,6 +22,16 @@ public class SyncAssetsViewModel(IApplication application)
         }
     } = [];
 
+    public void AddDefinition()
+    {
+        Definitions.Add(new()
+        {
+            SourceDirectory = string.Empty,
+            DestinationDirectory = string.Empty
+        });
+        NotifyPropertyChanged(nameof(Definitions));
+    }
+
     public void DeleteDefinition(SyncAssetsDirectoriesDefinition definition)
     {
         if (Definitions.Remove(definition))
@@ -48,6 +58,18 @@ public class SyncAssetsViewModel(IApplication application)
     public override async Task RunProcessAsync(ProcessStatusChangedCallback callback)
     {
         List<SyncAssetsResult> results = await application.SyncAssetsAsync(callback);
-        Results = [.. results];
+        Results = CreateObservableCollection(results);
+    }
+
+    private static ObservableCollection<SyncAssetsResult> CreateObservableCollection(List<SyncAssetsResult> results)
+    {
+        ObservableCollection<SyncAssetsResult> observableResults = [];
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            observableResults.Add(results[i]);
+        }
+
+        return observableResults;
     }
 }

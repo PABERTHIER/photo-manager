@@ -30,6 +30,8 @@ public class FolderTests
     [TestCase("FolderName", "FolderName")]
     [TestCase("C:\\TestFolder\\SubFolder", "SubFolder")]
     [TestCase("C:\\TestFolder\\SubFolder\\", "SubFolder")]
+    [TestCase("/home/user/SubFolder", "SubFolder")]
+    [TestCase("/home/user/SubFolder/", "SubFolder")]
     public void Name_PathIsValid_ReturnsExpected(string path, string expected)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = path };
@@ -66,6 +68,17 @@ public class FolderTests
     {
         Folder parentFolder = new() { Id = Guid.NewGuid(), Path = "C:\\TestFolder" };
         Folder childFolder = new() { Id = Guid.NewGuid(), Path = "C:\\TESTFOLDER\\SubFolder" };
+
+        bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
+
+        Assert.That(isFolderParentOfChild, Is.True);
+    }
+
+    [Test]
+    public void IsParentOf_UnixPathIsValid_ReturnsTrue()
+    {
+        Folder parentFolder = new() { Id = Guid.NewGuid(), Path = "/home/user/Pictures" };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = "/home/user/Pictures/SubFolder" };
 
         bool isFolderParentOfChild = parentFolder.IsParentOf(childFolder);
 

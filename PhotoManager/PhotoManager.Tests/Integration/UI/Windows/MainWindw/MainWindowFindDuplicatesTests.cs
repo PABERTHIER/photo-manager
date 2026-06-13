@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +14,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowFindDuplicatesTests
 {
     private string? _assetsDirectory;
@@ -85,9 +84,9 @@ public class MainWindowFindDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -111,9 +110,9 @@ public class MainWindowFindDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -145,9 +144,9 @@ public class MainWindowFindDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -175,9 +174,9 @@ public class MainWindowFindDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -201,7 +200,7 @@ public class MainWindowFindDuplicatesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -265,15 +264,19 @@ public class MainWindowFindDuplicatesTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -354,7 +357,7 @@ public class MainWindowFindDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
-                Visible = Visibility.Collapsed,
+                IsVisible = false,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -362,7 +365,7 @@ public class MainWindowFindDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
-                Visible = Visibility.Collapsed,
+                IsVisible = false,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -519,7 +522,7 @@ public class MainWindowFindDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
-                Visible = Visibility.Collapsed,
+                IsVisible = false,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -659,7 +662,7 @@ public class MainWindowFindDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
-                Visible = Visibility.Collapsed,
+                IsVisible = false,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -808,7 +811,7 @@ public class MainWindowFindDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
-                Visible = Visibility.Collapsed,
+                IsVisible = false,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
@@ -1170,8 +1173,8 @@ public class MainWindowFindDuplicatesTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -1204,8 +1207,8 @@ public class MainWindowFindDuplicatesTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -1364,8 +1367,8 @@ public class MainWindowFindDuplicatesTests
 
             for (int i = 0; i < expectedDuplicatedAssetSet.Count; i++)
             {
-                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(
-                    a => a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
+                DuplicatedAssetViewModel actualAsset = duplicatedAssetSet.First(a =>
+                    a.Asset.FullPath == expectedDuplicatedAssetSet[i].Asset.FullPath);
                 AssertDuplicatedAsset(actualAsset, expectedDuplicatedAssetSet[i]);
             }
         }
@@ -1383,7 +1386,7 @@ public class MainWindowFindDuplicatesTests
 
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatedSetViewModel.DuplicatesCount));
 
-        Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedDuplicatedSetViewModel.Visible));
+        Assert.That(duplicatedSetViewModel.IsVisible, Is.EqualTo(expectedDuplicatedSetViewModel.IsVisible));
     }
 
     private static void AssertDuplicatedAsset(DuplicatedAssetViewModel? duplicatedAsset,
@@ -1393,7 +1396,7 @@ public class MainWindowFindDuplicatesTests
         {
             AssertAssetPropertyValidity(duplicatedAsset!.Asset, expectedDuplicatedAsset.Asset);
 
-            Assert.That(duplicatedAsset.Visible, Is.EqualTo(expectedDuplicatedAsset.Visible));
+            Assert.That(duplicatedAsset.IsVisible, Is.EqualTo(expectedDuplicatedAsset.IsVisible));
 
             if (expectedDuplicatedAsset.ParentViewModel.Count > 0)
             {
@@ -1402,10 +1405,11 @@ public class MainWindowFindDuplicatesTests
                 for (int i = 0; i < expectedDuplicatedAsset.ParentViewModel.Count; i++)
                 {
                     DuplicatedAssetViewModel actualSibling =
-                        duplicatedAsset.ParentViewModel.First(
-                            a => a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
+                        duplicatedAsset.ParentViewModel.First(a =>
+                            a.Asset.FullPath == expectedDuplicatedAsset.ParentViewModel[i].Asset.FullPath);
 
-                    Assert.That(actualSibling.Visible, Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].Visible));
+                    Assert.That(actualSibling.IsVisible,
+                        Is.EqualTo(expectedDuplicatedAsset.ParentViewModel[i].IsVisible));
 
                     AssertAssetPropertyValidity(actualSibling.Asset, expectedDuplicatedAsset.ParentViewModel[i].Asset);
                 }

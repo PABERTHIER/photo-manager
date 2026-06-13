@@ -1,7 +1,7 @@
-﻿using PhotoManager.Domain;
+﻿using PhotoManager.Common.Imaging;
+using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using System.Reflection;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Application;
 
@@ -58,13 +58,26 @@ public class Application(
 
     public void LoadThumbnail(Asset asset)
     {
-        asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width,
-            asset.Pixel.Thumbnail.Height);
+        IImageData? imageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName,
+            asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+        asset.ImageData?.Dispose();
+        asset.ImageData = imageData;
     }
 
     public Folder[] GetSubFolders(Folder parentFolder) => assetRepository.GetSubFolders(parentFolder);
 
-    public List<string> GetRecentTargetPaths() => [.. assetRepository.GetRecentTargetPaths()];
+    public List<string> GetRecentTargetPaths()
+    {
+        string[] recentTargetPaths = assetRepository.GetRecentTargetPaths();
+        List<string> result = new(recentTargetPaths.Length);
+
+        for (int i = 0; i < recentTargetPaths.Length; i++)
+        {
+            result.Add(recentTargetPaths[i]);
+        }
+
+        return result;
+    }
 
     public int GetAssetsCounter() => assetRepository.GetAssetsCounter();
 
@@ -81,11 +94,8 @@ public class Application(
         userConfigurationService.GetAboutInformation(assembly);
 
     // ImageProcessingService
-    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) =>
+    public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation) =>
         imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
-
-    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) =>
-        imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
     // FileOperationsService
     public bool FileExists(string fullPath) => fileOperationsService.FileExists(fullPath);

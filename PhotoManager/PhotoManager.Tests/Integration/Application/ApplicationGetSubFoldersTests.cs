@@ -58,11 +58,14 @@ public class ApplicationGetSubFoldersTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -150,7 +153,8 @@ public class ApplicationGetSubFoldersTests
             Assert.That(childFolders2, Is.Empty);
             Assert.That(childFolders3, Is.Empty);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(31));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(8));
+            Assert.That(assetsUpdatedEvents, Has.All.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

@@ -17,6 +17,7 @@ public class FindDuplicatedAssetsService(
     public List<List<Asset>> GetDuplicatedAssets()
     {
         Asset[] assets = assetRepository.GetCataloguedAssets();
+        Array.Sort(assets, CompareByFileNameThenFolderPath);
 
         if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
@@ -24,19 +25,7 @@ public class FindDuplicatedAssetsService(
                 userConfigurationService.HashSettings.PHashThreshold);
         }
 
-        List<Asset> validAssets = assets
-            .AsParallel()
-            .AsOrdered()
-            .Where(asset => fileOperationsService.FileExists(asset.FullPath))
-            .ToList();
-
-        return
-        [
-            .. validAssets
-                .GroupBy(a => a.Hash)
-                .Where(g => g.Count() > 1)
-                .Select(g => g.ToList())
-        ];
+        return GetDuplicatesByExactHash(assets);
     }
 
     // Between Original and Thumbnail:
@@ -62,6 +51,82 @@ public class FindDuplicatedAssetsService(
             }
         }
 
-        return [.. bkTree.GetAllGroups().Where(g => g.Count > 1)];
+        List<List<Asset>> duplicateGroups = [];
+
+        foreach (List<Asset> group in bkTree.GetAllGroups())
+        {
+            if (group.Count > 1)
+            {
+                duplicateGroups.Add(group);
+            }
+        }
+
+        return duplicateGroups;
+    }
+
+    private List<List<Asset>> GetDuplicatesByExactHash(Asset[] assets)
+    {
+        Dictionary<string, HashGroup> groupsByHash = new(assets.Length, StringComparer.Ordinal);
+        List<HashGroup> duplicateGroupsInOrder = [];
+
+        for (int i = 0; i < assets.Length; i++)
+        {
+            Asset asset = assets[i];
+
+            if (!groupsByHash.TryGetValue(asset.Hash, out HashGroup? group))
+            {
+                group = new(asset);
+                groupsByHash.Add(asset.Hash, group);
+                continue;
+            }
+
+            if (group.Assets is null)
+            {
+                group.Assets = [group.FirstAsset];
+                duplicateGroupsInOrder.Add(group);
+            }
+
+            group.Assets.Add(asset);
+        }
+
+        List<List<Asset>> duplicateGroups = [];
+
+        for (int i = 0; i < duplicateGroupsInOrder.Count; i++)
+        {
+            List<Asset> group = duplicateGroupsInOrder[i].Assets!;
+            List<Asset> existingAssets = new(group.Count);
+
+            for (int j = 0; j < group.Count; j++)
+            {
+                Asset asset = group[j];
+
+                if (fileOperationsService.FileExists(asset.FullPath))
+                {
+                    existingAssets.Add(asset);
+                }
+            }
+
+            if (existingAssets.Count > 1)
+            {
+                duplicateGroups.Add(existingAssets);
+            }
+        }
+
+        return duplicateGroups;
+    }
+
+    private static int CompareByFileNameThenFolderPath(Asset left, Asset right)
+    {
+        int fileNameComparison = string.CompareOrdinal(left.FileName, right.FileName);
+
+        return fileNameComparison != 0
+            ? fileNameComparison
+            : string.CompareOrdinal(left.Folder.Path, right.Folder.Path);
+    }
+
+    private sealed class HashGroup(Asset firstAsset)
+    {
+        public Asset FirstAsset { get; } = firstAsset;
+        public List<Asset>? Assets { get; set; }
     }
 }

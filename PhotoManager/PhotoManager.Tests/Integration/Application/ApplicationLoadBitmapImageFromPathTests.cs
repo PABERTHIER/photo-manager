@@ -55,7 +55,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -80,7 +80,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -113,7 +113,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -142,7 +142,7 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -187,15 +187,19 @@ public class ApplicationLoadBitmapImageFromPathTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -225,53 +229,32 @@ public class ApplicationLoadBitmapImageFromPathTests
         Asset asset3 = assets.First(x => x.FileName == _asset3!.FileName);
         Asset asset4 = assets.First(x => x.FileName == _asset4!.FileName);
 
-        BitmapImage image1 = _application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
-        BitmapImage image2 = _application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
-        BitmapImage image3 = _application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
-        BitmapImage image4 = _application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
+        using IImageData image1 = _application!.LoadBitmapImageFromPath(asset1.FullPath, asset1.ImageRotation);
+        using IImageData image2 = _application!.LoadBitmapImageFromPath(asset2.FullPath, asset2.ImageRotation);
+        using IImageData image3 = _application!.LoadBitmapImageFromPath(asset3.FullPath, asset3.ImageRotation);
+        using IImageData image4 = _application!.LoadBitmapImageFromPath(asset4.FullPath, asset4.ImageRotation);
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(image1, Is.Not.Null);
-            Assert.That(image1.StreamSource, Is.Null);
             Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));
             Assert.That(image1.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
             Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
-            Assert.That(image1.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.DecodePixelWidth, Is.Zero);
-            Assert.That(image1.DecodePixelHeight, Is.Zero);
 
             Assert.That(image2, Is.Not.Null);
-            Assert.That(image2.StreamSource, Is.Null);
             Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
-            Assert.That((int)image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
-            Assert.That((int)image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
-            Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.DecodePixelWidth, Is.Zero);
-            Assert.That(image2.DecodePixelHeight, Is.Zero);
+            Assert.That(image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
+            Assert.That(image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
 
             Assert.That(image3, Is.Not.Null);
-            Assert.That(image3.StreamSource, Is.Null);
             Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
-            Assert.That((int)image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
-            Assert.That((int)image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
-            Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.DecodePixelWidth, Is.Zero);
-            Assert.That(image3.DecodePixelHeight, Is.Zero);
+            Assert.That(image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
+            Assert.That(image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
 
             Assert.That(image4, Is.Not.Null);
-            Assert.That(image4.StreamSource, Is.Null);
             Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
-            Assert.That(image4.Width,
-                Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-            Assert.That(image4.Height, Is.EqualTo(5376)); // Wrong height
-            Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
-            Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
-            Assert.That(image4.DecodePixelWidth, Is.Zero);
-            Assert.That(image4.DecodePixelHeight, Is.Zero);
+            Assert.That(image4.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
+            Assert.That(image4.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
         }
     }
 }

@@ -1,0 +1,142 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.SyncAssetsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Sync Assets"
+    Width="900"
+    Height="600"
+    WindowState="Maximized">
+    <Grid Background="{DynamicResource PhotoManagerBackgroundBrush}">
+        <Grid IsVisible="{Binding IsDescriptionVisible}" RowDefinitions="*,Auto">
+            <TextBlock
+                Grid.Row="0"
+                Margin="24"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                Text="{Binding Description}"
+                TextWrapping="Wrap" />
+            <Button
+                x:Name="ContinueFromDescriptionButton"
+                Grid.Row="1"
+                Classes="action"
+                Width="120"
+                Margin="16"
+                HorizontalAlignment="Right"
+                Content="Continue"
+                Click="ContinueButton_Click" />
+        </Grid>
+
+        <Grid IsVisible="{Binding IsConfigurationVisible}" RowDefinitions="Auto,*,Auto">
+            <TextBlock
+                Grid.Row="0"
+                Margin="16,12"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                Text="Sync definitions" />
+            <Button
+                x:Name="AddDefinitionButton"
+                Grid.Row="0"
+                Classes="action"
+                Width="140"
+                Margin="16,8"
+                HorizontalAlignment="Right"
+                Content="Add definition"
+                Click="AddButton_Click" />
+            <DataGrid
+                x:Name="DefinitionsDataGrid"
+                Grid.Row="1"
+                Margin="16,0"
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="False"
+                CanUserResizeColumns="True"
+                GridLinesVisibility="All"
+                IsReadOnly="False"
+                IsEnabled="{Binding CanConfigure}"
+                ItemsSource="{Binding Definitions}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Source Directory" Binding="{Binding SourceDirectory}" Width="300" />
+                    <DataGridTextColumn
+                        Header="Destination Directory"
+                        Binding="{Binding DestinationDirectory}"
+                        Width="300" />
+                    <DataGridCheckBoxColumn
+                        Header="Include Sub Folders"
+                        Binding="{Binding IncludeSubFolders}"
+                        Width="150" />
+                    <DataGridCheckBoxColumn
+                        Header="Delete Assets Not In Source"
+                        Binding="{Binding DeleteAssetsNotInSource}"
+                        Width="220" />
+                    <DataGridTemplateColumn Header="Actions" Width="320">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Classes="action" Content="Move Up" Click="MoveUpButton_Click" />
+                                    <Button Classes="action" Content="Move Down" Click="MoveDownButton_Click" />
+                                    <Button Classes="action" Content="Delete" Click="DeleteButton_Click" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel
+                Grid.Row="2"
+                Margin="16"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="8">
+                <Button x:Name="SaveButton" Classes="action" Width="100" Content="Save" Click="SaveButton_Click" />
+                <Button x:Name="RunButton" Classes="action" Width="100" Content="Run" Click="RunButton_Click" />
+            </StackPanel>
+        </Grid>
+
+        <Grid IsVisible="{Binding IsRunVisible}" RowDefinitions="*,Auto">
+            <ListBox
+                Grid.Row="0"
+                Margin="16"
+                Background="{DynamicResource PhotoManagerPanelBrush}"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                ItemsSource="{Binding ProcessStatusMessages}" />
+            <Button
+                x:Name="ViewResultsButton"
+                Grid.Row="1"
+                Classes="action"
+                Width="120"
+                Margin="16"
+                HorizontalAlignment="Right"
+                Content="View Results"
+                IsEnabled="{Binding CanViewResults}"
+                Click="ContinueButton_Click" />
+        </Grid>
+
+        <Grid IsVisible="{Binding IsResultsVisible}" RowDefinitions="Auto,*,Auto">
+            <TextBlock
+                Grid.Row="0"
+                Margin="16,12"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                Text="Results" />
+            <DataGrid
+                Grid.Row="1"
+                Margin="16,0"
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="All"
+                IsReadOnly="True"
+                ItemsSource="{Binding Results}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Source Directory" Binding="{Binding SourceDirectory}" Width="250" />
+                    <DataGridTextColumn Header="Destination Directory" Binding="{Binding DestinationDirectory}" Width="250" />
+                    <DataGridTextColumn Header="Synced Images" Binding="{Binding Message}" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button
+                x:Name="CloseResultsButton"
+                Grid.Row="2"
+                Classes="action"
+                Width="100"
+                Margin="16"
+                HorizontalAlignment="Right"
+                Content="Close"
+                Click="CloseButton_Click" />
+        </Grid>
+    </Grid>
+</Window>

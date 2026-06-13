@@ -37,7 +37,7 @@ public class PixelSizeConverterTests
         object? input = null;
         object? parameter = null;
 
-        object? result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
+        object result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(""));
     }
@@ -49,7 +49,7 @@ public class PixelSizeConverterTests
         const string input = "Not an Asset object";
         object? parameter = null;
 
-        object? result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
+        object result = pixelSizeConverter.Convert(input, typeof(string), parameter, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(""));
     }

@@ -8,9 +8,9 @@ public class Asset
     public string FullPath => Path.Combine(Folder.Path, FileName);
     public FileProperties FileProperties { get; set; } // Not stored in DB
     public required Pixel Pixel { get; init; }
-    public Rotation ImageRotation { get; init; }
+    public ImageRotation ImageRotation { get; init; }
     public required string Hash { get; init; }
-    public BitmapImage? ImageData { get; set; } // Not stored in DB
+    public IImageData? ImageData { get; set; } // Not stored in DB
     public DateTime ThumbnailCreationDateTime { get; init; }
     public Metadata Metadata { get; init; }
 

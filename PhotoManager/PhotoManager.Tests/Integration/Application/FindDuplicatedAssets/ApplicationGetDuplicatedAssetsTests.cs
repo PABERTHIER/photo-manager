@@ -45,7 +45,7 @@ public class ApplicationGetDuplicatedAssetsTests
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -70,7 +70,7 @@ public class ApplicationGetDuplicatedAssetsTests
             FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
@@ -95,7 +95,7 @@ public class ApplicationGetDuplicatedAssetsTests
             FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -176,7 +176,7 @@ public class ApplicationGetDuplicatedAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -221,15 +221,19 @@ public class ApplicationGetDuplicatedAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -276,31 +280,39 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)
-            && a.Hash == hash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                          FileNames.IMAGE_1_JPG)
+                                                      && a.Hash == hash1), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)
-            && a.Hash == hash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_1_DUPLICATE_JPG)
+                                                      && a.Hash == hash1), Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)
-            && a.Hash == hash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_PNG)
+                                                       && a.Hash == hash2), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)
-            && a.Hash == hash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_DUPLICATE_PNG)
+                                                       && a.Hash == hash2), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
-            && a.Hash == hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(
+                                                          duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
+                                                      && a.Hash == hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)
-            && a.Hash == hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_ORIGINAL_JPG)
+                                                      && a.Hash == hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)
-            && a.Hash == hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                          FileNames._1336_4_K_ORIGINAL_JPG)
+                                                      && a.Hash == hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)
-            && a.Hash == hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_ORIGINAL_JPG)
+                                                      && a.Hash == hash3), Is.True);
     }
 
     [Test]
@@ -350,65 +362,83 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(seventhDuplicatedAssetsSet, Has.Count.EqualTo(2));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)
-            && a.Hash == dHash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                          FileNames.IMAGE_1_JPG)
+                                                      && a.Hash == dHash1), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)
-            && a.Hash == dHash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_1_DUPLICATE_JPG)
+                                                      && a.Hash == dHash1), Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)
-            && a.Hash == dHash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_PNG)
+                                                       && a.Hash == dHash2), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)
-            && a.Hash == dHash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_DUPLICATE_PNG)
+                                                       && a.Hash == dHash2), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_11_HEIC
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_11_HEIC)
-            && a.Hash == dHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_11_HEIC)
+                                                      && a.Hash == dHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1337_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1337_JPG)
-            && a.Hash == dHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(
+                                                          duplicatesNotDuplicateSample1Directory, FileNames._1337_JPG)
+                                                      && a.Hash == dHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_SHIT_QUALITY_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_SHIT_QUALITY_JPG)
-            && a.Hash == dHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_SHIT_QUALITY_JPG)
+                                                      && a.Hash == dHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_SMALL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_SMALL_JPG)
-            && a.Hash == dHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_SMALL_JPG)
+                                                      && a.Hash == dHash3), Is.True);
 
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
-            && a.Hash == dHash4), Is.True);
+                                                       && a.FullPath == Path.Combine(
+                                                           duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
+                                                       && a.Hash == dHash4), Is.True);
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)
-            && a.Hash == dHash4), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                           FileNames._1336_ORIGINAL_JPG)
+                                                       && a.Hash == dHash4), Is.True);
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)
-            && a.Hash == dHash4), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                           FileNames._1336_4_K_ORIGINAL_JPG)
+                                                       && a.Hash == dHash4), Is.True);
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)
-            && a.Hash == dHash4), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                           FileNames.IMAGE_1336_ORIGINAL_JPG)
+                                                       && a.Hash == dHash4), Is.True);
 
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_BOTTOM_LEFT_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_BOTTOM_LEFT_PART_JPG)
-            && a.Hash == dHash5), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_BOTTOM_LEFT_PART_JPG)
+                                                      && a.Hash == dHash5), Is.True);
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_BOTTOM_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_BOTTOM_PART_JPG)
-            && a.Hash == dHash5), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_BOTTOM_PART_JPG)
+                                                      && a.Hash == dHash5), Is.True);
 
         Assert.That(sixthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_LEFT_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_LEFT_PART_JPG)
-            && a.Hash == dHash6), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_LEFT_PART_JPG)
+                                                      && a.Hash == dHash6), Is.True);
         Assert.That(sixthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_TOP_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_TOP_PART_JPG)
-            && a.Hash == dHash6), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_TOP_PART_JPG)
+                                                      && a.Hash == dHash6), Is.True);
 
         Assert.That(seventhDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_RIGHT_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_RIGHT_PART_JPG)
-            && a.Hash == dHash7), Is.True);
+                                                        && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                            FileNames._1336_RIGHT_PART_JPG)
+                                                        && a.Hash == dHash7), Is.True);
         Assert.That(seventhDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_TOP_RIGHT_PART_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_TOP_RIGHT_PART_JPG)
-            && a.Hash == dHash7), Is.True);
+                                                        && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                            FileNames._1336_TOP_RIGHT_PART_JPG)
+                                                        && a.Hash == dHash7), Is.True);
     }
 
     [Test]
@@ -446,31 +476,39 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)
-            && a.Hash == mD5Hash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                          FileNames.IMAGE_1_JPG)
+                                                      && a.Hash == mD5Hash1), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)
-            && a.Hash == mD5Hash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_1_DUPLICATE_JPG)
+                                                      && a.Hash == mD5Hash1), Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)
-            && a.Hash == mD5Hash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_PNG)
+                                                       && a.Hash == mD5Hash2), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)
-            && a.Hash == mD5Hash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_DUPLICATE_PNG)
+                                                       && a.Hash == mD5Hash2), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
-            && a.Hash == mD5Hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(
+                                                          duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
+                                                      && a.Hash == mD5Hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)
-            && a.Hash == mD5Hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_ORIGINAL_JPG)
+                                                      && a.Hash == mD5Hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)
-            && a.Hash == mD5Hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                          FileNames._1336_4_K_ORIGINAL_JPG)
+                                                      && a.Hash == mD5Hash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)
-            && a.Hash == mD5Hash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_ORIGINAL_JPG)
+                                                      && a.Hash == mD5Hash3), Is.True);
     }
 
     [Test]
@@ -508,31 +546,39 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)
-            && a.Hash == pHash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                          FileNames.IMAGE_1_JPG)
+                                                      && a.Hash == pHash1), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)
-            && a.Hash == pHash1), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_1_DUPLICATE_JPG)
+                                                      && a.Hash == pHash1), Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)
-            && a.Hash == pHash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_PNG)
+                                                       && a.Hash == pHash2), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)
-            && a.Hash == pHash2), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_9_DUPLICATE_PNG)
+                                                       && a.Hash == pHash2), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
-            && a.Hash == pHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(
+                                                          duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
+                                                      && a.Hash == pHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)
-            && a.Hash == pHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_ORIGINAL_JPG)
+                                                      && a.Hash == pHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)
-            && a.Hash == pHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                          FileNames._1336_4_K_ORIGINAL_JPG)
+                                                      && a.Hash == pHash3), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)
-            && a.Hash == pHash3), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_ORIGINAL_JPG)
+                                                      && a.Hash == pHash3), Is.True);
     }
 
     [Test]
@@ -563,15 +609,19 @@ public class ApplicationGetDuplicatedAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -619,38 +669,49 @@ public class ApplicationGetDuplicatedAssetsTests
             Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(2));
 
             Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-                && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)
-                && a.Hash == pHash1), Is.True);
+                                                          && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                              FileNames.IMAGE_1_JPG)
+                                                          && a.Hash == pHash1), Is.True);
             Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-                && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)
-                && a.Hash == pHash1), Is.True);
+                                                          && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                              FileNames.IMAGE_1_DUPLICATE_JPG)
+                                                          && a.Hash == pHash1), Is.True);
 
             Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-                && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)
-                && a.Hash == pHash2), Is.True);
+                                                           && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                               FileNames.IMAGE_9_PNG)
+                                                           && a.Hash == pHash2), Is.True);
             Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-                && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)
-                && a.Hash == pHash2), Is.True);
+                                                           && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                               FileNames.IMAGE_9_DUPLICATE_PNG)
+                                                           && a.Hash == pHash2), Is.True);
 
             Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-                && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)
-                && a.Hash == pHash3), Is.True);
+                                                          && a.FullPath ==
+                                                          Path.Combine(duplicatesNotDuplicateSample1Directory,
+                                                              FileNames._1336_JPG)
+                                                          && a.Hash == pHash3), Is.True);
             Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-                && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)
-                && a.Hash == pHash3), Is.True);
+                                                          && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                              FileNames._1336_ORIGINAL_JPG)
+                                                          && a.Hash == pHash3), Is.True);
             Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-                && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)
-                && a.Hash == pHash3), Is.True);
+                                                          && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                              FileNames._1336_4_K_ORIGINAL_JPG)
+                                                          && a.Hash == pHash3), Is.True);
             Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-                && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)
-                && a.Hash == pHash3), Is.True);
+                                                          && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                              FileNames.IMAGE_1336_ORIGINAL_JPG)
+                                                          && a.Hash == pHash3), Is.True);
 
             Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_1_K_JPG
-                && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_1_K_JPG)
-                && a.Hash == pHash4First), Is.True);
+                                                           && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                               FileNames._1336_1_K_JPG)
+                                                           && a.Hash == pHash4First), Is.True);
             Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_2_K_JPG
-                && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_2_K_JPG)
-                && a.Hash == pHash4Second), Is.True);
+                                                           && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                               FileNames._1336_2_K_JPG)
+                                                           && a.Hash == pHash4Second), Is.True);
         }
     }
 
@@ -692,41 +753,55 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(fifthDuplicatedAssetsSet, Has.Count.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG)), Is.True);
+                                                      && a.FullPath == Path.Combine(_assetsDirectory!,
+                                                          FileNames.IMAGE_1_JPG)), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
+                                                          FileNames.IMAGE_1_JPG)), Is.True);
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_DUPLICATE_JPG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)),
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_1_DUPLICATE_JPG)),
             Is.True);
 
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_2_DUPLICATED_JPG
-            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)), Is.True);
+                                                       && a.FullPath == Path.Combine(_assetsDirectory!,
+                                                           FileNames.IMAGE_2_DUPLICATED_JPG)), Is.True);
         Assert.That(secondDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_2_JPG
-            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_JPG)), Is.True);
+                                                       && a.FullPath == Path.Combine(_assetsDirectory!,
+                                                           FileNames.IMAGE_2_JPG)), Is.True);
 
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG)), Is.True);
+                                                      && a.FullPath == Path.Combine(_assetsDirectory!,
+                                                          FileNames.IMAGE_9_PNG)), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_9_PNG)), Is.True);
         Assert.That(thirdDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_9_DUPLICATE_PNG
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)),
+                                                      && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                          FileNames.IMAGE_9_DUPLICATE_PNG)),
             Is.True);
 
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_11_HEIC
-            && a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC)), Is.True);
+                                                       && a.FullPath == Path.Combine(_assetsDirectory!,
+                                                           FileNames.IMAGE_11_HEIC)), Is.True);
         Assert.That(fourthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_11_HEIC
-            && a.FullPath == Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_11_HEIC)), Is.True);
+                                                       && a.FullPath == Path.Combine(duplicatesNewFolder2Directory,
+                                                           FileNames.IMAGE_11_HEIC)), Is.True);
 
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_JPG
-            && a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)),
+                                                      && a.FullPath == Path.Combine(
+                                                          duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)),
             Is.True);
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)), Is.True);
+                                                      && a.FullPath == Path.Combine(duplicatesPartDirectory,
+                                                          FileNames._1336_ORIGINAL_JPG)), Is.True);
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames._1336_4_K_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_4_K_ORIGINAL_JPG)),
+                                                      && a.FullPath == Path.Combine(duplicatesResolutionDirectory,
+                                                          FileNames._1336_4_K_ORIGINAL_JPG)),
             Is.True);
         Assert.That(fifthDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1336_ORIGINAL_JPG
-            && a.FullPath == Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)),
+                                                      && a.FullPath == Path.Combine(duplicatesThumbnailDirectory,
+                                                          FileNames.IMAGE_1336_ORIGINAL_JPG)),
             Is.True);
     }
 
@@ -735,8 +810,8 @@ public class ApplicationGetDuplicatedAssetsTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string sourcePath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
-        string sourcePath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+        string sourcePath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
@@ -762,7 +837,8 @@ public class ApplicationGetDuplicatedAssetsTests
         Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
 
         List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
+        List<Asset> secondDuplicatedAssetsSet =
+            duplicatedAssets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
 
         Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
         Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
@@ -790,7 +866,7 @@ public class ApplicationGetDuplicatedAssetsTests
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
         const string hash = Hashes.IMAGE_9_PNG;
-        string sourcePath = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourcePath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
@@ -836,7 +912,7 @@ public class ApplicationGetDuplicatedAssetsTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
         string folderPath2 = Path.Combine(_assetsDirectory!, Directories.NEW_FOLDER_2);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };

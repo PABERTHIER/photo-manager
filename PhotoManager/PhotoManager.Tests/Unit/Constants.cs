@@ -3,7 +3,7 @@
 public static class Constants
 {
     public const string DATABASE_BACKUP_END_PATH = "Backups";
-    public const string VERSION = "v2.0.0";
+    public const string VERSION = "v3.0.0";
 
     public static class Directories
     {
@@ -217,7 +217,7 @@ public static class Constants
         public const string IMAGE_8_JPEG = "54aaa1554aaa14";
         public const string IMAGE_10_PORTRAIT_PNG = "80500d40555402";
         public const string IMAGE_11_HEIC = "00000000000000";
-        public const string IMAGE_11_90_DEG_HEIC = "347636785c99d1";
+        public const string IMAGE_11_90_DEG_HEIC = "3476367d5c9dd9";
 
         public const string EMPTY_IMAGE = "00000000000000";
 

@@ -1,7 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.UI.Models;
-using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
@@ -25,7 +24,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         get;
         set
         {
-            field = value;
+            field = NormalizeDuplicatedAssetSetsPosition(value);
             NotifyPropertyChanged(nameof(DuplicatedAssetSetsPosition), nameof(CurrentDuplicatedAssetSet));
             ResetDuplicatedAssetPosition();
         }
@@ -36,21 +35,14 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         get;
         set
         {
-            field = value;
+            field = NormalizeDuplicatedAssetPosition(value);
 
             if (CurrentDuplicatedAsset is { Asset.ImageData: null })
             {
                 application.LoadThumbnail(CurrentDuplicatedAsset.Asset);
             }
 
-            if (CurrentDuplicatedAsset is { Asset.ImageData: null })
-            {
-                Refresh();
-            }
-            else
-            {
-                NotifyPropertyChanged(nameof(DuplicatedAssetPosition), nameof(CurrentDuplicatedAsset));
-            }
+            NotifyPropertyChanged(nameof(DuplicatedAssetPosition), nameof(CurrentDuplicatedAsset));
         }
     }
 
@@ -60,7 +52,9 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         {
             DuplicatedSetViewModel result = [];
 
-            if (DuplicatedAssetSets.Count > 0 && DuplicatedAssetSetsPosition >= 0)
+            if (DuplicatedAssetSets.Count > 0
+                && DuplicatedAssetSetsPosition >= 0
+                && DuplicatedAssetSetsPosition < DuplicatedAssetSets.Count)
             {
                 result = DuplicatedAssetSets[DuplicatedAssetSetsPosition];
             }
@@ -75,7 +69,9 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         {
             DuplicatedAssetViewModel? result = null;
 
-            if (CurrentDuplicatedAssetSet.Count > 0 && DuplicatedAssetPosition >= 0)
+            if (CurrentDuplicatedAssetSet.Count > 0
+                && DuplicatedAssetPosition >= 0
+                && DuplicatedAssetPosition < CurrentDuplicatedAssetSet.Count)
             {
                 result = CurrentDuplicatedAssetSet[DuplicatedAssetPosition];
             }
@@ -159,7 +155,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         {
             if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
                  && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
-                || duplicatedSetViewModel[i].Visible == Visibility.Collapsed)
+                || !duplicatedSetViewModel[i].IsVisible)
             {
                 continue;
             }
@@ -192,7 +188,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
                 {
                     exemptedAssets.Add(duplicatedAsset);
                 }
-                else if (duplicatedAsset.Visible != Visibility.Collapsed)
+                else if (duplicatedAsset.IsVisible)
                 {
                     duplicatedAssetsFiltered.Add(duplicatedAsset);
                 }
@@ -226,13 +222,13 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
     {
         for (int i = 0; i < duplicatedAssets.Count; i++)
         {
-            duplicatedAssets[i].Visible = Visibility.Collapsed;
+            duplicatedAssets[i].IsVisible = false;
         }
 
         // We want to navigate to another set only when we are collapsing the last duplicate of the current set
-        if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
+        if (CurrentDuplicatedAssetSet.IsVisible)
         {
-            if (CurrentDuplicatedAsset!.Visible == Visibility.Collapsed)
+            if (!CurrentDuplicatedAsset!.IsVisible)
             {
                 ResetDuplicatedAssetPosition();
             }
@@ -245,7 +241,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void ResetDuplicatedAssetPosition()
     {
-        if (DuplicatedAssetSets.Count == 0 || CurrentDuplicatedAssetSet.Visible != Visibility.Visible)
+        if (DuplicatedAssetSets.Count == 0 || !CurrentDuplicatedAssetSet.IsVisible)
         {
             DuplicatedAssetPosition = 0;
 
@@ -254,7 +250,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
         for (int i = 0; i < CurrentDuplicatedAssetSet.Count; i++)
         {
-            if (CurrentDuplicatedAssetSet[i].Visible != Visibility.Visible)
+            if (!CurrentDuplicatedAssetSet[i].IsVisible)
             {
                 continue;
             }
@@ -265,11 +261,43 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         }
     }
 
+    private int NormalizeDuplicatedAssetSetsPosition(int position)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return 0;
+        }
+
+        if (position >= 0 && position < DuplicatedAssetSets.Count)
+        {
+            return position;
+        }
+
+        return Math.Clamp(DuplicatedAssetSetsPosition, 0, DuplicatedAssetSets.Count - 1);
+    }
+
+    private int NormalizeDuplicatedAssetPosition(int position)
+    {
+        DuplicatedSetViewModel currentDuplicatedAssetSet = CurrentDuplicatedAssetSet;
+
+        if (currentDuplicatedAssetSet.Count == 0)
+        {
+            return 0;
+        }
+
+        if (position >= 0 && position < currentDuplicatedAssetSet.Count)
+        {
+            return position;
+        }
+
+        return Math.Clamp(DuplicatedAssetPosition, 0, currentDuplicatedAssetSet.Count - 1);
+    }
+
     private void NavigateToNextVisibleSet(int currentIndex)
     {
         for (int i = currentIndex; i < DuplicatedAssetSets.Count; i++)
         {
-            if (DuplicatedAssetSets[i].Visible == Visibility.Visible)
+            if (DuplicatedAssetSets[i].IsVisible)
             {
                 DuplicatedAssetSetsPosition = i;
                 return;
@@ -292,7 +320,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
         for (int i = currentIndex; i >= 0; i--)
         {
-            if (DuplicatedAssetSets[i].Visible == Visibility.Visible)
+            if (DuplicatedAssetSets[i].IsVisible)
             {
                 DuplicatedAssetSetsPosition = i;
                 return;

@@ -98,14 +98,15 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
             FolderId = new("db973547-ed18-4e7d-8dc8-ce441aabef80"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
@@ -130,7 +131,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("65a65540-586e-4b2e-a62a-ccdbd7d442f2"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1337_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1337_JPG, Height = PixelHeightAsset._1337_JPG },
@@ -155,7 +156,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("65ba6b40-dc3c-46b6-8508-135cb4e1f961"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1349_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1349_JPG, Height = PixelHeightAsset._1349_JPG },
@@ -180,7 +181,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("ee3dcc63-53d8-4937-a38a-45b3189118e6"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1350_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1350_JPG, Height = PixelHeightAsset._1350_JPG },
@@ -205,7 +206,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("044e3039-0b4b-4065-b215-9cf185d1f90f"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1413_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1413_JPG, Height = PixelHeightAsset._1413_JPG },
@@ -230,7 +231,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("80fa1201-1b9d-4d8e-8730-6efe8e46fcbd"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1414_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1414_JPG, Height = PixelHeightAsset._1414_JPG },
@@ -255,7 +256,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("4c0b2c7c-3159-4855-850b-27c7e737a96e"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1415_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset._1415_JPG, Height = PixelHeightAsset._1415_JPG },
@@ -280,7 +281,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -334,12 +335,12 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -374,7 +375,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -401,12 +402,12 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -441,7 +442,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -461,8 +462,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
@@ -485,7 +486,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -505,8 +506,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -529,7 +530,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -549,8 +550,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -575,7 +576,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList = [.. assetsName];
-            Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList));
         }
     }
 
@@ -656,12 +657,12 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
         string folderPath1 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
         string folderPath2 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_2}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_2);
         string folderPath3 = Path.Combine(_assetsDirectory!,
-            $"{Directories.DUPLICATES}\\{Directories.NOT_DUPLICATE}\\{Directories.SAMPLE_3}");
-        string folderPath4 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_3);
+        string folderPath4 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -696,17 +697,17 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         if (expected > 0)
         {
             IList<string> assetsNameList1 = [.. assetsName1];
-            Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[0].Select(y => y.FileName), Is.EquivalentTo(assetsNameList1));
         }
         if (expected > 1)
         {
             IList<string> assetsNameList2 = [.. assetsName2];
-            Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[1].Select(y => y.FileName), Is.EquivalentTo(assetsNameList2));
         }
         if (expected > 2)
         {
             IList<string> assetsNameList3 = [.. assetsName3];
-            Assert.That(assetsNameList3.SequenceEqual(duplicatedAssets[2].Select(y => y.FileName)), Is.True);
+            Assert.That(duplicatedAssets[2].Select(y => y.FileName), Is.EquivalentTo(assetsNameList3));
         }
     }
 }

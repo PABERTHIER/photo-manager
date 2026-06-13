@@ -50,11 +50,14 @@ public class ApplicationGetExemptedFolderPathTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -71,6 +74,8 @@ public class ApplicationGetExemptedFolderPathTests
     [TestCase("E:\\Workspace\\PhotoManager\\Test\\test2")]
     public void GetExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue(string expectedExemptedFolderPath)
     {
+        expectedExemptedFolderPath = PathHelper.ToPlatformAbsolutePath(expectedExemptedFolderPath);
+
         ConfigureApplication(_assetsDirectory!, expectedExemptedFolderPath);
 
         string exemptedFolderPath = _application!.GetExemptedFolderPath();

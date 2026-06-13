@@ -1,24 +1,18 @@
-﻿#nullable disable
+﻿using Avalonia.Data.Converters;
 using System.Globalization;
-using System.Windows.Data;
 
 namespace PhotoManager.UI.Converters;
 
 public class FileNameConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is string fileName)
-        {
-            if (!string.IsNullOrWhiteSpace(fileName))
-            {
-                return fileName.Replace("_", "__");
-            }
-        }
-        return value;
+        return value is string fileName && !string.IsNullOrWhiteSpace(fileName)
+            ? fileName.Replace("_", "__")
+            : value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

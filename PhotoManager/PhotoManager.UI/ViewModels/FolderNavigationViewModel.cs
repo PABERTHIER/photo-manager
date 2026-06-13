@@ -13,10 +13,7 @@ public class FolderNavigationViewModel(
 
     public Folder SourceFolder { get; } = sourceFolder;
 
-    // TODO: Not great having a new guid each time
-    public Folder? SelectedFolder => !string.IsNullOrWhiteSpace(TargetPath)
-        ? new() { Id = Guid.NewGuid(), Path = TargetPath }
-        : null;
+    public Folder? SelectedFolder { get; private set; }
 
     public Folder? LastSelectedFolder => ApplicationViewModel.MoveAssetsLastSelectedFolder;
 
@@ -38,15 +35,57 @@ public class FolderNavigationViewModel(
 
     public bool HasConfirmed { get; set; }
 
-    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [.. recentTargetPaths];
+    public ObservableCollection<string> RecentTargetPaths { get; private set; } =
+        CreateObservableCollection(recentTargetPaths);
 
     public string? TargetPath
     {
         get;
         set
         {
-            field = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
+            string? targetPath = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
+
+            if (field == targetPath)
+            {
+                return;
+            }
+
+            field = targetPath;
+            SelectedFolder = CreateSelectedFolder(targetPath);
             NotifyPropertyChanged(nameof(TargetPath), nameof(SelectedFolder), nameof(CanConfirm));
         }
+    }
+
+    private Folder? CreateSelectedFolder(string? targetPath)
+    {
+        if (string.IsNullOrWhiteSpace(targetPath))
+        {
+            return null;
+        }
+
+        if (string.Equals(SourceFolder.Path, targetPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return SourceFolder;
+        }
+
+        if (LastSelectedFolder is { } lastSelectedFolder
+            && string.Equals(lastSelectedFolder.Path, targetPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return lastSelectedFolder;
+        }
+
+        return new() { Id = Guid.NewGuid(), Path = targetPath };
+    }
+
+    private static ObservableCollection<string> CreateObservableCollection(List<string> values)
+    {
+        ObservableCollection<string> result = [];
+
+        for (int i = 0; i < values.Count; i++)
+        {
+            result.Add(values[i]);
+        }
+
+        return result;
     }
 }

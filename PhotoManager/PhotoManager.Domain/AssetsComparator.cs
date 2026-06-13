@@ -23,12 +23,29 @@ public class AssetsComparator : IAssetsComparator
             }
         }
 
-        return [.. result];
+        return CopyToArray(result);
     }
 
     public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
     {
-        return [.. sourceFileNames.Except(destinationFileNames).Where(IsValidAsset)];
+        ArgumentNullException.ThrowIfNull(sourceFileNames, "first");
+        ArgumentNullException.ThrowIfNull(destinationFileNames, "second");
+
+        HashSet<string> destinationSet = CreateHashSet(destinationFileNames);
+        List<string> result = new(sourceFileNames.Length);
+        HashSet<string> resultSet = [];
+
+        for (int i = 0; i < sourceFileNames.Length; i++)
+        {
+            string fileName = sourceFileNames[i];
+
+            if (!destinationSet.Contains(fileName) && resultSet.Add(fileName) && IsValidAsset(fileName))
+            {
+                result.Add(fileName);
+            }
+        }
+
+        return CopyToArray(result);
     }
 
     public (string[], string[]) GetImageAndVideoNames(string[] fileNames)
@@ -49,17 +66,29 @@ public class AssetsComparator : IAssetsComparator
             }
         }
 
-        return ([.. imageNames], [.. videoNames]);
+        return (CopyToArray(imageNames), CopyToArray(videoNames));
     }
 
     public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
     {
-        return [.. cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName)];
+        ArgumentNullException.ThrowIfNull(cataloguedAssets, "source");
+
+        List<string> result = new(cataloguedAssets.Count);
+
+        foreach (Asset cataloguedAsset in CollectionsMarshal.AsSpan(cataloguedAssets))
+        {
+            if (IsUpdatedAsset(cataloguedAsset))
+            {
+                result.Add(cataloguedAsset.FileName);
+            }
+        }
+
+        return CopyToArray(result);
     }
 
     public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
-        HashSet<string> fileNameSet = [.. fileNames];
+        HashSet<string> fileNameSet = CreateHashSet(fileNames);
         List<string> result = new(cataloguedAssets.Count);
 
         foreach (Asset cataloguedAsset in CollectionsMarshal.AsSpan(cataloguedAssets))
@@ -70,12 +99,29 @@ public class AssetsComparator : IAssetsComparator
             }
         }
 
-        return [.. result];
+        return CopyToArray(result);
     }
 
     public string[] GetDeletedFileNamesToSync(string[] fileNames, string[] destinationFileNames)
     {
-        return [.. destinationFileNames.Except(fileNames)];
+        ArgumentNullException.ThrowIfNull(destinationFileNames, "first");
+        ArgumentNullException.ThrowIfNull(fileNames, "second");
+
+        HashSet<string> fileNameSet = CreateHashSet(fileNames);
+        List<string> result = new(destinationFileNames.Length);
+        HashSet<string> resultSet = [];
+
+        for (int i = 0; i < destinationFileNames.Length; i++)
+        {
+            string destinationFileName = destinationFileNames[i];
+
+            if (!fileNameSet.Contains(destinationFileName) && resultSet.Add(destinationFileName))
+            {
+                result.Add(destinationFileName);
+            }
+        }
+
+        return CopyToArray(result);
     }
 
     private static bool IsValidAsset(string assetFileName)
@@ -83,9 +129,28 @@ public class AssetsComparator : IAssetsComparator
         return ImageHelper.IsImageFile(assetFileName) || VideoHelper.IsVideoFile(assetFileName);
     }
 
-    private static Func<Asset, bool> IsUpdatedAsset()
+    private static bool IsUpdatedAsset(Asset asset)
     {
-        return a => a.FileProperties.Creation > a.ThumbnailCreationDateTime
-                    || a.FileProperties.Modification > a.ThumbnailCreationDateTime;
+        return asset.FileProperties.Creation > asset.ThumbnailCreationDateTime
+               || asset.FileProperties.Modification > asset.ThumbnailCreationDateTime;
+    }
+
+    private static string[] CopyToArray(List<string> values)
+    {
+        string[] result = new string[values.Count];
+        values.CopyTo(result);
+        return result;
+    }
+
+    private static HashSet<string> CreateHashSet(string[] values)
+    {
+        HashSet<string> result = new(values.Length);
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            result.Add(values[i]);
+        }
+
+        return result;
     }
 }

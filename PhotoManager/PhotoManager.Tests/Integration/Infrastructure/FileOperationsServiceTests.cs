@@ -85,11 +85,15 @@ public class FileOperationsServiceTests
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_1), Is.True);
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_2), Is.True);
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_3), Is.True);
-        Assert.That(recursiveSubDirectories[0].FullName, Does.EndWith("\\" + Directories.TEST_HIDDEN_SUB_FOLDER));
-        Assert.That(recursiveSubDirectories[1].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_1));
-        Assert.That(recursiveSubDirectories[2].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2));
+        Assert.That(recursiveSubDirectories[0].FullName,
+            Does.EndWith(Path.DirectorySeparatorChar + Directories.TEST_HIDDEN_SUB_FOLDER));
+        Assert.That(recursiveSubDirectories[1].FullName,
+            Does.EndWith(Path.DirectorySeparatorChar + Directories.TEST_SUB_FOLDER_1));
+        Assert.That(recursiveSubDirectories[2].FullName,
+            Does.EndWith(Path.DirectorySeparatorChar + Directories.TEST_SUB_FOLDER_2));
         Assert.That(recursiveSubDirectories[3].FullName,
-            Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2 + "\\" + Directories.TEST_SUB_FOLDER_3));
+            Does.EndWith(Path.DirectorySeparatorChar +
+                         Path.Combine(Directories.TEST_SUB_FOLDER_2, Directories.TEST_SUB_FOLDER_3)));
 
         _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }
@@ -155,6 +159,7 @@ public class FileOperationsServiceTests
     }
 
     [Test]
+    [Platform("Win", Reason = "Only Windows blocks deleting a file that another stream holds open")]
     public void DeleteFile_FileIsLocked_LogsItAndDoesNotThrowAndNoActionTaken()
     {
         const string testFileName = FileNames.IMAGE_TO_DELETE_JPG;
@@ -200,6 +205,18 @@ public class FileOperationsServiceTests
         Assert.That(fileNames, Has.Length.GreaterThanOrEqualTo(2));
         Assert.That(fileNames, Does.Contain(FileNames.IMAGE_2_JPG));
         Assert.That(fileNames, Does.Contain(FileNames.IMAGE_1_JPG));
+
+        _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+    }
+
+    [Test]
+    public void GetFileInfos_ReturnsFileInfos()
+    {
+        FileInfo[] fileInfos = _fileOperationsService!.GetFileInfos(_assetsDirectory!);
+
+        Assert.That(fileInfos, Has.Length.GreaterThanOrEqualTo(2));
+        Assert.That(fileInfos.Select(static fileInfo => fileInfo.Name), Does.Contain(FileNames.IMAGE_2_JPG));
+        Assert.That(fileInfos.Select(static fileInfo => fileInfo.Name), Does.Contain(FileNames.IMAGE_1_JPG));
 
         _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
     }

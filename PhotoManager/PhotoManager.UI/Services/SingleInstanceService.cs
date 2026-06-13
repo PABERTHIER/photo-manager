@@ -1,0 +1,90 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace PhotoManager.UI.Services;
+
+public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
+{
+    private const int UnixAccessDeniedHResult = unchecked((int)0x8007000D);
+    private const int UnixResourceUnavailableHResult = unchecked((int)0x8007000B);
+    private const int SharingViolationHResult = unchecked((int)0x80070020);
+    private const int LockViolationHResult = unchecked((int)0x80070021);
+
+    // On Unix, .NET sets IOException.HResult to the raw errno value, not a Win32-packed HResult
+    private const int AccessDeniedErrno = 13; // EACCES
+    private const int ResourceUnavailableLinuxErrno = 11; // EAGAIN / EWOULDBLOCK on Linux
+    private const int ResourceUnavailableMacOsErrno = 35; // EAGAIN / EWOULDBLOCK on macOS
+
+    private readonly string _lockFilePath;
+
+    private FileStream? _lockFileStream;
+
+    public SingleInstanceService() : this(GetDefaultLockFilePath())
+    {
+    }
+
+    public SingleInstanceService(string lockFilePath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(lockFilePath);
+
+        _lockFilePath = lockFilePath;
+    }
+
+    public bool TryAcquire()
+    {
+        if (_lockFileStream is not null)
+        {
+            return true;
+        }
+
+        string? lockDirectory = Path.GetDirectoryName(_lockFilePath);
+
+        if (!string.IsNullOrEmpty(lockDirectory))
+        {
+            Directory.CreateDirectory(lockDirectory);
+        }
+
+        try
+        {
+            _lockFileStream = new(_lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            _lockFileStream.SetLength(0);
+
+            return true;
+        }
+        catch (IOException ex) when (IsLockUnavailable(ex))
+        {
+            return false;
+        }
+    }
+
+    [ExcludeFromCodeCoverage(Justification = "Platform-dependent")]
+    public static bool IsLockUnavailable(IOException exception)
+    {
+        if (exception.HResult is SharingViolationHResult or LockViolationHResult)
+        {
+            return true;
+        }
+
+        return !OperatingSystem.IsWindows()
+               && exception.HResult is UnixAccessDeniedHResult or UnixResourceUnavailableHResult
+                   or AccessDeniedErrno or ResourceUnavailableLinuxErrno or ResourceUnavailableMacOsErrno;
+    }
+
+    public void Dispose()
+    {
+        _lockFileStream?.Dispose();
+        _lockFileStream = null;
+    }
+
+    [ExcludeFromCodeCoverage(Justification = "Cannot change ApplicationData folder existence")]
+    private static string GetDefaultLockFilePath()
+    {
+        string applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+        if (string.IsNullOrWhiteSpace(applicationDataPath))
+        {
+            applicationDataPath = Path.GetTempPath();
+        }
+
+        return Path.Combine(applicationDataPath, "PhotoManager", "PhotoManager.lock");
+    }
+}

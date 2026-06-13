@@ -7,6 +7,12 @@ public static class DirectoryHelper
 {
     public static void DenyWriteAccess(string directoryPath)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            RemoveUnixMode(directoryPath, UnixFileMode.UserWrite | UnixFileMode.GroupWrite | UnixFileMode.OtherWrite);
+            return;
+        }
+
         DirectoryInfo directoryInfo = new(directoryPath);
         DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
 
@@ -20,6 +26,12 @@ public static class DirectoryHelper
 
     public static void AllowWriteAccess(string directoryPath)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            AddUnixMode(directoryPath, UnixFileMode.UserWrite | UnixFileMode.GroupWrite | UnixFileMode.OtherWrite);
+            return;
+        }
+
         DirectoryInfo directoryInfo = new(directoryPath);
         DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
 
@@ -33,6 +45,15 @@ public static class DirectoryHelper
 
     public static void DenyAccess(string directoryPath)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            RemoveUnixMode(directoryPath,
+                UnixFileMode.UserRead | UnixFileMode.UserExecute
+                | UnixFileMode.GroupRead | UnixFileMode.GroupExecute
+                | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+            return;
+        }
+
         DirectoryInfo directoryInfo = new(directoryPath);
         DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
 
@@ -49,6 +70,15 @@ public static class DirectoryHelper
 
     public static void AllowAccess(string directoryPath)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            AddUnixMode(directoryPath,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute
+                | UnixFileMode.GroupRead | UnixFileMode.GroupExecute
+                | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+            return;
+        }
+
         DirectoryInfo directoryInfo = new(directoryPath);
         DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
 
@@ -61,5 +91,17 @@ public static class DirectoryHelper
             AccessControlType.Deny));
 
         directoryInfo.SetAccessControl(directorySecurity);
+    }
+
+    [System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
+    private static void AddUnixMode(string directoryPath, UnixFileMode mode)
+    {
+        File.SetUnixFileMode(directoryPath, File.GetUnixFileMode(directoryPath) | mode);
+    }
+
+    [System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
+    private static void RemoveUnixMode(string directoryPath, UnixFileMode mode)
+    {
+        File.SetUnixFileMode(directoryPath, File.GetUnixFileMode(directoryPath) & ~mode);
     }
 }

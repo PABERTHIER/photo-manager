@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PhotoManager.Domain.Pipeline;
 
 namespace PhotoManager.Domain;
 
@@ -10,6 +11,7 @@ public static class DomainServiceCollectionExtensions
         {
             services.AddSingleton<IAssetsComparator, AssetsComparator>();
             services.AddSingleton<IAssetCreationService, AssetCreationService>();
+            services.AddSingleton<CatalogFolderPipeline>();
             services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();
             services.AddSingleton<IFindDuplicatedAssetsService, FindDuplicatedAssetsService>();
             services.AddSingleton<IMoveAssetsService, MoveAssetsService>();

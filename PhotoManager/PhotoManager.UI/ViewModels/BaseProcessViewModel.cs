@@ -1,7 +1,6 @@
 ﻿using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
@@ -37,22 +36,21 @@ public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
             field = value;
             NotifyPropertyChanged(
                 nameof(Step),
-                nameof(DescriptionVisible),
-                nameof(ConfigurationVisible),
-                nameof(RunVisible),
-                nameof(ResultsVisible),
+                nameof(IsDescriptionVisible),
+                nameof(IsConfigurationVisible),
+                nameof(IsRunVisible),
+                nameof(IsResultsVisible),
                 nameof(CanConfigure));
         }
     } = ProcessStep.ViewDescription;
 
-    public Visibility DescriptionVisible =>
-        Step == ProcessStep.ViewDescription ? Visibility.Visible : Visibility.Hidden;
+    public bool IsDescriptionVisible => Step == ProcessStep.ViewDescription;
 
-    public Visibility ConfigurationVisible => Step == ProcessStep.Configure ? Visibility.Visible : Visibility.Hidden;
+    public bool IsConfigurationVisible => Step == ProcessStep.Configure;
 
-    public Visibility RunVisible => Step == ProcessStep.Run ? Visibility.Visible : Visibility.Hidden;
+    public bool IsRunVisible => Step == ProcessStep.Run;
 
-    public Visibility ResultsVisible => Step == ProcessStep.ViewResults ? Visibility.Visible : Visibility.Hidden;
+    public bool IsResultsVisible => Step == ProcessStep.ViewResults;
 
     public bool CanViewDescription => Step == ProcessStep.ViewDescription;
 

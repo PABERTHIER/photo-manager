@@ -69,7 +69,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_MINI_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -102,7 +102,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -135,7 +135,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -168,7 +168,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_SMALL_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new()
@@ -201,7 +201,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -260,15 +260,19 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -300,8 +304,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -350,8 +354,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -406,8 +410,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
@@ -516,8 +520,8 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
-        string folderPath1 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
-        string folderPath2 = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string folderPath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.THUMBNAIL);
+        string folderPath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
 
         Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
         Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };

@@ -1,0 +1,83 @@
+﻿<!-- ReSharper disable Xaml.BindingWithContextNotResolved -->
+<UserControl
+    x:Class="PhotoManager.UI.Controls.ThumbnailsUserControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:PhotoManager.UI.Controls"
+    xmlns:converters="clr-namespace:PhotoManager.UI.Converters"
+    Background="{DynamicResource PhotoManagerPanelBrush}">
+    <UserControl.Resources>
+        <converters:FileNameConverter x:Key="FileNameConverter" />
+        <converters:FileSizeConverter x:Key="FileSizeConverter" />
+        <converters:PixelSizeConverter x:Key="PixelSizeConverter" />
+        <converters:TernaryConverter x:Key="TernaryConverter" />
+        <converters:ImageDataConverter x:Key="ImageDataConverter" />
+        <DataTemplate x:Key="ThumbnailDataTemplate">
+            <!-- Thumbnail_PointerPressed will open the image in full screen mode in the ViewerUserControl -->
+            <Border
+                Margin="8"
+                Padding="10"
+                Background="{DynamicResource PhotoManagerCardBrush}"
+                CornerRadius="8"
+                Cursor="Hand"
+                PointerPressed="Thumbnail_PointerPressed">
+                <Grid ColumnDefinitions="220,260,*" RowDefinitions="Auto,Auto,Auto">
+                    <!-- Displaying the pictures in thumbnails mode, main page -->
+                    <controls:DisposableImage
+                        Grid.Row="0"
+                        Grid.RowSpan="3"
+                        Grid.Column="0"
+                        Width="200"
+                        Height="150"
+                        Source="{Binding ImageData, Converter={StaticResource ImageDataConverter}}"
+                        RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                        Text="{Binding FileName, Converter={StaticResource FileNameConverter}}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                        Text="{Binding Converter={StaticResource PixelSizeConverter}}" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                        Text="{Binding FileProperties.Size, Converter={StaticResource FileSizeConverter}}" />
+                    <TextBlock Grid.Row="0" Grid.Column="2" Foreground="{DynamicResource PhotoManagerForegroundBrush}">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource TernaryConverter}">
+                                <Binding Path="Metadata.Corrupted.IsTrue" />
+                                <Binding Path="Metadata.Corrupted.Message" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Foreground="{DynamicResource PhotoManagerForegroundBrush}">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource TernaryConverter}">
+                                <Binding Path="Metadata.Rotated.IsTrue" />
+                                <Binding Path="Metadata.Rotated.Message" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ListBox
+        x:Name="ThumbnailsListBox"
+        ItemsSource="{Binding ObservableAssets, Mode=OneWay}"
+        ItemTemplate="{StaticResource ThumbnailDataTemplate}"
+        Background="{DynamicResource PhotoManagerPanelBrush}"
+        SelectedIndex="{Binding ViewerPosition, Mode=TwoWay}"
+        SelectionMode="Multiple"
+        SelectionChanged="ThumbnailsListBox_SelectionChanged">
+        <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel Orientation="Vertical" />
+            </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+    </ListBox>
+</UserControl>

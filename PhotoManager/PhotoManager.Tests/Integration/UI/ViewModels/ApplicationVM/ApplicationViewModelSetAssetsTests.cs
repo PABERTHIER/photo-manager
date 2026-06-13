@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -63,11 +62,11 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -88,11 +87,11 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -121,11 +120,11 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -150,11 +149,11 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_11_HEIC,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -199,15 +198,19 @@ public class ApplicationViewModelSetAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -265,7 +268,7 @@ public class ApplicationViewModelSetAssetsTests
             folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -286,7 +289,6 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -330,10 +332,10 @@ public class ApplicationViewModelSetAssetsTests
         _asset3 = _asset3!.WithFolder(folder);
         _asset4 = _asset4!.WithFolder(folder);
 
-        _asset1.ImageData = new();
-        _asset2.ImageData = new();
-        _asset3.ImageData = new();
-        _asset4.ImageData = new();
+        _asset1.ImageData = SkiaImageData.Empty();
+        _asset2.ImageData = SkiaImageData.Empty();
+        _asset3.ImageData = SkiaImageData.Empty();
+        _asset4.ImageData = SkiaImageData.Empty();
 
         const string expectedStatusMessage = "The catalog process has ended.";
         string expectedAppTitle =
@@ -353,7 +355,7 @@ public class ApplicationViewModelSetAssetsTests
             folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -376,7 +378,6 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CurrentFolderPath"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -434,7 +435,7 @@ public class ApplicationViewModelSetAssetsTests
                 null!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -443,7 +444,6 @@ public class ApplicationViewModelSetAssetsTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             // SetAssets
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -507,7 +507,7 @@ public class ApplicationViewModelSetAssetsTests
                 null!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -518,7 +518,6 @@ public class ApplicationViewModelSetAssetsTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -580,8 +579,8 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -617,8 +616,8 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));

@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -81,7 +80,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -106,7 +105,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -139,7 +138,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -168,7 +167,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -201,7 +200,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
             Metadata = new()
             {
@@ -226,7 +225,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -251,7 +250,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
@@ -271,13 +270,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.HOMER_JPG,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.HOMER_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -304,13 +303,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_DUPLICATED_JPG,
+                Size = FileSize.HOMER_DUPLICATED_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.HOMER_DUPLICATED_JPG,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.HOMER_DUPLICATED_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -350,15 +349,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -419,7 +422,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -592,7 +595,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -834,7 +837,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1025,7 +1028,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1180,7 +1183,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1332,7 +1335,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1437,7 +1440,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -1539,7 +1542,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Second sync
 
-            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];
@@ -1731,7 +1738,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2078,7 +2085,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2369,7 +2376,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2459,7 +2466,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<string> assetPathsUpdated = [imagePath1ToCopy, imagePath2ToCopy];
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -2618,7 +2629,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2718,8 +2729,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(File.Exists(imagePath1ToCopy), Is.True);
 
             // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
-            _asset2Temp!.FileProperties =
-                _asset2Temp.FileProperties with { Modification = DateTime.Now.AddMinutes(-10) };
+            _asset2Temp!.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The recreated file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddMinutes(-10)
+            };
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
@@ -2884,7 +2898,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -2988,7 +3002,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CatalogAssetsAsyncAsserts.RemoveDatabaseBackup(backupFilePath);
 
-            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];
@@ -3164,7 +3182,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3451,7 +3469,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -3800,7 +3818,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4094,7 +4112,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4486,7 +4504,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -4734,7 +4752,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -5005,7 +5023,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -5265,7 +5283,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -5592,7 +5610,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -6125,7 +6143,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -6364,7 +6382,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
@@ -6683,7 +6705,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(63));
             Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
@@ -6695,19 +6717,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("AppTitle"));
         }
         finally
         {
@@ -6849,7 +6870,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7077,7 +7098,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
@@ -7384,7 +7409,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(63));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(61));
             Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
@@ -7396,19 +7421,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolderPath"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
         }
         finally
         {
@@ -7551,7 +7574,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -7780,7 +7803,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -8193,7 +8220,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
 
         CancellationTokenSource cancellationTokenSource = new();
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(e =>
@@ -8210,17 +8237,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(folder, Is.Not.Null);
 
         _asset1 = _asset1!.WithFolder(folder!);
+        _asset2 = _asset2!.WithFolder(folder!);
+        _asset3 = _asset3!.WithFolder(folder!);
+        _asset4 = _asset4!.WithFolder(folder!);
+        List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
         Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
 
         assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
+        Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(expectedAssets.Count));
 
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-        Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
+        Assert.That(assetsFromRepository, Has.Count.EqualTo(expectedAssets.Count));
 
-        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0],
-            _asset1!, imagePath1, assetsDirectory, folder!);
+        CatalogAssetsAsyncAsserts.AssertAssetsPropertyValidityAndImageData(assetsFromRepository,
+            expectedAssets, assetPaths, assetsDirectory, folder!);
 
         CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
@@ -8232,8 +8263,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository,
             assetsDirectory, ref increment);
+
+        CatalogChangeCallbackEventArgs assetCreatedChange =
+            catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetCreated);
+        Asset expectedCreatedAsset = expectedAssets.Single(asset =>
+            asset.FileName == assetCreatedChange.Asset!.FileName);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory,
-            [_asset1], _asset1, folder!, ref increment);
+            [expectedCreatedAsset], expectedCreatedAsset, folder!, ref increment);
+
         CatalogAssetsAsyncAsserts.CheckCatalogChangesCancelled(catalogChanges, ref increment);
         CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
@@ -8289,7 +8326,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+        CatalogChangeRecorder firstSyncChanges = [];
 
         await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -8350,7 +8387,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         // Second sync (cancelled)
 
         CancellationTokenSource cancellationTokenSource = new();
-        List<CatalogChangeCallbackEventArgs> cancelledChanges = [];
+        CatalogChangeRecorder cancelledChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(e =>
@@ -8448,7 +8485,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+            CatalogChangeRecorder firstSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -8544,7 +8581,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.Delete(tempDirectory, true);
 
-            List<CatalogChangeCallbackEventArgs> secondSyncChanges = [];
+            CatalogChangeRecorder secondSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(secondSyncChanges.Add);
 
@@ -8655,7 +8692,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> firstSyncChanges = [];
+            CatalogChangeRecorder firstSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(firstSyncChanges.Add);
 
@@ -8759,7 +8796,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.Delete(tempDirectory, true);
 
-            List<CatalogChangeCallbackEventArgs> secondSyncChanges = [];
+            CatalogChangeRecorder secondSyncChanges = [];
 
             await _applicationViewModel!.CatalogAssets(secondSyncChanges.Add);
 
@@ -8854,7 +8891,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -8947,7 +8984,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -9037,7 +9074,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -9125,7 +9162,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -9222,7 +9259,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
             CancellationToken cancellationToken = new(true);
 
             Assert.CatchAsync<OperationCanceledException>(async () =>
@@ -9302,7 +9339,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -9528,7 +9565,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -9802,7 +9839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -10065,7 +10102,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         Assert.CatchAsync<OperationCanceledException>(async () =>
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationTokenSource.Token));
@@ -10136,7 +10173,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             DirectoryHelper.DenyAccess(assetsDirectory);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
@@ -10246,8 +10283,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -10281,8 +10318,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -10563,10 +10600,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
 
-        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        // Deleted assets release ImageData immediately; only the remaining visible assets keep their loaded thumbnails.
         if (string.Equals(catalogChange.Asset!.Folder.Path, currentDirectory))
         {
-            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else

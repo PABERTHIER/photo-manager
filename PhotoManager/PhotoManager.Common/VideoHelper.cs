@@ -1,10 +1,28 @@
 ﻿using FFMpegCore;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.Common;
 
 public static class VideoHelper
 {
+    private const string PhotoManagerFfmpegBinaryFolderEnvironmentVariable = "PHOTOMANAGER_FFMPEG_BINARY_FOLDER";
+    private const string FfmpegBinaryFolderEnvironmentVariable = "FFMPEG_BINARY_FOLDER";
+    private const string FfmpegFolderName = "Ffmpeg";
+    private const string FfmpegBinFolderName = "Bin";
+
+    private static readonly string[] AppLocalCandidateFolders =
+    [
+        string.Empty,
+        FfmpegFolderName,
+        Path.Combine(FfmpegFolderName, FfmpegBinFolderName),
+        Path.Combine("runtimes", "win-x64", "native"),
+        Path.Combine("runtimes", "linux-x64", "native"),
+        Path.Combine("runtimes", "linux-arm64", "native"),
+        Path.Combine("runtimes", "osx-x64", "native"),
+        Path.Combine("runtimes", "osx-arm64", "native")
+    ];
+
     //.3g2 - Mobile video
     //.3gp - Mobile video
     //.asf - Advanced Systems Format
@@ -61,10 +79,8 @@ public static class VideoHelper
         {
             string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
 
-            // Set the path to the extracted ffmpeg.exe, ffplay.exe, and ffprobe.exe files
-            string ffmpegBinPath = GetCommonProjectPath();
-
-            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegBinPath);
+            string? ffmpegBinPath = GetFfmpegBinaryFolder();
+            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegBinPath!);
 
             // Use FFMpegCore to extract the first frame
             FFMpegArguments
@@ -76,7 +92,7 @@ public static class VideoHelper
 
             if (!File.Exists(firstFrameVideoPath))
             {
-                throw new FileFormatException(
+                throw new InvalidDataException(
                     "FFmpeg failed to generate the first frame file due to its format or content.");
             }
 
@@ -95,31 +111,71 @@ public static class VideoHelper
         }
     }
 
-    /// <summary>
-    /// Gets the path where are stored the Ffmpeg binaries, resolving correctly for both test and runtime contexts.
-    /// </summary>
-    /// <returns>The path to the Ffmpeg binaries.</returns>
-    private static string GetCommonProjectPath()
+    public static string? GetFfmpegBinaryFolder()
     {
-        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string? configuredBinaryFolder =
+            Environment.GetEnvironmentVariable(PhotoManagerFfmpegBinaryFolderEnvironmentVariable);
 
-        // Traverse up the directory structure until you find the "PhotoManager.Common" folder
-        string commonProjectPath = FindProjectDirectory(baseDirectory, "PhotoManager.Common");
-
-        return Path.Combine(commonProjectPath, "Ffmpeg", "Bin");
-    }
-
-    private static string FindProjectDirectory(string startPath, string projectFolderName)
-    {
-        DirectoryInfo directoryInfo = new(startPath);
-
-        // Traverse up the directory structure and return as soon as the project folder is found
-        while (directoryInfo.GetDirectories(projectFolderName).Length == 0)
+        if (string.IsNullOrWhiteSpace(configuredBinaryFolder))
         {
-            directoryInfo = directoryInfo.Parent!;
+            configuredBinaryFolder = Environment.GetEnvironmentVariable(FfmpegBinaryFolderEnvironmentVariable);
         }
 
-        // Since the project structure is fixed, we can assume this point will always find the directory
-        return Path.Combine(directoryInfo.FullName, projectFolderName);
+        return GetFfmpegBinaryFolder(AppContext.BaseDirectory, configuredBinaryFolder);
+    }
+
+    public static string? GetFfmpegBinaryFolder(string baseDirectory, string? configuredBinaryFolder)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(baseDirectory);
+
+        if (ContainsFfmpegExecutable(configuredBinaryFolder))
+        {
+            return configuredBinaryFolder;
+        }
+
+        foreach (string appLocalCandidateFolder in AppLocalCandidateFolders)
+        {
+            string candidateFolder = Path.GetFullPath(Path.Combine(baseDirectory, appLocalCandidateFolder));
+
+            if (ContainsFfmpegExecutable(candidateFolder))
+            {
+                return candidateFolder;
+            }
+        }
+
+        return GetLegacyProjectBinaryFolder(baseDirectory);
+    }
+
+    private static string? GetLegacyProjectBinaryFolder(string baseDirectory)
+    {
+        DirectoryInfo? directoryInfo = new(baseDirectory);
+
+        while (directoryInfo is not null)
+        {
+            string candidateFolder = Path.Combine(directoryInfo.FullName, "PhotoManager.Common", FfmpegFolderName,
+                FfmpegBinFolderName);
+
+            if (ContainsFfmpegExecutable(candidateFolder))
+            {
+                return candidateFolder;
+            }
+
+            directoryInfo = directoryInfo.Parent;
+        }
+
+        return null;
+    }
+
+    [ExcludeFromCodeCoverage(Justification = "Platform-dependent")]
+    private static bool ContainsFfmpegExecutable(string? directory)
+    {
+        if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+        {
+            return false;
+        }
+
+        string executableName = OperatingSystem.IsWindows() ? "ffmpeg.exe" : "ffmpeg";
+
+        return File.Exists(Path.Combine(directory, executableName));
     }
 }

@@ -64,7 +64,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -89,7 +89,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -122,7 +122,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -151,7 +151,7 @@ public class ApplicationLoadThumbnailTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -171,13 +171,13 @@ public class ApplicationLoadThumbnailTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.HOMER_JPG,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.HOMER_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -221,15 +221,19 @@ public class ApplicationLoadThumbnailTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetCreationService,
@@ -245,7 +249,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public async Task LoadThumbnail_CataloguedAssets_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -257,11 +262,8 @@ public class ApplicationLoadThumbnailTests
         {
             await _application!.CatalogAssetsAsync(_ => { });
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
 
             Folder folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory)!;
 
@@ -297,11 +299,8 @@ public class ApplicationLoadThumbnailTests
             Assert.That(assets[2].FileName, Is.EqualTo(_asset3.FileName));
             Assert.That(assets[3].FileName, Is.EqualTo(_asset4.FileName));
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -364,7 +363,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ThumbnailExists_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -439,7 +439,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderDoesNotExist_DoesNotSetBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -519,7 +520,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderPathIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -555,7 +557,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FileNameIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -588,7 +591,7 @@ public class ApplicationLoadThumbnailTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
@@ -615,7 +618,8 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ConcurrentAccess_BitmapImageAreSetToEachAssetSafely()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string assetsDirectory =
+            Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 

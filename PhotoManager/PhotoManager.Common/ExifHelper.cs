@@ -1,5 +1,6 @@
 ﻿using ImageMagick;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
 
 namespace PhotoManager.Common;
 
@@ -16,35 +17,28 @@ public static class ExifHelper
         {
             using (MemoryStream stream = new(buffer))
             {
-                BitmapDecoder decoder = BitmapDecoder.Create(
-                    stream,
-                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
-                    BitmapCacheOption.None);
-
-                if (decoder.Frames[0].Metadata is BitmapMetadata bitmapMetadata)
+                using (SKCodec? codec = SKCodec.Create(stream))
                 {
-                    object? orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
+                    if (codec == null)
+                    {
+                        logger.LogError("The image is corrupted");
+                        return corruptedImageOrientation;
+                    }
 
-                    if (orientation == null)
+                    SKEncodedOrigin origin = codec.EncodedOrigin;
+
+                    if (origin == SKEncodedOrigin.Default)
                     {
                         return defaultExifOrientation;
                     }
 
-                    return (ushort)orientation;
+                    return (ushort)origin;
                 }
             }
         }
         catch (Exception ex)
         {
-            // All WPF/WIC NotSupportedExceptions always include a COMException as InnerException
-            if (ex is NotSupportedException && ex.InnerException!.HResult == -2003292351)
-            {
-                logger.LogError("The image is corrupted");
-            }
-            else
-            {
-                logger.LogError(ex, "{ExMessage}", ex.Message);
-            }
+            logger.LogError(ex, "{ExMessage}", ex.Message);
         }
 
         return corruptedImageOrientation;
@@ -87,37 +81,35 @@ public static class ExifHelper
     // (ushort)6 <=> "Rotate 90 CW"
     // (ushort)7 <=> "Mirror horizontal and rotate 90 CW"
     // (ushort)8 <=> "Rotate 270 CW"
-    public static Rotation GetImageRotation(ushort exifOrientation)
+    public static ImageRotation GetImageRotation(ushort exifOrientation)
     {
-        Rotation rotation = exifOrientation switch
+        ImageRotation rotation = exifOrientation switch
         {
-            1 => Rotation.Rotate0,
-            2 => Rotation.Rotate0, // FlipX
-            3 => Rotation.Rotate180,
-            4 => Rotation.Rotate180, // FlipX
-            5 => Rotation.Rotate90, // FlipX
-            6 => Rotation.Rotate90,
-            7 => Rotation.Rotate270, // FlipX
-            8 => Rotation.Rotate270,
-            _ => Rotation.Rotate0
+            1 => ImageRotation.Rotate0,
+            2 => ImageRotation.Rotate0, // FlipX
+            3 => ImageRotation.Rotate180,
+            4 => ImageRotation.Rotate180, // FlipX
+            5 => ImageRotation.Rotate90, // FlipX
+            6 => ImageRotation.Rotate90,
+            7 => ImageRotation.Rotate270, // FlipX
+            8 => ImageRotation.Rotate270,
+            _ => ImageRotation.Rotate0
         };
 
         return rotation;
     }
 
-    public static bool IsValidGdiPlusImage(byte[] imageData, ILogger logger)
+    public static bool IsValidImage(byte[] imageData, ILogger logger)
     {
         try
         {
-            using (MemoryStream ms = new(imageData))
+            using (MemoryStream stream = new(imageData))
             {
-                BitmapDecoder.Create(
-                    ms,
-                    BitmapCreateOptions.DelayCreation | BitmapCreateOptions.IgnoreColorProfile,
-                    BitmapCacheOption.None);
+                using (SKCodec? codec = SKCodec.Create(stream))
+                {
+                    return codec != null;
+                }
             }
-
-            return true;
         }
         catch (Exception ex)
         {

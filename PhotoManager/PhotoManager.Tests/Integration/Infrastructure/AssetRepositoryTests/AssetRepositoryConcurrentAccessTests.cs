@@ -61,7 +61,7 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -86,7 +86,7 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
@@ -127,7 +127,7 @@ public class AssetRepositoryConcurrentAccessTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -153,7 +153,7 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_2_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
@@ -178,7 +178,7 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_3_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },

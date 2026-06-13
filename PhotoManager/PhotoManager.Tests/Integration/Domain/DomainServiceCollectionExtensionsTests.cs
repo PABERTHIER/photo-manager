@@ -22,6 +22,10 @@ public class DomainServiceCollectionExtensionsTests
             services.FirstOrDefault(x => x.ServiceType == typeof(ICatalogAssetsService));
         Assert.That(catalogAssetsServiceDescriptor, Is.Null);
 
+        ServiceDescriptor? catalogFolderPipelineDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(CatalogFolderPipeline));
+        Assert.That(catalogFolderPipelineDescriptor, Is.Null);
+
         ServiceDescriptor? findDuplicatedAssetsServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
         Assert.That(findDuplicatedAssetsServiceDescriptor, Is.Null);
@@ -38,7 +42,7 @@ public class DomainServiceCollectionExtensionsTests
 
         services.AddDomain();
 
-        Assert.That(services, Has.Count.EqualTo(6));
+        Assert.That(services, Has.Count.EqualTo(7));
 
         assetsComparatorDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetsComparator));
         Assert.That(assetsComparatorDescriptor, Is.Not.Null);
@@ -54,9 +58,17 @@ public class DomainServiceCollectionExtensionsTests
         Assert.That(assetCreationServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(assetCreationServiceDescriptor.ImplementationType, Is.EqualTo(typeof(AssetCreationService)));
 
+        catalogFolderPipelineDescriptor =
+            services.FirstOrDefault(x => x.ServiceType == typeof(CatalogFolderPipeline));
+        Assert.That(catalogFolderPipelineDescriptor, Is.Not.Null);
+        Assert.That(catalogFolderPipelineDescriptor, Is.EqualTo(services[2]));
+        Assert.That(catalogFolderPipelineDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(catalogFolderPipelineDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(catalogFolderPipelineDescriptor.ImplementationType, Is.EqualTo(typeof(CatalogFolderPipeline)));
+
         catalogAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ICatalogAssetsService));
         Assert.That(catalogAssetsServiceDescriptor, Is.Not.Null);
-        Assert.That(catalogAssetsServiceDescriptor, Is.EqualTo(services[2]));
+        Assert.That(catalogAssetsServiceDescriptor, Is.EqualTo(services[3]));
         Assert.That(catalogAssetsServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(catalogAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(catalogAssetsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(CatalogAssetsService)));
@@ -64,7 +76,7 @@ public class DomainServiceCollectionExtensionsTests
         findDuplicatedAssetsServiceDescriptor =
             services.FirstOrDefault(x => x.ServiceType == typeof(IFindDuplicatedAssetsService));
         Assert.That(findDuplicatedAssetsServiceDescriptor, Is.Not.Null);
-        Assert.That(findDuplicatedAssetsServiceDescriptor, Is.EqualTo(services[3]));
+        Assert.That(findDuplicatedAssetsServiceDescriptor, Is.EqualTo(services[4]));
         Assert.That(findDuplicatedAssetsServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(findDuplicatedAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(findDuplicatedAssetsServiceDescriptor.ImplementationType,
@@ -72,14 +84,14 @@ public class DomainServiceCollectionExtensionsTests
 
         moveAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IMoveAssetsService));
         Assert.That(moveAssetsServiceDescriptor, Is.Not.Null);
-        Assert.That(moveAssetsServiceDescriptor, Is.EqualTo(services[4]));
+        Assert.That(moveAssetsServiceDescriptor, Is.EqualTo(services[5]));
         Assert.That(moveAssetsServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(moveAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(moveAssetsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(MoveAssetsService)));
 
         syncAssetsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ISyncAssetsService));
         Assert.That(syncAssetsServiceDescriptor, Is.Not.Null);
-        Assert.That(syncAssetsServiceDescriptor, Is.EqualTo(services[5]));
+        Assert.That(syncAssetsServiceDescriptor, Is.EqualTo(services[6]));
         Assert.That(syncAssetsServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(syncAssetsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(syncAssetsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(SyncAssetsService)));

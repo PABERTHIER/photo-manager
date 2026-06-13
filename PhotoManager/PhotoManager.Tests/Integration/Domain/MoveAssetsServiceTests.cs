@@ -51,9 +51,10 @@ public class MoveAssetsServiceTests
             imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        _assetCreationService = new(_testableAssetRepository, _fileOperationsService, imageProcessingService,
-            imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+        _assetCreationService = new(_testableAssetRepository, _fileOperationsService,
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         _testLogger = new();
         _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, _assetCreationService, _testLogger);
     }
@@ -1726,7 +1727,7 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationFilePathIsADirectory_LogsItAndDoesNotCopyAndThrowsIOException()
     {
-        string sourceDirectory = Path.Combine(_assetsDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_SYNC);
 
         try

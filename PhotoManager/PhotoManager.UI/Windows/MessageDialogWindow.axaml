@@ -1,0 +1,26 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.MessageDialogWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="420"
+    Height="180"
+    WindowStartupLocation="CenterOwner"
+    CanResize="False">
+    <Grid Background="{DynamicResource PhotoManagerBackgroundBrush}" RowDefinitions="*,Auto">
+        <TextBlock
+            x:Name="MessageTextBlock"
+            Grid.Row="0"
+            Margin="20"
+            Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+            TextWrapping="Wrap" />
+        <Button
+            x:Name="OkButton"
+            Grid.Row="1"
+            Classes="action"
+            Width="100"
+            Margin="20"
+            HorizontalAlignment="Right"
+            Content="OK"
+            Click="OkButton_Click" />
+    </Grid>
+</Window>

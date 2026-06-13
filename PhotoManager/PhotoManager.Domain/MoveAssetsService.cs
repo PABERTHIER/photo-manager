@@ -131,6 +131,17 @@ public class MoveAssetsService(
 
     private bool Copy(string sourceFilePath, string destinationFilePath)
     {
+        // Checked upfront because the exception File.Copy throws for a directory target differs per OS
+        if (fileOperationsService.FolderExists(destinationFilePath))
+        {
+            logger.LogError(
+                "Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the target is a directory, not a file.",
+                sourceFilePath,
+                destinationFilePath);
+
+            throw new IOException($"The target file '{destinationFilePath}' is a directory, not a file.");
+        }
+
         try
         {
             if (string.Equals(sourceFilePath, destinationFilePath, StringComparison.OrdinalIgnoreCase))
@@ -178,14 +189,6 @@ public class MoveAssetsService(
                 sourceFilePath,
                 destinationFilePath);
             throw new DirectoryNotFoundException($"Could not find a part of the path '{sourceFilePath}'.");
-        }
-        catch (IOException)
-        {
-            logger.LogError(
-                "Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the target is a directory, not a file.",
-                sourceFilePath,
-                destinationFilePath);
-            throw new IOException($"The target file '{destinationFilePath}' is a directory, not a file.");
         }
         catch (ArgumentNullException)
         {

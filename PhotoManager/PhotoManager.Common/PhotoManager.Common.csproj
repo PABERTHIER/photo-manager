@@ -1,27 +1,98 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProcessArch>$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)</ProcessArch>
+    <ProcessIsX64 Condition="'$(ProcessArch)' == 'X64'">true</ProcessIsX64>
+    <ProcessIsArm64 Condition="'$(ProcessArch)' == 'Arm64'">true</ProcessIsArm64>
+    <FfmpegRid Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</FfmpegRid>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">
+    <FfmpegRid Condition="'$(ProcessIsX64)' == 'true'">win-x64</FfmpegRid>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == '' and $([MSBuild]::IsOSPlatform('Linux'))">
+    <FfmpegRid Condition="'$(ProcessIsX64)' == 'true'">linux-x64</FfmpegRid>
+    <FfmpegRid Condition="'$(ProcessIsArm64)' == 'true'">linux-arm64</FfmpegRid>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == '' and $([MSBuild]::IsOSPlatform('OSX'))">
+    <FfmpegRid Condition="'$(ProcessIsX64)' == 'true'">osx-x64</FfmpegRid>
+    <FfmpegRid Condition="'$(ProcessIsArm64)' == 'true'">osx-arm64</FfmpegRid>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FFMpegCore" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="SkiaSharp" />
     <PackageReference Include="System.Numerics.Tensors" />
   </ItemGroup>
 
-  <!-- Reference the custom MSBuild task -->
-  <UsingTask TaskName="ExtractRarFile" AssemblyFile="MSBuildTask\FileExtractionTask.dll" />
+  <ItemGroup Condition="'$(FfmpegRid)' == 'win-x64'">
+    <PackageReference
+      Include="Curiosity.FFmpeg.Runtimes.win-x64"
+      GeneratePathProperty="true"
+      PrivateAssets="all" />
+  </ItemGroup>
 
-  <Target Name="ExtractFfmpegBinaries" AfterTargets="Build">
-    <!-- Define paths for the binaries and the .rar files -->
-    <PropertyGroup>
-      <FfmpegBinPath>$(MSBuildProjectDirectory)\Ffmpeg\Bin</FfmpegBinPath>
-      <FfmpegRarPath>$(MSBuildProjectDirectory)\Ffmpeg</FfmpegRarPath>
-      <FfmpegExePath>$(FfmpegBinPath)\ffmpeg.exe</FfmpegExePath>
-      <FfplayExePath>$(FfmpegBinPath)\ffplay.exe</FfplayExePath>
-      <FfprobeExePath>$(FfmpegBinPath)\ffprobe.exe</FfprobeExePath>
-    </PropertyGroup>
+  <ItemGroup Condition="'$(FfmpegRid)' == 'linux-x64'">
+    <PackageReference Include="Curiosity.FFmpeg.Runtimes.linux-x64" GeneratePathProperty="true"
+      PrivateAssets="all" />
+  </ItemGroup>
 
-    <!-- Check if the executables are missing, and if so, extract them -->
-    <ExtractRarFile Condition="!Exists('$(FfmpegExePath)')" RarFilePath="$(FfmpegRarPath)\ffmpeg.rar" DestinationPath="$(FfmpegBinPath)" />
-    <ExtractRarFile Condition="!Exists('$(FfplayExePath)')" RarFilePath="$(FfmpegRarPath)\ffplay.rar" DestinationPath="$(FfmpegBinPath)" />
-    <ExtractRarFile Condition="!Exists('$(FfprobeExePath)')" RarFilePath="$(FfmpegRarPath)\ffprobe.rar" DestinationPath="$(FfmpegBinPath)" />
-  </Target>
+  <ItemGroup Condition="'$(FfmpegRid)' == 'linux-arm64'">
+    <PackageReference Include="Curiosity.FFmpeg.Runtimes.linux-arm64" GeneratePathProperty="true"
+      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FfmpegRid)' == 'osx-x64'">
+    <PackageReference Include="Curiosity.FFmpeg.Runtimes.osx-x64" GeneratePathProperty="true"
+      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FfmpegRid)' == 'osx-arm64'">
+    <PackageReference Include="Curiosity.FFmpeg.Runtimes.osx-arm64" GeneratePathProperty="true"
+      PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == 'win-x64'">
+    <FfmpegPkg>$(PkgCuriosity_FFmpeg_Runtimes_win-x64)</FfmpegPkg>
+    <FfExt>.exe</FfExt>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == 'linux-x64'">
+    <FfmpegPkg>$(PkgCuriosity_FFmpeg_Runtimes_linux-x64)</FfmpegPkg>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == 'linux-arm64'">
+    <FfmpegPkg>$(PkgCuriosity_FFmpeg_Runtimes_linux-arm64)</FfmpegPkg>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == 'osx-x64'">
+    <FfmpegPkg>$(PkgCuriosity_FFmpeg_Runtimes_osx-x64)</FfmpegPkg>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FfmpegRid)' == 'osx-arm64'">
+    <FfmpegPkg>$(PkgCuriosity_FFmpeg_Runtimes_osx-arm64)</FfmpegPkg>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FfmpegRuntimeDir>$([System.IO.Path]::Combine('$(FfmpegPkg)', 'runtimes', '$(FfmpegRid)'))</FfmpegRuntimeDir>
+    <FfNative>$([System.IO.Path]::Combine('$(FfmpegRuntimeDir)', 'native'))</FfNative>
+    <FfmpegSourcePath>$([System.IO.Path]::Combine('$(FfNative)', 'ffmpeg-dist$(FfExt)'))</FfmpegSourcePath>
+    <FfprobeSourcePath>$([System.IO.Path]::Combine('$(FfNative)', 'ffprobe-dist$(FfExt)'))</FfprobeSourcePath>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(FfmpegPkg)' != ''">
+    <None Include="$(FfmpegSourcePath)" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <TargetPath>Ffmpeg/Bin/ffmpeg$(FfExt)</TargetPath>
+    </None>
+    <None Include="$(FfprobeSourcePath)" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <TargetPath>Ffmpeg/Bin/ffprobe$(FfExt)</TargetPath>
+    </None>
+  </ItemGroup>
 </Project>

@@ -189,7 +189,8 @@ public class UserConfigurationServiceTests
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
         Assert.That(assetsDirectory, Is.Not.Null);
-        Assert.That(assetsDirectory, Is.EqualTo("E:\\Workspace\\PhotoManager\\Test"));
+        Assert.That(assetsDirectory,
+            Is.EqualTo(PathHelper.ToResolvedConfigPath("E:\\Workspace\\PhotoManager\\TestAssets")));
     }
 
     [Test]
@@ -198,7 +199,8 @@ public class UserConfigurationServiceTests
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
         Assert.That(exemptedFolderPath, Is.Not.Null);
-        Assert.That(exemptedFolderPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Test\\test1"));
+        Assert.That(exemptedFolderPath,
+            Is.EqualTo(PathHelper.ToResolvedConfigPath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
     }
 
     [Test]
@@ -213,7 +215,8 @@ public class UserConfigurationServiceTests
         Assert.That(firstFrameVideosPath,
             Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
         Assert.That(firstFrameVideosPath,
-            Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame")));
+            Is.EqualTo(Path.Combine(PathHelper.ToResolvedConfigPath("E:\\Workspace\\PhotoManager\\TestAssets"),
+                Directories.OUTPUT_VIDEO_FIRST_FRAME)));
     }
 
     [Test]
@@ -257,6 +260,6 @@ public class UserConfigurationServiceTests
         string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
 
         Assert.That(paths, Has.Length.EqualTo(1));
-        Assert.That(paths[0], Is.EqualTo("E:\\Workspace\\PhotoManager\\Test"));
+        Assert.That(paths[0], Is.EqualTo(PathHelper.ToResolvedConfigPath("E:\\Workspace\\PhotoManager\\TestAssets")));
     }
 }

@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
@@ -47,7 +46,7 @@ public class ApplicationViewModelChangeAppModeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2020,
@@ -72,7 +71,7 @@ public class ApplicationViewModelChangeAppModeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             Hash = string.Empty,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2048,
@@ -97,7 +96,7 @@ public class ApplicationViewModelChangeAppModeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             Hash = string.Empty,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2000,
@@ -122,7 +121,7 @@ public class ApplicationViewModelChangeAppModeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             Hash = string.Empty,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2030,
@@ -147,7 +146,7 @@ public class ApplicationViewModelChangeAppModeTests
                 Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
             },
             Hash = string.Empty,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             FileProperties = new()
             {
                 Size = 2048,
@@ -209,11 +208,14 @@ public class ApplicationViewModelChangeAppModeTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -257,8 +259,8 @@ public class ApplicationViewModelChangeAppModeTests
             _applicationViewModel!,
             _assetsDirectory!,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             expectedViewerPosition,
             expectedAppTitle,
             assets,
@@ -291,8 +293,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
         // Second ChangeAppMode
@@ -305,8 +307,8 @@ public class ApplicationViewModelChangeAppModeTests
             _applicationViewModel!,
             _assetsDirectory!,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             assets,
@@ -339,21 +341,21 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         // ChangeAppMode 1
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
         // ChangeAppMode 2
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
             _assetsDirectory!,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             assets,
@@ -389,8 +391,8 @@ public class ApplicationViewModelChangeAppModeTests
             _applicationViewModel!,
             _assetsDirectory!,
             AppMode.Viewer,
-            Visibility.Hidden,
-            Visibility.Visible,
+            false,
+            true,
             0,
             expectedAppTitle,
             [],
@@ -401,8 +403,8 @@ public class ApplicationViewModelChangeAppModeTests
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
         expectedAppTitle =
@@ -414,8 +416,8 @@ public class ApplicationViewModelChangeAppModeTests
             _applicationViewModel!,
             _assetsDirectory!,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             0,
             expectedAppTitle,
             [],
@@ -426,20 +428,20 @@ public class ApplicationViewModelChangeAppModeTests
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppMode"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ThumbnailsVisible"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ViewerVisible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("IsThumbnailsVisible"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsViewerVisible"));
         Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
             _assetsDirectory!,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             0,
             expectedAppTitle,
             [],
@@ -492,8 +494,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -518,8 +520,8 @@ public class ApplicationViewModelChangeAppModeTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -532,8 +534,8 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -616,8 +618,8 @@ public class ApplicationViewModelChangeAppModeTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,

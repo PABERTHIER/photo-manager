@@ -1,0 +1,53 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.FolderNavigationWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:PhotoManager.UI.Controls"
+    Title="Select destination folder"
+    Width="560"
+    Height="460"
+    KeyDown="Window_KeyDown">
+    <Grid
+        Background="{DynamicResource PhotoManagerBackgroundBrush}"
+        RowDefinitions="*,Auto,Auto">
+        <controls:FolderNavigationControl
+            x:Name="FolderTreeView"
+            Grid.Row="0"
+            Margin="8"
+            FolderSelected="FolderTreeView_FolderSelected" />
+        <Grid Grid.Row="1" Margin="8" ColumnDefinitions="Auto,*">
+            <TextBlock
+                Grid.Column="0"
+                Width="110"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource PhotoManagerForegroundBrush}"
+                Text="Selected path:" />
+            <ComboBox
+                x:Name="SelectedPathComboBox"
+                Grid.Column="1"
+                IsEditable="True"
+                Text="{Binding TargetPath}"
+                ItemsSource="{Binding RecentTargetPaths}" />
+        </Grid>
+        <StackPanel
+            Grid.Row="2"
+            Margin="8"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Button
+                x:Name="ConfirmButton"
+                Classes="action"
+                Width="100"
+                Content="Confirm"
+                IsEnabled="{Binding CanConfirm}"
+                Click="ConfirmButton_Click" />
+            <Button
+                x:Name="CancelButton"
+                Classes="action"
+                Width="100"
+                Content="Cancel"
+                Click="CancelButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

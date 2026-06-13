@@ -43,7 +43,7 @@ public class ApplicationGetAssetsByPathTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
@@ -72,7 +72,7 @@ public class ApplicationGetAssetsByPathTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_2_JPG,
                 Metadata = new()
                 {
@@ -142,7 +142,7 @@ public class ApplicationGetAssetsByPathTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
@@ -168,7 +168,7 @@ public class ApplicationGetAssetsByPathTests
                     Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = Rotation.Rotate0,
+                ImageRotation = ImageRotation.Rotate0,
                 Hash = Hashes.IMAGE_2_JPG,
                 Metadata = new()
                 {

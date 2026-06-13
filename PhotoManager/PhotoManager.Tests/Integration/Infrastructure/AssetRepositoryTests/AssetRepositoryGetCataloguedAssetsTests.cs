@@ -60,7 +60,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -85,7 +85,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },

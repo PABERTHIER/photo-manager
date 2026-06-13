@@ -39,24 +39,24 @@ public class ImageMetadataServiceTests
     }
 
     [Test]
-    [TestCase((ushort)0, Rotation.Rotate0)]
-    [TestCase((ushort)1, Rotation.Rotate0)]
-    [TestCase((ushort)2, Rotation.Rotate0)]
-    [TestCase((ushort)3, Rotation.Rotate180)]
-    [TestCase((ushort)4, Rotation.Rotate180)]
-    [TestCase((ushort)5, Rotation.Rotate90)]
-    [TestCase((ushort)6, Rotation.Rotate90)]
-    [TestCase((ushort)7, Rotation.Rotate270)]
-    [TestCase((ushort)8, Rotation.Rotate270)]
-    [TestCase((ushort)9, Rotation.Rotate0)]
-    [TestCase((ushort)10, Rotation.Rotate0)]
-    [TestCase((ushort)10000, Rotation.Rotate0)]
-    [TestCase(ushort.MinValue, Rotation.Rotate0)]
-    [TestCase(ushort.MaxValue, Rotation.Rotate0)]
+    [TestCase((ushort)0, ImageRotation.Rotate0)]
+    [TestCase((ushort)1, ImageRotation.Rotate0)]
+    [TestCase((ushort)2, ImageRotation.Rotate0)]
+    [TestCase((ushort)3, ImageRotation.Rotate180)]
+    [TestCase((ushort)4, ImageRotation.Rotate180)]
+    [TestCase((ushort)5, ImageRotation.Rotate90)]
+    [TestCase((ushort)6, ImageRotation.Rotate90)]
+    [TestCase((ushort)7, ImageRotation.Rotate270)]
+    [TestCase((ushort)8, ImageRotation.Rotate270)]
+    [TestCase((ushort)9, ImageRotation.Rotate0)]
+    [TestCase((ushort)10, ImageRotation.Rotate0)]
+    [TestCase((ushort)10000, ImageRotation.Rotate0)]
+    [TestCase(ushort.MinValue, ImageRotation.Rotate0)]
+    [TestCase(ushort.MaxValue, ImageRotation.Rotate0)]
     public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
-        Rotation expectedRotation)
+        ImageRotation expectedRotation)
     {
-        Rotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
+        ImageRotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(expectedRotation));
 
@@ -68,9 +68,9 @@ public class ImageMetadataServiceTests
     {
         int exifOrientation = -10;
         // ReSharper disable once IntVariableOverflowInUncheckedContext
-        Rotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
+        ImageRotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
 
-        Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(rotation, Is.EqualTo(ImageRotation.Rotate0));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }
@@ -87,5 +87,65 @@ public class ImageMetadataServiceTests
         Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+    }
+
+    [Test]
+    public void UpdateAssetsFileProperties_FilePropertiesByName_UpdatesMatchingAssets()
+    {
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
+        Asset matchingAsset = CreateAsset(folder, "existing.jpg");
+        Asset missingAsset = CreateAsset(folder, "missing.jpg");
+        FileProperties expectedFileProperties = new()
+        {
+            Size = 42,
+            Creation = new(2026, 01, 02, 03, 04, 05),
+            Modification = new(2026, 02, 03, 04, 05, 06)
+        };
+        Dictionary<string, FileProperties> filePropertiesByName = new(StringComparer.Ordinal)
+        {
+            [matchingAsset.FileName] = expectedFileProperties
+        };
+
+        _imageMetadataService!.UpdateAssetsFileProperties([matchingAsset, missingAsset], filePropertiesByName);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(matchingAsset.FileProperties.Size, Is.EqualTo(expectedFileProperties.Size));
+            Assert.That(matchingAsset.FileProperties.Creation, Is.EqualTo(expectedFileProperties.Creation));
+            Assert.That(matchingAsset.FileProperties.Modification, Is.EqualTo(expectedFileProperties.Modification));
+            Assert.That(missingAsset.FileProperties.Size, Is.Zero);
+
+            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+        }
+    }
+
+    [Test]
+    public void UpdateAssetsFileProperties_NullFilePropertiesByName_ThrowsArgumentNullException()
+    {
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _imageMetadataService!.UpdateAssetsFileProperties([], null!));
+
+        Assert.That(exception?.ParamName, Is.EqualTo("filePropertiesByName"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+    }
+
+    private static Asset CreateAsset(Folder folder, string fileName)
+    {
+        return new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
+            {
+                Asset = new() { Width = 100, Height = 100 },
+                Thumbnail = new() { Width = 50, Height = 50 }
+            },
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = fileName,
+            ThumbnailCreationDateTime = DateTime.UnixEpoch,
+            Metadata = new()
+        };
     }
 }

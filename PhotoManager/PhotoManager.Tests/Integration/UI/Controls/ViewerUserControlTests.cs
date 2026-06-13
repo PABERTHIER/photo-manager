@@ -1,8 +1,10 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +17,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Control
-// The goal is to test what does ViewerUserControl
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class ViewerUserControlTests
 {
     private string? _assetsDirectory;
@@ -36,6 +38,7 @@ public class ViewerUserControlTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -70,7 +73,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -95,7 +98,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -128,7 +131,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -157,7 +160,7 @@ public class ViewerUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -202,15 +205,19 @@ public class ViewerUserControlTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -458,8 +465,6 @@ public class ViewerUserControlTests
         _asset3 = _asset3!.WithFolder(folder!);
         _asset4 = _asset4!.WithFolder(folder!);
 
-        List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
-
         int expectedViewerPosition = 0;
         string expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
@@ -467,17 +472,12 @@ public class ViewerUserControlTests
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
         // First ShowImage (jpg)
-        BitmapImage? bitmapImage = ShowImage();
+        Bitmap? bitmap = await ShowImage();
 
-        Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset1.ImageRotation));
-        Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(bitmapImage.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(bitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(bitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(bitmap, Is.Not.Null);
+        Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
+        Assert.That(bitmap.PixelSize.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
+        bitmap.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -516,19 +516,14 @@ public class ViewerUserControlTests
         expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 4 of 4 - sorted by file name ascending";
 
-        _applicationViewModel!.GoToAsset(observableAssets[expectedViewerPosition]);
+        _applicationViewModel!.SetViewerPosition(expectedViewerPosition);
 
-        bitmapImage = ShowImage();
+        bitmap = await ShowImage();
 
-        Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Not.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset4.ImageRotation));
-        Assert.That(bitmapImage.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
-        Assert.That(bitmapImage.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
-        Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
-        Assert.That(bitmapImage.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
-        Assert.That(bitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(bitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(bitmap, Is.Not.Null);
+        Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset4.Pixel.Asset.Width));
+        Assert.That(bitmap.PixelSize.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
+        bitmap.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -561,7 +556,7 @@ public class ViewerUserControlTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -616,19 +611,14 @@ public class ViewerUserControlTests
         const string expectedStatusMessage = "The catalog process has ended.";
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        _applicationViewModel!.ViewerPosition = -1;
+        _applicationViewModel!.SetViewerPosition(-1);
 
-        BitmapImage? bitmapImage = ShowImage();
+        Bitmap? bitmap = await ShowImage();
 
-        Assert.That(bitmapImage, Is.Not.Null);
-        Assert.That(bitmapImage.StreamSource, Is.Null);
-        Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset1.ImageRotation));
-        Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
-        Assert.That(bitmapImage.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-        Assert.That(bitmapImage.DecodePixelWidth, Is.Zero);
-        Assert.That(bitmapImage.DecodePixelHeight, Is.Zero);
+        Assert.That(bitmap, Is.Not.Null);
+        Assert.That(bitmap.PixelSize.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
+        Assert.That(bitmap.PixelSize.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
+        bitmap.Dispose();
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -642,7 +632,7 @@ public class ViewerUserControlTests
             false,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -666,7 +656,6 @@ public class ViewerUserControlTests
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
         Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -711,9 +700,9 @@ public class ViewerUserControlTests
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
-            BitmapImage? bitmapImage = ShowImage();
+            Bitmap? bitmap = await ShowImage();
 
-            Assert.That(bitmapImage, Is.Null);
+            Assert.That(bitmap, Is.Null);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -808,8 +797,8 @@ public class ViewerUserControlTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -846,8 +835,8 @@ public class ViewerUserControlTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -947,20 +936,27 @@ public class ViewerUserControlTests
         }
     }
 
-    private BitmapImage? ShowImage()
+    private Task<Bitmap?> ShowImage()
     {
-        BitmapImage? bitmapImage = null;
-
-        if (_applicationViewModel is { CurrentAsset: not null })
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
         {
-            bool isHeic =
-                _applicationViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
+            ViewerUserControl control = new()
+            {
+                DataContext = _applicationViewModel
+            };
 
-            bitmapImage = isHeic
-                ? _applicationViewModel.LoadBitmapHeicImageFromPath()
-                : _applicationViewModel.LoadBitmapImageFromPath();
-        }
+            try
+            {
+                control.ShowImage();
+                Image image = control.FindControl<Image>("Image")
+                    ?? throw new InvalidOperationException("Image was not found.");
 
-        return bitmapImage;
+                return image.Source as Bitmap;
+            }
+            finally
+            {
+                control.DataContext = null;
+            }
+        });
     }
 }

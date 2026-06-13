@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -51,7 +50,8 @@ public class DuplicatedSetViewModelTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
 
         DateTime actualDate = DateTime.Now;
 
@@ -68,13 +68,13 @@ public class DuplicatedSetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -102,13 +102,13 @@ public class DuplicatedSetViewModelTests
             FileProperties = new()
             {
                 Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
+                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -122,6 +122,14 @@ public class DuplicatedSetViewModelTests
     {
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
+    [Test]
+    public void FileName_EmptySet_ReturnsEmptyString()
+    {
+        _duplicatedSetViewModel = [];
+
+        Assert.That(_duplicatedSetViewModel.FileName, Is.EqualTo(string.Empty));
     }
 
     [Test]
@@ -152,60 +160,60 @@ public class DuplicatedSetViewModelTests
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2!.FileName,
             2,
-            Visibility.Visible);
+            true);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Collapsed;
+        duplicatedAssetViewModel1.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             1,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel2.Visible = Visibility.Collapsed;
+        duplicatedAssetViewModel2.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Visible;
+        duplicatedAssetViewModel1.IsVisible = true;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             1,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel2.Visible = Visibility.Visible;
+        duplicatedAssetViewModel2.IsVisible = true;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             2,
-            Visibility.Visible);
+            true);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsVisible"));
 
         CheckInstance(
             duplicatedSetViewModelInstances,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             2,
-            Visibility.Visible);
+            true);
     }
 
     [Test]
@@ -236,38 +244,38 @@ public class DuplicatedSetViewModelTests
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2!.FileName,
             2,
-            Visibility.Visible);
+            true);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Collapsed;
+        duplicatedAssetViewModel1.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             1,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel2.Visible = Visibility.Collapsed;
+        duplicatedAssetViewModel2.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("IsVisible"));
 
         CheckInstance(
             duplicatedSetViewModelInstances,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
     }
 
     [Test]
@@ -298,38 +306,38 @@ public class DuplicatedSetViewModelTests
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2!.FileName,
             2,
-            Visibility.Visible);
+            true);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Hidden;
+        duplicatedAssetViewModel1.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             1,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel2.Visible = Visibility.Hidden;
+        duplicatedAssetViewModel2.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("IsVisible"));
 
         CheckInstance(
             duplicatedSetViewModelInstances,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
     }
 
     [Test]
@@ -360,38 +368,38 @@ public class DuplicatedSetViewModelTests
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2!.FileName,
             2,
-            Visibility.Visible);
+            true);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Visible;
-
-        CheckAfterChanges(
-            _duplicatedSetViewModel!,
-            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-            _asset2.FileName,
-            2,
-            Visibility.Visible);
-
-        duplicatedAssetViewModel2.Visible = Visibility.Visible;
+        duplicatedAssetViewModel1.IsVisible = true;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             2,
-            Visibility.Visible);
+            true);
+
+        duplicatedAssetViewModel2.IsVisible = true;
+
+        CheckAfterChanges(
+            _duplicatedSetViewModel!,
+            [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+            _asset2.FileName,
+            2,
+            true);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsVisible"));
         Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("IsVisible"));
 
         CheckInstance(
             duplicatedSetViewModelInstances,
             [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
             _asset2.FileName,
             2,
-            Visibility.Visible);
+            true);
     }
 
     [Test]
@@ -418,27 +426,27 @@ public class DuplicatedSetViewModelTests
             [duplicatedAssetViewModel1],
             _asset2!.FileName,
             1,
-            Visibility.Collapsed);
+            false);
 
-        duplicatedAssetViewModel1.Visible = Visibility.Collapsed;
+        duplicatedAssetViewModel1.IsVisible = false;
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [duplicatedAssetViewModel1],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatesCount"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsVisible"));
 
         CheckInstance(
             duplicatedSetViewModelInstances,
             [duplicatedAssetViewModel1],
             _asset2.FileName,
             0,
-            Visibility.Collapsed);
+            false);
     }
 
     [Test]
@@ -461,14 +469,14 @@ public class DuplicatedSetViewModelTests
             [],
             null,
             0,
-            Visibility.Collapsed);
+            false);
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
             [],
             null,
             0,
-            Visibility.Collapsed);
+            false);
 
         Assert.That(notifyPropertyChangedEvents, Is.Empty);
         Assert.That(duplicatedSetViewModelInstances, Is.Empty);
@@ -493,7 +501,7 @@ public class DuplicatedSetViewModelTests
         DuplicatedSetViewModel expectedDuplicatedSetViewModel,
         string? expectedFileName,
         int expectedDuplicatesCount,
-        Visibility expectedVisible)
+        bool expectedVisible)
     {
         if (expectedDuplicatedSetViewModel.Count > 0)
         {
@@ -506,7 +514,8 @@ public class DuplicatedSetViewModelTests
 
             for (int i = 0; i < expectedDuplicatedSetViewModel.Count; i++)
             {
-                Assert.That(_duplicatedSetViewModel![i].Visible, Is.EqualTo(expectedDuplicatedSetViewModel[i].Visible));
+                Assert.That(_duplicatedSetViewModel![i].IsVisible,
+                    Is.EqualTo(expectedDuplicatedSetViewModel[i].IsVisible));
                 AssertAssetPropertyValidity(_duplicatedSetViewModel![i].Asset, expectedDuplicatedSetViewModel[i].Asset);
 
                 AssertDuplicatedSetViewModelValidity(
@@ -528,7 +537,7 @@ public class DuplicatedSetViewModelTests
         DuplicatedSetViewModel expectedDuplicatedSetViewModel,
         string? expectedFileName,
         int expectedDuplicatesCount,
-        Visibility expectedVisible)
+        bool expectedVisible)
     {
         if (expectedDuplicatedSetViewModel.Count > 0)
         {
@@ -541,8 +550,8 @@ public class DuplicatedSetViewModelTests
 
             for (int i = 0; i < expectedDuplicatedSetViewModel.Count; i++)
             {
-                Assert.That(duplicatedSetViewModelInstance[i].Visible,
-                    Is.EqualTo(expectedDuplicatedSetViewModel[i].Visible));
+                Assert.That(duplicatedSetViewModelInstance[i].IsVisible,
+                    Is.EqualTo(expectedDuplicatedSetViewModel[i].IsVisible));
                 AssertAssetPropertyValidity(duplicatedSetViewModelInstance[i].Asset,
                     expectedDuplicatedSetViewModel[i].Asset);
 
@@ -576,7 +585,7 @@ public class DuplicatedSetViewModelTests
         DuplicatedSetViewModel expectedDuplicatedSetViewModel,
         string? expectedFileName,
         int expectedDuplicatesCount,
-        Visibility expectedVisible)
+        bool expectedVisible)
     {
         Assert.That(duplicatedSetViewModel.FileName, Is.EqualTo(expectedDuplicatedSetViewModel.FileName));
         Assert.That(duplicatedSetViewModel.FileName, Is.EqualTo(expectedDuplicatedSetViewModel[0].Asset.FileName));
@@ -585,7 +594,7 @@ public class DuplicatedSetViewModelTests
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatedSetViewModel.DuplicatesCount));
         Assert.That(duplicatedSetViewModel.DuplicatesCount, Is.EqualTo(expectedDuplicatesCount));
 
-        Assert.That(duplicatedSetViewModel.Visible, Is.EqualTo(expectedVisible));
+        Assert.That(duplicatedSetViewModel.IsVisible, Is.EqualTo(expectedVisible));
     }
 
     private static void CheckInstance(
@@ -593,7 +602,7 @@ public class DuplicatedSetViewModelTests
         DuplicatedSetViewModel expectedDuplicatedSetViewModel,
         string? expectedFileName,
         int expectedDuplicatesCount,
-        Visibility expectedVisible)
+        bool expectedVisible)
     {
         int duplicatedSetViewModelInstancesCount = duplicatedSetViewModelInstances.Count;
 

@@ -1,0 +1,47 @@
+﻿name: CodeQL - macOS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 1 * * 1" # Weekly scan on Mondays at 1 AM UTC
+
+permissions:
+  security-events: write
+  contents: read
+
+jobs:
+  analyze-macos:
+    name: macOS CodeQL Analysis
+    runs-on: macos-latest
+
+    env:
+      DOTNET_VERSION: 10.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v6
+
+      # Step 2: Setup CodeQL for .NET
+      - name: 🛠️ Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+          build-mode: none # Extract C# from source; no compiled build (avoids the macOS tracer/arch conflict)
+          # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+          # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+      # Step 3: Setup .NET SDK (used by CodeQL to resolve NuGet dependencies for more accurate analysis)
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 4: Run CodeQL analysis
+      - name: 🛡️ Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:csharp/os:macos"

@@ -60,7 +60,7 @@ public class AssetRepositoryAddAssetTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -85,7 +85,7 @@ public class AssetRepositoryAddAssetTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
@@ -113,6 +113,97 @@ public class AssetRepositoryAddAssetTests
         _assetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _testLogger!.LoggingAssertTearDown();
+    }
+
+    [Test]
+    public void AddAssets_FolderAndThumbnailsExist_ReturnsCountAndAssetsUpdatedIsUpdatedOnce()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
+            _asset1 = _asset1!.WithFolder(folder);
+            _asset2 = _asset2!.WithFolder(folder);
+
+            int addedCount = _assetRepository.AddAssets([new(_asset1, [1, 2, 3]), new(_asset2, [4, 5, 6])]);
+
+            Asset[] assets = _assetRepository!.GetCataloguedAssets();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.EqualTo(2));
+                Assert.That(assets, Has.Length.EqualTo(2));
+                Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2.FileName]));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void AddAssets_EmptyList_ReturnsZeroAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            int addedCount = _assetRepository!.AddAssets([]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.Zero);
+                Assert.That(_assetRepository.GetCataloguedAssets(), Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
+    public void AddAssets_AssetFolderPathIsEmpty_ReturnsZeroAndLogsErrorAndAssetsUpdatedIsNotUpdated()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            int addedCount = _assetRepository!.AddAssets([new(_asset1!, [1, 2, 3])]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(addedCount, Is.Zero);
+                Assert.That(_assetRepository.GetCataloguedAssets(), Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
+
+            _testLogger!.AssertLogErrors(
+                [
+                    $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1!.FileName}"
+                ],
+                typeof(AssetRepository));
+        }
+        finally
+        {
+            assetsUpdatedSubscription.Dispose();
+        }
     }
 
     [Test]
@@ -145,8 +236,7 @@ public class AssetRepositoryAddAssetTests
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2!.FileName]));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -190,8 +280,7 @@ public class AssetRepositoryAddAssetTests
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets.Select(a => a.FileName), Is.EquivalentTo([_asset1.FileName, _asset2!.FileName]));
 
             Folder? folder = _assetRepository!.GetFolderByPath(folderPath);
             Assert.That(folder, Is.Not.Null);
@@ -429,15 +518,14 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_ThumbnailDataIsNull_AssetIsAddedAndThrowsInvalidOperationException()
+    public void AddAsset_ThumbnailDataIsNull_ThrowsArgumentNullExceptionAndDoesNotMutateCatalog()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription =
-            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            const string exceptionMessage = "Value must be set.";
+            const string exceptionMessage = "Value cannot be null. (Parameter 'thumbnailData')";
 
             string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
@@ -447,17 +535,16 @@ public class AssetRepositoryAddAssetTests
             Asset[] assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            InvalidOperationException? exception =
-                Assert.Throws<InvalidOperationException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
+            Assert.That(exception?.ParamName, Is.EqualTo("thumbnailData"));
 
             assets = _assetRepository!.GetCataloguedAssets();
-            Assert.That(assets, Has.Length.EqualTo(1));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets, Is.Empty);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             Exception expectedException = new(exceptionMessage);
             _testLogger!.AssertLogExceptions([expectedException], typeof(AssetRepository));
@@ -472,8 +559,15 @@ public class AssetRepositoryAddAssetTests
     public void AddAsset_ConcurrentAccess_ReturnsTrueAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
+        object assetsUpdatedLock = new();
         IDisposable assetsUpdatedSubscription =
-            _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+            _assetRepository!.AssetsUpdated.Subscribe(unit =>
+            {
+                lock (assetsUpdatedLock)
+                {
+                    assetsUpdatedEvents.Add(unit);
+                }
+            });
 
         try
         {

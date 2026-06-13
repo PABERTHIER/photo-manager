@@ -99,51 +99,84 @@ public class SqliteBackupServiceTests
     }
 
     [Test]
+    [Platform("Win", Reason = "Only Windows blocks deleting a file that another stream holds open")]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetriesAndSucceeds()
     {
         string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
         Directory.CreateDirectory(backupDirectory);
+        InsertBackupPayload();
 
         string backupFilePath = Path.Combine(backupDirectory, "20240502.zip");
         string snapshotPath = backupFilePath + ".tmp.db";
 
-        FileStream? lockStream = null;
+        CancellationTokenSource lockCancellation = new();
+        CancellationToken lockToken = lockCancellation.Token;
+        ManualResetEventSlim lockAcquired = new(false);
+        ManualResetEventSlim releaseLock = new(false);
 
-        // Background thread that locks the snapshot file as soon as it's created.
-        // Uses FileShare.ReadWrite so the zip can still read it,
-        // but omits FileShare.Delete so File.Delete throws IOException.
         Task lockTask = Task.Run(() =>
         {
-            SpinWait.SpinUntil(() => File.Exists(snapshotPath), 5000);
+            while (!lockToken.IsCancellationRequested)
+            {
+                if (!File.Exists(snapshotPath))
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
 
-            try
-            {
-                lockStream = new FileStream(snapshotPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                try
+                {
+                    using FileStream lockStream = new(snapshotPath, FileMode.Open, FileAccess.Read,
+                        FileShare.ReadWrite);
+                    // ReSharper disable once AccessToDisposedClosure
+                    lockAcquired.Set();
+                    // ReSharper disable once AccessToDisposedClosure
+                    releaseLock.Wait(lockToken);
+                    return;
+                }
+                catch (Exception ex) when (ex is IOException or OperationCanceledException)
+                {
+                    Thread.Sleep(1);
+                }
             }
-            catch
-            {
-                // File may have been deleted between Exists check and Open
-            }
-        });
+        }, lockToken);
+
+        Task backupTask = Task.Run(() => _backupService!.WriteBackup(backupFilePath), lockToken);
 
         try
         {
-            // The finally block's File.Delete will throw IOException because our
-            // lock holds the file open without FileShare.Delete.
-            // The retry after Thread.Sleep(20) also fails, propagating the exception.
-            Assert.Throws<IOException>(() => _backupService!.WriteBackup(backupFilePath));
+            Assert.That(lockAcquired.Wait(TimeSpan.FromSeconds(5)), Is.True);
 
+            IOException? caughtException = Assert.Throws<IOException>(() => backupTask.GetAwaiter().GetResult());
+
+            Assert.That(caughtException, Is.Not.Null);
             Assert.That(File.Exists(backupFilePath), Is.True);
         }
         finally
         {
-            lockStream?.Dispose();
+            releaseLock.Set();
+            lockCancellation.Cancel();
+
+            try
+            {
+                backupTask.Wait(5000);
+            }
+            catch (AggregateException)
+            {
+            }
+
             lockTask.Wait(1000);
+
+            lockCancellation.Dispose();
+            lockAcquired.Dispose();
+            releaseLock.Dispose();
         }
     }
 
     [Test]
     [Retry(3)]
+    [Platform(Exclude = "MacOsX",
+        Reason = "On macOS, the lock stream interferes with SQLite's own file locking and fails the backup")]
     public void WriteBackup_SnapshotDeleteThrowsIOException_RetrySucceedsAfterLockReleased()
     {
         string backupDirectory = Path.Combine(_databaseDirectory!, Constants.DATABASE_BACKUP_END_PATH);
@@ -187,6 +220,34 @@ public class SqliteBackupServiceTests
         {
             lockStream?.Dispose();
             lockTask.Wait(5000);
+        }
+    }
+
+    private void InsertBackupPayload()
+    {
+        using (SqliteConnection connection = _factory!.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT INTO Folders (Id, Path) VALUES ($id, $path);";
+
+                    SqliteParameter idParameter = command.Parameters.Add("$id", SqliteType.Text);
+                    SqliteParameter pathParameter = command.Parameters.Add("$path", SqliteType.Text);
+                    string payload = new('x', 4096);
+
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        idParameter.Value = Guid.NewGuid().ToString();
+                        pathParameter.Value = $"{payload}-{i}";
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+            }
         }
     }
 }

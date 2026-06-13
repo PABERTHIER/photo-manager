@@ -256,7 +256,7 @@ public class BkTreeTests
         FolderId = Guid.NewGuid(),
         Folder = new() { Id = Guid.Empty, Path = "" },
         FileName = fileName,
-        ImageRotation = Rotation.Rotate0,
+        ImageRotation = ImageRotation.Rotate0,
         Pixel = new()
         {
             Asset = new() { Width = 1920, Height = 1080 },

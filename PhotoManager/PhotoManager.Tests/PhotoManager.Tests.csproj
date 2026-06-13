@@ -272,6 +272,7 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit.Analyzers" />
     <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="Avalonia.Headless" />
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
   <ItemGroup>
@@ -287,6 +288,9 @@
   </Target>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rmdir /S /Q $(OutDir)TestFiles\ApplicationData\" />
+    <PropertyGroup>
+      <AppDataOut>$([System.IO.Path]::Combine('$(OutDir)', 'TestFiles', 'ApplicationData'))</AppDataOut>
+    </PropertyGroup>
+    <RemoveDir Directories="$(AppDataOut)" />
   </Target>
 </Project>

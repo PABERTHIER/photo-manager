@@ -13,18 +13,19 @@ public static class HashingHelper
         Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
         SHA512.HashData(imageBytes, hash);
 
-        return string.Create(128, hash, static (chars, hashBytes) =>
-        {
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                byte b = hashBytes[i];
-                chars[i * 2] = GetHexChar(b >> 4);
-                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
-            }
-        });
+        return ToLowerHex(hash);
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
+    public static string CalculateHash(string filePath)
+    {
+        Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
+
+        using (FileStream stream = OpenSequentialRead(filePath))
+        {
+            SHA512.HashData(stream, hash);
+        }
+
+        return ToLowerHex(hash);
     }
 
     // Performances are decreased by 6 times with CalculatePHash
@@ -58,12 +59,20 @@ public static class HashingHelper
     }
 
     // For GIF or some heic file it returns "00000000000000"
-    public static string CalculateDHash(string? filePath)
+    public static string CalculateDHash(string filePath)
     {
-        bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        using (Bitmap? image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new(filePath!))
+        if (!File.Exists(filePath))
         {
+            throw new ArgumentException($"The file '{filePath}' does not exist.", nameof(filePath));
+        }
+
+        using (SkiaImageData? imageData = BitmapHelper.LoadBitmapFromPath(filePath))
+        {
+            if (imageData == null)
+            {
+                return "00000000000000";
+            }
+
             ulong hash = 0UL;
             ulong mask = 1UL;
 
@@ -71,12 +80,14 @@ public static class HashingHelper
             {
                 for (int x = 0; x < 7; x++)
                 {
-                    float? leftPixel = image?.GetPixel(x, y).GetBrightness();
-                    float? rightPixel = image?.GetPixel(x + 1, y).GetBrightness();
+                    float leftPixel = imageData.GetPixelBrightness(x, y);
+                    float rightPixel = imageData.GetPixelBrightness(x + 1, y);
+
                     if (leftPixel < rightPixel)
                     {
                         hash |= mask;
                     }
+
                     mask <<= 1;
                 }
             }
@@ -90,18 +101,19 @@ public static class HashingHelper
         Span<byte> hash = stackalloc byte[MD5.HashSizeInBytes];
         MD5.HashData(imageBytes, hash);
 
-        return string.Create(32, hash, static (chars, hashBytes) =>
-        {
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                byte b = hashBytes[i];
-                chars[i * 2] = GetHexChar(b >> 4);
-                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
-            }
-        });
+        return ToLowerHex(hash);
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
+    public static string CalculateMD5Hash(string filePath)
+    {
+        Span<byte> hash = stackalloc byte[MD5.HashSizeInBytes];
+
+        using (FileStream stream = OpenSequentialRead(filePath))
+        {
+            MD5.HashData(stream, hash);
+        }
+
+        return ToLowerHex(hash);
     }
 
     // The best use is for PHash method, the most accurate
@@ -117,4 +129,26 @@ public static class HashingHelper
 
         return TensorPrimitives.HammingDistance(hash1.AsSpan(), hash2.AsSpan());
     }
+
+    private static FileStream OpenSequentialRead(string filePath)
+    {
+        return new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920,
+            FileOptions.SequentialScan);
+    }
+
+    private static string ToLowerHex(ReadOnlySpan<byte> hash)
+    {
+        return string.Create(hash.Length * 2, hash, static (chars, hashBytes) =>
+        {
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                byte b = hashBytes[i];
+                chars[i * 2] = GetHexChar(b >> 4);
+                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
+            }
+        });
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
 }

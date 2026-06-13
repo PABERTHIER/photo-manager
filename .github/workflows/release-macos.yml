@@ -1,0 +1,103 @@
+﻿name: Release - macOS
+
+on:
+  workflow_dispatch: # Manual trigger for a release
+  push:
+    tags:
+      - "v*" # Trigger on tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  release-macos:
+    name: macOS Release
+    runs-on: macos-latest
+
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.slnx
+      DOTNET_VERSION: 10.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Ensures full history is fetched
+
+      # Step 2: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 3: Restore dependencies
+      - name: 🛠️ Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_NAME }}
+
+      # Step 4: Build the project for release
+      - name: 🔨 Build
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
+
+      # Step 5: Publish the project (x64)
+      - name: 📦 Publish (x64)
+        run: dotnet publish --configuration Release --runtime osx-x64 --output ./output/osx-x64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+
+      # Step 6: Publish the project (arm64)
+      - name: 📦 Publish (arm64)
+        run: dotnet publish --configuration Release --runtime osx-arm64 --output ./output/osx-arm64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+
+      # Step 7: Compress output into a tar.gz file
+      - name: 📂 Create tar.gz Archives
+        run: |
+          cd ./output/osx-x64
+          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-x64.tar.gz .
+          cd ../..
+          cd ./output/osx-arm64
+          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-arm64.tar.gz .
+          cd ../..
+
+      # Step 8: Create Release with GitHub CLI
+      - name: 🏷️ Create Release (if not exists)
+        run: |
+          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 9: Wait for Release availability
+      - name: ⏳ Wait for Release availability
+        run: |
+          for i in $(seq 1 10); do
+            if gh release view ${{ github.ref_name }} > /dev/null 2>&1; then
+              echo "Release found"
+              exit 0
+            fi
+            echo "Waiting for release... attempt $i/10"
+            sleep 5
+          done
+          echo "::error::Release ${{ github.ref_name }} not found after retries"
+          exit 1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 10: Upload File as Artifact
+      - name: 📤 Upload Release Assets
+        run: |
+          gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-osx-x64.tar.gz --clobber
+          gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-osx-arm64.tar.gz --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 11: Upload Build Artifacts (x64)
+      - name: 💾 Upload Build Artifacts (x64)
+        uses: actions/upload-artifact@v6
+        with:
+          name: photo-manager-osx-x64
+          path: ./output/osx-x64
+
+      # Step 12: Upload Build Artifacts (arm64)
+      - name: 💾 Upload Build Artifacts (arm64)
+        uses: actions/upload-artifact@v6
+        with:
+          name: photo-manager-osx-arm64
+          path: ./output/osx-arm64

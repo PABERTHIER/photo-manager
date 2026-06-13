@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -66,7 +65,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -91,7 +90,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -124,7 +123,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -153,7 +152,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -198,15 +197,19 @@ public class ApplicationViewModelGoToPreviousAssetTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -252,9 +255,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
 
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
-
-        _applicationViewModel!.GoToAsset(observableAssets[3]);
+        _applicationViewModel!.SetViewerPosition(3);
 
         // First GoToPreviousAsset
         _applicationViewModel!.GoToPreviousAsset();
@@ -263,8 +264,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             expectedStatusMessage,
@@ -293,7 +294,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -317,8 +318,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             expectedStatusMessage,
@@ -347,7 +348,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -377,8 +378,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             _applicationViewModel!,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             expectedStatusMessage,
@@ -407,7 +408,7 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -436,8 +437,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
             applicationViewModelInstances,
             assetsDirectory,
             AppMode.Thumbnails,
-            Visibility.Visible,
-            Visibility.Hidden,
+            true,
+            false,
             expectedViewerPosition,
             expectedAppTitle,
             expectedStatusMessage,
@@ -484,8 +485,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 _applicationViewModel!,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 expectedViewerPosition,
                 expectedAppTitle,
                 expectedStatusMessage,
@@ -507,8 +508,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 expectedViewerPosition,
                 expectedAppTitle,
                 expectedStatusMessage,
@@ -567,8 +568,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -593,8 +594,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         string expectedStatusMessage,
@@ -608,8 +609,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -674,8 +675,8 @@ public class ApplicationViewModelGoToPreviousAssetTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         string expectedStatusMessage,

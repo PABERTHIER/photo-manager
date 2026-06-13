@@ -1,8 +1,10 @@
-﻿using PhotoManager.UI.Models;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.Application;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
+using PhotoManager.UI.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +17,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowRefreshAssetsCounterTests
 {
     private string? _assetsDirectory;
@@ -25,6 +27,8 @@ public class MainWindowRefreshAssetsCounterTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
+    private IApplication? _application;
+    private MainWindow? _window;
     private TestableAssetRepository? _testableAssetRepository;
 
     private Asset? _asset1;
@@ -37,6 +41,7 @@ public class MainWindowRefreshAssetsCounterTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -71,9 +76,9 @@ public class MainWindowRefreshAssetsCounterTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -97,9 +102,9 @@ public class MainWindowRefreshAssetsCounterTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -131,9 +136,9 @@ public class MainWindowRefreshAssetsCounterTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -161,9 +166,9 @@ public class MainWindowRefreshAssetsCounterTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -175,10 +180,16 @@ public class MainWindowRefreshAssetsCounterTests
     [TearDown]
     public void TearDown()
     {
+        if (_window != null)
+        {
+            AvaloniaTestSetup.RunOnUiThreadAsync(() => _window.Close()).GetAwaiter().GetResult();
+        }
+
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
         _sourceFolder = null;
         _folderNavigationViewModel = null;
+        _window = null;
     }
 
     private void ConfigureApplicationViewModel(
@@ -216,15 +227,19 @@ public class MainWindowRefreshAssetsCounterTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -232,10 +247,10 @@ public class MainWindowRefreshAssetsCounterTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
-        PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
+        _application = new PhotoManager.Application.Application(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
             fileOperationsService, imageProcessingService);
-        _applicationViewModel = new(application);
+        _applicationViewModel = new(_application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel.CurrentFolderPath };
     }
@@ -293,7 +308,7 @@ public class MainWindowRefreshAssetsCounterTests
             true,
             _sourceFolder!);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -314,6 +329,7 @@ public class MainWindowRefreshAssetsCounterTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // CalculateGlobalAssetsCounter
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("GlobalAssetsCounterWording"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("TotalFilesCountWording"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -377,7 +393,7 @@ public class MainWindowRefreshAssetsCounterTests
                 false,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -386,6 +402,7 @@ public class MainWindowRefreshAssetsCounterTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             // CalculateGlobalAssetsCounter
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -445,8 +462,8 @@ public class MainWindowRefreshAssetsCounterTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -480,8 +497,8 @@ public class MainWindowRefreshAssetsCounterTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -490,7 +507,8 @@ public class MainWindowRefreshAssetsCounterTests
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording,
             Is.EqualTo(expectedGlobalAssetsCounterWording));
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording,
+            Is.EqualTo($"{expectedAssets.Length} files found"));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo("The catalog process has ended."));
 
@@ -612,16 +630,17 @@ public class MainWindowRefreshAssetsCounterTests
     private void MainWindowsInit()
     {
         _folderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
-
-        CancellationTokenSource cancellationTokenSource = new();
-
-        Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
-        Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
-        Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            _window = new(_applicationViewModel!, _application!, NullLoggerFactory.Instance))
+            .GetAwaiter()
+            .GetResult();
     }
 
     private void RefreshAssetsCounter()
     {
-        _applicationViewModel!.CalculateGlobalAssetsCounter();
+        AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(_window!, "RefreshAssetsCounter", _window))
+            .GetAwaiter()
+            .GetResult();
     }
 }

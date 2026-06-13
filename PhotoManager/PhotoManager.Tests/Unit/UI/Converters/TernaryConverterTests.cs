@@ -72,16 +72,53 @@ public class TernaryConverterTests
     }
 
     [Test]
-    public void ConvertBack_ThrowsNotImplementedException()
+    public void Convert_EmptyValues_ReturnsNull()
     {
         TernaryConverter ternaryConverter = new();
-        object? value = null;
-        Type[]? targetTypes = null;
-        object? parameter = null;
 
-        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() =>
-            ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
+        object[] converterParameters = [];
 
-        Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
     }
+
+    [Test]
+    public void Convert_SingleValue_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object[] converterParameters = [true];
+
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void Convert_FirstValueIsNotBoolean_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object[] converterParameters = ["notABoolean", "Message"];
+
+        object? result = ternaryConverter.Convert(converterParameters, typeof(object[]), null,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public void Convert_NullValues_ReturnsNull()
+    {
+        TernaryConverter ternaryConverter = new();
+
+        object? result = ternaryConverter.Convert(null!, typeof(object[]), null!,
+            CultureInfo.InvariantCulture);
+
+        Assert.That(result, Is.Null);
+    }
+
 }

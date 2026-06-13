@@ -1,13 +1,15 @@
-﻿using PhotoManager.UI;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.UI;
+using PhotoManager.UI.Windows;
 using System.Reflection;
 using System.Reflection.Emit;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does AboutWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class AboutWindowTests
 {
     private string? _assetsDirectory;
@@ -19,6 +21,7 @@ public class AboutWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -56,11 +59,14 @@ public class AboutWindowTests
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -75,7 +81,7 @@ public class AboutWindowTests
     [Test]
     [TestCase("PhotoManager", "Toto", "PhotoManager", "Toto")]
     [TestCase("Photo Toto", "Tutu", "PhotoManager", "Tutu")]
-    public void Constructor_WithValidAssembly_SetsTitle(
+    public async Task Constructor_WithValidAssembly_SetsTitle(
         string projectName,
         string projectOwner,
         string expectedProjectName,
@@ -91,14 +97,14 @@ public class AboutWindowTests
         Assert.That(aboutInformation.Version, Does.StartWith("v"));
         Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        string title = await GetAboutWindowTitle(aboutInformation);
         string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
         Assert.That(title, Is.EqualTo(expectedTitle));
     }
 
     [Test]
-    public void Constructor_WithDifferentAssembly_SetsTitle()
+    public async Task Constructor_WithDifferentAssembly_SetsTitle()
     {
         ConfigureApplication(_assetsDirectory!, "PhotoManager", "Toto");
 
@@ -109,7 +115,7 @@ public class AboutWindowTests
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
         Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        string title = await GetAboutWindowTitle(aboutInformation);
         const string expectedTitle = $"About Microsoft® .NET {Constants.VERSION}";
 
         Assert.That(title, Is.EqualTo(expectedTitle));
@@ -118,7 +124,7 @@ public class AboutWindowTests
     [Test]
     [TestCase("Manager Photo", "Toto")]
     [TestCase("Photo Toto", "Tutu")]
-    public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName,
+    public async Task Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName,
         string expectedProjectOwner)
     {
         ConfigureApplication(_assetsDirectory!, expectedProjectName, expectedProjectOwner);
@@ -133,9 +139,28 @@ public class AboutWindowTests
         Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
         Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
-        string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+        string title = await GetAboutWindowTitle(aboutInformation);
         string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
         Assert.That(title, Is.EqualTo(expectedTitle));
+    }
+
+    private static Task<string> GetAboutWindowTitle(AboutInformation aboutInformation)
+    {
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            AboutWindow? window = null;
+
+            try
+            {
+                window = new(aboutInformation, NullLogger<AboutWindow>.Instance);
+
+                return window.Title ?? string.Empty;
+            }
+            finally
+            {
+                window?.Close();
+            }
+        });
     }
 }

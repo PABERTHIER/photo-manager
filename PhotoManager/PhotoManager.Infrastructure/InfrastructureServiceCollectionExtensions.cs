@@ -14,6 +14,9 @@ public static class InfrastructureServiceCollectionExtensions
             services.AddSingleton<IPathProviderService, PathProviderService>();
             services.AddSingleton<IFileOperationsService, FileOperationsService>();
             services.AddSingleton<IImageProcessingService, ImageProcessingService>();
+            services.AddSingleton<IThumbnailGenerator, ImageMagickThumbnailGenerator>();
+            services.AddSingleton(static serviceProvider =>
+                (ImageMagickThumbnailGenerator)serviceProvider.GetRequiredService<IThumbnailGenerator>());
             services.AddSingleton<IImageMetadataService, ImageMetadataService>();
             services.AddSingleton<IAssetRepository, AssetRepository>();
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();

@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +14,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowMoveAssetsTests
 {
     private string? _assetsDirectory;
@@ -64,9 +63,9 @@ public class MainWindowMoveAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -90,9 +89,9 @@ public class MainWindowMoveAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -149,15 +148,19 @@ public class MainWindowMoveAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -173,12 +176,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsTrueAndAllAssets_CopiesAssets(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -245,7 +248,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[0], observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -367,8 +370,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -402,12 +405,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsFalseAndAllAssets_MovesAssets(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -474,7 +477,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[0], observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -598,8 +601,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -636,12 +639,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsTrueAndSecondAsset_CopiesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -709,7 +712,7 @@ public class MainWindowMoveAssetsTests
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
             _applicationViewModel!.GoToNextAsset();
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -836,8 +839,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // GoToNextAsset
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
@@ -877,12 +880,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsFalseAndSecondAsset_MovesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -950,7 +953,7 @@ public class MainWindowMoveAssetsTests
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
             _applicationViewModel!.GoToNextAsset();
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1034,7 +1037,7 @@ public class MainWindowMoveAssetsTests
 
             if (appMode == AppMode.Thumbnails)
             {
-                Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(26));
+                Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
                 // CatalogAssets + NotifyCatalogChange
                 Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
                 Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -1064,11 +1067,10 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CurrentAsset"));
                 Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
                 Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-                Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
             }
             else
             {
-                Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(30));
+                Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(29));
                 // CatalogAssets + NotifyCatalogChange
                 Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
                 Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -1085,8 +1087,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // GoToNextAsset
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
@@ -1103,7 +1105,6 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CurrentAsset"));
                 Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
                 Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
-                Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
             }
 
             CheckInstance(
@@ -1134,12 +1135,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsTrueAndFirstAsset_CopiesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -1206,7 +1207,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[0]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1327,8 +1328,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -1362,12 +1363,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasConfirmedPreserveOriginalFilesIsFalseAndFirstAsset_MovesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -1434,7 +1435,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[0]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1558,8 +1559,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -1596,12 +1597,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasNotConfirmedPreserveOriginalFilesIsTrue_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -1664,7 +1665,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1776,8 +1777,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -1811,12 +1812,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndHasNotConfirmedPreserveOriginalFilesIsFalse_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
         string newDestinationDirectory = Path.Combine(destinationDirectory, Directories.FINAL_DESTINATION);
@@ -1879,7 +1880,7 @@ public class MainWindowMoveAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1991,8 +1992,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SelectedAssets"));
@@ -2026,12 +2027,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndNoSelectedAssetsAndPreserveOriginalFilesIsTrue_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2170,8 +2171,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
             }
 
@@ -2201,12 +2202,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_CataloguedAssetsAndNoSelectedAssetsPreserveOriginalFilesIsFalse_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2345,8 +2346,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
             }
 
@@ -2376,12 +2377,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_NoCataloguedAssetsAndPreserveOriginalFilesIsTrue_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -2482,8 +2483,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
             }
 
@@ -2513,12 +2514,12 @@ public class MainWindowMoveAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task MoveAssets_NoCataloguedAssetsAndPreserveOriginalFilesIsFalse_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -2619,8 +2620,8 @@ public class MainWindowMoveAssetsTests
                 Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
             }
 
@@ -2689,8 +2690,8 @@ public class MainWindowMoveAssetsTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -2727,8 +2728,8 @@ public class MainWindowMoveAssetsTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
@@ -2742,8 +2743,8 @@ public class MainWindowMoveAssetsTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -2789,8 +2790,8 @@ public class MainWindowMoveAssetsTests
         FolderNavigationViewModel folderNavigationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
@@ -2847,10 +2848,21 @@ public class MainWindowMoveAssetsTests
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
             Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id,
-                Is.Not.EqualTo(folderNavigationViewModelInstance.SelectedFolder!.Id));
             Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path,
                 Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+
+            if (folderNavigationViewModelInstance.SelectedFolder != null
+                && string.Equals(folderNavigationViewModelInstance.SelectedFolder.Path,
+                    expectedMoveAssetsLastSelectedFolder.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.That(folderNavigationViewModelInstance.LastSelectedFolder.Id,
+                    Is.EqualTo(folderNavigationViewModelInstance.SelectedFolder.Id));
+            }
+            else
+            {
+                Assert.That(folderNavigationViewModelInstance.LastSelectedFolder.Id,
+                    Is.Not.EqualTo(folderNavigationViewModelInstance.SelectedFolder?.Id));
+            }
         }
         else
         {
@@ -2883,8 +2895,8 @@ public class MainWindowMoveAssetsTests
         FolderNavigationViewModel folderNavigationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
@@ -2959,7 +2971,8 @@ public class MainWindowMoveAssetsTests
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
                 currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
-            Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
+            Assert.That(currentSelectedAsset.ImageData,
+                currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
         }
     }
 
@@ -2991,8 +3004,8 @@ public class MainWindowMoveAssetsTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         int expectedViewerPosition,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
@@ -3086,11 +3099,11 @@ public class MainWindowMoveAssetsTests
 
                     if (result)
                     {
-                        _applicationViewModel!.MoveAssetsLastSelectedFolder =
-                            _folderNavigationViewModel!.SelectedFolder;
-                        _applicationViewModel!.IsRefreshingFolders = true;
+                        _applicationViewModel!.SetMoveAssetsLastSelectedFolder(
+                            _folderNavigationViewModel!.SelectedFolder);
+                        _applicationViewModel!.SetIsRefreshingFolders(true);
                         _folderTreeViewSelectedPath = _folderNavigationViewModel!.SelectedFolder.Path;
-                        _applicationViewModel!.IsRefreshingFolders = false;
+                        _applicationViewModel!.SetIsRefreshingFolders(false);
 
                         if (!preserveOriginalFiles)
                         {

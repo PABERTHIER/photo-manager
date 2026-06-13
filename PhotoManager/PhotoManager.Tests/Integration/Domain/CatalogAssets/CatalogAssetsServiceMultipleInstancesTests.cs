@@ -81,7 +81,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -106,7 +106,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -139,7 +139,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -168,7 +168,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -193,7 +193,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
         //         Modification = ModificationDate.Default
         //     },
         //     ThumbnailCreationDateTime = DateTime.Now,
-        //     ImageRotation = Rotation.Rotate0,
+        //     ImageRotation = ImageRotation.Rotate0,
         //     Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
         //     Metadata = new()
         //     {
@@ -218,7 +218,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
@@ -243,7 +243,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
@@ -263,13 +263,13 @@ public class CatalogAssetsServiceMultipleInstancesTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_JPG,
+                Size = FileSize.HOMER_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.HOMER_JPG,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.HOMER_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -295,13 +295,13 @@ public class CatalogAssetsServiceMultipleInstancesTests
             },
             FileProperties = new()
             {
-                Size = FileSize.HOMER_DUPLICATED_JPG,
+                Size = FileSize.HOMER_DUPLICATED_JPG_CURRENT_OS,
                 Creation = DateTime.Now,
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.HOMER_DUPLICATED_JPG,
+            ImageRotation = ImageRotation.Rotate0,
+            Hash = Hashes.HOMER_DUPLICATED_JPG_CURRENT_OS,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -347,11 +347,15 @@ public class CatalogAssetsServiceMultipleInstancesTests
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, _userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, _testLogger);
+            assetCreationService, _userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
+            _testLogger);
     }
 
     [Test]
@@ -494,11 +498,13 @@ public class CatalogAssetsServiceMultipleInstancesTests
         IAssetCreationService assetCreationServiceMock = Substitute.For<IAssetCreationService>();
         IAssetsComparator assetsComparatorMock = Substitute.For<IAssetsComparator>();
 
-        using (CatalogAssetsService catalogService = new(assetRepositoryMock, fileOperationsServiceMock,
-                   imageMetadataServiceMock, assetCreationServiceMock, userConfigurationServiceMock,
-                   assetsComparatorMock, _testLogger))
+        using (CatalogAssetsService catalogService = new(assetRepositoryMock, fileOperationsServiceMock, imageMetadataServiceMock,
+            assetCreationServiceMock, userConfigurationServiceMock, assetsComparatorMock,
+            new CatalogFolderPipeline(fileOperationsServiceMock, assetCreationServiceMock,
+                assetRepositoryMock),
+            _testLogger))
         {
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
             await catalogService.CatalogAssetsAsync(catalogChanges.Add);
         }
 
@@ -686,7 +692,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assetsFromRepository, Is.Empty);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+            CatalogChangeRecorder catalogChanges = [];
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
@@ -1088,7 +1094,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+        CatalogChangeRecorder catalogChanges = [];
 
         await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 

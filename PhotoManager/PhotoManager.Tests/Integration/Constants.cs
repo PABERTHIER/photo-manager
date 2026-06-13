@@ -4,7 +4,7 @@ public static class Constants
 {
     public const string DATABASE_BACKUP_END_PATH = "Backups";
     public const string DATABASE_FILE_NAME = "photomanager.db";
-    public const string VERSION = "v2.0.0";
+    public const string VERSION = "v3.0.0";
 
     public static class Directories
     {
@@ -377,8 +377,19 @@ public static class Constants
     public static class FileSize
     {
         public const long HOMER_GIF = 64123;
-        public const long HOMER_JPG = 6599;
-        public const long HOMER_DUPLICATED_JPG = 6599;
+        public const long HOMER_JPG = 6600;
+        public const long HOMER_DUPLICATED_JPG = 6600;
+
+        // ffmpeg's bundled macOS build encodes the extracted video first frame slightly differently.
+        // The consts above stay usable in TestCase attributes; runtime expectations must use these values.
+        public const long HOMER_JPG_MAC_OS = 6595;
+
+        public static readonly long HOMER_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_JPG;
+
+        public static readonly long HOMER_DUPLICATED_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_DUPLICATED_JPG;
+
         public const long IMAGE_1_JPG = 29857;
         public const long IMAGE_1_90_DEG_JPG = 31535;
         public const long IMAGE_1_180_DEG_JPG = 31535;
@@ -433,53 +444,53 @@ public static class Constants
 
     public static class ImageByteSizes
     {
-        public const int HOMER_GIF = 10300;
-        public const int IMAGE_1_JPG = 2534;
-        public const int IMAGE_1_90_DEG_JPG = 2551;
-        public const int IMAGE_1_180_DEG_JPG = 2534;
-        public const int IMAGE_1_270_DEG_JPG = 2561;
-        public const int IMAGE_1_DUPLICATE_JPG = 2534;
-        public const int IMAGE_2_JPG = 2545;
-        public const int IMAGE_2_DUPLICATED_JPG = 2545;
-        public const int IMAGE_3_JPG = 2546;
-        public const int IMAGE_4_JPG = 2541;
-        public const int IMAGE_5_JPG = 2544;
-        public const int IMAGE_6_JPG = 2549;
-        public const int IMAGE_7_JPG = 2532;
-        public const int IMAGE_8_JPEG = 2548;
-        public const int IMAGE_9_PNG = 15026;
-        public const int IMAGE_9_DUPLICATE_PNG = 15026;
-        public const int IMAGE_10_PORTRAIT_PNG = 14420;
-        public const int IMAGE_11_HEIC = 6043;
-        public const int IMAGE_11_90_DEG_HEIC = 5921;
-        public const int IMAGE_11_180_DEG_HEIC = 6032;
-        public const int IMAGE_11_270_DEG_HEIC = 6070;
-        public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3531;
-        public const int _1336_ORIGINAL_JPG = 10753;
-        public const int _1336_1_K_JPG = 10312;
-        public const int _1336_2_K_JPG = 10226;
-        public const int _1336_3_K_JPG = 10576;
-        public const int _1336_4_K_ORIGINAL_JPG = 10753;
-        public const int _1336_8_K_JPG = 10836;
-        public const int _1336_THUMBNAIL_JPG = 10880;
-        public const int IMAGE_1336_ORIGINAL_JPG = 10753;
-        public const int IMAGE_1336_MINI_JPG = 4816;
-        public const int IMAGE_1336_SHIT_QUALITY_JPG = 11304;
-        public const int IMAGE_1336_SMALL_JPG = 10592;
-        public const int _1336_BOTTOM_LEFT_PART_JPG = 13128;
-        public const int _1336_BOTTOM_PART_JPG = 13756;
-        public const int _1336_BOTTOM_RIGHT_PART_JPG = 13254;
-        public const int _1336_LEFT_PART_JPG = 9878;
-        public const int _1336_RIGHT_PART_JPG = 10001;
-        public const int _1336_TOP_LEFT_PART_JPG = 5752;
-        public const int _1336_TOP_PART_JPG = 6558;
-        public const int _1336_TOP_RIGHT_PART_JPG = 6045;
-        public const int _1337_JPG = 8467;
-        public const int _1349_JPG = 7834;
-        public const int _1350_JPG = 8921;
-        public const int _1413_JPG = 8733;
-        public const int _1414_JPG = 8567;
-        public const int _1415_JPG = 8031;
+        public const int HOMER_GIF = 6287;
+        public const int IMAGE_1_JPG = 2027;
+        public const int IMAGE_1_90_DEG_JPG = 2024;
+        public const int IMAGE_1_180_DEG_JPG = 2035;
+        public const int IMAGE_1_270_DEG_JPG = 2015;
+        public const int IMAGE_1_DUPLICATE_JPG = 2027;
+        public const int IMAGE_2_JPG = 2044;
+        public const int IMAGE_2_DUPLICATED_JPG = 2044;
+        public const int IMAGE_3_JPG = 2047;
+        public const int IMAGE_4_JPG = 2037;
+        public const int IMAGE_5_JPG = 2042;
+        public const int IMAGE_6_JPG = 2051;
+        public const int IMAGE_7_JPG = 2028;
+        public const int IMAGE_8_JPEG = 2047;
+        public const int IMAGE_9_PNG = 12834;
+        public const int IMAGE_9_DUPLICATE_PNG = 12834;
+        public const int IMAGE_10_PORTRAIT_PNG = 10117;
+        public const int IMAGE_11_HEIC = 5521;
+        public const int IMAGE_11_90_DEG_HEIC = 8669;
+        public const int IMAGE_11_180_DEG_HEIC = 5478;
+        public const int IMAGE_11_270_DEG_HEIC = 8980;
+        public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3054;
+        public const int _1336_ORIGINAL_JPG = 10000;
+        public const int _1336_1_K_JPG = 10176;
+        public const int _1336_2_K_JPG = 10048;
+        public const int _1336_3_K_JPG = 10021;
+        public const int _1336_4_K_ORIGINAL_JPG = 10000;
+        public const int _1336_8_K_JPG = 9984;
+        public const int _1336_THUMBNAIL_JPG = 10068;
+        public const int IMAGE_1336_ORIGINAL_JPG = 10000;
+        public const int IMAGE_1336_MINI_JPG = 4308;
+        public const int IMAGE_1336_SHIT_QUALITY_JPG = 10502;
+        public const int IMAGE_1336_SMALL_JPG = 9836;
+        public const int _1336_BOTTOM_LEFT_PART_JPG = 13022;
+        public const int _1336_BOTTOM_PART_JPG = 10819;
+        public const int _1336_BOTTOM_RIGHT_PART_JPG = 13157;
+        public const int _1336_LEFT_PART_JPG = 8534;
+        public const int _1336_RIGHT_PART_JPG = 8703;
+        public const int _1336_TOP_LEFT_PART_JPG = 5468;
+        public const int _1336_TOP_PART_JPG = 5592;
+        public const int _1336_TOP_RIGHT_PART_JPG = 5780;
+        public const int _1337_JPG = 7856;
+        public const int _1349_JPG = 7258;
+        public const int _1350_JPG = 8249;
+        public const int _1413_JPG = 8147;
+        public const int _1414_JPG = 8043;
+        public const int _1415_JPG = 7065;
     }
 
     public static class ModificationDate
@@ -492,9 +503,20 @@ public static class Constants
         public const string HOMER_GIF =
             "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1";
         public const string HOMER_JPG =
-            "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66";
+            "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
         public const string HOMER_DUPLICATED_JPG =
-            "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66";
+            "a4d7b5cbb491dceed46f1d6d669b1e753366a0d1116819afd837ddf42db4ec12afc15f639ab6b8d6b6318366e49f20a402960489b7b8790ca660045f3d358d21";
+
+        // ffmpeg's bundled macOS build encodes the extracted video first frame slightly differently.
+        // The consts above stay usable in TestCase attributes; runtime expectations must use these values.
+        public const string HOMER_JPG_MAC_OS =
+            "0b7dc6b4c64d29b8b5d65789dc5bfe5cd578b662210978aa08ba0f8cf90cfd7800c37693ffe1cf2e77045855416d94ac32e7d256a45f33997e26483ce6db7cc0";
+
+        public static readonly string HOMER_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_JPG;
+
+        public static readonly string HOMER_DUPLICATED_JPG_CURRENT_OS =
+            OperatingSystem.IsMacOS() ? HOMER_JPG_MAC_OS : HOMER_DUPLICATED_JPG;
         public const string IMAGE_1_JPG =
             "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
         public const string IMAGE_1_90_DEG_JPG =
@@ -619,8 +641,8 @@ public static class Constants
         public const string IMAGE_9_DUPLICATE_PNG = "00088044010900";
         public const string IMAGE_10_PORTRAIT_PNG = "80500d40555402";
         public const string IMAGE_11_HEIC = "00000000000000";
-        public const string IMAGE_11_90_DEG_HEIC = "347636785c99d1";
-        public const string IMAGE_11_180_DEG_HEIC = "bd7b746d992246";
+        public const string IMAGE_11_90_DEG_HEIC = "3476367d5c9dd9";
+        public const string IMAGE_11_180_DEG_HEIC = "fffa746cd9a246";
         public const string IMAGE_11_270_DEG_HEIC = "00000000000000";
         public const string IMAGE_WITH_UPPERCASE_NAME_JPG = "54aaa1554aaa14";
         public const string _1336_JPG = "00000041040892";

@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +14,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Controls;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Control
-// The goal is to test what does ThumbnailsUserControl
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class ThumbnailsUserControlTests
 {
     private string? _assetsDirectory;
@@ -37,6 +36,7 @@ public class ThumbnailsUserControlTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -71,7 +71,7 @@ public class ThumbnailsUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
@@ -96,7 +96,7 @@ public class ThumbnailsUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
@@ -129,7 +129,7 @@ public class ThumbnailsUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
@@ -158,7 +158,7 @@ public class ThumbnailsUserControlTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -203,15 +203,19 @@ public class ThumbnailsUserControlTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -255,7 +259,7 @@ public class ThumbnailsUserControlTests
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        _applicationViewModel.IsRefreshingFolders = true;
+        _applicationViewModel.SetIsRefreshingFolders(true);
 
         await GoToFolder(assetsDirectory);
 
@@ -360,7 +364,7 @@ public class ThumbnailsUserControlTests
             false,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(24));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -381,13 +385,6 @@ public class ThumbnailsUserControlTests
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-        // ViewerPosition
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ViewerPosition"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToPreviousAsset"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CanGoToNextAsset"));
-        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CurrentAsset"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -409,7 +406,8 @@ public class ThumbnailsUserControlTests
     }
 
     [Test]
-    public async Task GoToFolder_CataloguedAssetsAndRootDirectoryAndIsRefreshingFoldersIsTrueAndGoToAsset_DoesNothing()
+    public async Task
+        GoToFolder_CataloguedAssetsAndRootDirectoryAndIsRefreshingFoldersIsTrueAndChangePosition_DoesNothing()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
@@ -439,11 +437,9 @@ public class ThumbnailsUserControlTests
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 3 of 4 - sorted by file name ascending";
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
+        _applicationViewModel!.SetViewerPosition(expectedViewerPosition);
 
-        _applicationViewModel!.GoToAsset(observableAssets[expectedViewerPosition]);
-
-        _applicationViewModel.IsRefreshingFolders = true;
+        _applicationViewModel.SetIsRefreshingFolders(true);
 
         await GoToFolder(assetsDirectory);
 
@@ -480,7 +476,7 @@ public class ThumbnailsUserControlTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -508,7 +504,7 @@ public class ThumbnailsUserControlTests
 
     [Test]
     public async Task
-        GoToFolder_CataloguedAssetsAndRootDirectoryAndIsRefreshingFoldersIsFalseAndGoToAsset_GoesToFolderAndResetsViewerPosition()
+        GoToFolder_CataloguedAssetsAndRootDirectoryAndIsRefreshingFoldersIsFalseAndChangePosition_GoesToFolderAndResetsViewerPosition()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
@@ -538,9 +534,7 @@ public class ThumbnailsUserControlTests
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
-
-        _applicationViewModel!.GoToAsset(observableAssets[2]);
+        _applicationViewModel!.SetViewerPosition(2);
 
         await GoToFolder(assetsDirectory);
 
@@ -558,7 +552,7 @@ public class ThumbnailsUserControlTests
             false,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(29));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
         // CatalogAssets + NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -577,7 +571,7 @@ public class ThumbnailsUserControlTests
         Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-        // GoToAsset
+        // SetViewerPosition
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
         Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
@@ -585,13 +579,12 @@ public class ThumbnailsUserControlTests
         Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
         // ViewerPosition
-        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ViewerPosition"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
-        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ViewerPosition"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -646,7 +639,7 @@ public class ThumbnailsUserControlTests
             // Mock like we already were in an empty directory
             await GoToFolder(emptyDirectory);
 
-            _applicationViewModel.IsRefreshingFolders = true;
+            _applicationViewModel.SetIsRefreshingFolders(true);
 
             await GoToFolder(assetsDirectory);
 
@@ -719,7 +712,7 @@ public class ThumbnailsUserControlTests
 
     [Test]
     public async Task
-        GoToFolder_CataloguedAssetsAndOtherNotEmptyDirectoryAndIsRefreshingFoldersIsFalse_GoesToFolderAndResetsViewerPosition()
+        GoToFolder_CataloguedAssetsAndOtherNotEmptyDirectoryAndNotRefreshing_GoesToFolderAndResetsViewerPosition()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string emptyDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
@@ -777,7 +770,7 @@ public class ThumbnailsUserControlTests
                 false,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(27));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -808,11 +801,6 @@ public class ThumbnailsUserControlTests
             Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -876,7 +864,7 @@ public class ThumbnailsUserControlTests
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            _applicationViewModel.IsRefreshingFolders = true;
+            _applicationViewModel.SetIsRefreshingFolders(true);
 
             await GoToFolder(emptyDirectory);
 
@@ -1056,7 +1044,7 @@ public class ThumbnailsUserControlTests
             string expectedAppTitle =
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            _applicationViewModel.IsRefreshingFolders = true;
+            _applicationViewModel.SetIsRefreshingFolders(true);
 
             await GoToFolder(assetsDirectory);
 
@@ -1148,7 +1136,7 @@ public class ThumbnailsUserControlTests
                 false,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
@@ -1157,7 +1145,6 @@ public class ThumbnailsUserControlTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             // SetAssets
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1229,7 +1216,7 @@ public class ThumbnailsUserControlTests
         Asset[] expectedSelectedAssets = [observableAssets[0]];
 
         // First set SelectedAssets
-        _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+        _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -1270,7 +1257,7 @@ public class ThumbnailsUserControlTests
         // Second set SelectedAssets
         expectedSelectedAssets = [];
 
-        _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+        _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -1314,7 +1301,7 @@ public class ThumbnailsUserControlTests
         expectedSelectedAssets =
             [observableAssets[3], observableAssets[0], observableAssets[1], observableAssets[2]];
 
-        _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+        _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -1426,8 +1413,8 @@ public class ThumbnailsUserControlTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -1466,8 +1453,8 @@ public class ThumbnailsUserControlTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.EqualTo(expectedIsRefreshingFolders));
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.False);
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -1591,13 +1578,13 @@ public class ThumbnailsUserControlTests
     {
         if (!_applicationViewModel!.IsRefreshingFolders)
         {
-            Asset[] assets = await GetAssets(selectedImagePath).ConfigureAwait(true);
+            Asset[] assets = await GetAssets(selectedImagePath);
 
             _applicationViewModel.SetAssets(selectedImagePath, assets);
 
             if (_applicationViewModel.ObservableAssets.Count > 0)
             {
-                _applicationViewModel.ViewerPosition = 0;
+                _applicationViewModel.SetViewerPosition(0);
             }
         }
     }

@@ -62,7 +62,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
@@ -87,7 +87,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = Rotation.Rotate90,
+            ImageRotation = ImageRotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
@@ -128,7 +128,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
@@ -187,12 +187,9 @@ public class AssetRepositoryGetAssetsByPathTests
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset1.FileName).ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset2!.FileName).ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Single(asset => asset.FileName == _asset3!.FileName).ImageData, Is.Null);
 
             Asset[] assets1 = _assetRepository.GetAssetsByPath(folderPath1);
             Asset[] assets2 = _assetRepository.GetAssetsByPath(folderPath2);
@@ -227,12 +224,13 @@ public class AssetRepositoryGetAssetsByPathTests
     [Test]
     public void GetAssetsByPath_ThumbnailsAndFolderExistButLoadBitmapThumbnailImageReturnsNull_ReturnsEmptyArray()
     {
-        BitmapImage? bitmapImage = null;
+        IImageData? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -276,7 +274,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(assets, Is.Empty);
 
             imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -623,7 +621,8 @@ public class AssetRepositoryGetAssetsByPathTests
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
-        imageProcessingServiceMock.LoadBitmapThumbnailImage(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>())
+        imageProcessingServiceMock.LoadBitmapThumbnailImage(
+                Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
         SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
@@ -679,7 +678,7 @@ public class AssetRepositoryGetAssetsByPathTests
                 Assert.That(assets, Is.Empty);
 
                 imageProcessingServiceMock.Received(1).LoadBitmapThumbnailImage(
-                    Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>());
+                    Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>());
 
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -737,12 +736,9 @@ public class AssetRepositoryGetAssetsByPathTests
             cataloguedAssets = _assetRepository!.GetCataloguedAssets();
 
             Assert.That(cataloguedAssets, Has.Length.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
-            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+            Assert.That(cataloguedAssets.Select(a => a.FileName),
+                Is.EquivalentTo([_asset1.FileName, _asset2!.FileName, _asset3!.FileName]));
+            Assert.That(cataloguedAssets, Has.All.Matches<Asset>(a => a.ImageData == null));
 
             Asset[] assets1 = [];
             Asset[] assets2 = [];
@@ -753,16 +749,13 @@ public class AssetRepositoryGetAssetsByPathTests
                 () => assets2 = _assetRepository.GetAssetsByPath(folderPath2)
             );
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
-            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets, Has.All.Matches<Asset>(a => a.ImageData != null));
 
             Assert.That(assets1, Has.Length.EqualTo(1));
             Assert.That(assets2, Has.Length.EqualTo(2));
 
             Assert.That(assets1[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets2[0].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets2[1].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(assets2.Select(a => a.FileName), Is.EquivalentTo([_asset2!.FileName, _asset3!.FileName]));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

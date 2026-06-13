@@ -2,7 +2,6 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
@@ -15,9 +14,9 @@ using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWi
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
-// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
-// The goal is to test what does MainWindow
 [TestFixture]
+[Apartment(ApartmentState.STA)]
+[NonParallelizable]
 public class MainWindowDeleteAssetsTests
 {
     private string? _assetsDirectory;
@@ -60,9 +59,9 @@ public class MainWindowDeleteAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_1_JPG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -86,9 +85,9 @@ public class MainWindowDeleteAssetsTests
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
+            ImageRotation = ImageRotation.Rotate0,
             Hash = Hashes.IMAGE_9_PNG,
-            ImageData = new(),
+            ImageData = SkiaImageData.Empty(),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -141,15 +140,19 @@ public class MainWindowDeleteAssetsTests
         SqlitePersistenceContext sqlitePersistenceContext = new(
             sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
         _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
+            new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService, userConfigurationService,
-            new TestLogger<AssetCreationService>());
+            imageProcessingService, imageMetadataService, assetHashCalculatorService,
+            new ImageMagickThumbnailGenerator(imageProcessingService),
+            userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
-            imageMetadataService, assetCreationService, userConfigurationService, assetsComparator,
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator,
+            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
+                _testableAssetRepository),
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -233,8 +236,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -245,8 +248,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -275,8 +278,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -362,8 +365,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -374,8 +377,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -407,8 +410,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -492,8 +495,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -504,8 +507,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -534,8 +537,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -621,8 +624,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -633,8 +636,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -663,8 +666,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -749,8 +752,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -761,8 +764,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -789,8 +792,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -869,12 +872,15 @@ public class MainWindowDeleteAssetsTests
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
+            _asset1Temp.ImageData = null;
+            _asset2Temp.ImageData = null;
+
             CheckAfterChanges(
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -885,8 +891,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -912,8 +918,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1008,8 +1014,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1020,8 +1026,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1047,8 +1053,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 destinationDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1107,8 +1113,8 @@ public class MainWindowDeleteAssetsTests
                 _applicationViewModel!,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1119,8 +1125,8 @@ public class MainWindowDeleteAssetsTests
                 _folderNavigationViewModel!,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1140,8 +1146,8 @@ public class MainWindowDeleteAssetsTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 AppMode.Thumbnails,
-                Visibility.Visible,
-                Visibility.Hidden,
+                true,
+                false,
                 [],
                 expectedAppTitle,
                 expectedAssets,
@@ -1160,12 +1166,12 @@ public class MainWindowDeleteAssetsTests
 
     // DeleteSelectedAssets
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndMultipleSelectedAsset_DeletesAssets(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -1223,7 +1229,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[0], observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1307,8 +1313,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -1340,12 +1346,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndDeleteTwice_DeletesAssets(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -1401,7 +1407,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [_applicationViewModel.CurrentAsset!];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1418,7 +1424,7 @@ public class MainWindowDeleteAssetsTests
 
             expectedSelectedAssets = [_applicationViewModel.CurrentAsset!];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             result = DeleteSelectedAssets();
 
@@ -1501,8 +1507,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets 1
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -1539,12 +1545,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndCurrentAsset_DeletesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -1600,7 +1606,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [_applicationViewModel.CurrentAsset!];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1685,8 +1691,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -1718,12 +1724,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndNotCurrentAsset_DeletesAsset(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -1781,7 +1787,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -1866,8 +1872,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -1899,12 +1905,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndNoSelectedAssets_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2034,8 +2040,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
             }
 
@@ -2062,12 +2068,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_CataloguedAssetsAndUnknownSelectedAssetsAndFileExists_DeletesFiles(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2123,7 +2129,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [_asset1Temp, _asset2Temp];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -2143,6 +2149,9 @@ public class MainWindowDeleteAssetsTests
 
             assetsInRepository = _testableAssetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Empty);
+
+            _asset1Temp.ImageData = null;
+            _asset2Temp.ImageData = null;
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -2204,8 +2213,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -2234,13 +2243,13 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task
         DeleteSelectedAssets_CataloguedAssetsAndOneSelectedAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException(
             AppMode appMode,
-            Visibility expectedThumbnailsVisible,
-            Visibility expectedViewerVisible)
+            bool expectedThumbnailsVisible,
+            bool expectedViewerVisible)
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
 
@@ -2298,7 +2307,7 @@ public class MainWindowDeleteAssetsTests
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
-            _applicationViewModel!.SelectedAssets = expectedSelectedAssets;
+            _applicationViewModel!.SetSelectedAssets(expectedSelectedAssets);
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
@@ -2382,8 +2391,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
                 // SelectedAssets
                 Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("SelectedAssets"));
@@ -2412,12 +2421,12 @@ public class MainWindowDeleteAssetsTests
     }
 
     [Test]
-    [TestCase(AppMode.Thumbnails, Visibility.Visible, Visibility.Hidden)]
-    [TestCase(AppMode.Viewer, Visibility.Hidden, Visibility.Visible)]
+    [TestCase(AppMode.Thumbnails, true, false)]
+    [TestCase(AppMode.Viewer, false, true)]
     public async Task DeleteSelectedAssets_NoCataloguedAssets_DoesNothing(
         AppMode appMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible)
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible)
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -2509,8 +2518,8 @@ public class MainWindowDeleteAssetsTests
                 Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
                 // ChangeAppMode
                 Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppMode"));
-                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ThumbnailsVisible"));
-                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerVisible"));
+                Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("IsThumbnailsVisible"));
+                Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsViewerVisible"));
                 Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
             }
 
@@ -2575,8 +2584,8 @@ public class MainWindowDeleteAssetsTests
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
+        Assert.That(_applicationViewModel!.IsViewerVisible, Is.False);
         Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
@@ -2601,8 +2610,8 @@ public class MainWindowDeleteAssetsTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -2613,8 +2622,8 @@ public class MainWindowDeleteAssetsTests
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
+        Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.IsViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
@@ -2647,8 +2656,8 @@ public class MainWindowDeleteAssetsTests
         FolderNavigationViewModel folderNavigationViewModelInstance,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -2682,8 +2691,8 @@ public class MainWindowDeleteAssetsTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         AppMode expectedAppMode,
-        Visibility expectedThumbnailsVisible,
-        Visibility expectedViewerVisible,
+        bool expectedThumbnailsVisible,
+        bool expectedViewerVisible,
         Asset[] expectedSelectedAssets,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -2729,7 +2738,8 @@ public class MainWindowDeleteAssetsTests
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentSelectedAsset, currentExpectedAsset,
                 currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
-            Assert.That(currentSelectedAsset.ImageData, Is.Not.Null);
+            Assert.That(currentSelectedAsset.ImageData,
+                currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
         }
     }
 
@@ -2748,7 +2758,8 @@ public class MainWindowDeleteAssetsTests
 
             if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
-                Assert.That(currentObservableAsset.ImageData, Is.Not.Null);
+                Assert.That(currentObservableAsset.ImageData,
+                    currentExpectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
             }
             else
             {
@@ -2803,7 +2814,7 @@ public class MainWindowDeleteAssetsTests
 
     private void DeleteAssets(Asset[] assets)
     {
-        _application!.DeleteAssets(assets); // TODO: Need to rework how the deletion is handled
+        _application!.DeleteAssets(assets);
         _applicationViewModel!.RemoveAssets(assets);
     }
 

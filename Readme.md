@@ -1,10 +1,13 @@
-# PhotoManager
+﻿# PhotoManager
 
 ![PhotoManager][app-icon]
 
-[![Build & Test][build-badge]][build-link]
-[![Release][release-badge]][release-link]
-[![CodeQL][code-ql-badge]][code-ql-link]
+| | Windows | Linux | macOS |
+|--|---------|-------|-------|
+| **Build** | [![Build - Windows][build-windows-badge]][build-windows-link] | [![Build - Linux][build-linux-badge]][build-linux-link] | [![Build - macOS][build-macos-badge]][build-macos-link] |
+| **CodeQL** | [![CodeQL - Windows][codeql-windows-badge]][codeql-windows-link] | [![CodeQL - Linux][codeql-linux-badge]][codeql-linux-link] | [![CodeQL - macOS][codeql-macos-badge]][codeql-macos-link] |
+| **Release** | [![Release - Windows][release-windows-badge]][release-windows-link] | [![Release - Linux][release-linux-badge]][release-linux-link] | [![Release - macOS][release-macos-badge]][release-macos-link] |
+
 [![Coverage Status][coverage-status-badge]][coverage-status-link]
 
 **I used this [repo][jp-photo-manager-repo] as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
@@ -29,10 +32,8 @@ The SQLite database is stored locally on your computer.**
 ## Upcoming :next_track_button:
 
 - Progress bar.
-- Multithread.
 - Handling corrupted images and videos.
 - Conversion feature (convert heic to jpg for example).
-- Migration to MAUI (or better) for full compatibility on macOs.
 
 ## Run the application :rocket:
 
@@ -43,11 +44,17 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 
 ## Installation instructions :man_teacher:
 
-- Download the zip file with the compiled application files (`publish.zip` or `photo-manager-{version}.zip`) for the latest release.
-- Unzip the content of the zip file to a new folder.
+- Download the archive for your platform from the latest release:
+  - **Windows**: `photo-manager-{version}-win-x64.zip`
+  - **Linux**: `photo-manager-{version}-linux-x64.tar.gz`
+  - **macOS (Intel)**: `photo-manager-{version}-osx-x64.tar.gz`
+  - **macOS (Apple Silicon)**: `photo-manager-{version}-osx-arm64.tar.gz`
+- Extract the archive to a new folder.
 - [Configure the appsettings.json file](#config-file-card_file_box)
-- Run `PhotoManager.UI.exe`.
-- The application automatically creates a `Database/` folder next to the `.exe` to store the database and backups.
+- Run the application:
+  - **Windows**: Run `PhotoManager.UI.exe`
+  - **Linux / macOS**: Run `./PhotoManager.UI` (you may need to `chmod +x PhotoManager.UI` first)
+- The application automatically creates a `Database/` folder next to the executable to store the database and backups.
 
 ## Config file :card_file_box:
 
@@ -102,9 +109,62 @@ The lower the value of `PHashThreshold`, the more precise it is.
 
 **The `Paths` part is about settings of paths:** :open_file_folder:
 
-- `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
-- `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
-- `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
+- `AssetsDirectory = "~/Pictures"`: The directory where your assets are, to analyse them.
+- `ExemptedFolderPath = "~/Pictures/PhotoManagerExempted"`: The path where PhotoManager will protect your
+  assets and if there are duplicates in others paths, you will be able to delete all of them except the assets
+  in this exempted path.
+- `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file
+  (used if you set `AnalyseVideos` to true). The full path is built from `AssetsDirectory` and this folder name.
+
+### Path configuration details :world_map:
+
+`AssetsDirectory` and `ExemptedFolderPath` support several expansion syntaxes:
+
+| Syntax | Platform | Example |
+|--------|----------|---------|
+| `~` or `~/...` or `~\...` | All | `~/Pictures` → `C:\Users\<user>\Pictures` (Windows) or `/home/<user>/Pictures` (Linux/macOS) |
+| `%VARIABLE%` | Windows | `%USERPROFILE%\Photos` → `C:\Users\<user>\Photos` |
+| `$VARIABLE` or `${VARIABLE}` | Linux/macOS | `$HOME/Pictures` → `/home/<user>/Pictures` |
+| Absolute path | All | `C:\Photos` (Windows) or `/mnt/data/Photos` (Linux/macOS) |
+
+**Cross-drive paths (Windows):** You can point to any drive letter. For example:
+
+```json
+{
+  "AssetsDirectory": "E:\\Workspace\\PhotoManager\\Test",
+  "ExemptedFolderPath": "E:\\Workspace\\PhotoManager\\Test\\Exempted"
+}
+```
+
+**Cross-platform note:** On Windows, forward slashes in paths (e.g. `~/Workspace/Photos`) are automatically
+normalized to backslashes. On Linux/macOS, backslashes are kept as-is by the OS path APIs.
+Always use the native separator for your platform, or rely on `~` expansion which handles it for you.
+
+**Examples by platform:**
+
+Windows:
+```json
+{
+  "AssetsDirectory": "C:\\Users\\John\\Pictures",
+  "ExemptedFolderPath": "C:\\Users\\John\\Pictures\\Exempted"
+}
+```
+
+Linux/macOS:
+```json
+{
+  "AssetsDirectory": "~/Pictures",
+  "ExemptedFolderPath": "~/Pictures/Exempted"
+}
+```
+
+Using environment variables:
+```json
+{
+  "AssetsDirectory": "%PHOTO_LIBRARY%",
+  "ExemptedFolderPath": "${PHOTO_LIBRARY}/Exempted"
+}
+```
 
 **The `Project` part is about settings of project (there is no need to update it):** :building_construction:
 
@@ -115,6 +175,10 @@ The lower the value of `PHashThreshold`, the more precise it is.
 
 - `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
 - `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
+
+**The `Ui` part is about desktop UI settings:** :desktop_computer:
+
+- `ThemeMode = "System"`: Uses the operating system theme. Supported values are `System`, `Light`, and `Dark`.
 
 ## Compatible picture formats :camera:
 
@@ -168,7 +232,7 @@ Improvements **WIP**.
 ## Technologies used :man_technologist:
 
 - [.NET 10.0][dotnet]
-- [Windows Presentation Foundation][wpf]
+- [Avalonia UI][avalonia]
 - [SQLite][sqlite] (via [Microsoft.Data.Sqlite][ms-data-sqlite])
 - [NUnit][nunit]
 - [NSubstitute][nsubstitute]
@@ -182,42 +246,58 @@ Improvements **WIP**.
 
 [![codecov][codecov-badge]][codecov-link]
 
+To generate a local coverage report:
+
+```powershell
+pwsh PhotoManager/test-with-coverage.ps1
+```
+
+Use `-Filter "FullyQualifiedName~ClassName"` for focused runs. The report is written to `PhotoManager/TestResults`.
+
 ## Transparency :handshake:
 
-This project has some versionned dll and rar files for its own good working.
-There are 3 rar files, located here: PhotoManager\PhotoManager.Common\Ffmpeg
+This project uses versioned FFmpeg runtime packages for video duplicate detection. At build time, `PhotoManager.Common` copies `ffmpeg` and `ffprobe` from the matching `Curiosity.FFmpeg.Runtimes.*`
+NuGet package into the output folder under `Ffmpeg/Bin`. This keeps frame extraction deterministic without keeping Windows-only RAR archives or a custom extraction task in the repository.
 
-- **ffmpeg.rar**
-- **ffplay.rar**
-- **ffprobe.rar**
+If you need to override the bundled binaries, set `PHOTOMANAGER_FFMPEG_BINARY_FOLDER` or `FFMPEG_BINARY_FOLDER` to a folder containing the platform-specific `ffmpeg` executable.
+If neither the bundled folder nor an override exists, FFMpegCore falls back to resolving `ffmpeg` from `PATH`.
 
-They are used for the video duplicates detection feature and are here to ensure everyone has the same exact version (even for GitHub CI). That will prevent asset generation differences accross various versions.
-To add to that, without them, everyone who want to use it will have to install on their own Ffmpeg and add the path to the .exe file to the env variables. With the rar file in the project, there is no need to do all of this (working only for Windows because these are .exe files in the end **WIP**).
-
-When the project is built for the first time, the three .exe files will be extracted from their rar file (in here: PhotoManager\PhotoManager.Common\Ffmpeg\Bin), done by the **FileExtractionTask.dll**.
-
-The FileExtractionTask.dll is located in here: PhotoManager\PhotoManager.Common\MSBuildTask
-Its goal is only to extract the content of a rar file.
-It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Common\PhotoManager.Common.csproj
-And this dll depends on **SharpCompress** library. To avoid the installation of a nuGet just for that, it was better to just add the generated dll of that library.
-
-For the last dll, it is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
+The remaining versioned dll is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
 It is only used for the well working of the tests, accross each machine.
 The **FileDateTask.dll** is used to set a fixed date for every tests files used for integration testing.
 It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests\PhotoManager.Tests.csproj
 
-I've made a specific repo for the two customs dll, injected in the project: [photo-manager-tasks][photo-manager-tasks-link]
+I've made a specific repo for the custom dll, injected in the project:
+[photo-manager-tasks][photo-manager-tasks-link]
 
-[app-icon]: PhotoManager/Images/AppIcon.png
+[app-icon]: PhotoManager/PhotoManager.UI/Assets/AppIcon.png
 
-[build-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg
-[build-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml
+[build-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-windows.yml/badge.svg
+[build-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-windows.yml
 
-[release-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml/badge.svg
-[release-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml
+[build-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-linux.yml/badge.svg
+[build-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-linux.yml
 
-[code-ql-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg
-[code-ql-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml
+[build-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-macos.yml/badge.svg
+[build-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build-macos.yml
+
+[codeql-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-windows.yml/badge.svg
+[codeql-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-windows.yml
+
+[codeql-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-linux.yml/badge.svg
+[codeql-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-linux.yml
+
+[codeql-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-macos.yml/badge.svg
+[codeql-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-macos.yml
+
+[release-windows-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-windows.yml/badge.svg
+[release-windows-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-windows.yml
+
+[release-linux-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-linux.yml/badge.svg
+[release-linux-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-linux.yml
+
+[release-macos-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-macos.yml/badge.svg
+[release-macos-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release-macos.yml
 
 [coverage-status-badge]: https://codecov.io/gh/PABERTHIER/photo-manager/graph/badge.svg?token=DILR0QRXVN
 [coverage-status-link]: https://codecov.io/gh/PABERTHIER/photo-manager
@@ -225,7 +305,7 @@ I've made a specific repo for the two customs dll, injected in the project: [pho
 [jp-photo-manager-repo]: https://github.com/jpablodrexler/jp-photo-manager
 
 [dotnet]: https://dotnet.microsoft.com/
-[wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
+[avalonia]: https://avaloniaui.net/
 [sqlite]: https://www.sqlite.org/
 [ms-data-sqlite]: https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/
 [nunit]: https://nunit.org/

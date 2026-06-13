@@ -5,26 +5,26 @@ namespace PhotoManager.Persistence.Repositories;
 
 internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactory) : IAssetPersistence
 {
-    private const string UPSERT_SQL = """
-                                      INSERT INTO Assets (FolderId, FileName, ImageRotation, PixelWidth, PixelHeight,
-                                          ThumbnailPixelWidth, ThumbnailPixelHeight, ThumbnailCreationDateTime, Hash,
-                                          CorruptedMessage, IsCorrupted, RotatedMessage, IsRotated)
-                                      VALUES ($folderId, $fileName, $imageRotation, $pixelWidth, $pixelHeight,
-                                          $thumbnailPixelWidth, $thumbnailPixelHeight, $thumbnailCreationDateTime, $hash,
-                                          $corruptedMessage, $isCorrupted, $rotatedMessage, $isRotated)
-                                      ON CONFLICT(FolderId, FileName) DO UPDATE SET
-                                          ImageRotation             = excluded.ImageRotation,
-                                          PixelWidth                = excluded.PixelWidth,
-                                          PixelHeight               = excluded.PixelHeight,
-                                          ThumbnailPixelWidth       = excluded.ThumbnailPixelWidth,
-                                          ThumbnailPixelHeight      = excluded.ThumbnailPixelHeight,
-                                          ThumbnailCreationDateTime = excluded.ThumbnailCreationDateTime,
-                                          Hash                      = excluded.Hash,
-                                          CorruptedMessage          = excluded.CorruptedMessage,
-                                          IsCorrupted               = excluded.IsCorrupted,
-                                          RotatedMessage            = excluded.RotatedMessage,
-                                          IsRotated                 = excluded.IsRotated;
-                                      """;
+    internal const string UPSERT_SQL = """
+                                       INSERT INTO Assets (FolderId, FileName, ImageRotation, PixelWidth, PixelHeight,
+                                           ThumbnailPixelWidth, ThumbnailPixelHeight, ThumbnailCreationDateTime, Hash,
+                                           CorruptedMessage, IsCorrupted, RotatedMessage, IsRotated)
+                                       VALUES ($folderId, $fileName, $imageRotation, $pixelWidth, $pixelHeight,
+                                           $thumbnailPixelWidth, $thumbnailPixelHeight, $thumbnailCreationDateTime,
+                                           $hash, $corruptedMessage, $isCorrupted, $rotatedMessage, $isRotated)
+                                       ON CONFLICT(FolderId, FileName) DO UPDATE SET
+                                           ImageRotation             = excluded.ImageRotation,
+                                           PixelWidth                = excluded.PixelWidth,
+                                           PixelHeight               = excluded.PixelHeight,
+                                           ThumbnailPixelWidth       = excluded.ThumbnailPixelWidth,
+                                           ThumbnailPixelHeight      = excluded.ThumbnailPixelHeight,
+                                           ThumbnailCreationDateTime = excluded.ThumbnailCreationDateTime,
+                                           Hash                      = excluded.Hash,
+                                           CorruptedMessage          = excluded.CorruptedMessage,
+                                           IsCorrupted               = excluded.IsCorrupted,
+                                           RotatedMessage            = excluded.RotatedMessage,
+                                           IsRotated                 = excluded.IsRotated;
+                                       """;
 
     private const string SELECT_COLUMNS = """
                                           SELECT FolderId, FileName, ImageRotation, PixelWidth, PixelHeight,
@@ -219,7 +219,7 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
         }
     }
 
-    private static void BindAsset(SqliteCommand command, Asset asset)
+    internal static void BindAsset(SqliteCommand command, Asset asset)
     {
         command.Parameters.AddWithValue("$folderId", asset.FolderId);
         command.Parameters.AddWithValue("$fileName", asset.FileName);
@@ -245,7 +245,7 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
             FolderId = folderId,
             Folder = new Folder { Id = Guid.Empty, Path = string.Empty }, // hydrated by repository
             FileName = reader.GetString(1),
-            ImageRotation = (Rotation)reader.GetInt32(2),
+            ImageRotation = MapRotationFromDb(reader.GetInt32(2)),
             Pixel = new Pixel
             {
                 Asset = new Dimensions
@@ -274,6 +274,18 @@ internal sealed class AssetPersistence(ISqliteConnectionFactory connectionFactor
                     IsTrue = reader.GetInt32(12) != 0
                 }
             }
+        };
+    }
+
+    private static ImageRotation MapRotationFromDb(int value)
+    {
+        return value switch
+        {
+            0 => ImageRotation.Rotate0,
+            90 => ImageRotation.Rotate90,
+            180 => ImageRotation.Rotate180,
+            270 => ImageRotation.Rotate270,
+            _ => ImageRotation.Rotate0
         };
     }
 }
