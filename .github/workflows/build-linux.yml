@@ -72,12 +72,12 @@ jobs:
           path: ${{ env.PROJECT_TESTRESULTS_PATH }}/test-results.trx
 
       # Step 10: Upload coverage report to Codecov
-      - name: ☁️ Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
-          name: codecov-linux
-          flags: linux
-          verbose: true
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: ☁️ Upload coverage reports to Codecov
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
+      #     name: codecov-linux
+      #     flags: linux
+      #     verbose: true
+      #     fail_ci_if_error: true
+      #     token: ${{ secrets.CODECOV_TOKEN }}

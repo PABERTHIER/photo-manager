@@ -6382,7 +6382,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
@@ -7094,7 +7098,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
@@ -7795,7 +7803,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with
+            {
+                Creation = ModificationDate.Default, // The copied file keeps the pinned birth time on macOS
+                Modification = DateTime.Now.AddDays(10)
+            };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
