@@ -1,5 +1,6 @@
 ﻿using PhotoManager.UI.Models;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.ViewModels;
 
@@ -7,6 +8,7 @@ public class ShortcutsViewModel : BaseViewModel
 {
     public ObservableCollection<ShortcutItem> Shortcuts { get; }
 
+    [ExcludeFromCodeCoverage(Justification = "Platform-dependent")]
     public ShortcutsViewModel()
     {
         // macOS users expect the Command key; every other platform uses Control.
