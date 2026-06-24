@@ -43,7 +43,7 @@ public class ApplicationSyncAssetsAsyncTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -51,23 +51,21 @@ public class ApplicationSyncAssetsAsyncTests
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, _fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(_fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, _fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(_fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, _userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -75,8 +73,11 @@ public class ApplicationSyncAssetsAsyncTests
             _moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, _fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(_fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService,
-            findDuplicatedAssetsService, _userConfigurationService, _fileOperationsService, imageProcessingService);
+            findDuplicatedAssetsService, _userConfigurationService, _fileOperationsService, imageProcessingService,
+            assetConversionService);
     }
 
     [Test]

@@ -131,6 +131,8 @@ public class ApplicationViewModel : BaseViewModel
 
     public bool IsRefreshingFolders { get; private set; }
 
+    public bool IsCataloging { get; private set; }
+
     public string AppTitle
     {
         get => _appTitle;
@@ -220,6 +222,12 @@ public class ApplicationViewModel : BaseViewModel
     public void SetIsRefreshingFolders(bool isRefreshingFolders)
     {
         IsRefreshingFolders = isRefreshingFolders;
+    }
+
+    public void SetIsCataloging(bool isCataloging)
+    {
+        IsCataloging = isCataloging;
+        NotifyPropertyChanged(nameof(IsCataloging));
     }
 
     public void SetMoveAssetsLastSelectedFolder(Folder? folder)
@@ -491,7 +499,11 @@ public class ApplicationViewModel : BaseViewModel
 
     private void OnObservableAssetsUpdated()
     {
-        NotifyPropertyChanged(nameof(ObservableAssets));
+        NotifyPropertyChanged(
+            nameof(ObservableAssets),
+            nameof(CanGoToPreviousAsset),
+            nameof(CanGoToNextAsset),
+            nameof(CurrentAsset));
         UpdateAppTitle();
     }
 

@@ -1,0 +1,68 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.ShortcutsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:PhotoManager.UI.Models"
+    Title="Shortcuts"
+    Width="860"
+    Height="600"
+    MinWidth="560"
+    MinHeight="420"
+    WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="18">
+        <StackPanel DockPanel.Dock="Top" Spacing="6">
+            <TextBlock FontSize="24" FontWeight="SemiBold" Text="Keyboard shortcuts" />
+            <TextBlock
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="Use these shortcuts from the main window. Some actions need selected pictures first."
+                TextWrapping="Wrap" />
+        </StackPanel>
+        <Button
+            DockPanel.Dock="Bottom"
+            HorizontalAlignment="Right"
+            Classes="action"
+            Content="Close"
+            Click="Close_Click" />
+        <ScrollViewer Margin="0,16">
+            <ItemsControl ItemsSource="{Binding Shortcuts}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:ShortcutItem">
+                        <Border
+                            Margin="0,0,0,10"
+                            Padding="12"
+                            Background="{DynamicResource PhotoManagerPanelBrush}"
+                            BorderBrush="{DynamicResource PhotoManagerBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                            <Grid ColumnDefinitions="120,180,*" RowDefinitions="Auto,Auto">
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Section}" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Shortcut}" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Action}" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="0,4,0,0"
+                                    Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                                    Text="{Binding Details}"
+                                    TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

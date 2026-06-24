@@ -74,10 +74,10 @@ public class AssetRepositoryTests
         _imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         _imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
 
-        _assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock,
-            _imageMetadataServiceMock, userConfigurationService, _persistenceContextMock, _testLogger);
+        _assetRepository = new(_imageProcessingServiceMock, _imageMetadataServiceMock, userConfigurationService,
+            _persistenceContextMock, _testLogger);
 
         _asset1 = new()
         {
@@ -146,7 +146,7 @@ public class AssetRepositoryTests
         persistenceContextMock.RecentPaths.Returns(recentPathsPersistenceMock);
         persistenceContextMock.SyncDefinitions.Returns(syncDefinitionsPersistenceMock);
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
@@ -155,7 +155,7 @@ public class AssetRepositoryTests
             using (Assert.EnterMultipleScope())
             {
                 IOException? exception = Assert.Throws<IOException>(() =>
-                    new AssetRepository(_pathProviderServiceMock!, imageProcessingServiceMock, imageMetadataServiceMock,
+                    new AssetRepository(imageProcessingServiceMock, imageMetadataServiceMock,
                         userConfigurationService, persistenceContextMock, testLogger));
 
                 Assert.That(exception?.Message, Is.EqualTo(expectedInnerException.Message));
@@ -228,11 +228,11 @@ public class AssetRepositoryTests
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         TestLogger<AssetRepository> testLogger = new();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            imageMetadataServiceMock, userConfigurationService, persistenceContextMock, testLogger);
+        AssetRepository assetRepository = new(_imageProcessingServiceMock!, imageMetadataServiceMock,
+            userConfigurationService, persistenceContextMock, testLogger);
 
         try
         {
@@ -916,11 +916,11 @@ public class AssetRepositoryTests
                 Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(SkiaImageData.Empty());
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         TestLogger<AssetRepository> testLogger = new();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            _imageMetadataServiceMock!, userConfigurationService, _persistenceContextMock!, testLogger);
+        AssetRepository assetRepository = new(_imageProcessingServiceMock!, _imageMetadataServiceMock!,
+            userConfigurationService, _persistenceContextMock!, testLogger);
 
         try
         {
@@ -954,11 +954,11 @@ public class AssetRepositoryTests
 
         _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns([]);
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         TestLogger<AssetRepository> testLogger = new();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            _imageMetadataServiceMock!, userConfigurationService, _persistenceContextMock!, testLogger);
+        AssetRepository assetRepository = new(_imageProcessingServiceMock!, _imageMetadataServiceMock!,
+            userConfigurationService, _persistenceContextMock!, testLogger);
 
         try
         {
@@ -1043,11 +1043,11 @@ public class AssetRepositoryTests
                 Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(SkiaImageData.Empty());
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         TestLogger<AssetRepository> testLogger = new();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            _imageMetadataServiceMock!, userConfigurationService, _persistenceContextMock!, testLogger);
+        AssetRepository assetRepository = new(_imageProcessingServiceMock!, _imageMetadataServiceMock!,
+            userConfigurationService, _persistenceContextMock!, testLogger);
 
         try
         {
@@ -1164,10 +1164,10 @@ public class AssetRepositoryTests
 
         IImageMetadataService imageMetadataServiceMock = Substitute.For<IImageMetadataService>();
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, imageProcessingServiceMock,
-            imageMetadataServiceMock, userConfigurationService, persistenceContextMock, testLogger);
+        AssetRepository assetRepository = new(imageProcessingServiceMock, imageMetadataServiceMock,
+            userConfigurationService, persistenceContextMock, testLogger);
 
         try
         {
@@ -1232,11 +1232,11 @@ public class AssetRepositoryTests
 
         _thumbnailPersistenceMock!.GetByFolderId(folderId).Returns([]);
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         TestLogger<AssetRepository> testLogger = new();
 
-        AssetRepository assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            _imageMetadataServiceMock!, userConfigurationService, _persistenceContextMock!, testLogger);
+        AssetRepository assetRepository = new(_imageProcessingServiceMock!, _imageMetadataServiceMock!,
+            userConfigurationService, _persistenceContextMock!, testLogger);
 
         try
         {
@@ -1288,10 +1288,10 @@ public class AssetRepositoryTests
         ];
         _assetRepository!.Dispose();
         _recentPathsPersistenceMock!.GetAll().Returns(persistedRecentTargetPaths);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
 
-        _assetRepository = new(_pathProviderServiceMock!, _imageProcessingServiceMock!,
-            _imageMetadataServiceMock!, userConfigurationService, _persistenceContextMock!, _testLogger!);
+        _assetRepository = new(_imageProcessingServiceMock!, _imageMetadataServiceMock!, userConfigurationService,
+            _persistenceContextMock!, _testLogger!);
 
         string[] recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 

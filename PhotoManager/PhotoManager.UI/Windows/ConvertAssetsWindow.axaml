@@ -1,0 +1,59 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.ConvertAssetsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Convert Assets"
+    Width="760"
+    Height="560"
+    MinWidth="620"
+    MinHeight="460"
+    WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="18">
+        <StackPanel DockPanel.Dock="Top" Spacing="6">
+            <TextBlock FontSize="24" FontWeight="SemiBold" Text="Convert assets" />
+            <TextBlock
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="Select HEIC, PNG, or JPG images. Converted files are saved one by one in a Converted folder."
+                TextWrapping="Wrap" />
+            <TextBlock
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="Metadata is preserved when the target format supports it, but format-specific metadata can be lost."
+                TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel
+            DockPanel.Dock="Bottom"
+            Margin="0,12,0,0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Spacing="8">
+            <Button Classes="action" Content="Convert" IsEnabled="{Binding CanConvert}" Click="Convert_Click" />
+            <Button Classes="action" Content="Close" Click="Close_Click" />
+        </StackPanel>
+        <Grid RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12" Margin="0,16">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                <Button Content="Select images..." Click="SelectImages_Click" />
+                <ComboBox
+                    Width="120"
+                    ItemsSource="{Binding TargetFormats}"
+                    SelectedItem="{Binding SelectedTargetFormat}" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Spacing="6">
+                <ProgressBar
+                    Height="10"
+                    Maximum="100"
+                    Value="{Binding ProgressPercentage}"
+                    IsVisible="{Binding IsConverting}" />
+                <TextBlock
+                    Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                    Text="{Binding ProgressMessage}"
+                    IsVisible="{Binding IsConverting}" />
+                <TextBlock Text="{Binding SummaryMessage}" TextWrapping="Wrap" />
+            </StackPanel>
+            <TextBlock
+                Grid.Row="2"
+                FontWeight="SemiBold"
+                Text="Selected images" />
+            <ListBox Grid.Row="3" ItemsSource="{Binding SelectedFilePaths}" />
+        </Grid>
+    </DockPanel>
+</Window>

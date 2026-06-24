@@ -181,7 +181,7 @@ public class ApplicationGetAssetsByPathTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
         _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -190,24 +190,21 @@ public class ApplicationGetAssetsByPathTests
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(_pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
-            new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, _userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService =
             new(_testableAssetRepository, fileOperationsService, assetCreationService,
@@ -216,8 +213,11 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
-            findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
+            findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService,
+            assetConversionService);
     }
 
     [Test]
@@ -746,7 +746,7 @@ public class ApplicationGetAssetsByPathTests
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IImageData? bitmapImage = null;
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
@@ -761,24 +761,21 @@ public class ApplicationGetAssetsByPathTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
-            imageProcessingServiceMock, imageMetadataService, userConfigurationService,
-            sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        TestableAssetRepository testableAssetRepository = new(imageProcessingServiceMock, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -786,9 +783,11 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -1036,7 +1035,7 @@ public class ApplicationGetAssetsByPathTests
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
@@ -1050,24 +1049,21 @@ public class ApplicationGetAssetsByPathTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        TestableAssetRepository testableAssetRepository = new(pathProviderServiceMock,
-            imageProcessingServiceMock, imageMetadataService, userConfigurationService,
-            sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        TestableAssetRepository testableAssetRepository = new(imageProcessingServiceMock, imageMetadataService,
+            userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -1075,9 +1071,11 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =

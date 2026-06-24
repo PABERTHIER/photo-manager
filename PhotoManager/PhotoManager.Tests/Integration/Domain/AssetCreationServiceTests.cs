@@ -66,25 +66,21 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
-            new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock!.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
         ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
-        _assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            thumbnailGenerator,
-            _userConfigurationService, _testLogger!);
+        _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, thumbnailGenerator, _userConfigurationService,
+            _testLogger!);
     }
 
     [Test]
@@ -1914,9 +1910,9 @@ public class AssetCreationServiceTests
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService!,
             new TestLogger<AssetHashCalculatorService>());
 
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(assetRepositoryMock, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             _userConfigurationService!, _testLogger!);
 
         Asset? asset = assetCreationService.CreateAsset(_assetsDirectory!, assetName);
@@ -2293,24 +2289,21 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "true");
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext,
-            new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock!.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
-        _assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
-            _userConfigurationService, _testLogger!);
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
+        _assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, thumbnailGenerator, _userConfigurationService,
+            _testLogger!);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 

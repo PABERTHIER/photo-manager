@@ -44,7 +44,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -52,23 +52,21 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, _fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(_fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, _fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(_fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         _moveAssetsService = new(_testableAssetRepository, _fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -76,9 +74,11 @@ public class SyncAssetsViewModelRunProcessAsyncTests
             _moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, _fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(_fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            _fileOperationsService, imageProcessingService);
+            _fileOperationsService, imageProcessingService, assetConversionService);
         _syncAssetsViewModel = new(application);
     }
 

@@ -7,6 +7,7 @@ public interface IImageProcessingService
     byte[] GetJpegBitmapImage(IImageData thumbnailImage);
     byte[] GetPngBitmapImage(IImageData thumbnailImage);
     byte[] GetGifBitmapImage(IImageData thumbnailImage);
+    byte[] ConvertImage(string imagePath, ImageEncodingFormat targetFormat);
     (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation);
     bool IsValidImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);

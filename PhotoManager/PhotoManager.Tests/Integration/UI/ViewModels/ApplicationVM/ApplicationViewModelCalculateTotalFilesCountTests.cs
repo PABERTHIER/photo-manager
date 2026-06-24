@@ -34,7 +34,7 @@ public class ApplicationViewModelCalculateTotalFilesCountTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -43,23 +43,21 @@ public class ApplicationViewModelCalculateTotalFilesCountTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -67,9 +65,11 @@ public class ApplicationViewModelCalculateTotalFilesCountTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
         _applicationViewModel = new(application);
     }
 
@@ -175,6 +175,7 @@ public class ApplicationViewModelCalculateTotalFilesCountTests
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
+        Assert.That(_applicationViewModel!.IsCataloging, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
@@ -206,6 +207,7 @@ public class ApplicationViewModelCalculateTotalFilesCountTests
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
+        Assert.That(applicationViewModelInstance.IsCataloging, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);

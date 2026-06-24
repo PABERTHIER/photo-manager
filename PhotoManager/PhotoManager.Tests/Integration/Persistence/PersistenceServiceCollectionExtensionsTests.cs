@@ -1,12 +1,30 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PhotoManager.Domain.Interfaces.Persistence;
 using PhotoManager.Persistence;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Persistence;
 
 [TestFixture]
 public class PersistenceServiceCollectionExtensionsTests
 {
+    private string? _assetsDirectory;
+    private string? _databaseDirectory;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+    }
+
     [Test]
     public void AddPersistence_RegistersServicesAsSingleton()
     {
@@ -49,6 +67,37 @@ public class PersistenceServiceCollectionExtensionsTests
         Assert.That(persistenceContextDescriptor, Is.EqualTo(services[2]));
         Assert.That(persistenceContextDescriptor.ImplementationInstance, Is.Null);
         Assert.That(persistenceContextDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(persistenceContextDescriptor.ImplementationType, Is.EqualTo(typeof(SqlitePersistenceContext)));
+        // The context is registered via a factory (it self-initializes at the composition root), so it exposes an
+        // ImplementationFactory rather than an ImplementationType.
+        Assert.That(persistenceContextDescriptor.ImplementationType, Is.Null);
+        Assert.That(persistenceContextDescriptor.ImplementationFactory, Is.Not.Null);
+    }
+
+    [Test]
+    public void AddPersistence_ResolvedPersistenceContext_CreatesInitializedSingletonContext()
+    {
+        ServiceCollection services = new();
+        IPathProviderService pathProviderService = Substitute.For<IPathProviderService>();
+        pathProviderService.ResolveDatabaseDirectory().Returns(_databaseDirectory);
+
+        services.AddPersistence();
+        services.AddSingleton(pathProviderService);
+        services.AddSingleton<ILogger<SqliteConnectionFactory>>(new TestLogger<SqliteConnectionFactory>());
+        services.AddSingleton<ILogger<SqlitePersistenceContext>>(new TestLogger<SqlitePersistenceContext>());
+
+        using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+        {
+            IPersistenceContext persistenceContext = serviceProvider.GetRequiredService<IPersistenceContext>();
+
+            Assert.That(persistenceContext, Is.InstanceOf<SqlitePersistenceContext>());
+            Assert.That(persistenceContext.Configuration, Is.Not.Null);
+            Assert.That(File.Exists(Path.Combine(_databaseDirectory!, SqlitePersistenceContext.DATABASE_FILE_NAME)),
+                Is.True);
+
+            // The factory runs once and the same instance is returned: the context is a self-initializing singleton.
+            Assert.That(serviceProvider.GetRequiredService<IPersistenceContext>(), Is.SameAs(persistenceContext));
+
+            pathProviderService.Received(1).ResolveDatabaseDirectory();
+        }
     }
 }

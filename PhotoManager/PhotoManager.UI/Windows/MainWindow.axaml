@@ -13,10 +13,11 @@
     <DockPanel Background="{DynamicResource PhotoManagerBackgroundBrush}">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="Find _Duplicates..." Click="FindDuplicates_Click" />
-                <MenuItem Header="Sync Assets..." Click="SyncAssets_Click" />
-                <MenuItem Header="Copy Assets (Ctrl+C)..." Click="CopyAssets_Click" />
-                <MenuItem Header="Move Assets (Ctrl+M)..." Click="MoveAssets_Click" />
+                <MenuItem Header="Find _Duplicates" Click="FindDuplicates_Click" />
+                <MenuItem Header="Convert Assets" Click="ConvertAssets_Click" />
+                <MenuItem Header="Sync Assets" Click="SyncAssets_Click" />
+                <MenuItem x:Name="CopyAssetsMenuItem" Header="Copy Assets (Ctrl+C)" Click="CopyAssets_Click" />
+                <MenuItem x:Name="MoveAssetsMenuItem" Header="Move Assets (Ctrl+M)" Click="MoveAssets_Click" />
                 <MenuItem Header="Delete Assets (Del)" Click="DeleteAssets_Click" />
                 <MenuItem Header="_Exit" Click="Exit_Click" />
             </MenuItem>
@@ -29,8 +30,12 @@
                     <MenuItem Header="By _Thumbnail Creation Date" Click="SortAssetsByThumbnailCreationDateTime_Click" />
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="Settings..." Click="Settings_Click" />
+            </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="About PhotoManager..." Click="About_Click" />
+                <MenuItem Header="Shortcuts" Click="Shortcuts_Click" />
+                <MenuItem Header="About PhotoManager" Click="About_Click" />
             </MenuItem>
         </Menu>
         <Grid>
@@ -89,6 +94,14 @@
                 Text="{Binding ExecutionTimeWording}"
                 TextAlignment="Right"
                 IsVisible="{Binding IsThumbnailsVisible}" />
+            <ProgressBar
+                Grid.Row="2"
+                Grid.Column="1"
+                Width="160"
+                Height="8"
+                HorizontalAlignment="Center"
+                IsIndeterminate="True"
+                IsVisible="{Binding IsCataloging}" />
         </Grid>
     </DockPanel>
 </Window>

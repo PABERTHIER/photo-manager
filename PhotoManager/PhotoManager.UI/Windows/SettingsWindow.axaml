@@ -1,0 +1,262 @@
+﻿<Window
+    x:Class="PhotoManager.UI.Windows.SettingsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Settings"
+    Width="780"
+    Height="720"
+    MinWidth="660"
+    MinHeight="520"
+    WindowStartupLocation="CenterOwner">
+    <Window.Styles>
+        <!-- Avalonia's Expander does not stretch its content by default; force it so inputs fill the width. -->
+        <Style Selector="Expander">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <!-- Labels sit beside taller inputs in the settings grids; center them on the input row. -->
+        <Style Selector="TextBlock.setting-label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <!-- Numeric inputs only need room for a few digits; keep them compact and left-aligned. -->
+        <!-- FormatString "0" forces whole-number display so the spinner never introduces decimals. -->
+        <Style Selector="NumericUpDown.setting-number">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Width" Value="130" />
+            <Setter Property="Increment" Value="1" />
+            <Setter Property="FormatString" Value="0" />
+        </Style>
+    </Window.Styles>
+    <DockPanel Margin="18">
+        <StackPanel DockPanel.Dock="Top" Spacing="6">
+            <TextBlock FontSize="24" FontWeight="SemiBold" Text="Settings" />
+            <TextBlock
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="Saved settings are stored in the local database and override appsettings.json on next startup."
+                TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel
+            DockPanel.Dock="Bottom"
+            Margin="0,12,0,0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Spacing="8">
+            <TextBlock
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource PhotoManagerMutedForegroundBrush}"
+                Text="{Binding StatusMessage}" />
+            <Button Classes="action" Content="Save" Click="Save_Click" />
+            <Button Classes="action" Content="Close" Click="Close_Click" />
+        </StackPanel>
+        <ScrollViewer Margin="0,16" Padding="0,0,14,0">
+            <StackPanel Spacing="12">
+                <Expander Header="Paths" IsExpanded="True">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Assets directory" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <TextBox Grid.Column="0" Text="{Binding AssetsDirectory}" />
+                            <Button Grid.Column="1" Content="Browse..." Click="BrowseAssetsDirectory_Click" />
+                        </Grid>
+                        <TextBlock Text="Exempted folder path" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <TextBox Grid.Column="0" Text="{Binding ExemptedFolderPath}" />
+                            <Button Grid.Column="1" Content="Browse..." Click="BrowseExemptedFolder_Click" />
+                        </Grid>
+                        <TextBlock Text="First frame videos folder name" />
+                        <TextBox Text="{Binding FirstFrameVideosFolderName}" />
+                    </StackPanel>
+                </Expander>
+                <Expander Header="Theme" IsExpanded="True">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Application theme" />
+                        <ComboBox
+                            Width="180"
+                            HorizontalAlignment="Left"
+                            ItemsSource="{Binding ThemeModes}"
+                            SelectedItem="{Binding ThemeMode}" />
+                    </StackPanel>
+                </Expander>
+                <Expander Header="Asset settings">
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="16"
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                        RowSpacing="8">
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.ColumnSpan="2"
+                            Content="Analyse videos"
+                            IsChecked="{Binding AnalyseVideos}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Corrupted message" />
+                        <TextBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{Binding CorruptedMessage}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Rotated message" />
+                        <TextBox
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{Binding RotatedMessage}" />
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Catalog batch size" />
+                        <NumericUpDown
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Width="180"
+                            Minimum="1"
+                            Value="{Binding CatalogBatchSize}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Catalog cooldown minutes" />
+                        <NumericUpDown
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding CatalogCooldownMinutes}" />
+                        <TextBlock
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Corrupted image orientation" />
+                        <NumericUpDown
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding CorruptedImageOrientation}" />
+                        <TextBlock
+                            Grid.Row="6"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Default EXIF orientation" />
+                        <NumericUpDown
+                            Grid.Row="6"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding DefaultExifOrientation}" />
+                        <CheckBox
+                            Grid.Row="7"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="Detect thumbnails"
+                            IsChecked="{Binding DetectThumbnails}" />
+                        <CheckBox
+                            Grid.Row="8"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="Sync assets every cooldown interval"
+                            IsChecked="{Binding SyncAssetsEveryXMinutes}" />
+                        <TextBlock
+                            Grid.Row="9"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Thumbnail max height" />
+                        <NumericUpDown
+                            Grid.Row="9"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ThumbnailMaxHeight}" />
+                        <TextBlock
+                            Grid.Row="10"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Thumbnail max width" />
+                        <NumericUpDown
+                            Grid.Row="10"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ThumbnailMaxWidth}" />
+                    </Grid>
+                </Expander>
+                <Expander Header="Hash settings">
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="16"
+                        RowDefinitions="Auto,Auto,Auto,Auto"
+                        RowSpacing="8">
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="PHash threshold" />
+                        <NumericUpDown
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="0"
+                            Value="{Binding PHashThreshold}" />
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="Use DHash"
+                            IsChecked="{Binding UsingDHash}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="Use MD5 hash"
+                            IsChecked="{Binding UsingMD5Hash}" />
+                        <CheckBox
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="Use PHash"
+                            IsChecked="{Binding UsingPHash}" />
+                    </Grid>
+                </Expander>
+                <Expander Header="Storage settings">
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="16"
+                        RowDefinitions="Auto,Auto"
+                        RowSpacing="8">
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Backups to keep" />
+                        <NumericUpDown
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding BackupsToKeep}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Thumbnails dictionary entries to keep" />
+                        <NumericUpDown
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ThumbnailsDictionaryEntriesToKeep}" />
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

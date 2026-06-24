@@ -53,17 +53,18 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image =
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
+        using (SkiaImageData image =
+               BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -141,16 +142,17 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const ImageRotation rotation = (ImageRotation)999;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(100));
+            Assert.That(image.Height, Is.EqualTo(100));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(100));
-        Assert.That(image.Height, Is.EqualTo(100));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -163,17 +165,18 @@ public class BitmapHelperTests
         const int width = 100;
         const int height = 100;
 
-        using SkiaImageData image =
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
+        using (SkiaImageData image =
+               BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(75));
+            Assert.That(image.Height, Is.EqualTo(height));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(75));
-        Assert.That(image.Height, Is.EqualTo(height));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -204,17 +207,18 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image =
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
+        using (SkiaImageData image =
+               BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -228,17 +232,18 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image =
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
+        using (SkiaImageData image =
+               BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -252,17 +257,18 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image =
-            BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!);
+        using (SkiaImageData image =
+               BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -272,17 +278,18 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate90, -100, -100,
-            _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate90, -100, -100,
+                   _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(100));
+            Assert.That(image.Height, Is.EqualTo(75));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(100));
-        Assert.That(image.Height, Is.EqualTo(75));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -293,17 +300,18 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 1000000, 1000000,
-            _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 1000000, 1000000,
+                   _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            Assert.That(image.Height, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        Assert.That(image.Height, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -365,16 +373,17 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const ImageRotation rotation = (ImageRotation)999;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(75));
+            Assert.That(image.Height, Is.EqualTo(100));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(75));
-        Assert.That(image.Height, Is.EqualTo(100));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -412,16 +421,17 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -431,16 +441,17 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(1));
+            Assert.That(image.Height, Is.EqualTo(1));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(1));
-        Assert.That(image.Height, Is.EqualTo(1));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -479,16 +490,17 @@ public class BitmapHelperTests
         string? filePath = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(1));
+            Assert.That(image.Height, Is.EqualTo(1));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(1));
-        Assert.That(image.Height, Is.EqualTo(1));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -498,16 +510,17 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         const ImageRotation rotation = (ImageRotation)999;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
+            Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_1_JPG));
-        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_1_JPG));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -517,19 +530,20 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const ImageRotation rotation = ImageRotation.Rotate0;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
         {
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-            Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-            Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+                Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -544,19 +558,20 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
         {
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-            Assert.That(image.Width, Is.EqualTo(expectedWidth));
-            Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                Assert.That(image.Width, Is.EqualTo(expectedWidth));
+                Assert.That(image.Height, Is.EqualTo(expectedHeight));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -572,19 +587,20 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
         {
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-            Assert.That(image.Width, Is.EqualTo(expectedWidth));
-            Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                Assert.That(image.Width, Is.EqualTo(expectedWidth));
+                Assert.That(image.Height, Is.EqualTo(expectedHeight));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -594,19 +610,20 @@ public class BitmapHelperTests
         string? filePath = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation, _testLogger!))
         {
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-            Assert.That(image.Width, Is.EqualTo(1));
-            Assert.That(image.Height, Is.EqualTo(1));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                Assert.That(image.Width, Is.EqualTo(1));
+                Assert.That(image.Height, Is.EqualTo(1));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -616,19 +633,20 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
         {
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-            Assert.That(image.Width, Is.EqualTo(1));
-            Assert.That(image.Height, Is.EqualTo(1));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+                Assert.That(image.Width, Is.EqualTo(1));
+                Assert.That(image.Height, Is.EqualTo(1));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -674,16 +692,17 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         const ImageRotation rotation = (ImageRotation)999;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation, _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+            Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-        Assert.That(image.Height, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -708,17 +727,18 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(
-            buffer, ImageRotation.Rotate0, width, height, _testLogger!);
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, width, height,
+                   _testLogger!))
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.Bitmap, Is.Not.Null);
+            Assert.That(image.Bitmap.IsEmpty, Is.False);
+            Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.Bitmap, Is.Not.Null);
-        Assert.That(image.Bitmap.IsEmpty, Is.False);
-        Assert.That(image.Rotation, Is.EqualTo(ImageRotation.Rotate0));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -796,19 +816,20 @@ public class BitmapHelperTests
         const int width = 100;
         const int height = 100;
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(
-            buffer, ImageRotation.Rotate0, width, height, _testLogger!);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, width, height,
+                   _testLogger!))
         {
-            Assert.That(image.Bitmap, Is.Not.Null);
-            Assert.That(image.Bitmap.IsEmpty, Is.False);
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.Width, Is.EqualTo(75));
-            Assert.That(image.Height, Is.EqualTo(height));
-        }
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image.Bitmap, Is.Not.Null);
+                Assert.That(image.Bitmap.IsEmpty, Is.False);
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.Width, Is.EqualTo(75));
+                Assert.That(image.Height, Is.EqualTo(height));
+            }
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -963,31 +984,37 @@ public class BitmapHelperTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        using SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
-            _testLogger!);
 
-        byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -996,43 +1023,49 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
-            new TestLogger<BitmapHelperTests>());
-
-        byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
+                   new TestLogger<BitmapHelperTests>()))
         {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
     public void GetJpegBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
+        using (SkiaImageData image = new(new(), ImageRotation.Rotate0))
+        {
+            byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
-        byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
+            Assert.That(imageBuffer, Is.Empty);
 
-        Assert.That(imageBuffer, Is.Empty);
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -1054,77 +1087,88 @@ public class BitmapHelperTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        using SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
-            _testLogger!);
 
-        byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
-    // TODO: Inspire from this test to dev the conversion feature
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
-            new TestLogger<BitmapHelperTests>());
-
-        byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
+                   new TestLogger<BitmapHelperTests>()))
         {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
     public void GetPngBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
+        using (SkiaImageData image = new(new(), ImageRotation.Rotate0))
+        {
+            byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
-        byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
+            Assert.That(imageBuffer, Is.Empty);
 
-        Assert.That(imageBuffer, Is.Empty);
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -1146,37 +1190,44 @@ public class BitmapHelperTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_assetsDirectory!, fileName);
-        using SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
-            _testLogger!);
 
-        byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = SkiaImageData.FromEncodedBytes(File.ReadAllBytes(filePath), ImageRotation.Rotate0,
+                   _testLogger!))
         {
-            Assert.That(imageBuffer, Is.Not.Empty);
-            Assert.That(imageBuffer[0], Is.EqualTo((byte)0x47));
-            Assert.That(imageBuffer[1], Is.EqualTo((byte)0x49));
-            Assert.That(imageBuffer[2], Is.EqualTo((byte)0x46));
-            Assert.That(imageBuffer[3], Is.EqualTo((byte)0x38));
-        }
+            byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(imageBuffer, Is.Not.Empty);
+                Assert.That(imageBuffer[0], Is.EqualTo((byte)0x47));
+                Assert.That(imageBuffer[1], Is.EqualTo((byte)0x49));
+                Assert.That(imageBuffer[2], Is.EqualTo((byte)0x46));
+                Assert.That(imageBuffer[3], Is.EqualTo((byte)0x38));
+            }
 
-        try
-        {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
+                    Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -1185,49 +1236,55 @@ public class BitmapHelperTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
-            new TestLogger<BitmapHelperTests>());
-
-        byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
-
-        using (Assert.EnterMultipleScope())
+        using (SkiaImageData image = BitmapHelper.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100,
+                   new TestLogger<BitmapHelperTests>()))
         {
-            Assert.That(imageBuffer, Is.Not.Empty);
-            Assert.That(imageBuffer[0], Is.EqualTo((byte)0x47));
-            Assert.That(imageBuffer[1], Is.EqualTo((byte)0x49));
-            Assert.That(imageBuffer[2], Is.EqualTo((byte)0x46));
-            Assert.That(imageBuffer[3], Is.EqualTo((byte)0x38));
-        }
+            byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(imageBuffer, Is.Not.Empty);
+                Assert.That(imageBuffer[0], Is.EqualTo((byte)0x47));
+                Assert.That(imageBuffer[1], Is.EqualTo((byte)0x49));
+                Assert.That(imageBuffer[2], Is.EqualTo((byte)0x46));
+                Assert.That(imageBuffer[3], Is.EqualTo((byte)0x38));
+            }
 
-        try
-        {
-            Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()),
-                Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
-        }
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            try
+            {
+                Assert.That(ExifHelper.IsValidImage(imageBuffer, new TestLogger<BitmapHelperTests>()), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
+
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
     public void GetGifBitmapImage_InvalidImage_ReturnsEmptyByteArray()
     {
-        using SkiaImageData image = new(new(), ImageRotation.Rotate0);
+        using (SkiaImageData image = new(new(), ImageRotation.Rotate0))
+        {
+            byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 
-        byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
+            Assert.That(imageBuffer, Is.Empty);
 
-        Assert.That(imageBuffer, Is.Empty);
-
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        }
     }
 
     [Test]
@@ -1239,6 +1296,97 @@ public class BitmapHelperTests
             Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageEncodingFormat.Png)]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageEncodingFormat.Png)]
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageEncodingFormat.Jpeg)]
+    public void ConvertImage_ValidImage_ReturnsTargetFormatBuffer(string fileName, ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = BitmapHelper.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageEncodingFormat.Png)]
+    public void ConvertImage_ValidImageAndSameType_ReturnsTargetFormatBuffer(string fileName,
+        ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = BitmapHelper.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    [TestCase(FileNames.HOMER_GIF, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.HOMER_GIF, ImageEncodingFormat.Png)]
+    public void ConvertImage_GifFormat_ReturnsTargetFormatBuffer(string fileName,
+        ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = BitmapHelper.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    public void ConvertImage_NullImagePath_ThrowsArgumentNullException()
+    {
+        string? imagePath = null;
+
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            BitmapHelper.ConvertImage(imagePath!, ImageEncodingFormat.Png));
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'imagePath')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    public void ConvertImage_WhitespaceImagePath_ThrowsArgumentException()
+    {
+        const string expectedMessage =
+            "The value cannot be an empty string or composed entirely of whitespace. (Parameter 'imagePath')";
+
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            BitmapHelper.ConvertImage(" ", ImageEncodingFormat.Png));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+    }
+
+    [Test]
+    public void ConvertImage_UnsupportedTargetFormat_ThrowsArgumentOutOfRangeException()
+    {
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+        string expectedMessage =
+            $"Unsupported target format. (Parameter 'targetFormat'){Environment.NewLine}Actual value was Gif.";
+
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            BitmapHelper.ConvertImage(filePath, ImageEncodingFormat.Gif));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -1290,16 +1438,20 @@ public class BitmapHelperTests
     [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
     public void GetImageDimensions_BmpBufferWithoutHeaderReader_ReturnsDimensions()
     {
-        using SKBitmap bitmap = new(13, 17);
-        using SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0);
-        byte[] buffer = imageData.ToByteArray(ImageEncodingFormat.Bmp);
+        using (SKBitmap bitmap = new(13, 17))
+        {
+            using (SkiaImageData imageData = new(bitmap, ImageRotation.Rotate0))
+            {
+                byte[] buffer = imageData.ToByteArray(ImageEncodingFormat.Bmp);
 
-        (int width, int height) = BitmapHelper.GetImageDimensions(buffer, ImageRotation.Rotate90, _testLogger!);
+                (int width, int height) = BitmapHelper.GetImageDimensions(buffer, ImageRotation.Rotate90, _testLogger!);
 
-        Assert.That(width, Is.EqualTo(17));
-        Assert.That(height, Is.EqualTo(13));
+                Assert.That(width, Is.EqualTo(17));
+                Assert.That(height, Is.EqualTo(13));
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+                _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+            }
+        }
     }
 
     [Test]
@@ -1455,20 +1607,5 @@ public class BitmapHelperTests
 
         Assert.That(brightness, Is.GreaterThan(0));
         Assert.That(brightness, Is.LessThan(1));
-    }
-
-    private static bool IsValidImage(string filePath)
-    {
-        try
-        {
-            using (SKCodec? codec = SKCodec.Create(filePath))
-            {
-                return codec != null;
-            }
-        }
-        catch (Exception)
-        {
-            return false;
-        }
     }
 }

@@ -35,6 +35,7 @@ public class ImageMagickThumbnailGeneratorTests
         Assert.That(result, Is.EqualTo(expectedBytes));
         thumbnailImage.Received(1).ToByteArray(ImageEncodingFormat.Bmp);
         thumbnailImage.Received(1).Dispose();
+
         _testLogger.AssertLogExceptions([], typeof(ImageMagickThumbnailGeneratorTests));
     }
 
@@ -54,6 +55,7 @@ public class ImageMagickThumbnailGeneratorTests
 
         Assert.That(exception?.ParamName, Is.EqualTo("encodingFormat"));
         thumbnailImage.Received(1).Dispose();
+
         _testLogger.AssertLogExceptions([], typeof(ImageMagickThumbnailGeneratorTests));
     }
 }

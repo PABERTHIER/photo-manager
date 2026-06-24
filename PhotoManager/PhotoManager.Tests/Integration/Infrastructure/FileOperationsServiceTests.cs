@@ -25,7 +25,7 @@ public class FileOperationsServiceTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory);
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
     }
 
     [SetUp]
@@ -258,6 +258,98 @@ public class FileOperationsServiceTests
     }
 
     [Test]
+    public void WriteFileBytes_ValidFilePath_WritesFileBytes()
+    {
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_FOLDER);
+        string testFilePath = Path.Combine(testDirectory, "WrittenBytes.bin");
+        byte[] bytes = [0x01, 0x02, 0x03];
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+
+            _fileOperationsService!.WriteFileBytes(testFilePath, bytes);
+
+            Assert.That(File.ReadAllBytes(testFilePath), Is.EqualTo(bytes));
+
+            _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_9_PNG)]
+    [TestCase(FileNames.IMAGE_11_HEIC)]
+    [TestCase(FileNames.HOMER_GIF)]
+    public void WriteFileBytes_RealImageBytes_WritesByteIdenticalFile(string fileName)
+    {
+        byte[] sourceBytes = File.ReadAllBytes(Path.Combine(_assetsDirectory!, fileName));
+
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_FOLDER);
+        string destinationPath = Path.Combine(testDirectory, fileName);
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+
+            _fileOperationsService!.WriteFileBytes(destinationPath, sourceBytes);
+
+            byte[] writtenBytes = File.ReadAllBytes(destinationPath);
+
+            Assert.That(writtenBytes, Has.Length.EqualTo(sourceBytes.Length));
+            Assert.That(writtenBytes, Is.EqualTo(sourceBytes));
+
+            _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    [Test]
+    public void WriteFileBytes_DestinationFileAlreadyExists_OverwritesAndTruncatesToNewContent()
+    {
+        byte[] largeImageBytes = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC));
+        byte[] smallImageBytes = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG));
+
+        string testDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_FOLDER);
+        string destinationPath = Path.Combine(testDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+
+        try
+        {
+            Directory.CreateDirectory(testDirectory);
+
+            _fileOperationsService!.WriteFileBytes(destinationPath, largeImageBytes);
+            _fileOperationsService!.WriteFileBytes(destinationPath, smallImageBytes);
+
+            byte[] writtenBytes = File.ReadAllBytes(destinationPath);
+
+            Assert.That(writtenBytes, Has.Length.EqualTo(smallImageBytes.Length));
+            Assert.That(writtenBytes, Is.EqualTo(smallImageBytes));
+
+            _testLogger!.AssertLogExceptions([], typeof(FileOperationsService));
+        }
+        finally
+        {
+            if (Directory.Exists(testDirectory))
+            {
+                Directory.Delete(testDirectory, true);
+            }
+        }
+    }
+
+    [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
@@ -431,7 +523,7 @@ public class FileOperationsServiceTests
             configurationRootMock.GetDefaultMockConfig();
             configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-            UserConfigurationService userConfigurationService = new(configurationRootMock);
+            UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
             TestLogger<FileOperationsService> logger = new();
             FileOperationsService fileOperationsService = new(userConfigurationService, logger);
 

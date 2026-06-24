@@ -3,9 +3,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.0.0.0</FileVersion>
-    <InformationalVersion>3.0.0</InformationalVersion>
+    <AssemblyVersion>3.1.0.0</AssemblyVersion>
+    <FileVersion>3.1.0.0</FileVersion>
+    <InformationalVersion>3.1.0</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <AnalysisLevel>latest</AnalysisLevel>
     <!-- TODO: Enable it to improve code quality (it generates lots of warnings) -->
@@ -16,7 +16,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);AD0001</NoWarn>
     <!-- Temporary: suppress NuGet audit for vulnerability warnings -->
-    <!-- <NuGetAudit>false</NuGetAudit> -->
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

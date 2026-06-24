@@ -9,7 +9,10 @@ public interface IUserConfigurationService
     PathSettings PathSettings { get; }
     ProjectSettings ProjectSettings { get; }
     StorageSettings StorageSettings { get; }
+    UiSettings UiSettings { get; }
 
     AboutInformation GetAboutInformation(Assembly assembly);
     string[] GetRootCatalogFolderPaths();
+    EditableUserConfiguration GetEditableConfiguration();
+    void SaveEditableConfiguration(EditableUserConfiguration configuration);
 }

@@ -63,12 +63,17 @@ Follow this workflow in order:
    - Constants in `PhotoManager.Tests.Unit.Constants`
 
 5. **Test naming (NON-NEGOTIABLE)**: `MethodName_Situation_ExpectedResult`
-   No BDD-style naming (Given/When/Should).
+   - Do NOT use BDD-style naming (Given/When/Should)
+   - Examples: `CalculateHash_ValidFile_ReturnsHashValue`, `DeleteAsset_AssetExists_RemovesAssetFromDatabase`
 
 6. **Always verify logs** in assertions and **always cleanup** in `finally` blocks.
 
 7. **100% coverage** for all new code — every branch, exception path, and edge case.
 
-8. **Build**: `dotnet build PhotoManager/PhotoManager.slnx` — zero warnings.
+8. **Cross-platform (NON-NEGOTIABLE)**: tests run on Windows, Linux, and macOS CI and must pass on all three. On Linux/macOS `\` is not a path separator and `C:\...` is not rooted, so `Path.*` calls diverge from Windows.
+   Never assert on a Windows-only absolute path routed through a `Path` API — wrap it with `PathHelper.ToPlatformAbsolutePath(@"C:\Dir")` (or `PathHelper.ToResolvedConfigPath(...)` for a resolved config path), build expected paths with `Path.Combine` exactly as production does, and reference test files with their exact on-disk case.
+   Opaque path strings (stored/asserted verbatim, e.g. config values or sync definitions) are fine.
 
-9. **Run**: `dotnet test --filter "FullyQualifiedName~ClassName" PhotoManager/PhotoManager.slnx`
+9. **Build**: `dotnet build PhotoManager/PhotoManager.slnx` — zero warnings.
+
+10. **Run**: `dotnet test --filter "FullyQualifiedName~ClassName" PhotoManager/PhotoManager.slnx`

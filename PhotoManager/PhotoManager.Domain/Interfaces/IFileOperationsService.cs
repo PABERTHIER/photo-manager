@@ -9,6 +9,7 @@ public interface IFileOperationsService
     string[] GetFileNames(string directory);
     FileInfo[] GetFileInfos(string directory);
     byte[] GetFileBytes(string filePath);
+    void WriteFileBytes(string filePath, byte[] bytes);
     bool FileExists(Folder folder, Asset asset);
     bool FileExists(string fullPath);
     bool FolderExists(string fullPath);

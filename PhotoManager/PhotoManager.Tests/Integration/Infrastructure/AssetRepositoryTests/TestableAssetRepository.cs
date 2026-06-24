@@ -4,14 +4,12 @@ using PhotoManager.Domain.Interfaces.Persistence;
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 public class TestableAssetRepository(
-    IPathProviderService pathProviderService,
     IImageProcessingService imageProcessingService,
     IImageMetadataService imageMetadataService,
     IUserConfigurationService userConfigurationService,
     IPersistenceContext persistenceContext,
     ILogger<AssetRepository> logger)
     : AssetRepository(
-        pathProviderService,
         imageProcessingService,
         imageMetadataService,
         userConfigurationService,

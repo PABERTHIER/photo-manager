@@ -186,7 +186,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -195,23 +195,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -219,9 +217,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
         _applicationViewModel = new(application);
     }
 
@@ -297,14 +297,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -395,14 +401,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -490,14 +502,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -584,11 +602,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
 
         // Second NotifyCatalogChange
         expectedAssets = [_asset1, _asset2];
@@ -617,15 +638,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
         // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 2
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
 
         // Third NotifyCatalogChange
         expectedAssets = [_asset1, _asset2, _asset3];
@@ -654,19 +681,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(18));
         // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 3
+        // NotifyCatalogChange 2
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 3
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
 
         // Fourth NotifyCatalogChange
         expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -695,23 +731,35 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(24));
         // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 3
+        // NotifyCatalogChange 2
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 4
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 3
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 4
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
 
         // Fifth NotifyCatalogChange
         expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
@@ -740,27 +788,42 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(30));
         // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 3
+        // NotifyCatalogChange 2
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 4
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 5
+        // NotifyCatalogChange 3
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 4
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 5
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -844,11 +907,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // NotifyCatalogChange
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -931,12 +997,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -995,12 +1064,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1071,16 +1143,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1151,16 +1232,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1228,16 +1318,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1327,16 +1426,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 1
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
 
         // Second NotifyCatalogChange
         expectedAssets = [_asset2, _asset4, _asset5, _asset3, _asset1];
@@ -1363,22 +1471,37 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(27));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 1
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
 
         // Third NotifyCatalogChange
         expectedAssets = [_asset2, _asset4, _asset5, _asset3, _asset1];
@@ -1405,28 +1528,49 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(38));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 1
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange 2
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange 3
-        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1493,16 +1637,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1665,12 +1818,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1729,12 +1885,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1805,14 +1964,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1883,14 +2048,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1958,14 +2129,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2055,14 +2232,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 1
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         // Second NotifyCatalogChange
         expectedAssets = [_asset2, _asset4, _asset5];
@@ -2091,18 +2274,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
+        // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 2
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
 
         // Third NotifyCatalogChange
         expectedAssets = [_asset2, _asset4];
@@ -2131,22 +2323,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 1
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 2
+        // NotifyCatalogChange 1
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange 3
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 2
+        Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange 3
+        Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2213,14 +2417,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             null!,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        // NotifyCatalogChange
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2383,12 +2593,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2447,12 +2660,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2636,12 +2852,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -2980,12 +3199,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         // NotifyCatalogChange
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -3307,6 +3529,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
+        Assert.That(_applicationViewModel!.IsCataloging, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
@@ -3343,6 +3566,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
+        Assert.That(applicationViewModelInstance.IsCataloging, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);

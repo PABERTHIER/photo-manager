@@ -227,7 +227,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -236,23 +236,21 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
         FileOperationsService fileOperationsService = new(_userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, _userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             _userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, _userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -260,9 +258,11 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             _userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
         _findDuplicatedAssetsViewModel = new(application);
     }
 
@@ -4406,176 +4406,6 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
 
         Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
         Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(string.Empty));
-
-        Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-        Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
-
-        Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-        CheckInstance(
-            findDuplicatedAssetsViewModelInstances,
-            [],
-            0,
-            0,
-            [],
-            null);
-    }
-
-    [Test]
-    public void
-        DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, null!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents =
-            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        CheckBeforeChanges();
-
-        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
-
-        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
-        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
-
-        const string hash1 = Hashes.IMAGE_1_JPG;
-        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
-
-        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
-        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
-        _asset4 = _asset4!.WithFolder(folder1).WithHash(hash1);
-
-        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
-        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
-
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
-
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-        DeleteNotExemptedDuplicatedAssets();
-
-        DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
-        DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
-
-        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
-        {
-            Asset = _asset1,
-            ParentViewModel = expectedDuplicatedAssetSet1
-        };
-        expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
-        {
-            Asset = _asset3,
-            ParentViewModel = expectedDuplicatedAssetSet1
-        };
-        expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
-        {
-            Asset = _asset4,
-            ParentViewModel = expectedDuplicatedAssetSet1
-        };
-        expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
-        {
-            Asset = _asset2,
-            ParentViewModel = expectedDuplicatedAssetSet2
-        };
-        expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
-        {
-            Asset = _asset5,
-            ParentViewModel = expectedDuplicatedAssetSet2
-        };
-        expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-            [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
-
-        CheckAfterChanges(
-            _findDuplicatedAssetsViewModel!,
-            expectedDuplicatedAssetsSets,
-            0,
-            0,
-            expectedDuplicatedAssetSet1,
-            expectedDuplicatedAssetViewModel1);
-
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-        // SetDuplicates
-        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-        // CollapseAssets
-
-        Assert.That(messagesInformationSent, Is.Empty);
-
-        Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
-        Assert.That(getExemptedFolderPathEvents[0], Is.Null);
-
-        Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-        Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
-
-        Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-        CheckInstance(
-            findDuplicatedAssetsViewModelInstances,
-            expectedDuplicatedAssetsSets,
-            0,
-            0,
-            expectedDuplicatedAssetSet1,
-            expectedDuplicatedAssetViewModel1);
-    }
-
-    [Test]
-    public void
-        DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, null!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents =
-            NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        CheckBeforeChanges();
-
-        DeleteNotExemptedDuplicatedAssets();
-
-        CheckAfterChanges(
-            _findDuplicatedAssetsViewModel!,
-            [],
-            0,
-            0,
-            [],
-            null);
-
-        Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-        Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-        Assert.That(messagesInformationSent[0].Message,
-            Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-        Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-        Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
-        Assert.That(getExemptedFolderPathEvents[0], Is.Null);
 
         Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
         Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);

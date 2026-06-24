@@ -94,6 +94,24 @@ public static class BitmapHelper
         return image.ToByteArray(ImageEncodingFormat.Gif);
     }
 
+    public static byte[] ConvertImage(string imagePath, ImageEncodingFormat targetFormat)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(imagePath);
+
+        using (MagickImage image = new(imagePath))
+        {
+            if (targetFormat == ImageEncodingFormat.Jpeg)
+            {
+                image.BackgroundColor = MagickColors.White;
+                image.Alpha(AlphaOption.Remove);
+            }
+
+            image.Format = ToMagickFormat(targetFormat);
+
+            return image.ToByteArray();
+        }
+    }
+
     public static (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(buffer);
@@ -339,6 +357,14 @@ public static class BitmapHelper
 
         return (-1, -1);
     }
+
+    private static MagickFormat ToMagickFormat(ImageEncodingFormat targetFormat) =>
+        targetFormat switch
+        {
+            ImageEncodingFormat.Jpeg => MagickFormat.Jpeg,
+            ImageEncodingFormat.Png => MagickFormat.Png,
+            _ => throw new ArgumentOutOfRangeException(nameof(targetFormat), targetFormat, "Unsupported target format.")
+        };
 
     private static void ValidateBuffer(byte[] buffer)
     {

@@ -28,4 +28,6 @@ public static class UserConfigurationKeys
 
     public const string BACKUPS_TO_KEEP = "appsettings:Storage:BackupsToKeep";
     public const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:Storage:ThumbnailsDictionaryEntriesToKeep";
+
+    public const string THEME_MODE = "appsettings:Ui:ThemeMode";
 }

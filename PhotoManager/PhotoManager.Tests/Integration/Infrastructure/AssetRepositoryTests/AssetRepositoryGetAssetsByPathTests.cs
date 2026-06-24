@@ -45,17 +45,15 @@ public class AssetRepositoryGetAssetsByPathTests
         _pathProviderServiceMock = Substitute.For<IPathProviderService>();
         _pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock.ResolveDatabaseDirectory());
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         _imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            _imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
+        _assetRepository = new(imageProcessingService, _imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, _testLogger);
 
         _asset1 = new()
         {
@@ -233,13 +231,11 @@ public class AssetRepositoryGetAssetsByPathTests
                 Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bitmapImage!);
 
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
-        AssetRepository assetRepository = new(pathProviderServiceMock, imageProcessingServiceMock,
-            _imageMetadataService!, userConfigurationService, sqlitePersistenceContext, _testLogger!);
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
+        AssetRepository assetRepository = new(imageProcessingServiceMock, _imageMetadataService!,
+            userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -377,18 +373,17 @@ public class AssetRepositoryGetAssetsByPathTests
             IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
             pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory!);
 
-            SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-            SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-            SqlitePersistenceContext sqlitePersistenceContext = new(
-                sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-            UserConfigurationService userConfigurationService = new(configurationRootMock);
+            SqlitePersistenceContext sqlitePersistenceContext =
+                PersistenceContextTestHelper.CreateInitializedContext(
+                    pathProviderServiceMock.ResolveDatabaseDirectory());
+            UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
             ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
             FileOperationsService fileOperationsService = new(userConfigurationService,
                 new TestLogger<FileOperationsService>());
             ImageMetadataService imageMetadataService = new(fileOperationsService,
                 new TestLogger<ImageMetadataService>());
-            assetRepository = new(pathProviderServiceMock, imageProcessingService,
-                imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger!);
+            assetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+                sqlitePersistenceContext, _testLogger!);
 
             Asset[] cataloguedAssets2 = assetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets2, Has.Length.EqualTo(1));
@@ -625,13 +620,11 @@ public class AssetRepositoryGetAssetsByPathTests
                 Arg.Any<byte[]>(), Arg.Any<ImageRotation>(), Arg.Any<int>(), Arg.Any<int>())
             .Throws(new Exception());
 
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
-        AssetRepository assetRepository = new(pathProviderServiceMock, imageProcessingServiceMock,
-            _imageMetadataService!, userConfigurationService, sqlitePersistenceContext, _testLogger!);
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
+        AssetRepository assetRepository = new(imageProcessingServiceMock, _imageMetadataService!,
+            userConfigurationService, sqlitePersistenceContext, _testLogger!);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =

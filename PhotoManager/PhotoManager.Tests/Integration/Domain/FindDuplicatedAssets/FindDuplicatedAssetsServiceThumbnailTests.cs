@@ -47,18 +47,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [SetUp]
     public void SetUp()
     {
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
-            new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock!.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         _findDuplicatedAssetsService = new(_testableAssetRepository!, fileOperationsService, userConfigurationService,
             new TestLogger<FindDuplicatedAssetsService>());
 

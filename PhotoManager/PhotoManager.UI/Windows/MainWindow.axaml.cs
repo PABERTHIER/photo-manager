@@ -70,6 +70,15 @@ public partial class MainWindow : Window
             ?? throw new InvalidOperationException("ViewerUserControl control was not found.");
         ThumbnailsUserControl = this.FindControl<ThumbnailsUserControl>(nameof(ThumbnailsUserControl))
             ?? throw new InvalidOperationException("ThumbnailsUserControl control was not found.");
+
+        if (OperatingSystem.IsMacOS())
+        {
+            MenuItem? copyAssetsMenuItem = this.FindControl<MenuItem>(nameof(CopyAssetsMenuItem));
+            MenuItem? moveAssetsMenuItem = this.FindControl<MenuItem>(nameof(MoveAssetsMenuItem));
+
+            copyAssetsMenuItem?.Header = "Copy Assets (Cmd+C)";
+            moveAssetsMenuItem?.Header = "Move Assets (Cmd+M)";
+        }
     }
 
     private void Window_Opened(object? sender, EventArgs e)
@@ -84,12 +93,16 @@ public partial class MainWindow : Window
         }
     }
 
-    // TODO: Add a help page to describe all shortcuts available
     private void Window_KeyDown(object? sender, KeyEventArgs e)
     {
         try
         {
-            if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+            // On macOS the idiomatic command modifier is Cmd (Meta); Ctrl stays accepted as a fallback.
+            // Windows and Linux only use Ctrl.
+            bool commandModifierPressed = e.KeyModifiers.HasFlag(KeyModifiers.Control)
+                || (OperatingSystem.IsMacOS() && e.KeyModifiers.HasFlag(KeyModifiers.Meta));
+
+            if (commandModifierPressed)
             {
                 switch (e.Key)
                 {
@@ -109,7 +122,10 @@ public partial class MainWindow : Window
             {
                 switch (e.Key)
                 {
+                    // On macOS the key labeled "delete" is Backspace (Key.Back); the forward-delete (Key.Delete)
+                    // only exists on full keyboards. Accept both so the Mac delete key matches Windows' Delete.
                     case Key.Delete:
+                    case Key.Back when OperatingSystem.IsMacOS():
                         DeleteSelectedAssets();
                         break;
 
@@ -211,6 +227,26 @@ public partial class MainWindow : Window
         _ = SyncAssetsAsync();
     }
 
+    private void ConvertAssets_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _ = ConvertAssetsAsync();
+    }
+
+    private async Task ConvertAssetsAsync()
+    {
+        try
+        {
+            ConvertAssetsViewModel convertAssetsViewModel = new(_application);
+            ConvertAssetsWindow convertAssetsWindow = new(convertAssetsViewModel,
+                _loggerFactory.CreateLogger<ConvertAssetsWindow>());
+            await convertAssetsWindow.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
+        }
+    }
+
     private async Task SyncAssetsAsync()
     {
         try
@@ -219,6 +255,43 @@ public partial class MainWindow : Window
             SyncAssetsWindow syncAssetsWindow = new(syncAssetsViewModel,
                 _loggerFactory.CreateLogger<SyncAssetsWindow>());
             await syncAssetsWindow.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
+        }
+    }
+
+    private void Settings_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _ = SettingsAsync();
+    }
+
+    private async Task SettingsAsync()
+    {
+        try
+        {
+            SettingsViewModel settingsViewModel = new(_application);
+            SettingsWindow settingsWindow = new(settingsViewModel, _loggerFactory.CreateLogger<SettingsWindow>());
+            await settingsWindow.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
+        }
+    }
+
+    private void Shortcuts_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _ = ShortcutsAsync();
+    }
+
+    private async Task ShortcutsAsync()
+    {
+        try
+        {
+            ShortcutsWindow shortcutsWindow = new(new(), _loggerFactory.CreateLogger<ShortcutsWindow>());
+            await shortcutsWindow.ShowDialog(this);
         }
         catch (Exception ex)
         {
@@ -367,17 +440,21 @@ public partial class MainWindow : Window
 
     private async Task InitializeOnceAsync(Stopwatch stopwatch)
     {
-        _catalogTask = ViewModel.CatalogAssets(
-            NotifyCatalogChangeOnUiThread,
-            _cancellationTokenSource.Token);
+        ViewModel.SetIsCataloging(true);
 
         try
         {
+            _catalogTask = ViewModel.CatalogAssets(NotifyCatalogChangeOnUiThread, _cancellationTokenSource.Token);
+
             await _catalogTask;
         }
         catch (OperationCanceledException)
         {
             // Expected: the user requested cancellation.
+        }
+        finally
+        {
+            ViewModel.SetIsCataloging(false);
         }
 
         ViewModel.CalculateGlobalAssetsCounter();

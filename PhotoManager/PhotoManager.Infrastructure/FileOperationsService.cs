@@ -73,6 +73,11 @@ public class FileOperationsService(
         return File.ReadAllBytes(filePath);
     }
 
+    public void WriteFileBytes(string filePath, byte[] bytes)
+    {
+        File.WriteAllBytes(filePath, bytes);
+    }
+
     public bool FileExists(Folder folder, Asset asset)
     {
         string fullPath = Path.Combine(folder.Path, asset.FileName);

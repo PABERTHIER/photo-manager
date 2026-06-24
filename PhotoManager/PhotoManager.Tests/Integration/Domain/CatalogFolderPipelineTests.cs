@@ -203,7 +203,8 @@ public class CatalogFolderPipelineTests
                         OnResultAsync,
                         cancellationToken)
                     .WaitAsync(TimeSpan.FromSeconds(5)));
-            Assert.That(exception, Is.Not.Null);
+
+            Assert.That(exception?.Message, Is.EqualTo("The operation was canceled."));
         }
         finally
         {
@@ -244,7 +245,8 @@ public class CatalogFolderPipelineTests
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(exception, Is.Not.Null);
+                Assert.That(exception?.Message, Is.EqualTo("The operation was canceled."));
+
                 Assert.That(results, Has.Count.EqualTo(1));
                 Assert.That(results[0].FileName, Is.EqualTo("first.jpg"));
             }

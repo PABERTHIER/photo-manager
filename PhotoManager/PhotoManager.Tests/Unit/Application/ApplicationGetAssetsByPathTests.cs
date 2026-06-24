@@ -93,6 +93,7 @@ public class ApplicationGetAssetsByPathTests
         IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
         IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
+        IAssetConversionService assetConversionServiceMock = Substitute.For<IAssetConversionService>();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock,
@@ -102,7 +103,8 @@ public class ApplicationGetAssetsByPathTests
             findDuplicatedAssetsServiceMock,
             userConfigurationServiceMock,
             fileOperationsServiceMock,
-            imageProcessingServiceMock);
+            imageProcessingServiceMock,
+            assetConversionServiceMock);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
@@ -189,6 +191,7 @@ public class ApplicationGetAssetsByPathTests
         IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
         IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
+        IAssetConversionService assetConversionServiceMock = Substitute.For<IAssetConversionService>();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock,
@@ -198,7 +201,8 @@ public class ApplicationGetAssetsByPathTests
             findDuplicatedAssetsServiceMock,
             userConfigurationServiceMock,
             fileOperationsServiceMock,
-            imageProcessingServiceMock);
+            imageProcessingServiceMock,
+            assetConversionServiceMock);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
@@ -233,6 +237,7 @@ public class ApplicationGetAssetsByPathTests
         IUserConfigurationService userConfigurationServiceMock = Substitute.For<IUserConfigurationService>();
         IFileOperationsService fileOperationsServiceMock = Substitute.For<IFileOperationsService>();
         IImageProcessingService imageProcessingServiceMock = Substitute.For<IImageProcessingService>();
+        IAssetConversionService assetConversionServiceMock = Substitute.For<IAssetConversionService>();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock,
@@ -242,7 +247,8 @@ public class ApplicationGetAssetsByPathTests
             findDuplicatedAssetsServiceMock,
             userConfigurationServiceMock,
             fileOperationsServiceMock,
-            imageProcessingServiceMock);
+            imageProcessingServiceMock,
+            assetConversionServiceMock);
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => application.GetAssetsByPath(directory!));
 

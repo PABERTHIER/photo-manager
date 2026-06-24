@@ -32,17 +32,15 @@ public class AssetRepositoryFolderExistsTests
     public void SetUp()
     {
         _testLogger = new();
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock!.ResolveDatabaseDirectory());
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        _assetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, _testLogger);
+        _assetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, _testLogger);
     }
 
     [TearDown]

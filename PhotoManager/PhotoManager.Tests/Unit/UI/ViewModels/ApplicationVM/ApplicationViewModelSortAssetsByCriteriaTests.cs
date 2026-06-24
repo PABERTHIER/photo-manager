@@ -182,7 +182,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         IPathProviderService pathProviderServiceMock = Substitute.For<IPathProviderService>();
         pathProviderServiceMock.ResolveDatabaseDirectory().Returns(_databaseDirectory);
@@ -191,23 +191,21 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         FileOperationsService fileOperationsService = new(userConfigurationService,
             new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(pathProviderServiceMock, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext, new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(pathProviderServiceMock.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService,
             new TestLogger<AssetHashCalculatorService>());
+        ImageMagickThumbnailGenerator thumbnailGenerator = new(imageProcessingService);
         AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService,
-            imageProcessingService, imageMetadataService, assetHashCalculatorService,
-            new ImageMagickThumbnailGenerator(imageProcessingService),
+            imageProcessingService, imageMetadataService, assetHashCalculatorService, thumbnailGenerator,
             userConfigurationService, new TestLogger<AssetCreationService>());
         AssetsComparator assetsComparator = new();
+        CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
+            _testableAssetRepository);
         CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, userConfigurationService, assetsComparator,
-            new CatalogFolderPipeline(fileOperationsService, assetCreationService,
-                _testableAssetRepository),
+            assetCreationService, userConfigurationService, assetsComparator, catalogFolderPipeline,
             new TestLogger<CatalogAssetsService>());
         MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
             new TestLogger<MoveAssetsService>());
@@ -215,9 +213,11 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
             userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
+        AssetConversionService assetConversionService = new(fileOperationsService, imageProcessingService,
+            new TestLogger<AssetConversionService>());
         PhotoManager.Application.Application application = new(_testableAssetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            fileOperationsService, imageProcessingService);
+            fileOperationsService, imageProcessingService, assetConversionService);
         _applicationViewModel = new(application);
     }
 
@@ -270,12 +270,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             assets[0].Folder,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -327,9 +333,12 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -359,12 +368,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssetsUpdated[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -441,39 +456,72 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             }
         }
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(65));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[64], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -526,12 +574,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -608,39 +662,72 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             }
         }
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(65));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[64], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -694,12 +781,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -777,39 +870,72 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             }
         }
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(65));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[64], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -863,12 +989,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -946,39 +1078,72 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             }
         }
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(65));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[64], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1032,12 +1197,18 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             expectedAssets[0].Folder,
             true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1115,39 +1286,72 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             }
         }
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(65));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CurrentAsset"));
         Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("AppTitle"));
         Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("SortCriteria"));
         Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[64], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1215,12 +1419,15 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             null!,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         // SetAssets
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
         // SortAssetsByCriteria
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SortCriteria"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1276,10 +1483,13 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             assets[0].Folder,
             false);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("SortCriteria"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanGoToPreviousAsset"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanGoToNextAsset"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CurrentAsset"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("AppTitle"));
+        Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("SortCriteria"));
 
         CheckInstance(
             applicationViewModelInstances,
@@ -1334,6 +1544,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
+        Assert.That(_applicationViewModel!.IsCataloging, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
@@ -1371,6 +1582,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
+        Assert.That(applicationViewModelInstance.IsCataloging, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
         Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
