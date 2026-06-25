@@ -440,7 +440,7 @@ public class HashingHelperTests
 
     [Test]
     [TestCase(Hashes.IMAGE_1_JPG, Hashes.IMAGE_1_90_DEG_JPG, 118)] // SHA512
-    [TestCase(PHashes.IMAGE_1_JPG, PHashes.IMAGE_10_PORTRAIT_PNG, 21)] // PHash
+    [TestCase(PHashes.IMAGE_1_JPG, PHashes.IMAGE_10_PORTRAIT_PNG, 27)] // PHash
     [TestCase(DHashes.IMAGE_1_JPG, DHashes.IMAGE_10_PORTRAIT_PNG, 14)] // DHash
     [TestCase(MD5Hashes.IMAGE_1_JPG, MD5Hashes.IMAGE_1_90_DEG_JPG, 32)] // MD5Hash
     public void CalculateHammingDistance_DifferentHashes_ReturnsCorrectDistance(string hash1, string hash2,

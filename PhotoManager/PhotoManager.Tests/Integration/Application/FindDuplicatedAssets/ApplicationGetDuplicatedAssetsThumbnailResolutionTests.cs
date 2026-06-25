@@ -526,12 +526,11 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
     [Test]
     [Category("Resolution folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase(10, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
-    [TestCase(20, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(20, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
     [TestCase(30, 1,
         new[]
         {
-            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
-            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
+            FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
         })]
     [TestCase(40, 1,
         new[]

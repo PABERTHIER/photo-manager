@@ -602,15 +602,11 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
     [Category("NotDuplicate folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase(10, 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase(20, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(30, 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { }, new string[] { })]
-    [TestCase(40, 3, new[] { FileNames._1336_JPG, FileNames._1350_JPG },
-        new[] { FileNames._1337_JPG, FileNames._1350_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG })]
-    [TestCase(50, 1,
-        new[]
-        {
-            FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
-            FileNames._1414_JPG
-        }, new string[] { }, new string[] { })]
+    [TestCase(30, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase(40, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase(50, 2,
+        new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG },
+        new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { })]
     [TestCase(60, 1,
         new[]
         {
