@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Configuration;
 using PhotoManager.UI.Services;
@@ -30,10 +31,10 @@ public class App : Avalonia.Application
     {
         ServiceCollection serviceCollection = new();
         IConfigurationRoot configuration = BuildConfiguration();
-        RequestedThemeVariant = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
         ConfigureServices(serviceCollection, configuration);
         _serviceProvider = serviceCollection.BuildServiceProvider();
         ServiceProvider = _serviceProvider;
+        ApplyConfiguredTheme(_serviceProvider);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -77,6 +78,14 @@ public class App : Avalonia.Application
         ServiceProvider = null;
         _serviceProvider?.Dispose();
         _serviceProvider = null;
+    }
+
+    private void ApplyConfiguredTheme(ServiceProvider serviceProvider)
+    {
+        IUserConfigurationService userConfigurationService =
+            serviceProvider.GetRequiredService<IUserConfigurationService>();
+        RequestedThemeVariant =
+            ThemeSettingsReader.GetRequestedThemeVariant(userConfigurationService.UiSettings.ThemeMode);
     }
 
     private static IConfigurationRoot BuildConfiguration()

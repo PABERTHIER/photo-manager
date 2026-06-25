@@ -21,6 +21,29 @@ internal sealed class ConfigurationPersistence(ISqliteConnectionFactory connecti
         }
     }
 
+    public IReadOnlyDictionary<string, string> GetAll()
+    {
+        Dictionary<string, string> values = new(StringComparer.Ordinal);
+
+        using (SqliteConnection connection = connectionFactory.Open())
+        {
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT Key, Value FROM Configuration;";
+
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        values[reader.GetString(0)] = reader.GetString(1);
+                    }
+                }
+            }
+        }
+
+        return values;
+    }
+
     public void SetValue(string key, string value)
     {
         using (SqliteConnection connection = connectionFactory.Open())
@@ -32,6 +55,39 @@ internal sealed class ConfigurationPersistence(ISqliteConnectionFactory connecti
                 command.Parameters.AddWithValue("$value", value);
 
                 command.ExecuteNonQuery();
+            }
+        }
+    }
+
+    public void SetValues(IReadOnlyDictionary<string, string> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+
+        if (values.Count == 0)
+        {
+            return;
+        }
+
+        using (SqliteConnection connection = connectionFactory.Open())
+        {
+            using (SqliteTransaction transaction = connection.BeginTransaction())
+            {
+                using (SqliteCommand command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR REPLACE INTO Configuration (Key, Value) VALUES ($key, $value);";
+                    SqliteParameter keyParameter = command.Parameters.Add("$key", SqliteType.Text);
+                    SqliteParameter valueParameter = command.Parameters.Add("$value", SqliteType.Text);
+
+                    foreach (KeyValuePair<string, string> entry in values)
+                    {
+                        keyParameter.Value = entry.Key;
+                        valueParameter.Value = entry.Value;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                transaction.Commit();
             }
         }
     }

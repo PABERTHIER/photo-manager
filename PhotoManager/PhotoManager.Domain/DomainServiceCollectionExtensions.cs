@@ -10,6 +10,7 @@ public static class DomainServiceCollectionExtensions
         public void AddDomain()
         {
             services.AddSingleton<IAssetsComparator, AssetsComparator>();
+            services.AddSingleton<IAssetConversionService, AssetConversionService>();
             services.AddSingleton<IAssetCreationService, AssetCreationService>();
             services.AddSingleton<CatalogFolderPipeline>();
             services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();

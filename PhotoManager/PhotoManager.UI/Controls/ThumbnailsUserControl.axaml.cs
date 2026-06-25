@@ -11,6 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Controls;
 
+/// <summary>
+/// User control that displays the grid of asset thumbnails.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class ThumbnailsUserControl : UserControl
 {

@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
+using PhotoManager.Domain.UserConfigurationSettings;
 using System.Reflection;
 
 namespace PhotoManager.Application;
@@ -19,9 +20,13 @@ public interface IApplication
     bool GetSyncAssetsEveryXMinutes();
     string GetExemptedFolderPath();
     AboutInformation GetAboutInformation(Assembly assembly);
+    EditableUserConfiguration GetEditableConfiguration();
+    void SaveEditableConfiguration(EditableUserConfiguration configuration);
     IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation);
     bool FileExists(string fullPath);
     int GetTotalFilesCount();
+    Task<AssetConversionResult> ConvertAssetsAsync(AssetConversionRequest request,
+        AssetConversionProgressCallback callback, CancellationToken token = default);
     bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
     void DeleteAssets(Asset[] assets);
     SyncAssetsConfiguration GetSyncAssetsConfiguration();

@@ -10,6 +10,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window for configuring and running asset synchronization between folders.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class SyncAssetsWindow : Window
 {

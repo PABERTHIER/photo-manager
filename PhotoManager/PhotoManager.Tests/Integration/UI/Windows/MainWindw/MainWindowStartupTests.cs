@@ -145,8 +145,8 @@ public class MainWindowStartupTests
         AboutInformation aboutInformation = new()
         {
             Product = "PhotoManager",
-            Author = "Author",
-            Version = "3.0.0"
+            Author = "Toto",
+            Version = Constants.VERSION
         };
         AboutWindow? window = null;
 
@@ -160,7 +160,7 @@ public class MainWindowStartupTests
 
                 using (Assert.EnterMultipleScope())
                 {
-                    Assert.That(window.Title, Is.EqualTo("About PhotoManager 3.0.0"));
+                    Assert.That(window.Title, Is.EqualTo($"About PhotoManager {Constants.VERSION}"));
                     Assert.That(productTextBlock.Text, Is.EqualTo("PhotoManager"));
                     Assert.That(window.DataContext, Is.EqualTo(aboutInformation));
                 }
@@ -404,7 +404,7 @@ public class MainWindowStartupTests
         application.GetAboutInformation(Arg.Any<System.Reflection.Assembly>()).Returns(new AboutInformation
         {
             Product = "PhotoManager",
-            Version = "3.0.0"
+            Version = Constants.VERSION
         });
         application.GetRecentTargetPaths().Returns([]);
         application.GetRootCatalogFolders().Returns([]);

@@ -59,7 +59,9 @@ public class CatalogAssetsServiceTests
                     Is.EqualTo(1));
                 Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetCreated).Asset,
                     Is.SameAs(createdAsset));
+
                 assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
+
                 _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
             }
         }
@@ -106,8 +108,10 @@ public class CatalogAssetsServiceTests
                     Is.EqualTo(1));
                 Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetUpdated).Asset,
                     Is.SameAs(updatedAsset));
+
                 assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, "skipped.mp4");
                 assetCreationService.DidNotReceive().CreateAsset(AssetsDirectory, "skipped.mp4", true, true);
+
                 _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
             }
         }
@@ -161,17 +165,20 @@ public class CatalogAssetsServiceTests
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(exception, Is.Not.Null);
+                Assert.That(exception?.Message, Is.EqualTo("The operation was canceled."));
+
                 Assert.That(catalogChanges.Count(change => change.Reason == CatalogChangeReason.AssetDeleted),
                     Is.EqualTo(1));
                 Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.CatalogProcessCancelled),
                     Is.True);
                 Assert.That(catalogChanges.Last().Reason, Is.EqualTo(CatalogChangeReason.CatalogProcessEnded));
+
                 assetRepository.Received(1).DeleteAssets(
                     AssetsDirectory,
                     Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 2
                                                                && fileNames[0] == firstDeletedFileName
                                                                && fileNames[1] == secondDeletedFileName));
+
                 _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
             }
         }
@@ -216,6 +223,7 @@ public class CatalogAssetsServiceTests
                     Is.EqualTo(1));
                 Assert.That(catalogChanges.Single(change => change.Reason == CatalogChangeReason.AssetDeleted).Asset,
                     Is.SameAs(firstDeletedAsset));
+
                 assetRepository.Received(1).DeleteAssets(
                     AssetsDirectory,
                     Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 1
@@ -344,7 +352,9 @@ public class CatalogAssetsServiceTests
             {
                 Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetDeleted), Is.False);
                 Assert.That(catalogChanges.Any(change => change.Reason == CatalogChangeReason.AssetUpdated), Is.False);
+
                 assetRepository.Received(1).DeleteAsset(AssetsDirectory, updatedFileName);
+
                 _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
             }
         }
@@ -377,6 +387,7 @@ public class CatalogAssetsServiceTests
             Directory.CreateDirectory(secondRootPath);
 
             IObservable<System.Reactive.Unit> assetsUpdated = CreateAssetsUpdatedObservable();
+
             assetRepository.AssetsUpdated.Returns(assetsUpdated);
             assetRepository.BackupExists().Returns(true);
             assetRepository.FolderExists(Arg.Any<string>())
@@ -403,13 +414,16 @@ public class CatalogAssetsServiceTests
             assetRepository
                 .When(repository => repository.DeleteFolder(Arg.Any<Folder>()))
                 .Do(call => foldersByPath.Remove(call.Arg<Folder>().Path));
+
             fileOperationsService.FolderExists(Arg.Any<string>())
                 .Returns(call => Directory.Exists(call.ArgAt<string>(0)));
             fileOperationsService.GetFileInfos(Arg.Any<string>()).Returns([]);
+
             assetsComparator.GetImageAndVideoNames(Arg.Any<string[]>()).Returns(([], []));
             assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
             assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
             assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
+
             userConfigurationService.GetRootCatalogFolderPaths().Returns(_ =>
             {
                 string path = rootCallIndex++ switch
@@ -421,6 +435,7 @@ public class CatalogAssetsServiceTests
 
                 return [path];
             });
+
             catalogAssetsService = CreateService(
                 assetRepository,
                 fileOperationsService,
@@ -433,6 +448,7 @@ public class CatalogAssetsServiceTests
             await catalogAssetsService.CatalogAssetsAsync(_ => { });
 
             fileOperationsService.Received(2).GetFileInfos(firstSubfolderPath);
+
             _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
         finally

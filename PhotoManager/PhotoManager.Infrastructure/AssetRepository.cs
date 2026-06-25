@@ -11,7 +11,6 @@ public class AssetRepository : IAssetRepository, IDisposable
 {
     private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
 
-    private readonly string _databaseDirectory;
     private int _totalAssetCount;
     private string[] _recentTargetPaths = [];
 
@@ -39,11 +38,10 @@ public class AssetRepository : IAssetRepository, IDisposable
     public IObservable<Unit> AssetsUpdated => _assetsUpdatedObservable;
 
     /// <summary>
-    /// Convenience constructor that creates the full SQLite chain internally.
-    /// Used by integration tests that do not need thumbnail inspection.
+    /// The persistence context is received already initialized (the composition root owns its bootstrap); this
+    /// repository only reads the catalog into memory and never initializes the database itself.
     /// </summary>
     public AssetRepository(
-        IPathProviderService pathProviderService,
         IImageProcessingService imageProcessingService,
         IImageMetadataService imageMetadataService,
         IUserConfigurationService userConfigurationService,
@@ -56,7 +54,6 @@ public class AssetRepository : IAssetRepository, IDisposable
         _persistenceContext = persistenceContext;
         _logger = logger;
 
-        _databaseDirectory = pathProviderService.ResolveDatabaseDirectory();
         ushort cacheCapacity = userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
         if (cacheCapacity == 0)
@@ -66,7 +63,7 @@ public class AssetRepository : IAssetRepository, IDisposable
 
         _thumbnailCache = new LruCache<Guid, ConcurrentDictionary<string, byte[]>>(cacheCapacity);
 
-        Initialize();
+        ReadCatalog();
     }
 
     // -------------------------------------------------------------- Folders
@@ -592,12 +589,6 @@ public class AssetRepository : IAssetRepository, IDisposable
     }
 
     // -------------------------------------------------------- Initialization
-
-    private void Initialize()
-    {
-        _persistenceContext.Initialize(_databaseDirectory);
-        ReadCatalog();
-    }
 
     private void ReadCatalog()
     {

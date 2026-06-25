@@ -29,7 +29,7 @@ public class ImageMetadataServiceTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _assetsDirectory);
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
         _fileOperationService = new(_userConfigurationService, new TestLogger<FileOperationsService>());
     }
 

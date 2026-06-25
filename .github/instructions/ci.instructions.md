@@ -28,6 +28,11 @@ The project uses separate workflow files per platform for independent badge repo
 - Release workflows use `gh release create ... || true` for idempotent release creation
 - Release workflows use `gh release upload ... --clobber` for safe asset upload
 
+## Cross-Platform Test Suite
+
+- `build-windows.yml`, `build-linux.yml`, and `build-macos.yml` run the **same** test suite. A test that passes only on Windows breaks the Linux and macOS pipelines.
+- Test code must be OS-agnostic — see the **Cross-Platform Test Compliance** rules in `AGENTS.md` and `.github/instructions/tests.instructions.md` (no Windows-only absolute paths through `Path` APIs, use `PathHelper`, build paths with `Path.Combine`, case-sensitive file names on Linux).
+
 ## .NET Version
 
 - Use `10.0.x` for the `dotnet-version` in `actions/setup-dotnet@v5`

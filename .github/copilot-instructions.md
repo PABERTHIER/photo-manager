@@ -27,6 +27,7 @@ This file provides Copilot-specific behavioral guidance that complements `AGENTS
 - Never suggest code that crosses the dependency flow: UI → Application → Domain ← Infrastructure ← Persistence
 - Match existing code patterns in the same file/project
 - All nullable reference type warnings are treated as errors (CS8600-CS8604)
+- Tests run on Windows, Linux, and macOS CI and must pass on all three — never assert on a Windows-only absolute path (`@"C:\..."`) routed through a `Path` API; use the `PathHelper` helpers and `Path.Combine` (see **Cross-Platform Test Compliance** in `AGENTS.md` and `.github/instructions/tests.instructions.md`)
 
 ## Git Policy
 

@@ -25,7 +25,7 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Logging" />
     <PackageReference Include="Serilog.Sinks.File" />
-    <!-- Pins Avalonia's transitive DBus dependency to a non-vulnerable version; UI code does not use it directly. -->
+    <!-- A Avalonia's transitive dependency, D-Bus is a core part of the Linux and MacOs environments. -->
     <PackageReference Include="Tmds.DBus.Protocol" PrivateAssets="all" />
   </ItemGroup>
 

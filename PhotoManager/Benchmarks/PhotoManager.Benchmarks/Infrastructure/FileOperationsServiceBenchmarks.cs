@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Benchmarks.Infrastructure;
+﻿using PhotoManager.Persistence.Sqlite;
+
+namespace PhotoManager.Benchmarks.Infrastructure;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
@@ -7,6 +9,8 @@ public class FileOperationsServiceBenchmarks
 {
     private string _testDirectory = null!;
     private string _fileNamesDirectory = null!;
+    private string _databaseDirectory = null!;
+    private SqlitePersistenceContext _persistenceContext = null!;
     private FileOperationsService _fileOperationsService = null!;
 
     [GlobalSetup]
@@ -78,16 +82,32 @@ public class FileOperationsServiceBenchmarks
         };
 
         IConfigurationRoot mockConfig = new ConfigurationBuilder().AddInMemoryCollection(configDict).Build();
-        UserConfigurationService userConfigService = new(mockConfig);
+
+        _databaseDirectory = Path.Combine(
+            Path.GetTempPath(), "FileOperationsServiceBenchmark_db_" + Guid.NewGuid().ToString("N"));
+        SqliteConnectionFactory connectionFactory = new(NullLogger<SqliteConnectionFactory>.Instance);
+        SqliteBackupService backupService = new(connectionFactory);
+
+        _persistenceContext = new(connectionFactory, backupService, NullLogger<SqlitePersistenceContext>.Instance);
+        _persistenceContext.Initialize(_databaseDirectory);
+
+        UserConfigurationService userConfigService = new(mockConfig, _persistenceContext);
         _fileOperationsService = new(userConfigService, NullLogger<FileOperationsService>.Instance);
     }
 
     [GlobalCleanup]
     public void Cleanup()
     {
+        _persistenceContext.Dispose();
+
         if (Directory.Exists(_testDirectory))
         {
             Directory.Delete(_testDirectory, true);
+        }
+
+        if (Directory.Exists(_databaseDirectory))
+        {
+            Directory.Delete(_databaseDirectory, true);
         }
     }
 

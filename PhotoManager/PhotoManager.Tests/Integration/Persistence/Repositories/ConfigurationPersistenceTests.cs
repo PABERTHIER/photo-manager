@@ -1,4 +1,4 @@
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Persistence.Repositories;
 
@@ -49,9 +49,9 @@ public class ConfigurationPersistenceTests
     [Test]
     public void SetValue_NewKey_StoresValue()
     {
-        _sqlitePersistenceContext!.Configuration.SetValue("AssetsDirectory", @"C:\Photos");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\Photos");
 
-        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue("AssetsDirectory");
+        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.ASSETS_DIRECTORY);
 
         Assert.That(retrieved, Is.EqualTo(@"C:\Photos"));
 
@@ -61,10 +61,10 @@ public class ConfigurationPersistenceTests
     [Test]
     public void SetValue_ExistingKey_OverwritesValue()
     {
-        _sqlitePersistenceContext!.Configuration.SetValue("AssetsDirectory", @"C:\Old");
-        _sqlitePersistenceContext!.Configuration.SetValue("AssetsDirectory", @"C:\New");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\Old");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\New");
 
-        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue("AssetsDirectory");
+        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.ASSETS_DIRECTORY);
 
         Assert.That(retrieved, Is.EqualTo(@"C:\New"));
 
@@ -74,14 +74,14 @@ public class ConfigurationPersistenceTests
     [Test]
     public void SetValue_MultipleKeys_EachStoredIndependently()
     {
-        _sqlitePersistenceContext!.Configuration.SetValue("Key1", "ValueA");
-        _sqlitePersistenceContext!.Configuration.SetValue("Key2", "ValueB");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\NewPhotos");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.THEME_MODE, "Dark");
 
-        string? value1 = _sqlitePersistenceContext!.Configuration.GetValue("Key1");
-        string? value2 = _sqlitePersistenceContext!.Configuration.GetValue("Key2");
+        string? value1 = _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.ASSETS_DIRECTORY);
+        string? value2 = _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.THEME_MODE);
 
-        Assert.That(value1, Is.EqualTo("ValueA"));
-        Assert.That(value2, Is.EqualTo("ValueB"));
+        Assert.That(value1, Is.EqualTo(@"C:\NewPhotos"));
+        Assert.That(value2, Is.EqualTo("Dark"));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
@@ -89,7 +89,8 @@ public class ConfigurationPersistenceTests
     [Test]
     public void GetValue_AfterReinit_ValuePersistsAcrossConnections()
     {
-        _sqlitePersistenceContext!.Configuration.SetValue("AssetsDirectory", @"C:\Photos\Persistent");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY,
+            @"C:\Photos\Persistent");
         _sqlitePersistenceContext!.Dispose();
 
         SqliteConnectionFactory factory = new(new TestLogger<SqliteConnectionFactory>());
@@ -98,9 +99,91 @@ public class ConfigurationPersistenceTests
         _sqlitePersistenceContext = new(factory, backupService, _testLogger);
         _sqlitePersistenceContext.Initialize(_databaseDirectory!);
 
-        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue("AssetsDirectory");
+        string? retrieved = _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.ASSETS_DIRECTORY);
 
         Assert.That(retrieved, Is.EqualTo(@"C:\Photos\Persistent"));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void GetAll_NoValues_ReturnsEmpty()
+    {
+        IReadOnlyDictionary<string, string> values = _sqlitePersistenceContext!.Configuration.GetAll();
+
+        Assert.That(values, Is.Empty);
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void GetAll_ValuesStored_ReturnsEveryKeyValuePair()
+    {
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\Photos");
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.THEME_MODE, "Dark");
+
+        IReadOnlyDictionary<string, string> values = _sqlitePersistenceContext!.Configuration.GetAll();
+
+        Assert.That(values, Has.Count.EqualTo(2));
+        Assert.That(values[UserConfigurationKeys.ASSETS_DIRECTORY], Is.EqualTo(@"C:\Photos"));
+        Assert.That(values[UserConfigurationKeys.THEME_MODE], Is.EqualTo("Dark"));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void SetValues_NewAndExistingKeys_InsertsAndOverwritesAtomically()
+    {
+        _sqlitePersistenceContext!.Configuration.SetValue(UserConfigurationKeys.ASSETS_DIRECTORY, @"C:\OldPhotos");
+
+        Dictionary<string, string> values = new(StringComparer.Ordinal)
+        {
+            [UserConfigurationKeys.ASSETS_DIRECTORY] = @"C:\NewPhotos",
+            [UserConfigurationKeys.THEME_MODE] = "Dark"
+        };
+        _sqlitePersistenceContext!.Configuration.SetValues(values);
+
+        IReadOnlyDictionary<string, string> stored = _sqlitePersistenceContext!.Configuration.GetAll();
+
+        Assert.That(stored, Has.Count.EqualTo(2));
+        Assert.That(stored[UserConfigurationKeys.ASSETS_DIRECTORY], Is.EqualTo(@"C:\NewPhotos"));
+        Assert.That(stored[UserConfigurationKeys.THEME_MODE], Is.EqualTo("Dark"));
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void SetValues_EmptyDictionary_StoresNothing()
+    {
+        _sqlitePersistenceContext!.Configuration.SetValues(new Dictionary<string, string>());
+
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetAll(), Is.Empty);
+
+        _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
+    }
+
+    [Test]
+    public void SetValues_AfterReinit_ValuesPersistAcrossConnections()
+    {
+        Dictionary<string, string> values = new(StringComparer.Ordinal)
+        {
+            [UserConfigurationKeys.ASSETS_DIRECTORY] = @"C:\Photos\Persistent",
+            [UserConfigurationKeys.THEME_MODE] = "Dark"
+        };
+        _sqlitePersistenceContext!.Configuration.SetValues(values);
+        _sqlitePersistenceContext!.Dispose();
+
+        SqliteConnectionFactory factory = new(new TestLogger<SqliteConnectionFactory>());
+        SqliteBackupService backupService = new(factory);
+
+        _sqlitePersistenceContext = new(factory, backupService, _testLogger);
+        _sqlitePersistenceContext.Initialize(_databaseDirectory!);
+
+        IReadOnlyDictionary<string, string> stored = _sqlitePersistenceContext!.Configuration.GetAll();
+
+        Assert.That(stored, Has.Count.EqualTo(2));
+        Assert.That(stored[UserConfigurationKeys.ASSETS_DIRECTORY], Is.EqualTo(@"C:\Photos\Persistent"));
+        Assert.That(stored[UserConfigurationKeys.THEME_MODE], Is.EqualTo("Dark"));
 
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }

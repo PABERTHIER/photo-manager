@@ -1,6 +1,7 @@
 ﻿using PhotoManager.Common.Imaging;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
+using PhotoManager.Domain.UserConfigurationSettings;
 using System.Reflection;
 
 namespace PhotoManager.Application;
@@ -13,7 +14,8 @@ public class Application(
     IFindDuplicatedAssetsService findDuplicatedAssetsService,
     IUserConfigurationService userConfigurationService,
     IFileOperationsService fileOperationsService,
-    IImageProcessingService imageProcessingService)
+    IImageProcessingService imageProcessingService,
+    IAssetConversionService assetConversionService)
     : IApplication
 {
     // Catalog
@@ -93,6 +95,12 @@ public class Application(
     public AboutInformation GetAboutInformation(Assembly assembly) =>
         userConfigurationService.GetAboutInformation(assembly);
 
+    public EditableUserConfiguration GetEditableConfiguration() =>
+        userConfigurationService.GetEditableConfiguration();
+
+    public void SaveEditableConfiguration(EditableUserConfiguration configuration) =>
+        userConfigurationService.SaveEditableConfiguration(configuration);
+
     // ImageProcessingService
     public IImageData LoadBitmapImageFromPath(string imagePath, ImageRotation rotation) =>
         imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
@@ -101,6 +109,11 @@ public class Application(
     public bool FileExists(string fullPath) => fileOperationsService.FileExists(fullPath);
 
     public int GetTotalFilesCount() => fileOperationsService.GetTotalFilesCount();
+
+    // AssetConversionService
+    public async Task<AssetConversionResult> ConvertAssetsAsync(AssetConversionRequest request,
+        AssetConversionProgressCallback callback, CancellationToken token = default) =>
+        await assetConversionService.ConvertAssetsAsync(request, callback, token);
 
     // MoveAssetsService
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) =>

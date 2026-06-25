@@ -1,5 +1,4 @@
-﻿using SkiaSharp;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 
@@ -57,7 +56,7 @@ public class ImageProcessingServiceTests
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         _testLogger = new();
         _imageProcessingService = new(_testLogger);
@@ -89,11 +88,15 @@ public class ImageProcessingServiceTests
             try
             {
                 Assert.That(_imageProcessingService.IsValidImage(imageBuffer), Is.True);
+
                 Directory.CreateDirectory(destinationNewFileDirectory);
+
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+
                 File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
 
                 _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
             }
@@ -110,29 +113,35 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using IImageData image =
-            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
-
-        byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (IImageData image =
+               _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100))
         {
-            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -181,11 +190,15 @@ public class ImageProcessingServiceTests
             try
             {
                 Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+
                 Directory.CreateDirectory(destinationNewFileDirectory);
+
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+
                 File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
 
                 _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
             }
@@ -202,29 +215,35 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using IImageData image =
-            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
-
-        byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (IImageData image =
+               _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100))
         {
-            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -273,11 +292,15 @@ public class ImageProcessingServiceTests
             try
             {
                 Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+
                 Directory.CreateDirectory(destinationNewFileDirectory);
+
                 string destinationNewFilePath =
                     Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+
                 File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-                Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
 
                 _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
             }
@@ -294,29 +317,35 @@ public class ImageProcessingServiceTests
         string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        using IImageData image =
-            _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100);
-
-        byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
-
-        Assert.That(imageBuffer, Is.Not.Null);
-        Assert.That(imageBuffer, Is.Not.Empty);
-
-        string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
-
-        try
+        using (IImageData image =
+               _imageProcessingService!.LoadBitmapThumbnailImage(buffer, ImageRotation.Rotate0, 100, 100))
         {
-            Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
-            Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
-            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
+            byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 
-            _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
-        }
-        finally
-        {
-            Directory.Delete(destinationNewFileDirectory, true);
+            Assert.That(imageBuffer, Is.Not.Null);
+            Assert.That(imageBuffer, Is.Not.Empty);
+
+            string destinationNewFileDirectory = Path.Combine(_assetsDirectory!, Directories.IMAGE_CONVERTED);
+
+            try
+            {
+                Assert.That(_imageProcessingService!.IsValidImage(imageBuffer), Is.True);
+
+                Directory.CreateDirectory(destinationNewFileDirectory);
+
+                string destinationNewFilePath =
+                    Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
+
+                File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+
+                Assert.That(ImageHelper.IsValidImage(destinationNewFilePath), Is.True);
+
+                _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
+            }
+            finally
+            {
+                Directory.Delete(destinationNewFileDirectory, true);
+            }
         }
     }
 
@@ -752,20 +781,5 @@ public class ImageProcessingServiceTests
         Assert.That(imageBuffer, Has.Length.EqualTo(expectedByteSize).Within(2).Percent);
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
-    }
-
-    private static bool IsValidImage(string filePath)
-    {
-        try
-        {
-            using (SKCodec? codec = SKCodec.Create(filePath))
-            {
-                return codec != null;
-            }
-        }
-        catch (Exception)
-        {
-            return false;
-        }
     }
 }

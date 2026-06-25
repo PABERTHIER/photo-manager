@@ -1,16 +1,11 @@
 ﻿using Avalonia.Styling;
-using Microsoft.Extensions.Configuration;
 
 namespace PhotoManager.UI.Configuration;
 
 public static class ThemeSettingsReader
 {
-    private const string THEME_MODE_CONFIGURATION_KEY = "appsettings:Ui:ThemeMode";
-
-    public static ThemeVariant GetRequestedThemeVariant(IConfiguration configuration)
+    public static ThemeVariant GetRequestedThemeVariant(string? configuredThemeMode)
     {
-        string? configuredThemeMode = configuration[THEME_MODE_CONFIGURATION_KEY];
-
         if (string.IsNullOrWhiteSpace(configuredThemeMode))
         {
             return ThemeVariant.Default;

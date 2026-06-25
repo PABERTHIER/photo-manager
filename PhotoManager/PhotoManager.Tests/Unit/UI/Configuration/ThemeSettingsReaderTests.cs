@@ -7,11 +7,9 @@ namespace PhotoManager.Tests.Unit.UI.Configuration;
 public class ThemeSettingsReaderTests
 {
     [Test]
-    public void GetRequestedThemeVariant_MissingThemeMode_ReturnsDefault()
+    public void GetRequestedThemeVariant_NullThemeMode_ReturnsDefault()
     {
-        IConfiguration configuration = BuildConfiguration(null);
-
-        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
+        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(null);
 
         Assert.That(result, Is.SameAs(ThemeVariant.Default));
     }
@@ -22,9 +20,7 @@ public class ThemeSettingsReaderTests
     [TestCase("\t")]
     public void GetRequestedThemeVariant_WhitespaceThemeMode_ReturnsDefault(string themeMode)
     {
-        IConfiguration configuration = BuildConfiguration(themeMode);
-
-        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
+        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(themeMode);
 
         Assert.That(result, Is.SameAs(ThemeVariant.Default));
     }
@@ -34,9 +30,7 @@ public class ThemeSettingsReaderTests
     [TestCase("system")]
     public void GetRequestedThemeVariant_SystemThemeMode_ReturnsDefault(string themeMode)
     {
-        IConfiguration configuration = BuildConfiguration(themeMode);
-
-        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
+        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(themeMode);
 
         Assert.That(result, Is.SameAs(ThemeVariant.Default));
     }
@@ -46,9 +40,7 @@ public class ThemeSettingsReaderTests
     [TestCase("light")]
     public void GetRequestedThemeVariant_LightThemeMode_ReturnsLight(string themeMode)
     {
-        IConfiguration configuration = BuildConfiguration(themeMode);
-
-        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
+        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(themeMode);
 
         Assert.That(result, Is.SameAs(ThemeVariant.Light));
     }
@@ -58,9 +50,7 @@ public class ThemeSettingsReaderTests
     [TestCase("dark")]
     public void GetRequestedThemeVariant_DarkThemeMode_ReturnsDark(string themeMode)
     {
-        IConfiguration configuration = BuildConfiguration(themeMode);
-
-        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(configuration);
+        ThemeVariant result = ThemeSettingsReader.GetRequestedThemeVariant(themeMode);
 
         Assert.That(result, Is.SameAs(ThemeVariant.Dark));
     }
@@ -68,10 +58,8 @@ public class ThemeSettingsReaderTests
     [Test]
     public void GetRequestedThemeVariant_UnsupportedThemeMode_ThrowsInvalidOperationException()
     {
-        IConfiguration configuration = BuildConfiguration("Blue");
-
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
-            ThemeSettingsReader.GetRequestedThemeVariant(configuration));
+            ThemeSettingsReader.GetRequestedThemeVariant("Blue"));
 
         Assert.That(exception!.Message,
             Is.EqualTo("Unsupported UI theme mode 'Blue'. Supported values: System, Light, Dark."));
@@ -80,25 +68,9 @@ public class ThemeSettingsReaderTests
     [Test]
     public void GetRequestedThemeVariant_NumericUnsupportedThemeMode_ThrowsArgumentOutOfRangeException()
     {
-        IConfiguration configuration = BuildConfiguration("42");
-
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            ThemeSettingsReader.GetRequestedThemeVariant(configuration));
+            ThemeSettingsReader.GetRequestedThemeVariant("42"));
 
         Assert.That(exception!.ParamName, Is.EqualTo("themeMode"));
-    }
-
-    private static IConfigurationRoot BuildConfiguration(string? themeMode)
-    {
-        Dictionary<string, string?> settings = [];
-
-        if (themeMode != null)
-        {
-            settings["appsettings:Ui:ThemeMode"] = themeMode;
-        }
-
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(settings)
-            .Build();
     }
 }

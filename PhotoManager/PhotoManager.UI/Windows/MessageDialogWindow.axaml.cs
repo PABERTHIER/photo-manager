@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Modal dialog window that shows a titled message to the user.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class MessageDialogWindow : Window
 {

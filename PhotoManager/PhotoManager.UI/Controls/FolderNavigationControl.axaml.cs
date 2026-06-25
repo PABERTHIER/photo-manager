@@ -12,6 +12,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Controls;
 
+/// <summary>
+/// User control rendering the folder tree used to navigate asset directories.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class FolderNavigationControl : UserControl
 {

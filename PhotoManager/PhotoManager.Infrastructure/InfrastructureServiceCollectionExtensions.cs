@@ -9,14 +9,14 @@ public static class InfrastructureServiceCollectionExtensions
     {
         public void AddInfrastructure()
         {
-            services.AddPersistence();
-            services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
             services.AddSingleton<IPathProviderService, PathProviderService>();
+
+            services.AddPersistence();
+
+            services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
             services.AddSingleton<IFileOperationsService, FileOperationsService>();
             services.AddSingleton<IImageProcessingService, ImageProcessingService>();
             services.AddSingleton<IThumbnailGenerator, ImageMagickThumbnailGenerator>();
-            services.AddSingleton(static serviceProvider =>
-                (ImageMagickThumbnailGenerator)serviceProvider.GetRequiredService<IThumbnailGenerator>());
             services.AddSingleton<IImageMetadataService, ImageMetadataService>();
             services.AddSingleton<IAssetRepository, AssetRepository>();
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();

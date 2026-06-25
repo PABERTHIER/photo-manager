@@ -686,6 +686,97 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageEncodingFormat.Png)]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageEncodingFormat.Png)]
+    [TestCase(FileNames.IMAGE_11_HEIC, ImageEncodingFormat.Jpeg)]
+    public void ConvertImage_ValidImage_ReturnsTargetFormatBuffer(string fileName, ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = _imageProcessingService!.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    [TestCase(FileNames.IMAGE_1_JPG, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.IMAGE_9_PNG, ImageEncodingFormat.Png)]
+    public void ConvertImage_ValidImageAndSameType_ReturnsTargetFormatBuffer(string fileName,
+        ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = _imageProcessingService!.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    [TestCase(FileNames.HOMER_GIF, ImageEncodingFormat.Jpeg)]
+    [TestCase(FileNames.HOMER_GIF, ImageEncodingFormat.Png)]
+    public void ConvertImage_GifFormat_ReturnsTargetFormatBuffer(string fileName,
+        ImageEncodingFormat targetFormat)
+    {
+        string filePath = Path.Combine(_assetsDirectory!, fileName);
+
+        byte[] imageBuffer = _imageProcessingService!.ConvertImage(filePath, targetFormat);
+
+        Assert.That(imageBuffer, Is.Not.Empty);
+        ImageHelper.AssertBufferHasExpectedSignature(imageBuffer, targetFormat);
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void ConvertImage_NullImagePath_ThrowsArgumentNullException()
+    {
+        string? imagePath = null;
+
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _imageProcessingService!.ConvertImage(imagePath!, ImageEncodingFormat.Png));
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'imagePath')"));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void ConvertImage_WhitespaceImagePath_ThrowsArgumentException()
+    {
+        const string expectedMessage =
+            "The value cannot be an empty string or composed entirely of whitespace. (Parameter 'imagePath')";
+
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            _imageProcessingService!.ConvertImage(" ", ImageEncodingFormat.Png));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
+    public void ConvertImage_UnsupportedTargetFormat_ThrowsArgumentOutOfRangeException()
+    {
+        string filePath = Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG);
+        string expectedMessage =
+            $"Unsupported target format. (Parameter 'targetFormat'){Environment.NewLine}Actual value was Gif.";
+
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            _imageProcessingService!.ConvertImage(filePath, ImageEncodingFormat.Gif));
+
+        Assert.That(exception?.Message, Is.EqualTo(expectedMessage));
+
+        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+    }
+
+    [Test]
     [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
     [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(FileNames.IMAGE_1_JPG, ImageRotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]

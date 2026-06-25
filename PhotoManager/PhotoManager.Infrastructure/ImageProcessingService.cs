@@ -31,6 +31,11 @@ public class ImageProcessingService(ILogger<ImageProcessingService> logger) : II
         return BitmapHelper.GetGifBitmapImage(thumbnailImage);
     }
 
+    public byte[] ConvertImage(string imagePath, ImageEncodingFormat targetFormat)
+    {
+        return BitmapHelper.ConvertImage(imagePath, targetFormat);
+    }
+
     public (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation)
     {
         return BitmapHelper.GetImageDimensions(buffer, rotation, logger);

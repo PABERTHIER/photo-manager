@@ -24,6 +24,8 @@ PhotoManager is a desktop application that allows:
 - Import / export images from local folders / shared folders in the local network.
 - Delete images in local or shared folders that are not present in source folder.
 - Detect videos duplicates.
+- Convert assets between HEIC, PNG, and JPG.
+- Update editable settings and the application theme from the UI.
 
 **It is a local tool, that does not require an Internet connection to work.
 Your data stay on your computer and nothing is collected from you.
@@ -31,9 +33,7 @@ The SQLite database is stored locally on your computer.**
 
 ## Upcoming :next_track_button:
 
-- Progress bar.
 - Handling corrupted images and videos.
-- Conversion feature (convert heic to jpg for example).
 
 ## Run the application :rocket:
 
@@ -62,6 +62,9 @@ If you use the .exe file, you can find a appsettings.json file in the same direc
 You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
 
 The aim is to let you configure it as you need.
+On first startup, PhotoManager reads these values and saves all editable settings in the local SQLite database.
+After that, the database values override `appsettings.json`. Use the **Settings** menu in the app to update them.
+The `Project` section is the only exception: it always stays in `appsettings.json` and is not editable from the UI.
 
 **The `Asset` part is about settings of asset:** :framed_picture:
 
@@ -180,6 +183,23 @@ Using environment variables:
 
 - `ThemeMode = "System"`: Uses the operating system theme. Supported values are `System`, `Light`, and `Dark`.
 
+### Settings page :gear:
+
+Open **Settings > Settings...** to update the editable `Asset`, `Hash`, `Paths`, `Storage`, and `Ui` settings.
+The assets directory and exempted folder fields include a browse button that opens the native folder picker.
+Saving writes the values to the local database, so they keep overriding `appsettings.json` on the next startup.
+
+### Convert assets page :repeat:
+
+Open **File > Convert Assets...** to select images with the native file picker and convert:
+
+- HEIC / HEIF to JPG or PNG.
+- PNG to JPG.
+- JPG / JPEG to PNG.
+
+Converted files are written one by one to a `Converted` folder next to the selected source images.
+Metadata is preserved when the target format supports it, but format-specific metadata can be lost during conversion.
+
 ## Compatible picture formats :camera:
 
 - .bmp - Windows bitmap
@@ -223,7 +243,7 @@ The button `Delete Every Duplicates Linked To Exempt Folder` :arrow_right: This 
 
 PhotoManager is able to detect duplicates between videos.
 To do so, you'll need to set `AnalyseVideos` to true and put all of your videos in a single folder.
-It will create another folder (**it should not exists**), which is `FirstFrameVideosFolderName`, and will store, inside of it, the first frame for each video (with the name of the video file).
+It will create another folder (**it should not exists**), which is `FirstFrameVideosFolderName`, and will store the first frame for each video inside it (with the name of the video file).
 :warning: Be aware that the `FirstFrameVideosFolderName` folder should be deleted before each run to prevent some conflicts. :warning:
 Then, you'll be able to see if there are duplicates between videos and to delete, manually, the videos in question.
 This feature is only here to help you to identify videos duplicates.
@@ -256,8 +276,9 @@ Use `-Filter "FullyQualifiedName~ClassName"` for focused runs. The report is wri
 
 ## Transparency :handshake:
 
-This project uses versioned FFmpeg runtime packages for video duplicate detection. At build time, `PhotoManager.Common` copies `ffmpeg` and `ffprobe` from the matching `Curiosity.FFmpeg.Runtimes.*`
-NuGet package into the output folder under `Ffmpeg/Bin`. This keeps frame extraction deterministic without keeping Windows-only RAR archives or a custom extraction task in the repository.
+This project uses versioned FFmpeg runtime packages for video duplicate detection.
+At build time, `PhotoManager.Common` copies `ffmpeg` and `ffprobe` from the matching `Curiosity.FFmpeg.Runtimes.*` NuGet package into the output folder under `Ffmpeg/Bin`.
+This keeps frame extraction deterministic without keeping Windows-only RAR archives or a custom extraction task in the repository.
 
 If you need to override the bundled binaries, set `PHOTOMANAGER_FFMPEG_BINARY_FOLDER` or `FFMPEG_BINARY_FOLDER` to a folder containing the platform-specific `ffmpeg` executable.
 If neither the bundled folder nor an override exists, FFMpegCore falls back to resolving `ffmpeg` from `PATH`.

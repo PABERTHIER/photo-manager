@@ -304,6 +304,25 @@ finally
   - Reconsider whether the method belongs in its current layer
 - Granting internal visibility to the test project couples tests to implementation details and undermines maintainability
 
+### Cross-Platform Test Compliance (NON-NEGOTIABLE)
+
+Tests run on Windows, Linux, and macOS CI (`build-windows.yml`, `build-linux.yml`, `build-macos.yml`).
+**Every new or modified test MUST pass on all three OSes.**
+The most common cross-OS failure is path handling: on Linux/macOS `\` is **not** a directory separator and drive-letter paths (`C:\...`) are **not** rooted, so the same `Path.*` call returns a different result than on Windows.
+
+- **Never hardcode a Windows-only absolute path that flows through a `Path` API and is then asserted.** A literal such as `@"C:\Photos\Image.png"` passed to `Path.GetFileName`, `Path.GetDirectoryName`, `Path.GetExtension`, or `Path.Combine` produces a Windows-specific result the production code under test cannot reproduce on Linux/macOS. For example, on Linux/macOS `Path.GetFileName(@"C:\Photos\Image.png")` returns the whole string `C:\Photos\Image.png` (there is no `/` to split on) and `Path.GetDirectoryName(@"C:\Photos\Image.png")` returns `""`.
+- **Use the `PathHelper` helpers** in `PhotoManager.Tests/PathHelper.cs` for absolute test paths:
+  - `PathHelper.ToPlatformAbsolutePath(@"C:\Photos")` → an absolute path valid on the current OS (`C:\Photos` on Windows, `/Photos` on Linux/macOS). Use it whenever the path is fed to a `Path` API or to production code that performs path operations.
+  - `PathHelper.ToResolvedConfigPath(@"E:\Workspace\...")` → mirrors how `UserConfigurationService` resolves a config path via `Path.GetFullPath`. Use it when asserting a resolved config path.
+- **Build expected paths the same way production builds them.** If the code under test does `Path.Combine(resolvedDirectory, name)`, the expectation must also be `Path.Combine(resolvedDirectory, name)` — never `Path.GetFullPath(@"...\name")`, because the `\` before `name` stays a literal character on Linux/macOS and will not match `Path.Combine`'s `/`.
+- **Opaque path strings are fine cross-OS.** A Windows-style literal that is only stored and read back verbatim, or asserted by equality against the same literal (e.g. a config value persisted in SQLite, a sync-definition source/destination), never touches `Path` semantics and is portable as-is — leave it unchanged.
+- **Build real paths with `Path.Combine`**, never by concatenating separators (`dir + "\\" + file`).
+- **File names are case-sensitive on Linux.** Reference test files with their exact on-disk case, and reuse the constants in `PhotoManager.Tests.Unit.Constants`.
+- **Do not assume `\r\n` or `Environment.NewLine`.** Line endings differ per OS; compare normalized text.
+- **OS-specific helpers stay OS-aware.** Directory access-control helpers (`DirectoryHelper.DenyAccess`, `DenyWriteAccess`, …) behave differently per OS — guard such assertions accordingly.
+
+Quick test before relying on an assertion: "If `\` stops being a separator and a drive letter stops being a root, does this still assert the same value?" If not, route the path through `PathHelper` / `Path.Combine`.
+
 ## External Dependencies
 
 - **Avalonia UI** - Cross-platform desktop UI framework (Windows, Linux, macOS)

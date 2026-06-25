@@ -6,6 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window displaying application information such as product, version and author details.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class AboutWindow : Window
 {

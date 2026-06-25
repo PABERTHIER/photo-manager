@@ -89,17 +89,14 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [SetUp]
     public void SetUp()
     {
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         ImageProcessingService imageProcessingService = new(new TestLogger<ImageProcessingService>());
         _fileOperationsService = new(userConfigurationService, new TestLogger<FileOperationsService>());
         ImageMetadataService imageMetadataService = new(_fileOperationsService, new TestLogger<ImageMetadataService>());
-        SqliteConnectionFactory sqliteConnectionFactory = new(new TestLogger<SqliteConnectionFactory>());
-        SqliteBackupService sqliteBackupService = new(sqliteConnectionFactory);
-        SqlitePersistenceContext sqlitePersistenceContext = new(
-            sqliteConnectionFactory, sqliteBackupService, new TestLogger<SqlitePersistenceContext>());
-        _testableAssetRepository = new(_pathProviderServiceMock!, imageProcessingService,
-            imageMetadataService, userConfigurationService, sqlitePersistenceContext,
-            new TestLogger<AssetRepository>());
+        SqlitePersistenceContext sqlitePersistenceContext =
+            PersistenceContextTestHelper.CreateInitializedContext(_pathProviderServiceMock!.ResolveDatabaseDirectory());
+        _testableAssetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
+            sqlitePersistenceContext, new TestLogger<AssetRepository>());
 
         _asset1 = new()
         {
@@ -330,7 +327,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
@@ -397,7 +394,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
@@ -457,7 +454,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
@@ -501,7 +498,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
@@ -545,7 +542,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 
@@ -652,7 +649,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!);
+        UserConfigurationService userConfigurationService = _configurationRootMock!.CreateUserConfigurationService();
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository!,
             _fileOperationsService!, userConfigurationService, new TestLogger<FindDuplicatedAssetsService>());
 

@@ -42,7 +42,8 @@ public static class ConfigurationMockExtensions
                 .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")
                 .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")
                 .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
-                .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
+                .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5")
+                .MockGetValue(UserConfigurationKeys.THEME_MODE, "Light");
 
         }
     }

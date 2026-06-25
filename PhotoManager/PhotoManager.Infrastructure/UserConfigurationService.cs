@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using PhotoManager.Domain.Interfaces.Persistence;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -13,13 +15,17 @@ public partial class UserConfigurationService : IUserConfigurationService
     public PathSettings PathSettings { get; private set; } = null!;
     public ProjectSettings ProjectSettings { get; private set; } = null!;
     public StorageSettings StorageSettings { get; private set; } = null!;
+    public UiSettings UiSettings { get; private set; } = null!;
 #pragma warning restore IDE0370
 
     private readonly IConfigurationRoot _configuration;
+    private readonly IPersistenceContext _persistenceContext;
+    private EditableUserConfiguration? _editableConfiguration;
 
-    public UserConfigurationService(IConfigurationRoot configuration)
+    public UserConfigurationService(IConfigurationRoot configuration, IPersistenceContext persistenceContext)
     {
         _configuration = configuration;
+        _persistenceContext = persistenceContext;
 
         InitializeConfigValues();
     }
@@ -50,61 +56,161 @@ public partial class UserConfigurationService : IUserConfigurationService
         return [PathSettings.AssetsDirectory];
     }
 
+    // Always initialized during construction (InitializeConfigValues -> ApplyEditableConfiguration)
+    public EditableUserConfiguration GetEditableConfiguration() => _editableConfiguration!;
+
+    public void SaveEditableConfiguration(EditableUserConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        ApplyEditableConfiguration(configuration);
+        PersistEditableConfiguration(configuration);
+    }
+
     private void InitializeConfigValues()
     {
-        bool analyseVideos = _configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS);
-        string? corruptedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE);
-        string? rotatedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE);
-        int catalogBatchSize = _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE);
-        ushort catalogCooldownMinutes = _configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES);
-        ushort corruptedImageOrientation =
-            _configuration.GetValue<ushort>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION);
-        ushort defaultExifOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION);
-        bool detectThumbnails = _configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS);
-        bool syncAssetsEveryXMinutes = _configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES);
-        int thumbnailMaxHeight = _configuration.GetValue<int>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT);
-        int thumbnailMaxWidth = _configuration.GetValue<int>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH);
+        // Project settings are intentionally never persisted: they always come from appsettings.json.
+        ProjectSettings = ReadProjectSettings();
 
-        AssetSettings = new(
-            analyseVideos,
-            corruptedMessage!,
-            rotatedMessage!,
-            catalogBatchSize,
-            catalogCooldownMinutes,
-            corruptedImageOrientation,
-            defaultExifOrientation,
-            detectThumbnails,
-            syncAssetsEveryXMinutes,
-            thumbnailMaxHeight,
-            thumbnailMaxWidth);
+        // Persisted settings (if any) live in the SQLite Configuration table and fully override appsettings.json.
+        // Absence of any stored row means first run: seed the table from appsettings.json.
+        IReadOnlyDictionary<string, string> storedValues = _persistenceContext.Configuration.GetAll();
+        bool hasPersistedSettings = storedValues.Count > 0;
 
-        ushort pHashThreshold = _configuration.GetValue<ushort>(UserConfigurationKeys.PHASH_THRESHOLD);
-        bool usingDHash = _configuration.GetValue<bool>(UserConfigurationKeys.USING_DHASH);
-        bool usingMD5Hash = _configuration.GetValue<bool>(UserConfigurationKeys.USING_MD5_HASH);
-        bool usingPHash = _configuration.GetValue<bool>(UserConfigurationKeys.USING_PHASH);
+        EditableUserConfiguration configuration = hasPersistedSettings
+            ? ReadEditableConfiguration(key => ReadStoredValue(storedValues, key))
+            : ReadEditableConfiguration(ReadConfigurationValue);
 
-        HashSettings = new(pHashThreshold, usingDHash, usingMD5Hash, usingPHash);
+        ApplyEditableConfiguration(configuration);
 
-        string assetsDirectory = ExpandPath(_configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY)!);
-        string exemptedFolderPath =
-            ExpandPath(_configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH)!);
-        string? firstFrameVideosFolderName =
-            _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
+        if (!hasPersistedSettings)
+        {
+            PersistEditableConfiguration(configuration);
+        }
+    }
 
-        string firstFrameVideosPath = Path.Combine(assetsDirectory, firstFrameVideosFolderName!);
+    private void ApplyEditableConfiguration(EditableUserConfiguration configuration)
+    {
+        string assetsDirectory = ExpandPath(configuration.PathSettings.AssetsDirectory);
+        string exemptedFolderPath = ExpandPath(configuration.PathSettings.ExemptedFolderPath);
+        string firstFrameVideosPath = Path.Combine(
+            assetsDirectory, configuration.PathSettings.FirstFrameVideosFolderName);
 
+        AssetSettings = configuration.AssetSettings;
+        HashSettings = configuration.HashSettings;
         PathSettings = new(assetsDirectory, exemptedFolderPath, firstFrameVideosPath);
+        StorageSettings = configuration.StorageSettings;
+        UiSettings = configuration.UiSettings;
 
-        string? projectName = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME);
-        string? projectOwner = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER);
+        _editableConfiguration = configuration;
+    }
 
-        ProjectSettings = new(projectName!, projectOwner!);
+    private static EditableUserConfiguration ReadEditableConfiguration(Func<string, string> readValue)
+    {
+        AssetSettings assetSettings = new(
+            ReadValue<bool>(readValue, UserConfigurationKeys.ANALYSE_VIDEOS),
+            readValue(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE),
+            readValue(UserConfigurationKeys.ASSET_ROTATED_MESSAGE),
+            ReadValue<int>(readValue, UserConfigurationKeys.CATALOG_BATCH_SIZE),
+            ReadValue<ushort>(readValue, UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES),
+            ReadValue<ushort>(readValue, UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION),
+            ReadValue<ushort>(readValue, UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION),
+            ReadValue<bool>(readValue, UserConfigurationKeys.DETECT_THUMBNAILS),
+            ReadValue<bool>(readValue, UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES),
+            ReadValue<int>(readValue, UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT),
+            ReadValue<int>(readValue, UserConfigurationKeys.THUMBNAIL_MAX_WIDTH));
 
-        ushort backupsToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP);
-        ushort thumbnailsDictionaryEntriesToKeep =
-            _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
+        HashSettings hashSettings = new(
+            ReadValue<ushort>(readValue, UserConfigurationKeys.PHASH_THRESHOLD),
+            ReadValue<bool>(readValue, UserConfigurationKeys.USING_DHASH),
+            ReadValue<bool>(readValue, UserConfigurationKeys.USING_MD5_HASH),
+            ReadValue<bool>(readValue, UserConfigurationKeys.USING_PHASH));
 
-        StorageSettings = new(backupsToKeep, thumbnailsDictionaryEntriesToKeep);
+        EditablePathSettings pathSettings = new(
+            readValue(UserConfigurationKeys.ASSETS_DIRECTORY),
+            readValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH),
+            readValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME));
+
+        StorageSettings storageSettings = new(
+            ReadValue<ushort>(readValue, UserConfigurationKeys.BACKUPS_TO_KEEP),
+            ReadValue<ushort>(readValue, UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP));
+
+        UiSettings uiSettings = new(readValue(UserConfigurationKeys.THEME_MODE));
+
+        return new(assetSettings, hashSettings, pathSettings, storageSettings, uiSettings);
+    }
+
+    private ProjectSettings ReadProjectSettings()
+    {
+        string projectName = ReadConfigurationValue(UserConfigurationKeys.PROJECT_NAME);
+        string projectOwner = ReadConfigurationValue(UserConfigurationKeys.PROJECT_OWNER);
+
+        return new(projectName, projectOwner);
+    }
+
+    // Persists the whole editable configuration atomically (single transaction). The Project section is never
+    // stored. The presence of any row is what InitializeConfigValues uses to detect "settings already persisted",
+    // so writing the complete set in one transaction guarantees the table is never left partially populated.
+    private void PersistEditableConfiguration(EditableUserConfiguration configuration)
+    {
+        Dictionary<string, string> values = new(StringComparer.Ordinal)
+        {
+            [UserConfigurationKeys.ANALYSE_VIDEOS] = ToStorageValue(configuration.AssetSettings.AnalyseVideos),
+            [UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE] = configuration.AssetSettings.CorruptedMessage,
+            [UserConfigurationKeys.ASSET_ROTATED_MESSAGE] = configuration.AssetSettings.RotatedMessage,
+            [UserConfigurationKeys.CATALOG_BATCH_SIZE] = ToStorageValue(configuration.AssetSettings.CatalogBatchSize),
+            [UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES] =
+                ToStorageValue(configuration.AssetSettings.CatalogCooldownMinutes),
+            [UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION] =
+                ToStorageValue(configuration.AssetSettings.CorruptedImageOrientation),
+            [UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION] =
+                ToStorageValue(configuration.AssetSettings.DefaultExifOrientation),
+            [UserConfigurationKeys.DETECT_THUMBNAILS] = ToStorageValue(configuration.AssetSettings.DetectThumbnails),
+            [UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES] =
+                ToStorageValue(configuration.AssetSettings.SyncAssetsEveryXMinutes),
+            [UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT] =
+                ToStorageValue(configuration.AssetSettings.ThumbnailMaxHeight),
+            [UserConfigurationKeys.THUMBNAIL_MAX_WIDTH] = ToStorageValue(configuration.AssetSettings.ThumbnailMaxWidth),
+            [UserConfigurationKeys.PHASH_THRESHOLD] = ToStorageValue(configuration.HashSettings.PHashThreshold),
+            [UserConfigurationKeys.USING_DHASH] = ToStorageValue(configuration.HashSettings.UsingDHash),
+            [UserConfigurationKeys.USING_MD5_HASH] = ToStorageValue(configuration.HashSettings.UsingMD5Hash),
+            [UserConfigurationKeys.USING_PHASH] = ToStorageValue(configuration.HashSettings.UsingPHash),
+            [UserConfigurationKeys.ASSETS_DIRECTORY] = configuration.PathSettings.AssetsDirectory,
+            [UserConfigurationKeys.EXEMPTED_FOLDER_PATH] =
+                ToStorageValue(configuration.PathSettings.ExemptedFolderPath),
+            [UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME] =
+                configuration.PathSettings.FirstFrameVideosFolderName,
+            [UserConfigurationKeys.BACKUPS_TO_KEEP] = ToStorageValue(configuration.StorageSettings.BackupsToKeep),
+            [UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP] =
+                ToStorageValue(configuration.StorageSettings.ThumbnailsDictionaryEntriesToKeep),
+            [UserConfigurationKeys.THEME_MODE] = configuration.UiSettings.ThemeMode
+        };
+
+        _persistenceContext.Configuration.SetValues(values);
+    }
+
+    private static string ToStorageValue(object value)
+    {
+        return Convert.ToString(value, CultureInfo.InvariantCulture)!;
+    }
+
+    private static string ReadStoredValue(IReadOnlyDictionary<string, string> storedValues, string key)
+    {
+        return storedValues.TryGetValue(key, out string? value)
+            ? value
+            : throw new InvalidOperationException($"Persisted configuration key '{key}' is missing.");
+    }
+
+    private string ReadConfigurationValue(string key)
+    {
+        return _configuration.GetValue<string>(key)
+            ?? throw new InvalidOperationException($"Configuration key '{key}' is missing.");
+    }
+
+    private static T ReadValue<T>(Func<string, string> readValue, string key)
+    {
+        string value = readValue(key);
+        return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
     }
 
     private string? GetProductVersion()

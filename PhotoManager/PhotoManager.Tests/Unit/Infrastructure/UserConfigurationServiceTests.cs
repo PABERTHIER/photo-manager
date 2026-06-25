@@ -16,7 +16,26 @@ public class UserConfigurationServiceTests
         IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock);
+        _userConfigurationService = configurationRootMock.CreateUserConfigurationService();
+    }
+
+    [Test]
+    public void Constructor_ConfigurationKeyMissing_ThrowsInvalidOperationException()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+
+        // A missing JSON key makes GetValue<string> return null, which ReadConfigurationValue turns into a descriptive failure.
+        // ProjectSettings are read first during construction, so this surfaces immediately.
+        IConfigurationSection missingSection = Substitute.For<IConfigurationSection>();
+        missingSection.Value.Returns((string?)null);
+        configurationRootMock.GetSection(UserConfigurationKeys.PROJECT_NAME).Returns(missingSection);
+
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
+            configurationRootMock.CreateUserConfigurationService());
+
+        Assert.That(exception?.Message,
+            Is.EqualTo($"Configuration key '{UserConfigurationKeys.PROJECT_NAME}' is missing."));
     }
 
     [Test]
@@ -235,7 +254,7 @@ public class UserConfigurationServiceTests
                 .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, $"%{assetsVariableName}%")
                 .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + "{" + exemptedVariableName + "}");
 
-            UserConfigurationService userConfigurationService = new(configurationRootMock);
+            UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
             Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(expandedAssetsDirectory));
             Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(expandedExemptedFolder));
@@ -258,7 +277,7 @@ public class UserConfigurationServiceTests
             .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "~/Pictures")
             .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "~\\Exempted");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
         string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
         Assert.That(userConfigurationService.PathSettings.AssetsDirectory,
@@ -312,6 +331,155 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
+    public void UiSettings_CorrectValue_ReturnsThemeModeValue()
+    {
+        string themeMode = _userConfigurationService!.UiSettings.ThemeMode;
+
+        Assert.That(themeMode, Is.EqualTo("Light"));
+    }
+
+    [Test]
+    public void GetEditableConfiguration_DefaultConfiguration_ReturnsEditableSettingsWithoutProjectSettings()
+    {
+        EditableUserConfiguration configuration = _userConfigurationService!.GetEditableConfiguration();
+
+        Assert.That(configuration.AssetSettings.CatalogBatchSize, Is.EqualTo(100));
+        Assert.That(configuration.HashSettings.PHashThreshold, Is.EqualTo(10));
+        Assert.That(configuration.PathSettings.AssetsDirectory, Is.EqualTo(
+            PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets")));
+        Assert.That(configuration.PathSettings.FirstFrameVideosFolderName,
+            Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
+        Assert.That(configuration.StorageSettings.BackupsToKeep, Is.EqualTo(2));
+        Assert.That(configuration.UiSettings.ThemeMode, Is.EqualTo("Light"));
+
+        Assert.That(configuration.AssetSettings.AnalyseVideos, Is.False);
+        Assert.That(configuration.AssetSettings.CorruptedMessage, Is.EqualTo("The asset is corrupted"));
+        Assert.That(configuration.AssetSettings.RotatedMessage, Is.EqualTo("The asset has been rotated"));
+        Assert.That(configuration.AssetSettings.CatalogBatchSize, Is.EqualTo(100));
+        Assert.That(configuration.AssetSettings.CatalogCooldownMinutes, Is.EqualTo(5));
+        Assert.That(configuration.AssetSettings.CorruptedImageOrientation, Is.EqualTo(10000));
+        Assert.That(configuration.AssetSettings.DefaultExifOrientation, Is.EqualTo(1));
+        Assert.That(configuration.AssetSettings.DetectThumbnails, Is.False);
+        Assert.That(configuration.AssetSettings.SyncAssetsEveryXMinutes, Is.False);
+        Assert.That(configuration.AssetSettings.ThumbnailMaxHeight, Is.EqualTo(150));
+        Assert.That(configuration.AssetSettings.ThumbnailMaxWidth, Is.EqualTo(200));
+
+        Assert.That(configuration.HashSettings.PHashThreshold, Is.EqualTo(10));
+        Assert.That(configuration.HashSettings.UsingDHash, Is.False);
+        Assert.That(configuration.HashSettings.UsingMD5Hash, Is.False);
+        Assert.That(configuration.HashSettings.UsingPHash, Is.False);
+
+        Assert.That(configuration.PathSettings.AssetsDirectory,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets")));
+        Assert.That(configuration.PathSettings.ExemptedFolderPath, Is.EqualTo(
+            PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
+        Assert.That(configuration.PathSettings.FirstFrameVideosFolderName,
+            Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
+
+        Assert.That(configuration.StorageSettings.BackupsToKeep, Is.EqualTo(2));
+        Assert.That(configuration.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
+
+        Assert.That(configuration.UiSettings.ThemeMode, Is.EqualTo("Light"));
+    }
+
+    [Test]
+    public void GetEditableConfiguration_PathContainsHomeDirectory_ReturnsUnexpandedEditablePath()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock
+            .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "~/Pictures")
+            .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "~\\Exempted");
+
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
+
+        Assert.That(userConfigurationService.GetEditableConfiguration().PathSettings.AssetsDirectory,
+            Is.EqualTo("~/Pictures"));
+        Assert.That(userConfigurationService.GetEditableConfiguration().PathSettings.ExemptedFolderPath,
+            Is.EqualTo("~\\Exempted"));
+    }
+
+    [Test]
+    public void SaveEditableConfiguration_ValidConfigurationWithoutPersistence_UpdatesRuntimeSettings()
+    {
+        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
+        configurationRootMock.GetDefaultMockConfig();
+
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
+
+        Assert.That(userConfigurationService.AssetSettings.AnalyseVideos, Is.False);
+        Assert.That(userConfigurationService.AssetSettings.CorruptedMessage, Is.EqualTo("The asset is corrupted"));
+        Assert.That(userConfigurationService.AssetSettings.RotatedMessage, Is.EqualTo("The asset has been rotated"));
+        Assert.That(userConfigurationService.AssetSettings.CatalogBatchSize, Is.EqualTo(100));
+        Assert.That(userConfigurationService.AssetSettings.CatalogCooldownMinutes, Is.EqualTo(5));
+        Assert.That(userConfigurationService.AssetSettings.CorruptedImageOrientation, Is.EqualTo(10000));
+        Assert.That(userConfigurationService.AssetSettings.DefaultExifOrientation, Is.EqualTo(1));
+        Assert.That(userConfigurationService.AssetSettings.DetectThumbnails, Is.False);
+        Assert.That(userConfigurationService.AssetSettings.SyncAssetsEveryXMinutes, Is.False);
+        Assert.That(userConfigurationService.AssetSettings.ThumbnailMaxHeight, Is.EqualTo(150));
+        Assert.That(userConfigurationService.AssetSettings.ThumbnailMaxWidth, Is.EqualTo(200));
+
+        Assert.That(userConfigurationService.HashSettings.PHashThreshold, Is.EqualTo(10));
+        Assert.That(userConfigurationService.HashSettings.UsingDHash, Is.False);
+        Assert.That(userConfigurationService.HashSettings.UsingMD5Hash, Is.False);
+        Assert.That(userConfigurationService.HashSettings.UsingPHash, Is.False);
+
+        Assert.That(userConfigurationService.PathSettings.AssetsDirectory,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets")));
+        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(
+            PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
+        Assert.That(userConfigurationService.PathSettings.FirstFrameVideosPath,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath(
+                $"E:\\Workspace\\PhotoManager\\TestAssets\\{Directories.OUTPUT_VIDEO_FIRST_FRAME}")));
+
+        Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("PhotoManager"));
+        Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("Toto"));
+
+        Assert.That(userConfigurationService.StorageSettings.BackupsToKeep, Is.EqualTo(2));
+        Assert.That(userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
+
+        Assert.That(userConfigurationService.UiSettings.ThemeMode, Is.EqualTo("Light"));
+
+        EditableUserConfiguration configuration = CreateEditableConfiguration();
+
+        userConfigurationService.SaveEditableConfiguration(configuration);
+
+        Assert.That(userConfigurationService.AssetSettings.AnalyseVideos, Is.True);
+        Assert.That(userConfigurationService.AssetSettings.CorruptedMessage, Is.EqualTo("Corrupted"));
+        Assert.That(userConfigurationService.AssetSettings.RotatedMessage, Is.EqualTo("Rotated"));
+        Assert.That(userConfigurationService.AssetSettings.CatalogBatchSize, Is.EqualTo(42));
+        Assert.That(userConfigurationService.AssetSettings.CatalogCooldownMinutes, Is.EqualTo(3));
+        Assert.That(userConfigurationService.AssetSettings.CorruptedImageOrientation, Is.EqualTo(999));
+        Assert.That(userConfigurationService.AssetSettings.DefaultExifOrientation, Is.EqualTo(1));
+        Assert.That(userConfigurationService.AssetSettings.DetectThumbnails, Is.True);
+        Assert.That(userConfigurationService.AssetSettings.SyncAssetsEveryXMinutes, Is.True);
+        Assert.That(userConfigurationService.AssetSettings.ThumbnailMaxHeight, Is.EqualTo(320));
+        Assert.That(userConfigurationService.AssetSettings.ThumbnailMaxWidth, Is.EqualTo(640));
+
+        Assert.That(userConfigurationService.HashSettings.PHashThreshold, Is.EqualTo(6));
+        Assert.That(userConfigurationService.HashSettings.UsingDHash, Is.True);
+        Assert.That(userConfigurationService.HashSettings.UsingMD5Hash, Is.True);
+        Assert.That(userConfigurationService.HashSettings.UsingPHash, Is.True);
+
+        Assert.That(userConfigurationService.PathSettings.AssetsDirectory,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets")));
+        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(
+            PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted")));
+        Assert.That(userConfigurationService.PathSettings.FirstFrameVideosPath,
+            Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Frames")));
+
+        Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("PhotoManager"));
+        Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("Toto"));
+
+        Assert.That(userConfigurationService.StorageSettings.BackupsToKeep, Is.EqualTo(4));
+        Assert.That(userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(12));
+
+        Assert.That(userConfigurationService.UiSettings.ThemeMode, Is.EqualTo("Dark"));
+
+        Assert.That(userConfigurationService.GetEditableConfiguration(), Is.SameAs(configuration));
+    }
+
+    [Test]
     [TestCase("~/Pictures", "", "~/Pictures")]
     [TestCase("~/Pictures", " ", "~/Pictures")]
     [TestCase("~/Pictures", null, "~/Pictures")]
@@ -360,7 +528,7 @@ public class UserConfigurationServiceTests
             .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "")
             .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(""));
         Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(""));
@@ -375,7 +543,7 @@ public class UserConfigurationServiceTests
             .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "   ")
             .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, " ");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock);
+        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
         Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo("   "));
         Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath, Is.EqualTo(" "));
@@ -398,7 +566,7 @@ public class UserConfigurationServiceTests
                 .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "$" + variableName)
                 .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + variableName + "\\Exempted");
 
-            UserConfigurationService userConfigurationService = new(configurationRootMock);
+            UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
             Assert.That(userConfigurationService.PathSettings.AssetsDirectory, Is.EqualTo(expandedValue));
             Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath,
@@ -426,7 +594,7 @@ public class UserConfigurationServiceTests
                 .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "${" + variableName + "}")
                 .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "$" + variableName);
 
-            UserConfigurationService userConfigurationService = new(configurationRootMock);
+            UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
 
             string expectedBracedPath = Path.GetFullPath("${" + variableName + "}");
             string expectedBarePath = Path.GetFullPath("$" + variableName);
@@ -438,5 +606,17 @@ public class UserConfigurationServiceTests
         {
             Environment.SetEnvironmentVariable(variableName, previousValue);
         }
+    }
+
+    private static EditableUserConfiguration CreateEditableConfiguration()
+    {
+        return new(
+            new(true, "Corrupted", "Rotated", 42, 3, 999, 1, true, true, 320, 640),
+            new(6, true, true, true),
+            new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
+                PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
+                "Frames"),
+            new(4, 12),
+            new("Dark"));
     }
 }

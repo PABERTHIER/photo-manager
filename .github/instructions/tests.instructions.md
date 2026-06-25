@@ -41,6 +41,16 @@ applyTo: "**/PhotoManager.Tests/**/*.cs"
 - 100% coverage required for new code
 - Every branch, exception path, and edge case must be tested
 
+## Cross-Platform Compatibility (NON-NEGOTIABLE)
+
+Tests run on Windows, Linux, and macOS CI — every test must pass on all three. On Linux/macOS `\` is **not** a path separator and `C:\...` paths are **not** rooted, so `Path.*` calls return different results than on Windows (e.g. `Path.GetFileName(@"C:\a\b.png")` returns the whole string, `Path.GetDirectoryName(...)` returns `""`).
+
+- Never hardcode a Windows-only absolute path (`@"C:\..."`, drive letters) that is passed to `Path.GetFileName`/`GetDirectoryName`/`GetExtension`/`Path.Combine` and then asserted.
+- Use `PathHelper.ToPlatformAbsolutePath(@"C:\Dir")` for absolute test paths fed to a `Path` API or to production path logic; use `PathHelper.ToResolvedConfigPath(@"...")` when asserting a path resolved by `UserConfigurationService`.
+- Build expected paths exactly as production does (`Path.Combine(resolvedDir, name)`), never `Path.GetFullPath(@"...\name")`.
+- Opaque path strings (stored/returned verbatim and asserted against the same literal — config values, sync definitions) are portable as-is; leave them unchanged.
+- Build real paths with `Path.Combine`, never literal separators. File names are case-sensitive on Linux — match the on-disk case. Do not assume `\r\n` / `Environment.NewLine`.
+
 ## Visibility and Testability (NON-NEGOTIABLE)
 
 - **Never use `InternalsVisibleTo`** to expose internal members for testing

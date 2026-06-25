@@ -14,8 +14,7 @@ public class SqliteConnectionFactoryConnectionStringBenchmarks
     public void Setup()
     {
         _databasePath = Path.Combine(Path.GetTempPath(),
-            "SqliteConnectionFactoryBenchmark_" + Guid.NewGuid().ToString("N"),
-            "benchmark.db");
+            "SqliteConnectionFactoryBenchmark_" + Guid.NewGuid().ToString("N"), "benchmark.db");
         _cachedConnectionString = BuildConnectionString(_databasePath);
     }
 
