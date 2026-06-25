@@ -9,6 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window for converting assets to other formats.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class ConvertAssetsWindow : Window
 {

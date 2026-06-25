@@ -8,6 +8,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window hosting the folder tree used to navigate asset directories.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class FolderNavigationWindow : Window
 {

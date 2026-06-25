@@ -14,6 +14,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Application main window hosting the primary photo-management workspace.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class MainWindow : Window
 {

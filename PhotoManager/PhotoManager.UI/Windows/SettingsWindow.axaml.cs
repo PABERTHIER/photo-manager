@@ -10,6 +10,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window for viewing and editing the application settings.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class SettingsWindow : Window
 {

@@ -7,6 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window listing the available keyboard shortcuts.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class ShortcutsWindow : Window
 {

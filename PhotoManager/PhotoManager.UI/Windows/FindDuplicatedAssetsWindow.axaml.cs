@@ -11,6 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Windows;
 
+/// <summary>
+/// Window that lists duplicated assets and lets the user review and resolve them.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class FindDuplicatedAssetsWindow : Window
 {

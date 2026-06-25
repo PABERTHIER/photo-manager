@@ -11,6 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI.Controls;
 
+/// <summary>
+/// User control that displays the currently selected asset (image or video viewer).
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class ViewerUserControl : UserControl
 {
