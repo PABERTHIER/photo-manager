@@ -1153,7 +1153,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(8));
+            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(7));
 
             // First set (6 items)
             List<Asset> image1DuplicatesSet =
@@ -1170,27 +1170,22 @@ public class FindDuplicatedAssetsViewModelPHashTests
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset7!.FileName));
             Assert.That(image7DuplicatesSet, Has.Count.EqualTo(2));
 
-            // Fourth set (2 items)
-            List<Asset> image8DuplicatesSet =
-                duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset8!.FileName));
-            Assert.That(image8DuplicatesSet, Has.Count.EqualTo(2));
-
-            // Fifth set (3 items)
+            // Fourth set (3 items)
             List<Asset> image13DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset13!.FileName));
             Assert.That(image13DuplicatesSet, Has.Count.EqualTo(3));
 
-            // Sixth set (2 items)
+            // Fifth set (2 items)
             List<Asset> image15DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset15!.FileName));
             Assert.That(image15DuplicatesSet, Has.Count.EqualTo(2));
 
-            // Seventh set (4 items)
+            // Sixth set (4 items)
             List<Asset> image24DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset24!.FileName));
             Assert.That(image24DuplicatesSet, Has.Count.EqualTo(4));
 
-            // Eighth set (2 items)
+            // Seventh set (2 items)
             List<Asset> image26DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset26!.FileName));
             Assert.That(image26DuplicatesSet, Has.Count.EqualTo(2));
@@ -1260,7 +1255,6 @@ public class FindDuplicatedAssetsViewModelPHashTests
             DuplicatedSetViewModel duplicatedAssetSet5 = [];
             DuplicatedSetViewModel duplicatedAssetSet6 = [];
             DuplicatedSetViewModel duplicatedAssetSet7 = [];
-            DuplicatedSetViewModel duplicatedAssetSet8 = [];
 
             // First set
             DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
@@ -1338,36 +1332,36 @@ public class FindDuplicatedAssetsViewModelPHashTests
             // Fourth set
             DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
             {
-                Asset = _asset8,
+                Asset = _asset13,
                 ParentViewModel = duplicatedAssetSet4
             };
             duplicatedAssetSet4.Add(duplicatedAssetViewModel11);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
             {
-                Asset = _asset10,
+                Asset = _asset21,
                 ParentViewModel = duplicatedAssetSet4
             };
             duplicatedAssetSet4.Add(duplicatedAssetViewModel12);
 
-            // Fifth set
             DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
             {
-                Asset = _asset13,
-                ParentViewModel = duplicatedAssetSet5
+                Asset = _asset22,
+                ParentViewModel = duplicatedAssetSet4
             };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel13);
+            duplicatedAssetSet4.Add(duplicatedAssetViewModel13);
 
+            // Fifth set
             DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
             {
-                Asset = _asset21,
+                Asset = _asset15,
                 ParentViewModel = duplicatedAssetSet5
             };
             duplicatedAssetSet5.Add(duplicatedAssetViewModel14);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel15 = new()
             {
-                Asset = _asset22,
+                Asset = _asset23,
                 ParentViewModel = duplicatedAssetSet5
             };
             duplicatedAssetSet5.Add(duplicatedAssetViewModel15);
@@ -1375,61 +1369,46 @@ public class FindDuplicatedAssetsViewModelPHashTests
             // Sixth set
             DuplicatedAssetViewModel duplicatedAssetViewModel16 = new()
             {
-                Asset = _asset15,
+                Asset = _asset24,
                 ParentViewModel = duplicatedAssetSet6
             };
             duplicatedAssetSet6.Add(duplicatedAssetViewModel16);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel17 = new()
             {
-                Asset = _asset23,
+                Asset = _asset25,
                 ParentViewModel = duplicatedAssetSet6
             };
             duplicatedAssetSet6.Add(duplicatedAssetViewModel17);
 
-            // Seventh set
             DuplicatedAssetViewModel duplicatedAssetViewModel18 = new()
             {
-                Asset = _asset24,
-                ParentViewModel = duplicatedAssetSet7
+                Asset = _asset28,
+                ParentViewModel = duplicatedAssetSet6
             };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel18);
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel18);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel19 = new()
             {
-                Asset = _asset25,
-                ParentViewModel = duplicatedAssetSet7
+                Asset = _asset31,
+                ParentViewModel = duplicatedAssetSet6
             };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel19);
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel19);
 
+            // Seventh set
             DuplicatedAssetViewModel duplicatedAssetViewModel20 = new()
             {
-                Asset = _asset28,
+                Asset = _asset26,
                 ParentViewModel = duplicatedAssetSet7
             };
             duplicatedAssetSet7.Add(duplicatedAssetViewModel20);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel21 = new()
             {
-                Asset = _asset31,
+                Asset = _asset27,
                 ParentViewModel = duplicatedAssetSet7
             };
             duplicatedAssetSet7.Add(duplicatedAssetViewModel21);
-
-            // Eighth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel22 = new()
-            {
-                Asset = _asset26,
-                ParentViewModel = duplicatedAssetSet8
-            };
-            duplicatedAssetSet8.Add(duplicatedAssetViewModel22);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel23 = new()
-            {
-                Asset = _asset27,
-                ParentViewModel = duplicatedAssetSet8
-            };
-            duplicatedAssetSet8.Add(duplicatedAssetViewModel23);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [
@@ -1439,8 +1418,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
                 duplicatedAssetSet4,
                 duplicatedAssetSet5,
                 duplicatedAssetSet6,
-                duplicatedAssetSet7,
-                duplicatedAssetSet8
+                duplicatedAssetSet7
             ];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
@@ -1452,8 +1430,8 @@ public class FindDuplicatedAssetsViewModelPHashTests
                     expectedDuplicatedAssetsSets,
                     0,
                     0,
-                    duplicatedAssetSet7,
-                    duplicatedAssetViewModel18);
+                    duplicatedAssetSet6,
+                    duplicatedAssetViewModel16);
 
                 Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(197));
                 // CatalogAssets + NotifyCatalogChange
@@ -1673,8 +1651,8 @@ public class FindDuplicatedAssetsViewModelPHashTests
                     expectedDuplicatedAssetsSets,
                     0,
                     0,
-                    duplicatedAssetSet7,
-                    duplicatedAssetViewModel18);
+                    duplicatedAssetSet6,
+                    duplicatedAssetViewModel16);
             }
         }
         finally

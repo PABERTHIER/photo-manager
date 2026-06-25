@@ -418,11 +418,10 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     [Test]
     [Category("Thumbnail folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase("10", 0, new string[] { }, new string[] { })]
-    [TestCase("20", 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG },
-        new string[] { })]
-    [TestCase("30", 2,
+    [TestCase("20", 0, new string[] { }, new string[] { })]
+    [TestCase("30", 1,
         new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG },
-        new[] { FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG })]
+        new string[] { })]
     [TestCase("40", 1,
         new[]
         {

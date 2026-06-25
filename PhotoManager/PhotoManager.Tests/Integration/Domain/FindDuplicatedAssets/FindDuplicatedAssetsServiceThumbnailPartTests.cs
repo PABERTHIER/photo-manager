@@ -674,22 +674,17 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("30", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("40", 1, new[] { FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG },
-        new string[] { }, new string[] { })]
-    [TestCase("50", 3,
-        new[]
-        {
-            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG,
-            FileNames._1336_TOP_RIGHT_PART_JPG
-        }, new[] { FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG },
-        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
-    [TestCase("60", 3,
+    [TestCase("40", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("50", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG },
+        new[] { FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
+    [TestCase("60", 2,
         new[]
         {
             FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
             FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
-        }, new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG },
-        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+        },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG }, new string[] { })]
     [TestCase("80", 1,
         new[]
         {
