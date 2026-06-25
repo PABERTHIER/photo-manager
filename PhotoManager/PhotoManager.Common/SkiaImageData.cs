@@ -12,6 +12,9 @@ public sealed class SkiaImageData : IImageData
 {
     private static readonly SKSamplingOptions ResizeSamplingOptions = new(SKFilterMode.Linear, SKMipmapMode.Linear);
 
+    // Rotations are exact multiples of 90°, so every pixel maps 1:1 — nearest sampling keeps it lossless.
+    private static readonly SKSamplingOptions RotationSamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None);
+
     private bool _disposed;
 
     public SkiaImageData(SKBitmap bitmap, ImageRotation rotation)
@@ -300,7 +303,7 @@ public sealed class SkiaImageData : IImageData
             canvas.Translate(newWidth / 2f, newHeight / 2f);
             canvas.RotateDegrees(degrees);
             canvas.Translate(-source.Width / 2f, -source.Height / 2f);
-            canvas.DrawBitmap(source, 0, 0);
+            canvas.DrawBitmap(source, 0, 0, RotationSamplingOptions);
         }
 
         return rotated;
