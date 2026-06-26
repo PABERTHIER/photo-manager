@@ -32,7 +32,13 @@ public class App : Avalonia.Application
         ServiceCollection serviceCollection = new();
         IConfigurationRoot configuration = BuildConfiguration();
         ConfigureServices(serviceCollection, configuration);
-        _serviceProvider = serviceCollection.BuildServiceProvider();
+
+        _serviceProvider = serviceCollection.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true
+        });
+
         ServiceProvider = _serviceProvider;
         ApplyConfiguredTheme(_serviceProvider);
 

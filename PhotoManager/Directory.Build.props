@@ -16,8 +16,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);AD0001</NoWarn>
     <!-- Temporary: suppress NuGet audit for vulnerability warnings -->
-    <NuGetAudit>false</NuGetAudit>
+    <!-- <NuGetAudit>false</NuGetAudit> -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
