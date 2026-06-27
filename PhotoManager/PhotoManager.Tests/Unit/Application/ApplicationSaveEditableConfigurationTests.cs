@@ -38,6 +38,7 @@ public class ApplicationSaveEditableConfigurationTests
             new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
                 "Frames"),
+            new(5, 1, 10, 20, 30, 25),
             new(4, 12),
             new("Dark"));
     }

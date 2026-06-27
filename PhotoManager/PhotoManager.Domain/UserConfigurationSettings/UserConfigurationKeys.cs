@@ -23,6 +23,13 @@ public static class UserConfigurationKeys
     public const string EXEMPTED_FOLDER_PATH = "appsettings:Paths:ExemptedFolderPath";
     public const string FIRST_FRAME_VIDEOS_FOLDER_NAME = "appsettings:Paths:FirstFrameVideosFolderName";
 
+    public const string READ_CONCURRENCY = "appsettings:Pipeline:ReadConcurrency";
+    public const string PROCESS_CONCURRENCY = "appsettings:Pipeline:ProcessConcurrency";
+    public const string READ_BUFFER_SIZE = "appsettings:Pipeline:ReadBufferSize";
+    public const string PROCESS_BUFFER_SIZE = "appsettings:Pipeline:ProcessBufferSize";
+    public const string PERSIST_BUFFER_SIZE = "appsettings:Pipeline:PersistBufferSize";
+    public const string PERSIST_BATCH_SIZE = "appsettings:Pipeline:PersistBatchSize";
+
     public const string PROJECT_NAME = "appsettings:Project:Name";
     public const string PROJECT_OWNER = "appsettings:Project:Owner";
 

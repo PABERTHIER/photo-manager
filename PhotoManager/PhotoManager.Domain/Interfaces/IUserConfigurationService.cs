@@ -7,6 +7,7 @@ public interface IUserConfigurationService
     AssetSettings AssetSettings { get; }
     HashSettings HashSettings { get; }
     PathSettings PathSettings { get; }
+    PipelineSettings PipelineSettings { get; }
     ProjectSettings ProjectSettings { get; }
     StorageSettings StorageSettings { get; }
     UiSettings UiSettings { get; }

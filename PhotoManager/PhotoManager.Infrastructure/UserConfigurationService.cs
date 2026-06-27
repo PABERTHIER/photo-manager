@@ -13,6 +13,7 @@ public partial class UserConfigurationService : IUserConfigurationService
     public AssetSettings AssetSettings { get; private set; } = null!;
     public HashSettings HashSettings { get; private set; } = null!;
     public PathSettings PathSettings { get; private set; } = null!;
+    public PipelineSettings PipelineSettings { get; private set; } = null!;
     public ProjectSettings ProjectSettings { get; private set; } = null!;
     public StorageSettings StorageSettings { get; private set; } = null!;
     public UiSettings UiSettings { get; private set; } = null!;
@@ -97,6 +98,7 @@ public partial class UserConfigurationService : IUserConfigurationService
         AssetSettings = configuration.AssetSettings;
         HashSettings = configuration.HashSettings;
         PathSettings = new(assetsDirectory, exemptedFolderPath, firstFrameVideosPath);
+        PipelineSettings = configuration.PipelineSettings;
         StorageSettings = configuration.StorageSettings;
         UiSettings = configuration.UiSettings;
 
@@ -129,13 +131,21 @@ public partial class UserConfigurationService : IUserConfigurationService
             readValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH),
             readValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME));
 
+        PipelineSettings pipelineSettings = new(
+            ReadValue<int>(readValue, UserConfigurationKeys.READ_CONCURRENCY),
+            ReadValue<int>(readValue, UserConfigurationKeys.PROCESS_CONCURRENCY),
+            ReadValue<int>(readValue, UserConfigurationKeys.READ_BUFFER_SIZE),
+            ReadValue<int>(readValue, UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+            ReadValue<int>(readValue, UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+            ReadValue<int>(readValue, UserConfigurationKeys.PERSIST_BATCH_SIZE));
+
         StorageSettings storageSettings = new(
             ReadValue<ushort>(readValue, UserConfigurationKeys.BACKUPS_TO_KEEP),
             ReadValue<ushort>(readValue, UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP));
 
         UiSettings uiSettings = new(readValue(UserConfigurationKeys.THEME_MODE));
 
-        return new(assetSettings, hashSettings, pathSettings, storageSettings, uiSettings);
+        return new(assetSettings, hashSettings, pathSettings, pipelineSettings, storageSettings, uiSettings);
     }
 
     private ProjectSettings ReadProjectSettings()
@@ -178,6 +188,16 @@ public partial class UserConfigurationService : IUserConfigurationService
                 ToStorageValue(configuration.PathSettings.ExemptedFolderPath),
             [UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME] =
                 configuration.PathSettings.FirstFrameVideosFolderName,
+            [UserConfigurationKeys.READ_CONCURRENCY] = ToStorageValue(configuration.PipelineSettings.ReadConcurrency),
+            [UserConfigurationKeys.PROCESS_CONCURRENCY] =
+                ToStorageValue(configuration.PipelineSettings.ProcessConcurrency),
+            [UserConfigurationKeys.READ_BUFFER_SIZE] = ToStorageValue(configuration.PipelineSettings.ReadBufferSize),
+            [UserConfigurationKeys.PROCESS_BUFFER_SIZE] =
+                ToStorageValue(configuration.PipelineSettings.ProcessBufferSize),
+            [UserConfigurationKeys.PERSIST_BUFFER_SIZE] =
+                ToStorageValue(configuration.PipelineSettings.PersistBufferSize),
+            [UserConfigurationKeys.PERSIST_BATCH_SIZE] =
+                ToStorageValue(configuration.PipelineSettings.PersistBatchSize),
             [UserConfigurationKeys.BACKUPS_TO_KEEP] = ToStorageValue(configuration.StorageSettings.BackupsToKeep),
             [UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP] =
                 ToStorageValue(configuration.StorageSettings.ThumbnailsDictionaryEntriesToKeep),

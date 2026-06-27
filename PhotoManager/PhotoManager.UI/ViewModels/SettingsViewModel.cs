@@ -30,6 +30,12 @@ public class SettingsViewModel : BaseViewModel
     public bool UsingDHash { get; set; }
     public bool UsingMD5Hash { get; set; }
     public bool UsingPHash { get; set; }
+    public int ReadConcurrency { get; set; }
+    public int ProcessConcurrency { get; set; }
+    public int ReadBufferSize { get; set; }
+    public int ProcessBufferSize { get; set; }
+    public int PersistBufferSize { get; set; }
+    public int PersistBatchSize { get; set; }
     public ushort BackupsToKeep { get; set; }
     public ushort ThumbnailsDictionaryEntriesToKeep { get; set; }
 
@@ -135,6 +141,8 @@ public class SettingsViewModel : BaseViewModel
                 ThumbnailMaxWidth),
             new(PHashThreshold, UsingDHash, UsingMD5Hash, UsingPHash),
             new(AssetsDirectory, ExemptedFolderPath, FirstFrameVideosFolderName),
+            new(ReadConcurrency, ProcessConcurrency, ReadBufferSize, ProcessBufferSize, PersistBufferSize,
+                PersistBatchSize),
             new(BackupsToKeep, ThumbnailsDictionaryEntriesToKeep),
             new(ThemeMode));
 
@@ -165,6 +173,12 @@ public class SettingsViewModel : BaseViewModel
         AssetsDirectory = configuration.PathSettings.AssetsDirectory;
         ExemptedFolderPath = configuration.PathSettings.ExemptedFolderPath;
         FirstFrameVideosFolderName = configuration.PathSettings.FirstFrameVideosFolderName;
+        ReadConcurrency = configuration.PipelineSettings.ReadConcurrency;
+        ProcessConcurrency = configuration.PipelineSettings.ProcessConcurrency;
+        ReadBufferSize = configuration.PipelineSettings.ReadBufferSize;
+        ProcessBufferSize = configuration.PipelineSettings.ProcessBufferSize;
+        PersistBufferSize = configuration.PipelineSettings.PersistBufferSize;
+        PersistBatchSize = configuration.PipelineSettings.PersistBatchSize;
         BackupsToKeep = configuration.StorageSettings.BackupsToKeep;
         ThumbnailsDictionaryEntriesToKeep = configuration.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
         ThemeMode = configuration.UiSettings.ThemeMode;
@@ -223,6 +237,42 @@ public class SettingsViewModel : BaseViewModel
         if (ThumbnailMaxWidth <= 0)
         {
             StatusMessage = "Thumbnail max width must be greater than 0.";
+            return false;
+        }
+
+        if (ReadConcurrency <= 0)
+        {
+            StatusMessage = "Read concurrency must be greater than 0.";
+            return false;
+        }
+
+        if (ProcessConcurrency < 0)
+        {
+            StatusMessage = "Process concurrency cannot be negative.";
+            return false;
+        }
+
+        if (ReadBufferSize <= 0)
+        {
+            StatusMessage = "Read buffer size must be greater than 0.";
+            return false;
+        }
+
+        if (ProcessBufferSize <= 0)
+        {
+            StatusMessage = "Process buffer size must be greater than 0.";
+            return false;
+        }
+
+        if (PersistBufferSize <= 0)
+        {
+            StatusMessage = "Persist buffer size must be greater than 0.";
+            return false;
+        }
+
+        if (PersistBatchSize <= 0)
+        {
+            StatusMessage = "Persist batch size must be greater than 0.";
             return false;
         }
 

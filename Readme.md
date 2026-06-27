@@ -169,6 +169,19 @@ Using environment variables:
 }
 ```
 
+**The `Pipeline` part is about catalog pipeline tuning (concurrency and buffering, update it only for a certain purpose):** :zap:
+
+The catalog runs as a multi-stage pipeline (read files → process and hash → persist to database).
+These settings tune how many files are handled in parallel and how large the queues between stages are.
+The defaults suit most computers; on a more powerful machine you can raise the concurrency and buffer sizes to catalog faster.
+
+- `ReadConcurrency = 4`: The maximum number of files read from disk in parallel.
+- `ProcessConcurrency = 0`: The number of parallel workers that build assets and thumbnails. `0` means use all available CPU cores.
+- `ReadBufferSize = 16`: The capacity of the queue between the read stage and the process stage.
+- `ProcessBufferSize = 32`: The capacity of the queue between the process stage and the persist stage.
+- `PersistBufferSize = 64`: The capacity of the queue between the persist stage and the result callback.
+- `PersistBatchSize = 50`: The number of assets written to the database per batch.
+
 **The `Project` part is about settings of project (there is no need to update it):** :building_construction:
 
 - `Name = "PhotoManager`: The name of the tool.
@@ -185,7 +198,7 @@ Using environment variables:
 
 ### Settings page :gear:
 
-Open **Settings > Settings...** to update the editable `Asset`, `Hash`, `Paths`, `Storage`, and `Ui` settings.
+Open **Settings > Settings...** to update the editable `Asset`, `Hash`, `Paths`, `Pipeline`, `Storage`, and `Ui` settings.
 The assets directory and exempted folder fields include a browse button that opens the native folder picker.
 Saving writes the values to the local database, so they keep overriding `appsettings.json` on the next startup.
 

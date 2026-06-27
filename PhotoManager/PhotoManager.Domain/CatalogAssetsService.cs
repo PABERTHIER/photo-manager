@@ -440,12 +440,22 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         Array.Sort(fileNames, StringComparer.Ordinal);
 
+        PipelineSettings pipelineSettings = _userConfigurationService.PipelineSettings;
+        CatalogPipelineOptions pipelineOptions = new(
+            pipelineSettings.ReadConcurrency,
+            pipelineSettings.ProcessConcurrency,
+            pipelineSettings.ReadBufferSize,
+            pipelineSettings.ProcessBufferSize,
+            pipelineSettings.PersistBufferSize,
+            pipelineSettings.PersistBatchSize);
+
         int cataloguedCount = _catalogFolderPipeline.CatalogAsync(
                 directory,
                 fileNames,
                 isAssetVideo,
                 remainingBatchCount,
                 operation,
+                pipelineOptions,
                 (result, ct) => OnCatalogPipelineResultAsync(result, callback, ct),
                 token)
             .GetAwaiter()

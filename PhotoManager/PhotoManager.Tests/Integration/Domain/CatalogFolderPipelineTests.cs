@@ -19,6 +19,7 @@ public class CatalogFolderPipelineTests
                 false,
                 maxSuccessfulAssets,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (_, _) => ValueTask.FromResult(true),
                 CancellationToken.None)
             .WaitAsync(TimeSpan.FromSeconds(5));
@@ -41,6 +42,7 @@ public class CatalogFolderPipelineTests
                 false,
                 fileNames.Length,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (_, _) => throw expectedException,
                 CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)));
 
@@ -62,6 +64,7 @@ public class CatalogFolderPipelineTests
                 false,
                 fileNames.Length,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (_, _) => ValueTask.FromResult(true),
                 CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)));
 
@@ -85,6 +88,7 @@ public class CatalogFolderPipelineTests
                 false,
                 1,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (result, _) =>
                 {
                     results.Add(result);
@@ -111,6 +115,7 @@ public class CatalogFolderPipelineTests
                 false,
                 1,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (result, _) =>
                 {
                     results.Add(result);
@@ -143,6 +148,7 @@ public class CatalogFolderPipelineTests
                 false,
                 1,
                 CatalogAssetPipelineOperation.Create,
+                new(),
                 (result, _) =>
                 {
                     results.Add(result);
@@ -200,6 +206,7 @@ public class CatalogFolderPipelineTests
                         false,
                         1,
                         CatalogAssetPipelineOperation.Create,
+                        new(),
                         OnResultAsync,
                         cancellationToken)
                     .WaitAsync(TimeSpan.FromSeconds(5)));
@@ -239,6 +246,7 @@ public class CatalogFolderPipelineTests
                         false,
                         2,
                         CatalogAssetPipelineOperation.Create,
+                        new(),
                         OnResultAsync,
                         cancellationToken)
                     .WaitAsync(TimeSpan.FromSeconds(5)));

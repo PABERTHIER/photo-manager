@@ -105,6 +105,13 @@ public class ApplicationGetEditableConfigurationTests
             Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
         Assert.That(result.PathSettings.FirstFrameVideosFolderName, Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
 
+        Assert.That(result.PipelineSettings.ReadConcurrency, Is.EqualTo(3));
+        Assert.That(result.PipelineSettings.ProcessConcurrency, Is.EqualTo(2));
+        Assert.That(result.PipelineSettings.ReadBufferSize, Is.EqualTo(8));
+        Assert.That(result.PipelineSettings.ProcessBufferSize, Is.EqualTo(16));
+        Assert.That(result.PipelineSettings.PersistBufferSize, Is.EqualTo(24));
+        Assert.That(result.PipelineSettings.PersistBatchSize, Is.EqualTo(20));
+
         Assert.That(result.StorageSettings.BackupsToKeep, Is.EqualTo(2));
         Assert.That(result.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
 
@@ -147,6 +154,13 @@ public class ApplicationGetEditableConfigurationTests
             Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted")));
         Assert.That(result.PathSettings.FirstFrameVideosFolderName, Is.EqualTo("Frames"));
 
+        Assert.That(result.PipelineSettings.ReadConcurrency, Is.EqualTo(5));
+        Assert.That(result.PipelineSettings.ProcessConcurrency, Is.EqualTo(1));
+        Assert.That(result.PipelineSettings.ReadBufferSize, Is.EqualTo(10));
+        Assert.That(result.PipelineSettings.ProcessBufferSize, Is.EqualTo(20));
+        Assert.That(result.PipelineSettings.PersistBufferSize, Is.EqualTo(30));
+        Assert.That(result.PipelineSettings.PersistBatchSize, Is.EqualTo(25));
+
         Assert.That(result.StorageSettings.BackupsToKeep, Is.EqualTo(4));
         Assert.That(result.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(12));
 
@@ -178,6 +192,7 @@ public class ApplicationGetEditableConfigurationTests
             new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
                 "Frames"),
+            new(5, 1, 10, 20, 30, 25),
             new(4, 12),
             new("Dark"));
     }

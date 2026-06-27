@@ -6,7 +6,7 @@ public sealed class CatalogFolderPipeline(IFileOperationsService fileOperationsS
     IAssetCreationService assetCreationService, IAssetRepository assetRepository)
 {
     public async Task<int> CatalogAsync(string directory, IReadOnlyList<string> fileNames, bool isAssetVideo,
-        int maxSuccessfulAssets, CatalogAssetPipelineOperation operation,
+        int maxSuccessfulAssets, CatalogAssetPipelineOperation operation, CatalogPipelineOptions options,
         Func<CatalogPipelineResult, CancellationToken, ValueTask<bool>> onResultAsync, CancellationToken token)
     {
         if (maxSuccessfulAssets <= 0 || fileNames.Count == 0)
@@ -14,7 +14,6 @@ public sealed class CatalogFolderPipeline(IFileOperationsService fileOperationsS
             return 0;
         }
 
-        CatalogPipelineOptions options = new();
         int queuedCount = fileNames.Count;
         CatalogPipelineFileItem[] items = new CatalogPipelineFileItem[queuedCount];
 
