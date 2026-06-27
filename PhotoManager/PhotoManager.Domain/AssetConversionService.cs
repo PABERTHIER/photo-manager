@@ -11,7 +11,6 @@ public class AssetConversionService(IFileOperationsService fileOperationsService
     public async Task<AssetConversionResult> ConvertAssetsAsync(AssetConversionRequest request,
         AssetConversionProgressCallback callback, CancellationToken token = default)
     {
-        ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(callback);
 
         if (request.FilePaths.Count == 0)

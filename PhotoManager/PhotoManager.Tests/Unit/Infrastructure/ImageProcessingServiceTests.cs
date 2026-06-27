@@ -91,15 +91,15 @@ public class ImageProcessingServiceTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImage_NullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -228,15 +228,15 @@ public class ImageProcessingServiceTests
 
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImageAssetRepository_NullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() =>
                 _imageProcessingService!.LoadBitmapThumbnailImage(buffer!, ImageRotation.Rotate0, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -499,15 +499,15 @@ public class ImageProcessingServiceTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapThumbnailImage_HeicNullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImage_HeicNullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _imageProcessingService!.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -821,18 +821,21 @@ public class ImageProcessingServiceTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
-    public void GetImageDimensions_NullBuffer_ThrowsArgumentNullException()
+    public void GetImageDimensions_NullBuffer_ThrowsNotSupportedException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
+        const string expectedExceptionMessage =
+            "No imaging component suitable to complete this operation was found.";
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
                 _imageProcessingService!.GetImageDimensions(buffer!, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
 
-        _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(ImageProcessingService));
     }
 
     [Test]

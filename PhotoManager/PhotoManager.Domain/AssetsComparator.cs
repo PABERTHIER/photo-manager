@@ -28,9 +28,6 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
     {
-        ArgumentNullException.ThrowIfNull(sourceFileNames, "first");
-        ArgumentNullException.ThrowIfNull(destinationFileNames, "second");
-
         HashSet<string> destinationSet = CreateHashSet(destinationFileNames);
         List<string> result = new(sourceFileNames.Length);
         HashSet<string> resultSet = [];
@@ -71,8 +68,6 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
     {
-        ArgumentNullException.ThrowIfNull(cataloguedAssets, "source");
-
         List<string> result = new(cataloguedAssets.Count);
 
         foreach (Asset cataloguedAsset in CollectionsMarshal.AsSpan(cataloguedAssets))
@@ -104,9 +99,6 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetDeletedFileNamesToSync(string[] fileNames, string[] destinationFileNames)
     {
-        ArgumentNullException.ThrowIfNull(destinationFileNames, "first");
-        ArgumentNullException.ThrowIfNull(fileNames, "second");
-
         HashSet<string> fileNameSet = CreateHashSet(fileNames);
         List<string> result = new(destinationFileNames.Length);
         HashSet<string> resultSet = [];

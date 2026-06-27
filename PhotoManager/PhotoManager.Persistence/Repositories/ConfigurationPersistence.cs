@@ -1,4 +1,4 @@
-using PhotoManager.Domain.Interfaces.Persistence.Repositories;
+﻿using PhotoManager.Domain.Interfaces.Persistence.Repositories;
 using PhotoManager.Persistence.Sqlite;
 
 namespace PhotoManager.Persistence.Repositories;
@@ -61,8 +61,6 @@ internal sealed class ConfigurationPersistence(ISqliteConnectionFactory connecti
 
     public void SetValues(IReadOnlyDictionary<string, string> values)
     {
-        ArgumentNullException.ThrowIfNull(values);
-
         if (values.Count == 0)
         {
             return;

@@ -78,19 +78,16 @@ public static class BitmapHelper
 
     public static byte[] GetJpegBitmapImage(IImageData image)
     {
-        ArgumentNullException.ThrowIfNull(image);
         return image.ToByteArray(ImageEncodingFormat.Jpeg);
     }
 
     public static byte[] GetPngBitmapImage(IImageData image)
     {
-        ArgumentNullException.ThrowIfNull(image);
         return image.ToByteArray(ImageEncodingFormat.Png);
     }
 
     public static byte[] GetGifBitmapImage(IImageData image)
     {
-        ArgumentNullException.ThrowIfNull(image);
         return image.ToByteArray(ImageEncodingFormat.Gif);
     }
 
@@ -114,8 +111,6 @@ public static class BitmapHelper
 
     public static (int width, int height) GetImageDimensions(byte[] buffer, ImageRotation rotation, ILogger logger)
     {
-        ArgumentNullException.ThrowIfNull(buffer);
-
         (int rawWidth, int rawHeight) = TryReadDimensionsFromHeader(buffer);
 
         if (rawWidth <= 0 || rawHeight <= 0)
@@ -368,8 +363,6 @@ public static class BitmapHelper
 
     private static void ValidateBuffer(byte[] buffer)
     {
-        ArgumentNullException.ThrowIfNull(buffer);
-
         if (buffer.Length == 0)
         {
             throw new ArgumentException("Value cannot be empty.", nameof(buffer));

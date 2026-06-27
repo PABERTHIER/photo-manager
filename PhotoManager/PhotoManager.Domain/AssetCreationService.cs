@@ -18,9 +18,6 @@ public class AssetCreationService(
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(directoryName);
-            ArgumentNullException.ThrowIfNull(fileName);
-
             if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
             {
                 // Create an asset from the video file
@@ -74,10 +71,6 @@ public class AssetCreationService(
     {
         try
         {
-            ArgumentNullException.ThrowIfNull(directoryName);
-            ArgumentNullException.ThrowIfNull(fileName);
-            ArgumentNullException.ThrowIfNull(imageBytes);
-
             if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
             {
                 VideoHelper.GetFirstFramePath(directoryName, fileName,

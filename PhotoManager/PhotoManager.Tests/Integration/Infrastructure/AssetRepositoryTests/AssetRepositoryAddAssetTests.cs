@@ -512,14 +512,14 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_ThumbnailDataIsNull_ThrowsArgumentNullExceptionAndDoesNotMutateCatalog()
+    public void AddAsset_ThumbnailDataIsNull_ThrowsInvalidOperationExceptionAndDoesNotMutateCatalog()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            const string exceptionMessage = "Value cannot be null. (Parameter 'thumbnailData')";
+            const string exceptionMessage = "Value must be set.";
 
             string folderPath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _assetRepository!.AddFolder(folderPath);
@@ -529,11 +529,10 @@ public class AssetRepositoryAddAssetTests
             Asset[] assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            ArgumentNullException? exception =
-                Assert.Throws<ArgumentNullException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
+            InvalidOperationException? exception =
+                Assert.Throws<InvalidOperationException>(() => _assetRepository.AddAsset(_asset1!, assetData!));
 
             Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
-            Assert.That(exception?.ParamName, Is.EqualTo("thumbnailData"));
 
             assets = _assetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);

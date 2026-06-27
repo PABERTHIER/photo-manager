@@ -97,17 +97,17 @@ public class ApplicationConvertAssetsAsyncTests
     }
 
     [Test]
-    public void ConvertAssetsAsync_NullRequest_ThrowsArgumentNullException()
+    public void ConvertAssetsAsync_NullRequest_ThrowsNullReferenceException()
     {
         ConfigureApplication();
 
         AssetConversionRequest? request = null;
         List<AssetConversionProgressEventArgs> progressEvents = [];
 
-        ArgumentNullException? exception = Assert.ThrowsAsync<ArgumentNullException>(async () =>
+        NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () =>
             await _application!.ConvertAssetsAsync(request!, progressEvents.Add));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'request')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         Assert.That(progressEvents, Is.Empty);
         Assert.That(Directory.Exists(_convertedDirectory!), Is.False);

@@ -214,8 +214,6 @@ public class AssetRepository : IAssetRepository, IDisposable
                 return false;
             }
 
-            ArgumentNullException.ThrowIfNull(thumbnailData);
-
             AddAssetCore(asset, thumbnailData);
 
             return true;
@@ -232,7 +230,6 @@ public class AssetRepository : IAssetRepository, IDisposable
     public int AddAssets(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails)
     {
         ThrowIfDisposed();
-        ArgumentNullException.ThrowIfNull(assetsWithThumbnails);
 
         if (assetsWithThumbnails.Count == 0)
         {
@@ -252,8 +249,6 @@ public class AssetRepository : IAssetRepository, IDisposable
                         assetWithThumbnail.Asset.FileName);
                     return 0;
                 }
-
-                ArgumentNullException.ThrowIfNull(assetWithThumbnail.ThumbnailData);
             }
 
             AssetWithThumbnail[] canonicalAssetsWithThumbnails;
@@ -314,7 +309,6 @@ public class AssetRepository : IAssetRepository, IDisposable
     public IReadOnlyList<Asset> DeleteAssets(string directory, IReadOnlyList<string> deletedFileNames)
     {
         ThrowIfDisposed();
-        ArgumentNullException.ThrowIfNull(deletedFileNames);
 
         if (deletedFileNames.Count == 0)
         {
