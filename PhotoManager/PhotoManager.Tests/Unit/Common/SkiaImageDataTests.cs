@@ -277,9 +277,9 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytes_NullBuffer_ThrowsArgumentNullException()
+    public void FromEncodedBytes_NullBuffer_ThrowsNullReferenceException()
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<NullReferenceException>(() =>
             SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -327,9 +327,9 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytes_WithResizeNullBuffer_ThrowsArgumentNullException()
+    public void FromEncodedBytes_WithResizeNullBuffer_ThrowsNullReferenceException()
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<NullReferenceException>(() =>
             SkiaImageData.FromEncodedBytes(null!, ImageRotation.Rotate0, 100, 100, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -416,9 +416,9 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytesWithRotation_NullBuffer_ThrowsArgumentNullException()
+    public void FromEncodedBytesWithRotation_NullBuffer_ThrowsNullReferenceException()
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<NullReferenceException>(() =>
             SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));
@@ -475,9 +475,9 @@ public class SkiaImageDataTests
     }
 
     [Test]
-    public void FromEncodedBytesWithRotation_WithResizeNullBuffer_ThrowsArgumentNullException()
+    public void FromEncodedBytesWithRotation_WithResizeNullBuffer_ThrowsNullReferenceException()
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<NullReferenceException>(() =>
             SkiaImageData.FromEncodedBytesWithRotation(null!, ImageRotation.Rotate0, 100, 100, _testLogger!));
 
         _testLogger!.AssertLogExceptions([], typeof(SkiaImageData));

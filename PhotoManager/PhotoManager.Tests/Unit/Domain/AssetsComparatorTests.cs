@@ -562,15 +562,15 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetNewFileNamesToSync_SourceFileNamesIsNull_ThrowsArgumentNullException()
+    public void GetNewFileNamesToSync_SourceFileNamesIsNull_ThrowsNullReferenceException()
     {
         string[]? sourceFileNames = null;
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -587,16 +587,16 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetNewFileNamesToSync_DestinationFileNamesIsNull_ThrowsArgumentNullException()
+    public void GetNewFileNamesToSync_DestinationFileNamesIsNull_ThrowsNullReferenceException()
     {
         string[] sourceFileNames =
             ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[]? destinationFileNames = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -719,14 +719,14 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetUpdatedFileNames_CataloguedAssetsIsNull_ThrowsArgumentNullException()
+    public void GetUpdatedFileNames_CataloguedAssetsIsNull_ThrowsNullReferenceException()
     {
         List<Asset>? cataloguedAssets = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -1169,15 +1169,15 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetDeletedFileNamesToSync_SourceFileNamesIsNull_ThrowsArgumentNullException()
+    public void GetDeletedFileNamesToSync_SourceFileNamesIsNull_ThrowsNullReferenceException()
     {
         string[]? sourceFileNames = null;
         string[] destinationFileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"];
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -1193,15 +1193,15 @@ public class AssetsComparatorTests
     }
 
     [Test]
-    public void GetDeletedFileNamesToSync_DestinationFileNamesIsNull_ThrowsArgumentNullException()
+    public void GetDeletedFileNamesToSync_DestinationFileNamesIsNull_ThrowsNullReferenceException()
     {
         string[] sourceFileNames =
             ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         string[]? destinationFileNames = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 }

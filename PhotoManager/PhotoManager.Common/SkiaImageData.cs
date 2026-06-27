@@ -162,8 +162,6 @@ public sealed class SkiaImageData : IImageData
     /// </summary>
     public static SkiaImageData FromBitmapWithRotation(SKBitmap bitmap, ImageRotation rotation)
     {
-        ArgumentNullException.ThrowIfNull(bitmap);
-
         if (rotation == ImageRotation.Rotate0)
         {
             return new(bitmap, ImageRotation.Rotate0);
@@ -185,8 +183,6 @@ public sealed class SkiaImageData : IImageData
     /// </summary>
     public static SkiaImageData FromEncodedStreamWithRotation(Stream stream, ImageRotation rotation)
     {
-        ArgumentNullException.ThrowIfNull(stream);
-
         SKBitmap decoded = SKBitmap.Decode(stream);
 
         if (rotation == ImageRotation.Rotate0)
@@ -272,8 +268,6 @@ public sealed class SkiaImageData : IImageData
 
     private static void ValidateBuffer(byte[] buffer, ILogger logger)
     {
-        ArgumentNullException.ThrowIfNull(buffer);
-
         if (buffer.Length == 0)
         {
             ArgumentException exception = new("Value cannot be empty.", nameof(buffer));

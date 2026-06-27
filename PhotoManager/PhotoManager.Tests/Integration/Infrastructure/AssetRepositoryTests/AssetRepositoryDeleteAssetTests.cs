@@ -408,7 +408,7 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_FileNameIsNull_LogsItAndThrowsArgumentNullExceptionAndAssetsUpdatedIsNotUpdated()
+    public void DeleteAsset_FileNameIsNull_LogsItAndThrowsInvalidOperationExceptionAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =
@@ -416,7 +416,7 @@ public class AssetRepositoryDeleteAssetTests
 
         try
         {
-            const string exceptionMessage = "Value cannot be null. (Parameter 'fileName')";
+            const string exceptionMessage = "Must add values for the following parameters: $fileName";
 
             string folderPath1 = Path.Combine(_assetsDirectory!, Directories.TEST_FOLDER_1);
             string? assetFileName = null;
@@ -439,7 +439,7 @@ public class AssetRepositoryDeleteAssetTests
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
                 Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-                ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+                InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() =>
                     _assetRepository!.DeleteAsset(folderPath1, assetFileName!));
 
                 Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));

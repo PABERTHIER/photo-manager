@@ -120,12 +120,15 @@ public class ImageMetadataServiceTests
     }
 
     [Test]
-    public void UpdateAssetsFileProperties_NullFilePropertiesByName_ThrowsArgumentNullException()
+    public void UpdateAssetsFileProperties_NullFilePropertiesByName_ThrowsNullReferenceException()
     {
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-            _imageMetadataService!.UpdateAssetsFileProperties([], null!));
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
+        Asset asset = CreateAsset(folder, "existing.jpg");
 
-        Assert.That(exception?.ParamName, Is.EqualTo("filePropertiesByName"));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
+            _imageMetadataService!.UpdateAssetsFileProperties([asset], null!));
+
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageMetadataService));
     }

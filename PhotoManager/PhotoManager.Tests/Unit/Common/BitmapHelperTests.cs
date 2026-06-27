@@ -87,15 +87,15 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImage_NullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100, _testLogger!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -316,16 +316,16 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapThumbnailImage_HeicNullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImage_HeicNullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100,
                 new TestLogger<BitmapHelperTests>()));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -762,15 +762,15 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapThumbnailImageAssetRepository_NullBuffer_ThrowsNullReferenceException()
     {
         byte[]? buffer = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() =>
                 BitmapHelper.LoadBitmapThumbnailImage(buffer!, ImageRotation.Rotate0, 100, 100, _testLogger!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -1069,14 +1069,14 @@ public class BitmapHelperTests
     }
 
     [Test]
-    public void GetJpegBitmapImage_NullImage_ThrowsArgumentNullException()
+    public void GetJpegBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetJpegBitmapImage(invalidImage!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => BitmapHelper.GetJpegBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -1172,14 +1172,14 @@ public class BitmapHelperTests
     }
 
     [Test]
-    public void GetPngBitmapImage_NullImage_ThrowsArgumentNullException()
+    public void GetPngBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetPngBitmapImage(invalidImage!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => BitmapHelper.GetPngBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -1288,14 +1288,14 @@ public class BitmapHelperTests
     }
 
     [Test]
-    public void GetGifBitmapImage_NullImage_ThrowsArgumentException()
+    public void GetGifBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
     }
@@ -1456,18 +1456,20 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetCreationService for CreateAsset() to get image dimensions")]
-    public void GetImageDimensions_NullBuffer_ThrowsArgumentNullException()
+    public void GetImageDimensions_NullBuffer_ThrowsNotSupportedException()
     {
         byte[]? buffer = null;
         const ImageRotation rotation = ImageRotation.Rotate90;
+        const string expectedExceptionMessage = "No imaging component suitable to complete this operation was found.";
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() =>
                 BitmapHelper.GetImageDimensions(buffer!, rotation, _testLogger!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
+        Assert.That(exception?.Message, Is.EqualTo(expectedExceptionMessage));
 
-        _testLogger!.AssertLogExceptions([], typeof(BitmapHelperTests));
+        _testLogger!.AssertLogExceptions([new NotSupportedException(expectedExceptionMessage)],
+            typeof(BitmapHelperTests));
     }
 
     [Test]

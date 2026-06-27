@@ -158,14 +158,14 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetJpegBitmapImage_NullImage_ThrowsArgumentNullException()
+    public void GetJpegBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _imageProcessingService!.GetJpegBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -260,14 +260,14 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetPngBitmapImage_NullImage_ThrowsArgumentNullException()
+    public void GetPngBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => _imageProcessingService!.GetPngBitmapImage(invalidImage!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _imageProcessingService!.GetPngBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }
@@ -362,14 +362,14 @@ public class ImageProcessingServiceTests
     }
 
     [Test]
-    public void GetGifBitmapImage_NullImage_ThrowsArgumentException()
+    public void GetGifBitmapImage_NullImage_ThrowsNullReferenceException()
     {
         IImageData? invalidImage = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => _imageProcessingService!.GetGifBitmapImage(invalidImage!));
+        NullReferenceException? exception =
+            Assert.Throws<NullReferenceException>(() => _imageProcessingService!.GetGifBitmapImage(invalidImage!));
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'image')"));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
         _testLogger!.AssertLogExceptions([], typeof(ImageProcessingService));
     }

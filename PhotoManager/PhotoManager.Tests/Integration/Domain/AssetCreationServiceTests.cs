@@ -2005,7 +2005,7 @@ public class AssetCreationServiceTests
 
         const string assetName = FileNames.IMAGE_1_JPG;
         _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
-        string? directoryName = null;
+        string? path1 = null;
 
         string imagePath = Path.Combine(_assetsDirectory!, assetName);
         Assert.That(File.Exists(imagePath), Is.True);
@@ -2013,14 +2013,15 @@ public class AssetCreationServiceTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName);
+        Asset? asset = _assetCreationService!.CreateAsset(path1!, assetName);
 
         Assert.That(asset, Is.Null);
 
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        ArgumentNullException argumentNullException = new(nameof(directoryName));
+        // The null directoryName is rejected by Path.Combine, whose first parameter is named "path1"
+        ArgumentNullException argumentNullException = new(nameof(path1));
         _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
@@ -2091,20 +2092,21 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        string? fileName = null;
+        string? path2 = null;
         _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, fileName!);
+        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, path2!);
 
         Assert.That(asset, Is.Null);
 
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        ArgumentNullException argumentNullException = new(nameof(fileName));
+        // The null fileName is rejected by Path.Combine, whose second parameter is named "path2"
+        ArgumentNullException argumentNullException = new(nameof(path2));
         _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
@@ -2803,7 +2805,7 @@ public class AssetCreationServiceTests
 
         const string assetName = FileNames.HOMER_MP4;
         _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
-        string? directoryName = null;
+        string? path1 = null;
 
         string imagePath = Path.Combine(_assetsDirectory!, assetName);
         Assert.That(File.Exists(imagePath), Is.True);
@@ -2811,7 +2813,7 @@ public class AssetCreationServiceTests
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        Asset? asset = _assetCreationService!.CreateAsset(directoryName!, assetName, true);
+        Asset? asset = _assetCreationService!.CreateAsset(path1!, assetName, true);
 
         Assert.That(asset, Is.Null);
 
@@ -2822,7 +2824,8 @@ public class AssetCreationServiceTests
         string firstFrameGeneratedPath = Path.Combine(firstFrameVideosPath, FileNames.HOMER_JPG);
         Assert.That(File.Exists(firstFrameGeneratedPath), Is.False);
 
-        ArgumentNullException argumentNullException = new(nameof(directoryName));
+        // The null directoryName is rejected by Path.Combine, whose first parameter is named "path1"
+        ArgumentNullException argumentNullException = new(nameof(path1));
         _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 
@@ -2919,20 +2922,21 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
 
-        string? fileName = null;
+        string? path2 = null;
         _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
         List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, fileName!, true);
+        Asset? asset = _assetCreationService!.CreateAsset(_assetsDirectory!, path2!, true);
 
         Assert.That(asset, Is.Null);
 
         assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
         Assert.That(assetsFromRepository, Is.Empty);
 
-        ArgumentNullException argumentNullException = new(nameof(fileName));
+        // The null fileName is rejected by Path.Combine, whose second parameter is named "path2"
+        ArgumentNullException argumentNullException = new(nameof(path2));
         _testLogger!.AssertLogExceptions([argumentNullException], typeof(AssetCreationService));
     }
 

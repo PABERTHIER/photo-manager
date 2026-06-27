@@ -61,8 +61,6 @@ public partial class UserConfigurationService : IUserConfigurationService
 
     public void SaveEditableConfiguration(EditableUserConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(configuration);
-
         ApplyEditableConfiguration(configuration);
         PersistEditableConfiguration(configuration);
     }

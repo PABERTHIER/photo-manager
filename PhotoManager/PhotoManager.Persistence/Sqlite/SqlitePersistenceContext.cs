@@ -94,8 +94,6 @@ public sealed class SqlitePersistenceContext(
     public void UpsertAssetWithThumbnail(Asset asset, byte[] thumbnailData)
     {
         EnsureInitialized();
-        ArgumentNullException.ThrowIfNull(asset);
-        ArgumentNullException.ThrowIfNull(thumbnailData);
 
         using (SqliteConnection connection = factory.Open())
         {
@@ -126,7 +124,6 @@ public sealed class SqlitePersistenceContext(
     public void UpsertAssetsWithThumbnails(IReadOnlyList<AssetWithThumbnail> assetsWithThumbnails)
     {
         EnsureInitialized();
-        ArgumentNullException.ThrowIfNull(assetsWithThumbnails);
 
         if (assetsWithThumbnails.Count == 0)
         {
@@ -205,7 +202,6 @@ public sealed class SqlitePersistenceContext(
     public void DeleteAssetWithThumbnail(Guid folderId, string fileName)
     {
         EnsureInitialized();
-        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
 
         using (SqliteConnection connection = factory.Open())
         {
@@ -226,7 +222,6 @@ public sealed class SqlitePersistenceContext(
     public void DeleteAssetsWithThumbnails(Guid folderId, IReadOnlyList<string> fileNames)
     {
         EnsureInitialized();
-        ArgumentNullException.ThrowIfNull(fileNames);
 
         if (fileNames.Count == 0)
         {
@@ -261,7 +256,6 @@ public sealed class SqlitePersistenceContext(
                         for (int i = 0; i < fileNames.Count; i++)
                         {
                             string fileName = fileNames[i];
-                            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
 
                             thumbnailFileName.Value = fileName;
                             thumbnailCommand.ExecuteNonQuery();
