@@ -531,6 +531,7 @@ public class CatalogAssetsServiceTests
         AssetSettings assetSettings = new(true, "The asset is corrupted", "The asset has been rotated",
             catalogBatchSize, 0, 0, 1, false, false, 150, 200);
         userConfigurationService.AssetSettings.Returns(assetSettings);
+        userConfigurationService.PipelineSettings.Returns(new PipelineSettings(4, 0, 16, 32, 64, 50));
         userConfigurationService.GetRootCatalogFolderPaths().Returns([AssetsDirectory]);
 
         return userConfigurationService;

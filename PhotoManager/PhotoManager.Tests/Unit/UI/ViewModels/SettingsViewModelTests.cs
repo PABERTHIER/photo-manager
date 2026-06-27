@@ -51,6 +51,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             PathHelper.ToPlatformAbsolutePath("D:\\Photos"),
@@ -82,6 +88,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             PathHelper.ToPlatformAbsolutePath("D:\\Photos"),
@@ -132,6 +144,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             PathHelper.ToPlatformAbsolutePath("D:\\Photos"),
@@ -164,6 +182,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             PathHelper.ToPlatformAbsolutePath("D:\\Photos"),
@@ -229,6 +253,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             string.Empty,
@@ -258,6 +288,12 @@ public class SettingsViewModelTests
             true,
             true,
             true,
+            5,
+            1,
+            10,
+            20,
+            30,
+            25,
             4,
             12,
             string.Empty,
@@ -275,6 +311,7 @@ public class SettingsViewModelTests
             new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
                 "Frames"),
+            new(5, 1, 10, 20, 30, 25),
             new(4, 12),
             new("Dark"));
     }
@@ -299,6 +336,18 @@ public class SettingsViewModelTests
             "Thumbnail max height must be greater than 0.");
         yield return InvalidSettingsCase(static viewModel => viewModel.ThumbnailMaxWidth = 0,
             "Thumbnail max width must be greater than 0.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.ReadConcurrency = 0,
+            "Read concurrency must be greater than 0.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.ProcessConcurrency = -1,
+            "Process concurrency cannot be negative.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.ReadBufferSize = 0,
+            "Read buffer size must be greater than 0.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.ProcessBufferSize = 0,
+            "Process buffer size must be greater than 0.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.PersistBufferSize = 0,
+            "Persist buffer size must be greater than 0.");
+        yield return InvalidSettingsCase(static viewModel => viewModel.PersistBatchSize = 0,
+            "Persist batch size must be greater than 0.");
         yield return InvalidSettingsCase(static viewModel => viewModel.BackupsToKeep = 0,
             "Backups to keep must be greater than 0.");
         yield return InvalidSettingsCase(static viewModel => viewModel.ThumbnailsDictionaryEntriesToKeep = 0,
@@ -351,6 +400,12 @@ public class SettingsViewModelTests
         Assert.That(_settingsViewModel.UsingDHash, Is.True);
         Assert.That(_settingsViewModel.UsingMD5Hash, Is.True);
         Assert.That(_settingsViewModel.UsingPHash, Is.True);
+        Assert.That(_settingsViewModel.ReadConcurrency, Is.EqualTo(5));
+        Assert.That(_settingsViewModel.ProcessConcurrency, Is.EqualTo(1));
+        Assert.That(_settingsViewModel.ReadBufferSize, Is.EqualTo(10));
+        Assert.That(_settingsViewModel.ProcessBufferSize, Is.EqualTo(20));
+        Assert.That(_settingsViewModel.PersistBufferSize, Is.EqualTo(30));
+        Assert.That(_settingsViewModel.PersistBatchSize, Is.EqualTo(25));
         Assert.That(_settingsViewModel.BackupsToKeep, Is.EqualTo(4));
         Assert.That(_settingsViewModel.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(12));
         Assert.That(_settingsViewModel.AssetsDirectory, Is.EqualTo(
@@ -379,6 +434,12 @@ public class SettingsViewModelTests
         bool usingDHash,
         bool usingMD5Hash,
         bool usingPHash,
+        int readConcurrency,
+        int processConcurrency,
+        int readBufferSize,
+        int processBufferSize,
+        int persistBufferSize,
+        int persistBatchSize,
         ushort backupsToKeep,
         ushort thumbnailsDictionaryEntriesToKeep,
         string assetsDirectory,
@@ -405,6 +466,12 @@ public class SettingsViewModelTests
         Assert.That(settingsViewModelInstance.UsingDHash, Is.EqualTo(usingDHash));
         Assert.That(settingsViewModelInstance.UsingMD5Hash, Is.EqualTo(usingMD5Hash));
         Assert.That(settingsViewModelInstance.UsingPHash, Is.EqualTo(usingPHash));
+        Assert.That(settingsViewModelInstance.ReadConcurrency, Is.EqualTo(readConcurrency));
+        Assert.That(settingsViewModelInstance.ProcessConcurrency, Is.EqualTo(processConcurrency));
+        Assert.That(settingsViewModelInstance.ReadBufferSize, Is.EqualTo(readBufferSize));
+        Assert.That(settingsViewModelInstance.ProcessBufferSize, Is.EqualTo(processBufferSize));
+        Assert.That(settingsViewModelInstance.PersistBufferSize, Is.EqualTo(persistBufferSize));
+        Assert.That(settingsViewModelInstance.PersistBatchSize, Is.EqualTo(persistBatchSize));
         Assert.That(settingsViewModelInstance.BackupsToKeep, Is.EqualTo(backupsToKeep));
         Assert.That(settingsViewModelInstance.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(
             thumbnailsDictionaryEntriesToKeep));
@@ -434,6 +501,12 @@ public class SettingsViewModelTests
         bool usingDHash,
         bool usingMD5Hash,
         bool usingPHash,
+        int readConcurrency,
+        int processConcurrency,
+        int readBufferSize,
+        int processBufferSize,
+        int persistBufferSize,
+        int persistBatchSize,
         ushort backupsToKeep,
         ushort thumbnailsDictionaryEntriesToKeep,
         string assetsDirectory,
@@ -471,6 +544,12 @@ public class SettingsViewModelTests
                 usingDHash,
                 usingMD5Hash,
                 usingPHash,
+                readConcurrency,
+                processConcurrency,
+                readBufferSize,
+                processBufferSize,
+                persistBufferSize,
+                persistBatchSize,
                 backupsToKeep,
                 thumbnailsDictionaryEntriesToKeep,
                 assetsDirectory,

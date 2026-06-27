@@ -99,6 +99,13 @@ public class ApplicationSaveEditableConfigurationTests
         Assert.That(applicationEditableConfiguration.PathSettings.FirstFrameVideosFolderName,
             Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
 
+        Assert.That(applicationEditableConfiguration.PipelineSettings.ReadConcurrency, Is.EqualTo(3));
+        Assert.That(applicationEditableConfiguration.PipelineSettings.ProcessConcurrency, Is.EqualTo(2));
+        Assert.That(applicationEditableConfiguration.PipelineSettings.ReadBufferSize, Is.EqualTo(8));
+        Assert.That(applicationEditableConfiguration.PipelineSettings.ProcessBufferSize, Is.EqualTo(16));
+        Assert.That(applicationEditableConfiguration.PipelineSettings.PersistBufferSize, Is.EqualTo(24));
+        Assert.That(applicationEditableConfiguration.PipelineSettings.PersistBatchSize, Is.EqualTo(20));
+
         Assert.That(applicationEditableConfiguration.StorageSettings.BackupsToKeep, Is.EqualTo(2));
         Assert.That(applicationEditableConfiguration.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
 
@@ -145,6 +152,19 @@ public class ApplicationSaveEditableConfigurationTests
         Assert.That(
             _sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
             Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
+
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+            Is.EqualTo("3"));
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+            Is.EqualTo("2"));
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+            Is.EqualTo("8"));
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+            Is.EqualTo("16"));
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+            Is.EqualTo("24"));
+        Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+            Is.EqualTo("20"));
 
         Assert.That(_sqlitePersistenceContext!.Configuration.GetValue(UserConfigurationKeys.BACKUPS_TO_KEEP),
             Is.EqualTo("2"));
@@ -202,6 +222,19 @@ public class ApplicationSaveEditableConfigurationTests
             _sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
             Is.EqualTo("Frames"));
 
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+            Is.EqualTo("5"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+            Is.EqualTo("1"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+            Is.EqualTo("10"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+            Is.EqualTo("20"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+            Is.EqualTo("30"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+            Is.EqualTo("25"));
+
         Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.BACKUPS_TO_KEEP),
             Is.EqualTo("4"));
         Assert.That(_sqlitePersistenceContext.Configuration.GetValue(
@@ -254,6 +287,13 @@ public class ApplicationSaveEditableConfigurationTests
             Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted")));
         Assert.That(reloadedConfiguration.PathSettings.FirstFrameVideosFolderName, Is.EqualTo("Frames"));
 
+        Assert.That(reloadedConfiguration.PipelineSettings.ReadConcurrency, Is.EqualTo(5));
+        Assert.That(reloadedConfiguration.PipelineSettings.ProcessConcurrency, Is.EqualTo(1));
+        Assert.That(reloadedConfiguration.PipelineSettings.ReadBufferSize, Is.EqualTo(10));
+        Assert.That(reloadedConfiguration.PipelineSettings.ProcessBufferSize, Is.EqualTo(20));
+        Assert.That(reloadedConfiguration.PipelineSettings.PersistBufferSize, Is.EqualTo(30));
+        Assert.That(reloadedConfiguration.PipelineSettings.PersistBatchSize, Is.EqualTo(25));
+
         Assert.That(reloadedConfiguration.StorageSettings.BackupsToKeep, Is.EqualTo(4));
         Assert.That(reloadedConfiguration.StorageSettings.ThumbnailsDictionaryEntriesToKeep, Is.EqualTo(12));
 
@@ -299,6 +339,19 @@ public class ApplicationSaveEditableConfigurationTests
             _sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
             Is.EqualTo("Frames"));
 
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+            Is.EqualTo("5"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+            Is.EqualTo("1"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+            Is.EqualTo("10"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+            Is.EqualTo("20"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+            Is.EqualTo("30"));
+        Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+            Is.EqualTo("25"));
+
         Assert.That(_sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.BACKUPS_TO_KEEP),
             Is.EqualTo("4"));
         Assert.That(_sqlitePersistenceContext.Configuration.GetValue(
@@ -334,6 +387,7 @@ public class ApplicationSaveEditableConfigurationTests
             new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
                 "Frames"),
+            new(5, 1, 10, 20, 30, 25),
             new(4, 12),
             new("Dark"));
     }

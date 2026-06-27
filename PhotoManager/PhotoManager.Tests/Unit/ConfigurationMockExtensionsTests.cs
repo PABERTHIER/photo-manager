@@ -36,6 +36,12 @@ public class ConfigurationMockExtensionsTests
             Is.EqualTo(PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted")));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
             Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.READ_CONCURRENCY), Is.EqualTo(3));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.PROCESS_CONCURRENCY), Is.EqualTo(2));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.READ_BUFFER_SIZE), Is.EqualTo(8));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.PROCESS_BUFFER_SIZE), Is.EqualTo(16));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.PERSIST_BUFFER_SIZE), Is.EqualTo(24));
+        Assert.That(configuration.GetValue<int>(UserConfigurationKeys.PERSIST_BATCH_SIZE), Is.EqualTo(20));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME), Is.EqualTo("PhotoManager"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER), Is.EqualTo("Toto"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP), Is.EqualTo(2));

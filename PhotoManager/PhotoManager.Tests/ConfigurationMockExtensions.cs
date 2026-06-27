@@ -39,6 +39,12 @@ public static class ConfigurationMockExtensions
                     PathHelper.ToPlatformAbsolutePath("E:\\Workspace\\PhotoManager\\TestAssets\\Exempted"))
                 .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME,
                     Directories.OUTPUT_VIDEO_FIRST_FRAME)
+                .MockGetValue(UserConfigurationKeys.READ_CONCURRENCY, "3")
+                .MockGetValue(UserConfigurationKeys.PROCESS_CONCURRENCY, "2")
+                .MockGetValue(UserConfigurationKeys.READ_BUFFER_SIZE, "8")
+                .MockGetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE, "16")
+                .MockGetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE, "24")
+                .MockGetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE, "20")
                 .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")
                 .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")
                 .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")

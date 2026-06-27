@@ -226,6 +226,80 @@
                             IsChecked="{Binding UsingPHash}" />
                     </Grid>
                 </Expander>
+                <Expander Header="Pipeline settings">
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="16"
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                        RowSpacing="8">
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Read concurrency" />
+                        <NumericUpDown
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ReadConcurrency}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Process concurrency (0 = all cores)" />
+                        <NumericUpDown
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="0"
+                            Value="{Binding ProcessConcurrency}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Read buffer size" />
+                        <NumericUpDown
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ReadBufferSize}" />
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Process buffer size" />
+                        <NumericUpDown
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding ProcessBufferSize}" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Persist buffer size" />
+                        <NumericUpDown
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding PersistBufferSize}" />
+                        <TextBlock
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Classes="setting-label"
+                            Text="Persist batch size" />
+                        <NumericUpDown
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Classes="setting-number"
+                            Minimum="1"
+                            Value="{Binding PersistBatchSize}" />
+                    </Grid>
+                </Expander>
                 <Expander Header="Storage settings">
                     <Grid
                         ColumnDefinitions="Auto,*"

@@ -66,6 +66,13 @@ public class UserConfigurationServiceTests
                 Is.EqualTo(PathHelper.ToPlatformAbsolutePath(
                     $"E:\\Workspace\\PhotoManager\\TestAssets\\{Directories.OUTPUT_VIDEO_FIRST_FRAME}")));
 
+            Assert.That(userConfigurationService.PipelineSettings.ReadConcurrency, Is.EqualTo(3));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessConcurrency, Is.EqualTo(2));
+            Assert.That(userConfigurationService.PipelineSettings.ReadBufferSize, Is.EqualTo(8));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessBufferSize, Is.EqualTo(16));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBufferSize, Is.EqualTo(24));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBatchSize, Is.EqualTo(20));
+
             Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("PhotoManager"));
             Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("Toto"));
 
@@ -115,6 +122,19 @@ public class UserConfigurationServiceTests
             Assert.That(
                 sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
                 Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
+
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+                Is.EqualTo("3"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+                Is.EqualTo("2"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+                Is.EqualTo("8"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+                Is.EqualTo("16"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+                Is.EqualTo("24"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+                Is.EqualTo("20"));
 
             // The Project section is intentionally never persisted: it stays in appsettings.json.
             Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROJECT_NAME), Is.Null);
@@ -184,6 +204,13 @@ public class UserConfigurationServiceTests
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted")));
             Assert.That(userConfigurationService.PathSettings.FirstFrameVideosPath,
                 Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Frames")));
+
+            Assert.That(userConfigurationService.PipelineSettings.ReadConcurrency, Is.EqualTo(5));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessConcurrency, Is.EqualTo(1));
+            Assert.That(userConfigurationService.PipelineSettings.ReadBufferSize, Is.EqualTo(10));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessBufferSize, Is.EqualTo(20));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBufferSize, Is.EqualTo(30));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBatchSize, Is.EqualTo(25));
 
             Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("JsonProject"));
             Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("JsonOwner"));
@@ -453,6 +480,54 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
+    public void ReadConcurrency_CorrectValue_ReturnsReadConcurrencyValue()
+    {
+        int readConcurrency = _userConfigurationService!.PipelineSettings.ReadConcurrency;
+
+        Assert.That(readConcurrency, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void ProcessConcurrency_CorrectValue_ReturnsProcessConcurrencyValue()
+    {
+        int processConcurrency = _userConfigurationService!.PipelineSettings.ProcessConcurrency;
+
+        Assert.That(processConcurrency, Is.Zero);
+    }
+
+    [Test]
+    public void ReadBufferSize_CorrectValue_ReturnsReadBufferSizeValue()
+    {
+        int readBufferSize = _userConfigurationService!.PipelineSettings.ReadBufferSize;
+
+        Assert.That(readBufferSize, Is.EqualTo(16));
+    }
+
+    [Test]
+    public void ProcessBufferSize_CorrectValue_ReturnsProcessBufferSizeValue()
+    {
+        int processBufferSize = _userConfigurationService!.PipelineSettings.ProcessBufferSize;
+
+        Assert.That(processBufferSize, Is.EqualTo(32));
+    }
+
+    [Test]
+    public void PersistBufferSize_CorrectValue_ReturnsPersistBufferSizeValue()
+    {
+        int persistBufferSize = _userConfigurationService!.PipelineSettings.PersistBufferSize;
+
+        Assert.That(persistBufferSize, Is.EqualTo(64));
+    }
+
+    [Test]
+    public void PersistBatchSize_CorrectValue_ReturnsPersistBatchSizeValue()
+    {
+        int persistBatchSize = _userConfigurationService!.PipelineSettings.PersistBatchSize;
+
+        Assert.That(persistBatchSize, Is.EqualTo(50));
+    }
+
+    [Test]
     public void BackupsToKeep_CorrectValue_ReturnsBackupsToKeepValue()
     {
         ushort backupsToKeep = _userConfigurationService!.StorageSettings.BackupsToKeep;
@@ -517,6 +592,13 @@ public class UserConfigurationServiceTests
                 Is.EqualTo(PathHelper.ToPlatformAbsolutePath(
                     $"E:\\Workspace\\PhotoManager\\TestAssets\\{Directories.OUTPUT_VIDEO_FIRST_FRAME}")));
 
+            Assert.That(userConfigurationService.PipelineSettings.ReadConcurrency, Is.EqualTo(3));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessConcurrency, Is.EqualTo(2));
+            Assert.That(userConfigurationService.PipelineSettings.ReadBufferSize, Is.EqualTo(8));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessBufferSize, Is.EqualTo(16));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBufferSize, Is.EqualTo(24));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBatchSize, Is.EqualTo(20));
+
             Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("PhotoManager"));
             Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("Toto"));
 
@@ -567,6 +649,19 @@ public class UserConfigurationServiceTests
                 sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
                 Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
 
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+                Is.EqualTo("3"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+                Is.EqualTo("2"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+                Is.EqualTo("8"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+                Is.EqualTo("16"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+                Is.EqualTo("24"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+                Is.EqualTo("20"));
+
             Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROJECT_NAME), Is.Null);
             Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROJECT_OWNER), Is.Null);
 
@@ -604,6 +699,13 @@ public class UserConfigurationServiceTests
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted")));
             Assert.That(userConfigurationService.PathSettings.FirstFrameVideosPath,
                 Is.EqualTo(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Frames")));
+
+            Assert.That(userConfigurationService.PipelineSettings.ReadConcurrency, Is.EqualTo(5));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessConcurrency, Is.EqualTo(1));
+            Assert.That(userConfigurationService.PipelineSettings.ReadBufferSize, Is.EqualTo(10));
+            Assert.That(userConfigurationService.PipelineSettings.ProcessBufferSize, Is.EqualTo(20));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBufferSize, Is.EqualTo(30));
+            Assert.That(userConfigurationService.PipelineSettings.PersistBatchSize, Is.EqualTo(25));
 
             Assert.That(userConfigurationService.ProjectSettings.Name, Is.EqualTo("PhotoManager"));
             Assert.That(userConfigurationService.ProjectSettings.Owner, Is.EqualTo("Toto"));
@@ -656,6 +758,19 @@ public class UserConfigurationServiceTests
             Assert.That(
                 sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME),
                 Is.EqualTo("Frames"));
+
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_CONCURRENCY),
+                Is.EqualTo("5"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_CONCURRENCY),
+                Is.EqualTo("1"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.READ_BUFFER_SIZE),
+                Is.EqualTo("10"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROCESS_BUFFER_SIZE),
+                Is.EqualTo("20"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BUFFER_SIZE),
+                Is.EqualTo("30"));
+            Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PERSIST_BATCH_SIZE),
+                Is.EqualTo("25"));
 
             Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROJECT_NAME), Is.Null);
             Assert.That(sqlitePersistenceContext.Configuration.GetValue(UserConfigurationKeys.PROJECT_OWNER), Is.Null);
@@ -711,6 +826,7 @@ public class UserConfigurationServiceTests
             new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
                 PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
                 "Frames"),
+            new(5, 1, 10, 20, 30, 25),
             new(4, 12),
             new("Dark"));
     }
