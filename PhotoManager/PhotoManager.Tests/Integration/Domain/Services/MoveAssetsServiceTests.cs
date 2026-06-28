@@ -1342,6 +1342,58 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
+    public void DeleteAssets_AssetsSpanMultipleFolders_DeletesAllAssetsAcrossFolders()
+    {
+        string destinationDirectory1 = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
+        string destinationDirectory2 = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_MOVE);
+
+        try
+        {
+            Directory.CreateDirectory(destinationDirectory1);
+            Directory.CreateDirectory(destinationDirectory2);
+
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
+
+            string sourceFilePath1 = Path.Combine(_assetsDirectory!, asset1FileName);
+            string destinationFilePath1 = Path.Combine(destinationDirectory1, asset1FileName);
+            string sourceFilePath2 = Path.Combine(_assetsDirectory!, asset2FileName);
+            string destinationFilePath2 = Path.Combine(destinationDirectory2, asset2FileName);
+
+            Assert.That(_moveAssetsService!.CopyAsset(sourceFilePath1, destinationFilePath1), Is.True);
+            Assert.That(_moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2), Is.True);
+            Assert.That(File.Exists(destinationFilePath1), Is.True);
+            Assert.That(File.Exists(destinationFilePath2), Is.True);
+
+            _testableAssetRepository!.AddFolder(destinationDirectory1);
+            _testableAssetRepository!.AddFolder(destinationDirectory2);
+
+            Asset? asset1 = _assetCreationService!.CreateAsset(destinationDirectory1, asset1FileName);
+            Assert.That(asset1, Is.Not.Null);
+            Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory2, asset2FileName);
+            Assert.That(asset2, Is.Not.Null);
+
+            Assert.That(_testableAssetRepository!.GetAssetsByPath(destinationDirectory1), Has.Length.EqualTo(1));
+            Assert.That(_testableAssetRepository!.GetAssetsByPath(destinationDirectory2), Has.Length.EqualTo(1));
+
+            _moveAssetsService!.DeleteAssets([asset1, asset2]);
+
+            Assert.That(_testableAssetRepository!.GetAssetsByPath(destinationDirectory1), Is.Empty);
+            Assert.That(_testableAssetRepository!.GetAssetsByPath(destinationDirectory2), Is.Empty);
+
+            Assert.That(File.Exists(destinationFilePath1), Is.False);
+            Assert.That(File.Exists(destinationFilePath2), Is.False);
+
+            _testLogger!.AssertLogErrors([], typeof(MoveAssetsService));
+        }
+        finally
+        {
+            Directory.Delete(destinationDirectory1, true);
+            Directory.Delete(destinationDirectory2, true);
+        }
+    }
+
+    [Test]
     public void DeleteAssets_AssetIsValid_DeletesAssetAndSavesCatalog()
     {
         string destinationDirectory = Path.Combine(_assetsDirectory!, Directories.DESTINATION_TO_COPY);
