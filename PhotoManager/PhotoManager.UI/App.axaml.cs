@@ -1,17 +1,11 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using PhotoManager.Application;
-using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Configuration;
 using PhotoManager.UI.Services;
 using PhotoManager.UI.Windows;
 using Serilog;
-using System.Diagnostics.CodeAnalysis;
 
 namespace PhotoManager.UI;
 

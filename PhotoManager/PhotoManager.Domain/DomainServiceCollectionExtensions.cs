@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PhotoManager.Domain.Pipeline;
+using PhotoManager.Domain.Pipelines;
 
 namespace PhotoManager.Domain;
 

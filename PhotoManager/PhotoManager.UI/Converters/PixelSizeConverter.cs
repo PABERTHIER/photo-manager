@@ -1,5 +1,4 @@
 ﻿using Avalonia.Data.Converters;
-using PhotoManager.Domain;
 using System.Globalization;
 
 namespace PhotoManager.UI.Converters;

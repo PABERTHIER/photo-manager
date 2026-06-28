@@ -1,10 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Logging;
-using PhotoManager.Domain;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Windows;
+﻿namespace PhotoManager.UI.Windows;
 
 /// <summary>
 /// Window displaying application information such as product, version and author details.

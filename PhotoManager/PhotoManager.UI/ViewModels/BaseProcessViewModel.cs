@@ -1,8 +1,4 @@
-﻿using PhotoManager.Domain;
-using PhotoManager.UI.ViewModels.Enums;
-using System.Collections.ObjectModel;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
 {

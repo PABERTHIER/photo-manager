@@ -1,5 +1,4 @@
-﻿using PhotoManager.Application;
-using PhotoManager.Domain.UserConfigurationSettings;
+﻿using PhotoManager.Domain.UserConfigurationSettings;
 
 namespace PhotoManager.UI.ViewModels;
 

@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI;
+﻿namespace PhotoManager.UI;
 
 [ExcludeFromCodeCoverage]
 internal static class Program

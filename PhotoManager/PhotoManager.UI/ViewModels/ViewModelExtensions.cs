@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public static class ViewModelExtensions
 {

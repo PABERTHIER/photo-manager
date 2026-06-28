@@ -1,11 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using PhotoManager.UI.ViewModels;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Windows;
+﻿namespace PhotoManager.UI.Windows;
 
 /// <summary>
 /// Window listing the available keyboard shortcuts.

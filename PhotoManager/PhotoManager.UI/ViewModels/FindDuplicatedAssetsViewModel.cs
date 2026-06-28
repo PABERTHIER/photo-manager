@@ -1,8 +1,4 @@
-﻿using PhotoManager.Application;
-using PhotoManager.Domain;
-using PhotoManager.UI.Models;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewModel
 {

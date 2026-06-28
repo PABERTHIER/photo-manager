@@ -1,14 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using PhotoManager.Application;
-using PhotoManager.Common.Imaging;
-using PhotoManager.Domain;
-using PhotoManager.Domain.Comparers;
-using PhotoManager.UI.Converters;
-using PhotoManager.UI.Models;
-using PhotoManager.UI.ViewModels.Enums;
-using System.Collections.ObjectModel;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public class ApplicationViewModel : BaseViewModel
 {

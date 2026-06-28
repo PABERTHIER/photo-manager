@@ -1,4 +1,4 @@
-namespace PhotoManager.Infrastructure;
+﻿namespace PhotoManager.Infrastructure;
 
 internal static class ConfigurationKeys
 {

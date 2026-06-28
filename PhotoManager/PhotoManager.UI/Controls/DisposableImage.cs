@@ -1,8 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Controls;
+﻿namespace PhotoManager.UI.Controls;
 
 [ExcludeFromCodeCoverage]
 public class DisposableImage : Image

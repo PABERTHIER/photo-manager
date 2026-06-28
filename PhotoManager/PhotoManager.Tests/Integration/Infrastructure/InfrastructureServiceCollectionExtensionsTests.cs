@@ -125,7 +125,7 @@ public class InfrastructureServiceCollectionExtensionsTests
         Assert.That(thumbnailGeneratorDescriptor, Is.EqualTo(services[7]));
         Assert.That(thumbnailGeneratorDescriptor.ImplementationInstance, Is.Null);
         Assert.That(thumbnailGeneratorDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(thumbnailGeneratorDescriptor.ImplementationType, Is.EqualTo(typeof(ImageMagickThumbnailGenerator)));
+        Assert.That(thumbnailGeneratorDescriptor.ImplementationType, Is.EqualTo(typeof(ThumbnailGenerator)));
 
         imageMetadataServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IImageMetadataService));
         Assert.That(imageMetadataServiceDescriptor, Is.Not.Null);

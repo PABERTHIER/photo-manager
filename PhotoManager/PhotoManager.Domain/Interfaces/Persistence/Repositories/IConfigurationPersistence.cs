@@ -1,4 +1,4 @@
-namespace PhotoManager.Domain.Interfaces.Persistence.Repositories;
+﻿namespace PhotoManager.Domain.Interfaces.Persistence.Repositories;
 
 /// <summary>
 /// Provides key/value configuration storage backed by the SQLite Configuration table.

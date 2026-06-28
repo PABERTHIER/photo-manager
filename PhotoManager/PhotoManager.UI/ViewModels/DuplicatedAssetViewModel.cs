@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public class DuplicatedAssetViewModel : BaseViewModel
 {
