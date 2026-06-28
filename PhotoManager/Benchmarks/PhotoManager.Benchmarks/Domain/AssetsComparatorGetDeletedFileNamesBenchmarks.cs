@@ -29,7 +29,21 @@ public class AssetsComparatorGetDeletedFileNamesBenchmarks
     public void Setup()
     {
         // cataloguedAssets contains CataloguedCount assets
-        _cataloguedAssets = [.. Enumerable.Range(1, CataloguedCount).Select(i => CreateAsset($"IMG_{i:D4}.jpg"))];
+        _cataloguedAssets =
+        [
+            .. Enumerable.Range(1, CataloguedCount).Select(i =>
+                AssetBenchmarkBuilder.Create()
+                    .WithFolderPath("", Guid.Empty)
+                    .WithFileName($"IMG_{i:D4}.jpg")
+                    .WithPixels(1920, 1080, 200, 112)
+                    .WithFileSize(1024)
+                    .WithHash(string.Empty)
+                    .WithThumbnailCreationDateTime(DateTime.Now)
+                    .WithImageRotation(ImageRotation.Rotate0)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build())
+        ];
 
         // fileNames is 80% of catalogued assets (i.e. 20% have been deleted)
         _fileNames = [.. _cataloguedAssets.Take(CataloguedCount * 8 / 10).Select(a => a.FileName)];
@@ -97,25 +111,4 @@ public class AssetsComparatorGetDeletedFileNamesBenchmarks
         return [.. result];
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private static Asset CreateAsset(string fileName) => new()
-    {
-        FolderId = Guid.Empty,
-        Folder = new() { Id = Guid.Empty, Path = "" },
-        FileName = fileName,
-        Pixel = new()
-        {
-            Asset = new() { Width = 1920, Height = 1080 },
-            Thumbnail = new() { Width = 200, Height = 112 }
-        },
-        FileProperties = new() { Size = 1024 },
-        Hash = string.Empty,
-        ThumbnailCreationDateTime = DateTime.Now,
-        Metadata = new()
-        {
-            Corrupted = new() { IsTrue = false, Message = null },
-            Rotated = new() { IsTrue = false, Message = null }
-        }
-    };
 }

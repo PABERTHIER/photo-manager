@@ -251,24 +251,17 @@ public class BkTreeTests
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static Asset CreateAsset(string fileName) => new()
-    {
-        FolderId = Guid.NewGuid(),
-        Folder = new() { Id = Guid.Empty, Path = "" },
-        FileName = fileName,
-        ImageRotation = ImageRotation.Rotate0,
-        Pixel = new()
-        {
-            Asset = new() { Width = 1920, Height = 1080 },
-            Thumbnail = new() { Width = 200, Height = 112 }
-        },
-        FileProperties = new() { Size = 1024 },
-        ThumbnailCreationDateTime = DateTime.Now,
-        Hash = "0000",
-        Metadata = new()
-        {
-            Corrupted = new() { IsTrue = false, Message = null },
-            Rotated = new() { IsTrue = false, Message = null }
-        }
-    };
+    private static Asset CreateAsset(string fileName) =>
+        AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFolderId(Guid.NewGuid())
+            .WithFileName(fileName)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1920, 1080, 200, 112)
+            .WithFileSize(1024)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("0000")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }

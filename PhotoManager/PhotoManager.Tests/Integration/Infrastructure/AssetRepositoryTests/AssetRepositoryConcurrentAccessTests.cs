@@ -54,85 +54,45 @@ public class AssetRepositoryConcurrentAccessTests
         _assetRepository = new(imageProcessingService, imageMetadataService, userConfigurationService,
             sqlitePersistenceContext, _testLogger);
 
-        _asset1 = new()
-        {
-            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset2 = new()
-        {
-            FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = ImageRotation.Rotate90,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_PNG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_9_PNG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = new("f91b8c81-6938-431a-a689-d86c7c4db126"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_11_HEIC,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
-                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("876283c6-780e-4ad5-975c-be63044c087a"))
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("68493435-e299-4bb5-9e02-214da41d0256"))
+            .WithFileName(FileNames.IMAGE_9_PNG)
+            .WithRotation(ImageRotation.Rotate90)
+            .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_PNG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_9_PNG)
+            .WithCorrupted(false, null)
+            .WithRotated(true, "The asset has been rotated")
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("f91b8c81-6938-431a-a689-d86c7c4db126"))
+            .WithFileName(FileNames.IMAGE_11_HEIC)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithCorrupted(true, "The asset is corrupted")
+            .WithRotated(true, "The asset has been rotated")
+            .Build();
     }
 
     [TearDown]
@@ -146,56 +106,32 @@ public class AssetRepositoryConcurrentAccessTests
     [Test]
     public void AssetRepository_ConcurrentAccess_WorksCorrectly()
     {
-        Asset asset4 = new()
-        {
-            FolderId = new("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_2_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_2_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_2_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
-                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
-            }
-        };
-        Asset asset5 = new()
-        {
-            FolderId = new("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_3_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_3_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_3_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
-                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
-            }
-        };
+        Asset asset4 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("cf9293ad-d835-4126-8a76-17c7bbfe626e"))
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileProperties(FileSize.IMAGE_2_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_2_JPG)
+            .WithCorrupted(true, "The asset is corrupted")
+            .WithRotated(true, "The asset has been rotated")
+            .Build();
+        Asset asset5 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"))
+            .WithFileName(FileNames.IMAGE_3_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG,
+                ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG)
+            .WithFileProperties(FileSize.IMAGE_3_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_3_JPG)
+            .WithCorrupted(true, "The asset is corrupted")
+            .WithRotated(true, "The asset has been rotated")
+            .Build();
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription =

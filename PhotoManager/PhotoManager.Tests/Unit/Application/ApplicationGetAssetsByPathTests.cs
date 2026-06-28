@@ -22,64 +22,30 @@ public class ApplicationGetAssetsByPathTests
 
         Asset[] expectedResult =
         [
-            new()
-            {
-                FolderId = folderId,
-                Folder = folder,
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            },
-            new()
-            {
-                FolderId = folderId,
-                Folder = folder,
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_2_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = Hashes.IMAGE_2_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            }
+            AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(FileNames.IMAGE_1_JPG)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithHash(Hashes.IMAGE_1_JPG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(FileNames.IMAGE_2_JPG)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                    ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+                .WithFileProperties(FileSize.IMAGE_2_JPG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithHash(Hashes.IMAGE_2_JPG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();
@@ -126,58 +92,30 @@ public class ApplicationGetAssetsByPathTests
 
         Asset[] expectedResult =
         [
-            new()
-            {
-                FolderId = folderId,
-                Folder = folder,
-                FileName = FileNames.IMAGE_1_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                        { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            },
-            new()
-            {
-                FolderId = folderId,
-                Folder = folder,
-                FileName = FileNames.IMAGE_2_JPG,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                    Thumbnail = new()
-                        { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_2_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = Hashes.IMAGE_2_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            }
+            AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(FileNames.IMAGE_1_JPG)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithHash(Hashes.IMAGE_1_JPG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(FileNames.IMAGE_2_JPG)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                    ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+                .WithFileProperties(FileSize.IMAGE_2_JPG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithHash(Hashes.IMAGE_2_JPG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         IAssetRepository assetRepositoryMock = Substitute.For<IAssetRepository>();

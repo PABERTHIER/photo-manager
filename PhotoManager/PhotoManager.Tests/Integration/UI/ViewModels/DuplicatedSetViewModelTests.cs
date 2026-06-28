@@ -52,66 +52,34 @@ public class DuplicatedSetViewModelTests
 
         DateTime actualDate = DateTime.Now;
 
-        _asset2 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_PNG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_PNG,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_9_PNG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
-                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
-                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset2 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_9_PNG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_PNG,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_9_PNG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_9_DUPLICATE_PNG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, PixelHeightAsset.IMAGE_9_DUPLICATE_PNG,
+                ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_DUPLICATE_PNG,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_9_DUPLICATE_PNG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]

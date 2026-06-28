@@ -13,40 +13,4 @@ public class Asset
     public IImageData? ImageData { get; set; } // Not stored in DB
     public DateTime ThumbnailCreationDateTime { get; init; }
     public Metadata Metadata { get; init; }
-
-    // Used for tests only, to make FolderId and Folder properties immutable
-    public Asset WithFolder(Folder folder)
-    {
-        return new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileName,
-            FileProperties = FileProperties,
-            Pixel = Pixel,
-            ImageRotation = ImageRotation,
-            Hash = Hash,
-            ImageData = ImageData,
-            ThumbnailCreationDateTime = ThumbnailCreationDateTime,
-            Metadata = Metadata
-        };
-    }
-
-    // Used for tests only, to make Hash property immutable
-    public Asset WithHash(string hash)
-    {
-        return new()
-        {
-            FolderId = FolderId,
-            Folder = Folder,
-            FileName = FileName,
-            FileProperties = FileProperties,
-            Pixel = Pixel,
-            ImageRotation = ImageRotation,
-            Hash = hash,
-            ImageData = ImageData,
-            ThumbnailCreationDateTime = ThumbnailCreationDateTime,
-            Metadata = Metadata
-        };
-    }
 }

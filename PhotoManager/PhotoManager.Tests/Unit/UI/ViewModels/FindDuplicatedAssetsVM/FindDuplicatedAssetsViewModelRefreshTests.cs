@@ -35,131 +35,71 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     [SetUp]
     public void Setup()
     {
-        _asset1 = new()
-        {
-            FolderId = Guid.Empty, // Set in each tests
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            Hash = string.Empty, // Set in each tests
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2020,
-                Creation = new(2010, 1, 1, 20, 20, 20, 20, 20),
-                Modification = new(2011, 1, 1, 20, 20, 20, 20, 20)
-            },
-            ThumbnailCreationDateTime = new(2010, 1, 1, 20, 20, 20, 20, 20),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset2 = new()
-        {
-            FolderId = Guid.Empty, // Set in each tests
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
-            },
-            Hash = string.Empty, // Set in each tests
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2048,
-                Creation = new(2020, 6, 1),
-                Modification = new(2020, 7, 1)
-            },
-            ThumbnailCreationDateTime = new(2020, 6, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = Guid.Empty, // Set in each tests
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = FileNames.IMAGE_3_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
-            },
-            Hash = string.Empty, // Set in each tests
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2000,
-                Creation = new(2010, 1, 1),
-                Modification = new(2011, 1, 1)
-            },
-            ThumbnailCreationDateTime = new(2010, 1, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset4 = new()
-        {
-            FolderId = Guid.Empty, // Set in each tests
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = FileNames.IMAGE_4_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
-            },
-            Hash = string.Empty, // Set in each tests
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2030,
-                Creation = new(2010, 8, 1),
-                Modification = new(2011, 9, 1)
-            },
-            ThumbnailCreationDateTime = new(2010, 8, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset5 = new()
-        {
-            FolderId = Guid.Empty, // Set in each tests
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = FileNames.IMAGE_5_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
-            },
-            Hash = string.Empty, // Set in each tests
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2048,
-                Creation = new(2020, 6, 1),
-                Modification = new(2020, 7, 1)
-            },
-            ThumbnailCreationDateTime = new(2020, 6, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(2020, new(2010, 1, 1, 20, 20, 20, 20, 20), new(2011, 1, 1, 20, 20, 20, 20, 20))
+            .WithThumbnailCreationDateTime(new(2010, 1, 1, 20, 20, 20, 20, 20))
+            .WithHash(string.Empty) // Set in each tests
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
+            .WithThumbnailCreationDateTime(new(2020, 6, 1))
+            .WithHash(string.Empty) // Set in each tests
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
+            .WithFileName(FileNames.IMAGE_3_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG,
+                ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG)
+            .WithFileProperties(2000, new(2010, 1, 1), new(2011, 1, 1))
+            .WithThumbnailCreationDateTime(new(2010, 1, 1))
+            .WithHash(string.Empty) // Set in each tests
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset4 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
+            .WithFileName(FileNames.IMAGE_4_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG,
+                ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG)
+            .WithFileProperties(2030, new(2010, 8, 1), new(2011, 9, 1))
+            .WithThumbnailCreationDateTime(new(2010, 8, 1))
+            .WithHash(string.Empty) // Set in each tests
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset5 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
+            .WithFileName(FileNames.IMAGE_5_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG,
+                ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG)
+            .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
+            .WithThumbnailCreationDateTime(new(2020, 6, 1))
+            .WithHash(string.Empty) // Set in each tests
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]

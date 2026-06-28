@@ -23,18 +23,17 @@ public class CatalogChangeCallbackSnapshotBenchmarks
 
         for (int i = 0; i < AssetCount; i++)
         {
-            _cataloguedAssetsByPath.Add(new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = $"Image_{i:D6}.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1920, Height = 1080 },
-                    Thumbnail = new() { Width = 200, Height = 150 }
-                },
-                Hash = i.ToString()
-            });
+            _cataloguedAssetsByPath.Add(AssetBenchmarkBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName($"Image_{i:D6}.jpg")
+                .WithPixels(1920, 1080, 200, 150)
+                .WithFileSize(0)
+                .WithHash(i.ToString())
+                .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+                .WithImageRotation(ImageRotation.Rotate0)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build());
         }
     }
 

@@ -53,31 +53,19 @@ public class AssetRepositoryLoadThumbnailTests
         _assetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
             sqlitePersistenceContext, _testLogger);
 
-        _asset1 = new()
-        {
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
-            FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("876283c6-780e-4ad5-975c-be63044c087a"))
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]
@@ -335,39 +323,18 @@ public class AssetRepositoryLoadThumbnailTests
 
             // Add folder2 + asset2 → evicts folder1 from LRU (capacity = 1)
             Folder folder2 = assetRepository.AddFolder(folderPath2);
-            Asset asset2 = new()
-            {
-                Folder = folder2,
-                FolderId = folder2.Id,
-                FileName = FileNames.IMAGE_9_PNG,
-                ImageRotation = ImageRotation.Rotate0,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.IMAGE_9_PNG,
-                        Height = PixelHeightAsset.IMAGE_9_PNG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
-                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_9_PNG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                Hash = Hashes.IMAGE_9_PNG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            };
+            Asset asset2 = AssetBuilder.Create()
+                .WithFolder(folder2)
+                .WithFileName(FileNames.IMAGE_9_PNG)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                    ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+                .WithFileProperties(FileSize.IMAGE_9_PNG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithHash(Hashes.IMAGE_9_PNG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             assetRepository.AddAsset(asset2, [1, 2, 3]);
 

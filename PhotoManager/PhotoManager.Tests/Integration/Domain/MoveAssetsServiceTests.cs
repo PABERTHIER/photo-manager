@@ -898,19 +898,20 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _testableAssetRepository.GetRecentTargetPaths();
             Assert.That(recentTargetPaths, Is.Empty);
 
-            Asset newAsset = new()
-            {
-                FolderId = asset.FolderId,
-                Folder = asset.Folder,
-                FileName = assetNewFileName,
-                FileProperties = asset.FileProperties,
-                Pixel = asset.Pixel,
-                ImageRotation = asset.ImageRotation,
-                Hash = asset.Hash,
-                ImageData = asset.ImageData,
-                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
-                Metadata = asset.Metadata,
-            };
+            Asset newAsset = AssetBuilder.Create()
+                .WithFolder(asset.Folder)
+                .WithFolderId(asset.FolderId)
+                .WithFileName(assetNewFileName)
+                .WithFileProperties(asset.FileProperties.Size, asset.FileProperties.Creation, asset.FileProperties.Modification)
+                .WithPixels(asset.Pixel.Asset.Width, asset.Pixel.Asset.Height,
+                    asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height)
+                .WithRotation(asset.ImageRotation)
+                .WithHash(asset.Hash)
+                .WithImageData(asset.ImageData)
+                .WithThumbnailCreationDateTime(asset.ThumbnailCreationDateTime)
+                .WithCorrupted(asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message)
+                .WithRotated(asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message)
+                .Build();
             Asset[] assets = [newAsset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() =>
@@ -1001,19 +1002,20 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _testableAssetRepository.GetRecentTargetPaths();
             Assert.That(recentTargetPaths, Is.Empty);
 
-            Asset newAsset = new()
-            {
-                FolderId = asset.FolderId,
-                Folder = asset.Folder,
-                FileName = assetNewFileName,
-                FileProperties = asset.FileProperties,
-                Pixel = asset.Pixel,
-                ImageRotation = asset.ImageRotation,
-                Hash = asset.Hash,
-                ImageData = asset.ImageData,
-                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
-                Metadata = asset.Metadata
-            };
+            Asset newAsset = AssetBuilder.Create()
+                .WithFolder(asset.Folder)
+                .WithFolderId(asset.FolderId)
+                .WithFileName(assetNewFileName)
+                .WithFileProperties(asset.FileProperties.Size, asset.FileProperties.Creation, asset.FileProperties.Modification)
+                .WithPixels(asset.Pixel.Asset.Width, asset.Pixel.Asset.Height,
+                    asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height)
+                .WithRotation(asset.ImageRotation)
+                .WithHash(asset.Hash)
+                .WithImageData(asset.ImageData)
+                .WithThumbnailCreationDateTime(asset.ThumbnailCreationDateTime)
+                .WithCorrupted(asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message)
+                .WithRotated(asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message)
+                .Build();
             Asset[] assets = [newAsset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() =>
@@ -1095,39 +1097,31 @@ public class MoveAssetsServiceTests
         Guid folderId1 = Guid.NewGuid();
         Guid folderId2 = Guid.NewGuid();
 
-        Asset asset1 = new()
-        {
-            FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId1, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
         Asset? asset2 = null;
-        Asset asset3 = new()
-        {
-            FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId2, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] assets = [asset1, asset2!, asset3];
 
@@ -1152,58 +1146,43 @@ public class MoveAssetsServiceTests
         Guid folderId2 = Guid.NewGuid();
         Folder? folder = null;
 
-        Asset asset1 = new()
-        {
-            FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                }
-            },
-            Hash = string.Empty
-        };
-        Asset asset2 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = folder!,
-            FileName = FileNames.NON_EXISTENT_FILE_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                }
-            },
-            Hash = string.Empty
-        };
-        Asset asset3 = new()
-        {
-            FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId1, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        Asset asset2 = AssetBuilder.Create()
+            .WithFolder(folder!)
+            .WithFolderId(Guid.Empty)
+            .WithFileName(FileNames.NON_EXISTENT_FILE_JPG)
+            .WithPixels(PixelWidthAsset.NON_EXISTENT_FILE_JPG, PixelHeightAsset.NON_EXISTENT_FILE_JPG,
+                ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        Asset asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId2, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] assets = [asset1, asset2, asset3];
 
@@ -1228,26 +1207,18 @@ public class MoveAssetsServiceTests
 
         Asset[] assets =
         [
-            new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = FileNames.NON_EXISTENT_FILE_JPG,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                    }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(FileNames.NON_EXISTENT_FILE_JPG)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_FILE_JPG, PixelHeightAsset.NON_EXISTENT_FILE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         Folder? destinationFolder = null;
@@ -1283,26 +1254,18 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
             Folder destinationFolder = _testableAssetRepository!.AddFolder(destinationDirectory);
 
-            Asset asset = new()
-            {
-                FolderId = sourceFolder.Id,
-                Folder = sourceFolder,
-                FileName = FileNames.NON_EXISTENT_FILE_JPG,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset = AssetBuilder.Create()
+                .WithFolder(sourceFolder)
+                .WithFileName(FileNames.NON_EXISTENT_FILE_JPG)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_FILE_JPG, PixelHeightAsset.NON_EXISTENT_FILE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() =>
                 _moveAssetsService!.MoveAssets([asset], destinationFolder, preserveOriginalFile));
@@ -1467,39 +1430,31 @@ public class MoveAssetsServiceTests
         Guid folderId1 = Guid.NewGuid();
         Guid folderId2 = Guid.NewGuid();
 
-        Asset asset1 = new()
-        {
-            FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId1, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
         Asset? asset2 = null;
-        Asset asset3 = new()
-        {
-            FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId2, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] assets = [asset1, asset2!, asset3];
 
@@ -1520,58 +1475,43 @@ public class MoveAssetsServiceTests
         Guid folderId2 = Guid.NewGuid();
         Folder? folder = null;
 
-        Asset asset1 = new()
-        {
-            FolderId = folderId1,
-            Folder = new() { Id = folderId1, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                }
-            },
-            Hash = string.Empty
-        };
-        Asset asset2 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = folder!,
-            FileName = FileNames.NON_EXISTENT_FILE_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                }
-            },
-            Hash = string.Empty
-        };
-        Asset asset3 = new()
-        {
-            FolderId = folderId2,
-            Folder = new() { Id = folderId2, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_2_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_2_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId1, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        Asset asset2 = AssetBuilder.Create()
+            .WithFolder(folder!)
+            .WithFolderId(Guid.Empty)
+            .WithFileName(FileNames.NON_EXISTENT_FILE_JPG)
+            .WithPixels(PixelWidthAsset.NON_EXISTENT_FILE_JPG, PixelHeightAsset.NON_EXISTENT_FILE_JPG,
+                ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        Asset asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = folderId2, Path = _assetsDirectory! })
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] assets = [asset1, asset2, asset3];
 
@@ -1590,26 +1530,18 @@ public class MoveAssetsServiceTests
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NON_EXISTENT_FILE_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG,
-                    Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NON_EXISTENT_FILE_JPG)
+            .WithPixels(PixelWidthAsset.NON_EXISTENT_FILE_JPG, PixelHeightAsset.NON_EXISTENT_FILE_JPG,
+                ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] assets = [asset];
 

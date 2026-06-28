@@ -38,131 +38,71 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         Guid folderId = Guid.NewGuid();
 
-        _asset1 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2020,
-                Creation = new(2010, 1, 1, 20, 20, 20, 20, 20),
-                Modification = new(2011, 1, 1, 20, 20, 20, 20, 20)
-            },
-            ThumbnailCreationDateTime = new(2010, 1, 1, 20, 20, 20, 20, 20),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset2 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2048,
-                Creation = new(2020, 6, 1),
-                Modification = new(2020, 7, 1)
-            },
-            ThumbnailCreationDateTime = new(2020, 6, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_3_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2000,
-                Creation = new(2010, 1, 1),
-                Modification = new(2011, 1, 1)
-            },
-            ThumbnailCreationDateTime = new(2010, 1, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset4 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_4_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2030,
-                Creation = new(2010, 8, 1),
-                Modification = new(2011, 9, 1)
-            },
-            ThumbnailCreationDateTime = new(2010, 8, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset5 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory! },
-            FileName = FileNames.IMAGE_5_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty(),
-            FileProperties = new()
-            {
-                Size = 2048,
-                Creation = new(2020, 6, 1),
-                Modification = new(2020, 7, 1)
-            },
-            ThumbnailCreationDateTime = new(2020, 6, 1),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolderPath(_assetsDirectory!, folderId)
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(2020, new(2010, 1, 1, 20, 20, 20, 20, 20), new(2011, 1, 1, 20, 20, 20, 20, 20))
+            .WithThumbnailCreationDateTime(new(2010, 1, 1, 20, 20, 20, 20, 20))
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolderPath(_assetsDirectory!, folderId)
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG,
+                ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
+            .WithThumbnailCreationDateTime(new(2020, 6, 1))
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolderPath(_assetsDirectory!, folderId)
+            .WithFileName(FileNames.IMAGE_3_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_3_JPG, PixelHeightAsset.IMAGE_3_JPG,
+                ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG)
+            .WithFileProperties(2000, new(2010, 1, 1), new(2011, 1, 1))
+            .WithThumbnailCreationDateTime(new(2010, 1, 1))
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset4 = AssetBuilder.Create()
+            .WithFolderPath(_assetsDirectory!, folderId)
+            .WithFileName(FileNames.IMAGE_4_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_4_JPG, PixelHeightAsset.IMAGE_4_JPG,
+                ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG)
+            .WithFileProperties(2030, new(2010, 8, 1), new(2011, 9, 1))
+            .WithThumbnailCreationDateTime(new(2010, 8, 1))
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset5 = AssetBuilder.Create()
+            .WithFolderPath(_assetsDirectory!, folderId)
+            .WithFileName(FileNames.IMAGE_5_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG,
+                ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG)
+            .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
+            .WithThumbnailCreationDateTime(new(2020, 6, 1))
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]
@@ -248,23 +188,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset newAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset newAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -350,23 +286,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset newAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset newAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -454,23 +386,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset newAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset newAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -860,23 +788,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-        Asset newAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset newAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -953,23 +877,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset newAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset newAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -1692,19 +1612,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_JPG, Height = PixelHeightAsset.IMAGE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_JPG, Height = ThumbnailHeightAsset.IMAGE_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_JPG, PixelHeightAsset.IMAGE_JPG,
+                ThumbnailWidthAsset.IMAGE_JPG, ThumbnailHeightAsset.IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -1774,23 +1694,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset updatedAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset updatedAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -2467,19 +2383,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_JPG, Height = PixelHeightAsset.IMAGE_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_JPG, Height = ThumbnailHeightAsset.IMAGE_JPG }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_JPG, PixelHeightAsset.IMAGE_JPG,
+                ThumbnailWidthAsset.IMAGE_JPG, ThumbnailHeightAsset.IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
         string filePath = Path.Combine(folderPath, _asset1!.FileName);
@@ -2549,23 +2465,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
-        Asset deletedAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NEW_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.NEW_IMAGE_JPG, Height = PixelHeightAsset.NEW_IMAGE_JPG },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NEW_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NEW_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty,
-            ImageData = SkiaImageData.Empty()
-        };
+        Asset deletedAsset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NEW_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NEW_IMAGE_JPG, PixelHeightAsset.NEW_IMAGE_JPG,
+                ThumbnailWidthAsset.NEW_IMAGE_JPG, ThumbnailHeightAsset.NEW_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 

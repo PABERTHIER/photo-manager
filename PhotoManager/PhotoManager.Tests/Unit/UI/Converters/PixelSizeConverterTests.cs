@@ -11,17 +11,17 @@ public class PixelSizeConverterTests
     public void Convert_AssetWithDifferentPixelsSize_ReturnsResolution(int width, int height, string expected)
     {
         PixelSizeConverter pixelSizeConverter = new();
-        Asset asset = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "toto.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = width, Height = height }
-            },
-            Hash = string.Empty
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFileName("toto.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(width, height, 0, 0)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
         object? parameter = null;
 
         string? result =

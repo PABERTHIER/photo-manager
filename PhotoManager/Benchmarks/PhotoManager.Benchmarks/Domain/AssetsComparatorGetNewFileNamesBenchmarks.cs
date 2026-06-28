@@ -41,7 +41,21 @@ public class AssetsComparatorGetNewFileNamesBenchmarks
         ];
 
         // Half the files are already catalogued
-        _cataloguedAssets = [.. _fileNames.Take(FileCount / 2).Select(CreateAsset)];
+        _cataloguedAssets =
+        [
+            .. _fileNames.Take(FileCount / 2).Select(x =>
+                AssetBenchmarkBuilder.Create()
+                    .WithFolderPath("", Guid.Empty)
+                    .WithFileName(x)
+                    .WithPixels(1920, 1080, 200, 112)
+                    .WithFileSize(1024)
+                    .WithHash(string.Empty)
+                    .WithThumbnailCreationDateTime(DateTime.Now)
+                    .WithImageRotation(ImageRotation.Rotate0)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build())
+        ];
     }
 
     // ── Benchmarks ────────────────────────────────────────────────────────────
@@ -159,24 +173,4 @@ public class AssetsComparatorGetNewFileNamesBenchmarks
     {
         return ImageHelper.IsImageFile(assetFileName) || VideoHelper.IsVideoFile(assetFileName);
     }
-
-    private static Asset CreateAsset(string fileName) => new()
-    {
-        FolderId = Guid.Empty,
-        Folder = new() { Id = Guid.Empty, Path = "" },
-        FileName = fileName,
-        Pixel = new()
-        {
-            Asset = new() { Width = 1920, Height = 1080 },
-            Thumbnail = new() { Width = 200, Height = 112 }
-        },
-        FileProperties = new() { Size = 1024 },
-        Hash = string.Empty,
-        ThumbnailCreationDateTime = DateTime.Now,
-        Metadata = new()
-        {
-            Corrupted = new() { IsTrue = false, Message = null },
-            Rotated = new() { IsTrue = false, Message = null }
-        }
-    };
 }

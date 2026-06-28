@@ -1,4 +1,4 @@
-namespace PhotoManager.Tests;
+﻿namespace PhotoManager.Tests;
 
 public sealed class CatalogChangeRecorder : List<CatalogChangeCallbackEventArgs>
 {

@@ -40,18 +40,17 @@ public class AssetRepositoryLookupBenchmarks
 
             for (int j = 0; j < AssetsPerFolder; j++)
             {
-                Asset asset = new()
-                {
-                    FolderId = folder.Id,
-                    Folder = folder,
-                    FileName = $"Image_{j}.jpg",
-                    Pixel = new()
-                    {
-                        Asset = new() { Width = 1920, Height = 1080 },
-                        Thumbnail = new() { Width = 200, Height = 150 }
-                    },
-                    Hash = "abc123"
-                };
+                Asset asset = AssetBenchmarkBuilder.Create()
+                    .WithFolder(folder)
+                    .WithFileName($"Image_{j}.jpg")
+                    .WithPixels(1920, 1080, 200, 150)
+                    .WithFileSize(0)
+                    .WithHash("abc123")
+                    .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+                    .WithImageRotation(ImageRotation.Rotate0)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build();
 
                 _assets.Add(asset);
                 folderAssets[asset.FileName] = asset;

@@ -35,7 +35,8 @@ public class UserConfigurationServiceTests
 
         try
         {
-            IConfigurationRoot configurationRootMock = CreateConfiguration(catalogBatchSize: "321", themeMode: "Dark");
+            IConfigurationRoot configurationRootMock =
+                ConfigurationFactory.CreateMockConfiguration(catalogBatchSize: "321", themeMode: "Dark");
 
             UserConfigurationService userConfigurationService =
                 new(configurationRootMock, sqlitePersistenceContext);
@@ -168,15 +169,17 @@ public class UserConfigurationServiceTests
 
         try
         {
-            IConfigurationRoot initialConfiguration = CreateConfiguration(catalogBatchSize: "321", themeMode: "Light");
+            IConfigurationRoot initialConfiguration =
+                ConfigurationFactory.CreateMockConfiguration(catalogBatchSize: "321", themeMode: "Light");
             UserConfigurationService initialUserConfigurationService =
                 new(initialConfiguration, sqlitePersistenceContext);
-            EditableUserConfiguration persistedConfiguration = CreateEditableConfiguration();
+            EditableUserConfiguration persistedConfiguration = ConfigurationFactory.CreateEditableConfiguration();
 
             initialUserConfigurationService.SaveEditableConfiguration(persistedConfiguration);
 
-            IConfigurationRoot changedJsonConfiguration = CreateConfiguration(catalogBatchSize: "999",
-                projectName: "JsonProject", projectOwner: "JsonOwner", themeMode: "System");
+            IConfigurationRoot changedJsonConfiguration =
+                ConfigurationFactory.CreateMockConfiguration(catalogBatchSize: "999", projectName: "JsonProject",
+                    projectOwner: "JsonOwner", themeMode: "System");
 
             UserConfigurationService userConfigurationService =
                 new(changedJsonConfiguration, sqlitePersistenceContext);
@@ -238,7 +241,7 @@ public class UserConfigurationServiceTests
 
         try
         {
-            IConfigurationRoot configurationRootMock = CreateConfiguration();
+            IConfigurationRoot configurationRootMock = ConfigurationFactory.CreateMockConfiguration();
             // A populated table means "persisted settings exist", so the service reads from it; a missing required
             // key is therefore an error. The atomic SetValues used on seed/save makes this state unreachable in
             // practice, but the read path must still fail fast if the table is ever partially populated.
@@ -562,9 +565,9 @@ public class UserConfigurationServiceTests
 
         try
         {
-            IConfigurationRoot configurationRootMock = CreateConfiguration();
+            IConfigurationRoot configurationRootMock = ConfigurationFactory.CreateMockConfiguration();
             UserConfigurationService userConfigurationService = new(configurationRootMock, sqlitePersistenceContext);
-            EditableUserConfiguration configuration = CreateEditableConfiguration();
+            EditableUserConfiguration configuration = ConfigurationFactory.CreateEditableConfiguration();
 
             Assert.That(userConfigurationService.AssetSettings.AnalyseVideos, Is.False);
             Assert.That(userConfigurationService.AssetSettings.CorruptedMessage, Is.EqualTo("The asset is corrupted"));
@@ -801,33 +804,4 @@ public class UserConfigurationServiceTests
         return new(factory, backupService, logger);
     }
 
-    private static IConfigurationRoot CreateConfiguration(
-        string catalogBatchSize = "100",
-        string projectName = "PhotoManager",
-        string projectOwner = "Toto",
-        string themeMode = "Light")
-    {
-        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
-        configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock
-            .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize)
-            .MockGetValue(UserConfigurationKeys.PROJECT_NAME, projectName)
-            .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, projectOwner)
-            .MockGetValue(UserConfigurationKeys.THEME_MODE, themeMode);
-
-        return configurationRootMock;
-    }
-
-    private static EditableUserConfiguration CreateEditableConfiguration()
-    {
-        return new(
-            new(true, "Corrupted", "Rotated", 42, 3, 999, 1, true, true, 320, 640),
-            new(6, true, true, true),
-            new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
-                PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
-                "Frames"),
-            new(5, 1, 10, 20, 30, 25),
-            new(4, 12),
-            new("Dark"));
-    }
 }

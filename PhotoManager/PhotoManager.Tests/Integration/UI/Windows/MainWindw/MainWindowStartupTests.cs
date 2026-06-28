@@ -414,34 +414,18 @@ public class MainWindowStartupTests
 
     private static Asset CreateAsset(string folderPath, string fileName)
     {
-        Guid folderId = Guid.NewGuid();
-
-        return new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = folderPath },
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 80 },
-                Thumbnail = new() { Width = 100, Height = 80 }
-            },
-            FileProperties = new()
-            {
-                Size = 1024,
-                Creation = new(2026, 1, 1),
-                Modification = new(2026, 1, 1)
-            },
-            ThumbnailCreationDateTime = new(2026, 1, 1),
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = fileName,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        return AssetBuilder.Create()
+            .WithFolderPath(folderPath, Guid.NewGuid())
+            .WithFileName(fileName)
+            .WithPixels(100, 80, 100, 80)
+            .WithFileProperties(1024, new(2026, 1, 1), new(2026, 1, 1))
+            .WithThumbnailCreationDateTime(new(2026, 1, 1))
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(fileName)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     private sealed class SingleLoggerFactory(ILogger<MainWindow> logger) : ILoggerFactory

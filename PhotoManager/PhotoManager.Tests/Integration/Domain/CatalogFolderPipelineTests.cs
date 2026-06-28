@@ -316,28 +316,16 @@ public class CatalogFolderPipelineTests
 
     private static Asset CreateAsset(string directory, string fileName)
     {
-        Folder folder = new()
-        {
-            Id = Guid.NewGuid(),
-            Path = directory
-        };
-
-        return new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            FileProperties = new()
-            {
-                Size = 1,
-                Creation = DateTime.UnixEpoch,
-                Modification = DateTime.UnixEpoch
-            },
-            Pixel = new(),
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = fileName,
-            ThumbnailCreationDateTime = DateTime.UnixEpoch,
-            Metadata = new()
-        };
+        return AssetBuilder.Create()
+            .WithFolderPath(directory, Guid.NewGuid())
+            .WithFileName(fileName)
+            .WithFileProperties(1, DateTime.UnixEpoch, DateTime.UnixEpoch)
+            .WithPixels(0, 0, 0, 0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(fileName)
+            .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 }

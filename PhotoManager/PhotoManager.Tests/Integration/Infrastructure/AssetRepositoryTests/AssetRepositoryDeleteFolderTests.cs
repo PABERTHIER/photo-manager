@@ -53,31 +53,19 @@ public class AssetRepositoryDeleteFolderTests
         _assetRepository = new(imageProcessingService, imageMetadataService, _userConfigurationService,
             sqlitePersistenceContext, _testLogger);
 
-        _asset1 = new()
-        {
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
-            FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFolderId(new("876283c6-780e-4ad5-975c-be63044c087a"))
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]

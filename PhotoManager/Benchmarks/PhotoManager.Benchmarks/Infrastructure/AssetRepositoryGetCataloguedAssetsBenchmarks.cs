@@ -34,18 +34,17 @@ public class AssetRepositoryGetCataloguedAssetsBenchmarks
             for (int assetIndex = 0; assetIndex < AssetsPerFolder; assetIndex++)
             {
                 string fileName = $"Image_{AssetsPerFolder - assetIndex:D6}.jpg";
-                folderAssets[fileName] = new()
-                {
-                    FolderId = folder.Id,
-                    Folder = folder,
-                    FileName = fileName,
-                    Pixel = new()
-                    {
-                        Asset = new() { Width = 1920, Height = 1080 },
-                        Thumbnail = new() { Width = 200, Height = 150 }
-                    },
-                    Hash = $"{folderIndex:D4}-{assetIndex:D6}"
-                };
+                folderAssets[fileName] = AssetBenchmarkBuilder.Create()
+                    .WithFolder(folder)
+                    .WithFileName(fileName)
+                    .WithPixels(1920, 1080, 200, 150)
+                    .WithFileSize(0)
+                    .WithHash($"{folderIndex:D4}-{assetIndex:D6}")
+                    .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+                    .WithImageRotation(ImageRotation.Rotate0)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build();
             }
         }
     }

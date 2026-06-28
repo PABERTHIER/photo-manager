@@ -26,11 +26,18 @@ public class AssetsComparatorGetUpdatedFileNamesBenchmarks
 
         _cataloguedAssets =
         [
-            .. Enumerable.Range(1, AssetCount).Select(i => CreateAsset(
-                $"IMG_{i:D4}.jpg",
-                fileCreation: i % 10 < 3 ? newFileTime : oldFileTime,
-                fileModification: oldFileTime,
-                thumbnailTime: thumbnailTime))
+            .. Enumerable.Range(1, AssetCount).Select(i =>
+                AssetBenchmarkBuilder.Create()
+                    .WithFolderPath("", Guid.Empty)
+                    .WithFileName($"IMG_{i:D4}.jpg")
+                    .WithPixels(1920, 1080, 200, 112)
+                    .WithFileProperties(1024, i % 10 < 3 ? newFileTime : oldFileTime, oldFileTime)
+                    .WithHash(string.Empty)
+                    .WithThumbnailCreationDateTime(thumbnailTime)
+                    .WithImageRotation(ImageRotation.Rotate0)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build())
         ];
     }
 
@@ -59,31 +66,4 @@ public class AssetsComparatorGetUpdatedFileNamesBenchmarks
     private static bool IsUpdatedAsset_Static(Asset a) =>
         a.FileProperties.Creation > a.ThumbnailCreationDateTime
         || a.FileProperties.Modification > a.ThumbnailCreationDateTime;
-
-    private static Asset CreateAsset(
-        string fileName,
-        DateTime fileCreation,
-        DateTime fileModification,
-        DateTime thumbnailTime)
-    {
-        return new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new() { Creation = fileCreation, Modification = fileModification, Size = 1024 },
-            Hash = string.Empty,
-            ThumbnailCreationDateTime = thumbnailTime,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-    }
 }

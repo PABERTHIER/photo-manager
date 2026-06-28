@@ -118,35 +118,19 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = expectedWidth, Height = expectedHeight },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = rotation,
-            Hash = Hashes.IMAGE_11_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(expectedWidth, expectedHeight,
+                ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -223,31 +207,19 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = expectedWidth, Height = expectedHeight },
-                Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
-            },
-            FileProperties = new()
-            {
-                Size = expectedFileSize,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = rotation,
-            Hash = expectedHash,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(expectedWidth, expectedHeight,
+                expectedThumbnailPixelWidth, expectedThumbnailPixelHeight)
+            .WithFileProperties(expectedFileSize,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(expectedHash)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -309,39 +281,19 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.NON_EXISTENT_IMAGE_HEIC,
-                    Height = PixelHeightAsset.NON_EXISTENT_IMAGE_HEIC
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_HEIC,
-                    Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.NON_EXISTENT_IMAGE_HEIC,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = rotation,
-            Hash = Hashes.NON_EXISTENT_IMAGE_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_HEIC, PixelHeightAsset.NON_EXISTENT_IMAGE_HEIC,
+                ThumbnailWidthAsset.NON_EXISTENT_IMAGE_HEIC, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_HEIC)
+            .WithFileProperties(FileSize.NON_EXISTENT_IMAGE_HEIC,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.NON_EXISTENT_IMAGE_HEIC)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         byte[] assetData = File.ReadAllBytes(Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC));
 
@@ -403,35 +355,19 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!);
 
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = rotation,
-            Hash = Hashes.IMAGE_11_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         byte[] assetData = File.ReadAllBytes(filePath);
 
@@ -491,40 +427,20 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Guid folderId = Guid.NewGuid();
         Folder folder = new() { Id = folderId, Path = @"C:\test" };
 
-        Asset asset = new()
-        {
-            FolderId = folderId,
-            Folder = folder,
-            FileName = "test.heic",
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_11_HEIC,
-                    Height = PixelHeightAsset.IMAGE_11_HEIC
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default),
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = thumbnailImageData,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("test.heic")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC,
+                FileDatesHelper.GetExpectedCreationDate(ModificationDate.Default), ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithImageData(thumbnailImageData)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         applicationViewModel.SetAssets(@"C:\test", [asset]);
 

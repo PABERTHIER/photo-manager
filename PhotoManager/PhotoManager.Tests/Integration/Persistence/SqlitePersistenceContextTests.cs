@@ -894,30 +894,17 @@ public class SqlitePersistenceContextTests
     private static Asset CreateAsset(Folder folder, string fileName = FileNames.IMAGE_1_JPG,
         string hash = Hashes.IMAGE_1_JPG, bool isCorrupted = false, bool isRotated = false)
     {
-        return new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = hash,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = isCorrupted, Message = isCorrupted ? "The asset is corrupted" : null },
-                Rotated = new() { IsTrue = isRotated, Message = isRotated ? "The asset has been rotated" : null }
-            }
-        };
+        return AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(hash)
+            .WithCorrupted(isCorrupted, isCorrupted ? "The asset is corrupted" : null)
+            .WithRotated(isRotated, isRotated ? "The asset has been rotated" : null)
+            .Build();
     }
 }

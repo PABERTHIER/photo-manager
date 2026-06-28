@@ -67,8 +67,8 @@ public class ApplicationSaveEditableConfigurationTests
     [Test]
     public void SaveEditableConfiguration_ValidConfiguration_PersistsConfigurationAndUpdatesEditableState()
     {
-        ConfigureApplication(CreateConfiguration());
-        EditableUserConfiguration configuration = CreateEditableConfiguration();
+        ConfigureApplication(ConfigurationFactory.CreateMockConfiguration());
+        EditableUserConfiguration configuration = ConfigurationFactory.CreateEditableConfiguration();
 
         // The application starts on the JSON-seeded defaults, both in memory and in the SQLite Configuration table.
         EditableUserConfiguration applicationEditableConfiguration = _application!.GetEditableConfiguration();
@@ -252,14 +252,15 @@ public class ApplicationSaveEditableConfigurationTests
     [Test]
     public void SaveEditableConfiguration_ValidConfigurationAndReadBackByANewService_PersistsConfiguration()
     {
-        ConfigureApplication(CreateConfiguration());
-        EditableUserConfiguration configuration = CreateEditableConfiguration();
+        ConfigureApplication(ConfigurationFactory.CreateMockConfiguration());
+        EditableUserConfiguration configuration = ConfigurationFactory.CreateEditableConfiguration();
 
         _application!.SaveEditableConfiguration(configuration);
 
         // A brand-new service reading the same database observes the saved values: the save is durable and
         // re-readable beyond the live instance, rebuilt by value rather than handing back the saved instance.
-        UserConfigurationService reloadedService = new(CreateConfiguration(), _sqlitePersistenceContext!);
+        UserConfigurationService reloadedService = new(ConfigurationFactory.CreateMockConfiguration(),
+            _sqlitePersistenceContext!);
         EditableUserConfiguration reloadedConfiguration = reloadedService.GetEditableConfiguration();
 
         Assert.That(reloadedConfiguration, Is.Not.SameAs(configuration));
@@ -362,33 +363,4 @@ public class ApplicationSaveEditableConfigurationTests
             Is.EqualTo("Dark"));
     }
 
-    private static IConfigurationRoot CreateConfiguration(
-        string catalogBatchSize = "100",
-        string projectName = "PhotoManager",
-        string projectOwner = "Toto",
-        string themeMode = "Light")
-    {
-        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
-        configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock
-            .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize)
-            .MockGetValue(UserConfigurationKeys.PROJECT_NAME, projectName)
-            .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, projectOwner)
-            .MockGetValue(UserConfigurationKeys.THEME_MODE, themeMode);
-
-        return configurationRootMock;
-    }
-
-    private static EditableUserConfiguration CreateEditableConfiguration()
-    {
-        return new(
-            new(true, "Corrupted", "Rotated", 42, 3, 999, 1, true, true, 320, 640),
-            new(6, true, true, true),
-            new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
-                PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
-                "Frames"),
-            new(5, 1, 10, 20, 30, 25),
-            new(4, 12),
-            new("Dark"));
-    }
 }

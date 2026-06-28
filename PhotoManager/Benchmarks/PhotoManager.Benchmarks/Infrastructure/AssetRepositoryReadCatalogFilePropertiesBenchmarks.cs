@@ -27,18 +27,17 @@ public class AssetRepositoryReadCatalogFilePropertiesBenchmarks
         {
             string fileName = $"Image_{i:D6}.jpg";
             File.WriteAllText(Path.Combine(_directory, fileName), "benchmark");
-            _assets[i] = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1920, Height = 1080 },
-                    Thumbnail = new() { Width = 200, Height = 150 }
-                },
-                Hash = $"hash_{i:D6}"
-            };
+            _assets[i] = AssetBenchmarkBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName)
+                .WithPixels(1920, 1080, 200, 150)
+                .WithFileSize(0)
+                .WithHash($"hash_{i:D6}")
+                .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+                .WithImageRotation(ImageRotation.Rotate0)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
         }
 
         _parallelOptions = new()
