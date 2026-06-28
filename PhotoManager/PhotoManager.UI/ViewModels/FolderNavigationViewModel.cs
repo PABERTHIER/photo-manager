@@ -1,7 +1,4 @@
-﻿using PhotoManager.Domain;
-using System.Collections.ObjectModel;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public class FolderNavigationViewModel(
     ApplicationViewModel applicationViewModel,

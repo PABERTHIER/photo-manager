@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Services;
+﻿namespace PhotoManager.UI.Services;
 
 public sealed class SingleInstanceService : ISingleInstanceService, IDisposable
 {

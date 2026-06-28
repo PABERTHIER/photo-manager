@@ -1,8 +1,4 @@
-﻿using PhotoManager.UI.Models;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.ViewModels;
+﻿namespace PhotoManager.UI.ViewModels;
 
 public class ShortcutsViewModel : BaseViewModel
 {

@@ -1,5 +1,4 @@
 ﻿using PhotoManager.Common.Imaging;
-using PhotoManager.Domain;
 using PhotoManager.Domain.UserConfigurationSettings;
 using System.Reflection;
 

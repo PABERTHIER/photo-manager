@@ -1,7 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using PhotoManager.Common.Imaging;
-
-namespace PhotoManager.UI.Converters;
+﻿namespace PhotoManager.UI.Converters;
 
 internal static class AvaloniaBitmapFactory
 {

@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain;
-
-namespace PhotoManager.UI.Models;
+﻿namespace PhotoManager.UI.Models;
 
 public delegate void FolderRemovedEventHandler(object sender, FolderRemovedEventArgs e);
 

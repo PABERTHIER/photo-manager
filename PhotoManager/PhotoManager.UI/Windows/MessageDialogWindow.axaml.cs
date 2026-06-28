@@ -1,8 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Windows;
+﻿namespace PhotoManager.UI.Windows;
 
 /// <summary>
 /// Modal dialog window that shows a titled message to the user.

@@ -1,15 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media.Imaging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using PhotoManager.UI.ViewModels;
-using System.Diagnostics.CodeAnalysis;
-
-namespace PhotoManager.UI.Controls;
+﻿namespace PhotoManager.UI.Controls;
 
 /// <summary>
 /// User control that displays the currently selected asset (image or video viewer).

@@ -1,14 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using PhotoManager.Domain;
-using PhotoManager.UI.Models;
-using PhotoManager.UI.ViewModels;
-using System.Diagnostics.CodeAnalysis;
+﻿using Avalonia.Interactivity;
 
 namespace PhotoManager.UI.Controls;
 

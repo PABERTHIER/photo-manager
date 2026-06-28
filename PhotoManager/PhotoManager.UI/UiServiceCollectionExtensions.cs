@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PhotoManager.UI.Services;
-using PhotoManager.UI.ViewModels;
+﻿using PhotoManager.UI.Services;
 using PhotoManager.UI.Windows;
 
 namespace PhotoManager.UI;

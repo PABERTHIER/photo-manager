@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain;
-
-namespace PhotoManager.UI.Models;
+﻿namespace PhotoManager.UI.Models;
 
 public delegate void FolderAddedEventHandler(object sender, FolderAddedEventArgs e);
 

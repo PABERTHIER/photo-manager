@@ -1,10 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Logging;
-using PhotoManager.UI.Controls;
-using PhotoManager.UI.ViewModels;
-using System.Diagnostics.CodeAnalysis;
+﻿using PhotoManager.UI.Controls;
 
 namespace PhotoManager.UI.Windows;
 
