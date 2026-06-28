@@ -19,14 +19,14 @@ public class TernaryConverterTests
             .WithFileSize(0)
             .WithThumbnailCreationDateTime(default)
             .WithHash(string.Empty)
-            .WithCorrupted(assertion, message!)
+            .WithCorrupted(assertion, message)
             .WithRotated(false, null)
             .Build();
 
         object?[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
         object? parameter = null;
 
-        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,
+        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter,
             CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
@@ -47,13 +47,13 @@ public class TernaryConverterTests
             .WithThumbnailCreationDateTime(default)
             .WithHash(string.Empty)
             .WithCorrupted(false, null)
-            .WithRotated(assertion, message!)
+            .WithRotated(assertion, message)
             .Build();
 
         object?[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
         object? parameter = null;
 
-        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,
+        string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter,
             CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(expected));
