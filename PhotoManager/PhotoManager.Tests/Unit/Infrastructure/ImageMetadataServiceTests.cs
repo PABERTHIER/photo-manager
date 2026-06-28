@@ -135,20 +135,16 @@ public class ImageMetadataServiceTests
 
     private static Asset CreateAsset(Folder folder, string fileName)
     {
-        return new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 100 },
-                Thumbnail = new() { Width = 50, Height = 50 }
-            },
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = fileName,
-            ThumbnailCreationDateTime = DateTime.UnixEpoch,
-            Metadata = new()
-        };
+        return AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithPixels(100, 100, 50, 50)
+            .WithFileSize(0)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(fileName)
+            .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 }

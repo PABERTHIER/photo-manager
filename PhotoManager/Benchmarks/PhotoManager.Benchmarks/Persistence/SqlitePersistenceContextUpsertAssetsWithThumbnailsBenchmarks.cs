@@ -140,21 +140,17 @@ public class SqlitePersistenceContextUpsertAssetsWithThumbnailsBenchmarks
 
         for (int i = 0; i < count; i++)
         {
-            Asset asset = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = $"Image_{i}.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1920, Height = 1080 },
-                    Thumbnail = new() { Width = 200, Height = 150 }
-                },
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = $"hash-{i}",
-                ThumbnailCreationDateTime = DateTime.UnixEpoch.AddSeconds(i),
-                Metadata = new()
-            };
+            Asset asset = AssetBenchmarkBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName($"Image_{i}.jpg")
+                .WithPixels(1920, 1080, 200, 150)
+                .WithFileSize(0)
+                .WithHash($"hash-{i}")
+                .WithThumbnailCreationDateTime(DateTime.UnixEpoch.AddSeconds(i))
+                .WithImageRotation(ImageRotation.Rotate0)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             batch[i] = new(asset, [1, 2, 3, 4, 5, 6, 7, 8]);
         }

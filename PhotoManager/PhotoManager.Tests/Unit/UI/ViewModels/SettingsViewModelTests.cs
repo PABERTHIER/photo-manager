@@ -13,7 +13,7 @@ public class SettingsViewModelTests
     public void SetUp()
     {
         _application = Substitute.For<IApplication>();
-        _application.GetEditableConfiguration().Returns(CreateEditableConfiguration());
+        _application.GetEditableConfiguration().Returns(ConfigurationFactory.CreateEditableConfiguration());
         _settingsViewModel = new(_application);
     }
 
@@ -301,19 +301,6 @@ public class SettingsViewModelTests
             "Frames",
             "Dark",
             "Assets directory is required.");
-    }
-
-    private static EditableUserConfiguration CreateEditableConfiguration()
-    {
-        return new(
-            new(true, "Corrupted", "Rotated", 42, 3, 999, 1, true, true, 320, 640),
-            new(6, true, true, true),
-            new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
-                PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
-                "Frames"),
-            new(5, 1, 10, 20, 30, 25),
-            new(4, 12),
-            new("Dark"));
     }
 
     private static IEnumerable<TestCaseData> InvalidSettingsCases()

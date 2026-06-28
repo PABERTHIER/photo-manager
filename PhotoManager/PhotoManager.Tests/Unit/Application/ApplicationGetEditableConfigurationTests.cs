@@ -7,7 +7,7 @@ public class ApplicationGetEditableConfigurationTests
     public void GetEditableConfiguration_ValidConfiguration_ReturnsEditableConfiguration()
     {
         IUserConfigurationService userConfigurationService = Substitute.For<IUserConfigurationService>();
-        EditableUserConfiguration configuration = CreateEditableConfiguration();
+        EditableUserConfiguration configuration = ConfigurationFactory.CreateEditableConfiguration();
         userConfigurationService.GetEditableConfiguration().Returns(configuration);
         PhotoManager.Application.Application application = CreateApplication(userConfigurationService);
 
@@ -31,16 +31,4 @@ public class ApplicationGetEditableConfigurationTests
             Substitute.For<IAssetConversionService>());
     }
 
-    private static EditableUserConfiguration CreateEditableConfiguration()
-    {
-        return new(
-            new(true, "Corrupted", "Rotated", 42, 3, 999, 1, true, true, 320, 640),
-            new(6, true, true, true),
-            new(PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets"),
-                PathHelper.ToPlatformAbsolutePath("C:\\PhotoManager\\Assets\\Exempted"),
-                "Frames"),
-            new(5, 1, 10, 20, 30, 25),
-            new(4, 12),
-            new("Dark"));
-    }
 }

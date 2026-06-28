@@ -1,4 +1,5 @@
 ﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
@@ -468,8 +469,7 @@ public class AssetPersistenceTests
     [TestCase(ImageRotation.Rotate90, FileNames.IMAGE_1_90_DEG_JPG, Hashes.IMAGE_1_90_DEG_JPG)]
     [TestCase(ImageRotation.Rotate180, FileNames.IMAGE_1_180_DEG_JPG, Hashes.IMAGE_1_180_DEG_JPG)]
     [TestCase(ImageRotation.Rotate270, FileNames.IMAGE_1_270_DEG_JPG, Hashes.IMAGE_1_270_DEG_JPG)]
-    public void Upsert_AllRotationValues_RoundTripCorrectly(
-        ImageRotation rotation, string fileName, string hash)
+    public void Upsert_AllRotationValues_RoundTripCorrectly(ImageRotation rotation, string fileName, string hash)
     {
         Asset asset = CreateAsset(
             _testFolder!.Id, fileName, hash,
@@ -487,32 +487,21 @@ public class AssetPersistenceTests
         _testLogger.AssertLogExceptions([], typeof(SqlitePersistenceContext));
     }
 
-    private static Asset CreateAsset(
-        Guid folderId, string fileName, string hash,
-        int pixelWidth, int pixelHeight,
-        int thumbnailWidth, int thumbnailHeight,
-        ImageRotation rotation,
-        bool isCorrupted, string? corruptedMessage,
+    private static Asset CreateAsset(Guid folderId, string fileName, string hash, int pixelWidth, int pixelHeight,
+        int thumbnailWidth, int thumbnailHeight, ImageRotation rotation, bool isCorrupted, string? corruptedMessage,
         bool isRotated, string? rotatedMessage)
     {
-        return new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = Guid.Empty, Path = string.Empty },
-            FileName = fileName,
-            ImageRotation = rotation,
-            Pixel = new()
-            {
-                Asset = new() { Width = pixelWidth, Height = pixelHeight },
-                Thumbnail = new() { Width = thumbnailWidth, Height = thumbnailHeight }
-            },
-            ThumbnailCreationDateTime = new(2024, 6, 7, 8, 54, 37),
-            Hash = hash,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = isCorrupted, Message = corruptedMessage },
-                Rotated = new() { IsTrue = isRotated, Message = rotatedMessage }
-            }
-        };
+        return AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = string.Empty })
+            .WithFolderId(folderId)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(pixelWidth, pixelHeight, thumbnailWidth, thumbnailHeight)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(ModificationDate.Default)
+            .WithHash(hash)
+            .WithCorrupted(isCorrupted, corruptedMessage)
+            .WithRotated(isRotated, rotatedMessage)
+            .Build();
     }
 }

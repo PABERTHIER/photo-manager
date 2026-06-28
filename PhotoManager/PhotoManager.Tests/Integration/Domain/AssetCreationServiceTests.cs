@@ -1127,31 +1127,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                expectedThumbnailPixelWidth, expectedThumbnailPixelHeight)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1206,35 +1193,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_10_PORTRAIT_PNG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_10_PORTRAIT_PNG,
-                    Height = PixelHeightAsset.IMAGE_10_PORTRAIT_PNG
-                },
-                Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_10_PORTRAIT_PNG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_10_PORTRAIT_PNG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_10_PORTRAIT_PNG)
+            .WithPixels(PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG,
+                expectedThumbnailPixelWidth, expectedThumbnailPixelHeight)
+            .WithFileProperties(FileSize.IMAGE_10_PORTRAIT_PNG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_10_PORTRAIT_PNG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1290,31 +1260,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_11_HEIC,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_11_HEIC)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                expectedThumbnailPixelWidth, expectedThumbnailPixelHeight)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1358,31 +1315,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1471,31 +1415,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1545,31 +1476,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1621,31 +1539,18 @@ public class AssetCreationServiceTests
     {
         ConfigureAssetCreationService(200, 150, false, false, false, false);
 
-        Asset expectedAsset = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         Folder folder = _testableAssetRepository!.AddFolder(_assetsDirectory!); // Set above, not in this method
 
@@ -1780,35 +1685,17 @@ public class AssetCreationServiceTests
 
         try
         {
-            Asset expectedAsset = new()
-            {
-                FolderId = Guid.Empty, // Initialised later
-                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-                FileName = corruptedAssetFileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = pixelWidth, Height = pixelHeight },
-                    Thumbnail = new() { Width = thumbnailPixelWidth, Height = thumbnailPixelHeight }
-                },
-                FileProperties = new()
-                {
-                    Size = fileSize,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = imageRotation,
-                Hash = hash,
-                Metadata = new()
-                {
-                    Corrupted = new()
-                    {
-                        IsTrue = true,
-                        Message = _userConfigurationService!.AssetSettings.CorruptedMessage
-                    },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            };
+            Asset expectedAsset = AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+                .WithFileName(corruptedAssetFileName)
+                .WithPixels(pixelWidth, pixelHeight, thumbnailPixelWidth, thumbnailPixelHeight)
+                .WithFileProperties(fileSize, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithRotation(imageRotation)
+                .WithHash(hash)
+                .WithCorrupted(true, _userConfigurationService!.AssetSettings.CorruptedMessage)
+                .WithRotated(false, null)
+                .Build();
 
             string imagePath = Path.Combine(_assetsDirectory!, initialFileName);
             Assert.That(File.Exists(imagePath), Is.True);
@@ -1867,31 +1754,18 @@ public class AssetCreationServiceTests
         const string assetName = FileNames.IMAGE_1_JPG;
         Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
 
-        Asset expectedAsset = new()
-        {
-            FolderId = folder.Id,
-            Folder = new() { Id = folder.Id, Path = folder.Path },
-            FileName = assetName,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset expectedAsset = AssetBuilder.Create()
+            .WithFolder(new() { Id = folder.Id, Path = folder.Path })
+            .WithFileName(assetName)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         string imagePath = Path.Combine(_assetsDirectory!, assetName);
 
@@ -2582,35 +2456,18 @@ public class AssetCreationServiceTests
             Assert.That(File.Exists(videoPath), Is.True);
             Assert.That(File.Exists(imagePath), Is.True);
 
-            Asset expectedAsset = new()
-            {
-                FolderId = Guid.Empty, // Initialised later
-                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-                FileName = firstFrameFileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                FileProperties = new()
-                {
-                    Size = FileSize.IMAGE_1_JPG,
-                    Creation = DateTime.Now,
-                    Modification = ModificationDate.Default
-                },
-                ThumbnailCreationDateTime = DateTime.Now,
-                ImageRotation = ImageRotation.Rotate0,
-                Hash = Hashes.IMAGE_1_JPG,
-                Metadata = new()
-                {
-                    Corrupted = new() { IsTrue = false, Message = null },
-                    Rotated = new() { IsTrue = false, Message = null }
-                }
-            };
+            Asset expectedAsset = AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Initialised later
+                .WithFileName(firstFrameFileName)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+                .WithThumbnailCreationDateTime(DateTime.Now)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithHash(Hashes.IMAGE_1_JPG)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             AssertAssetPropertyValidity(
                 asset2!,

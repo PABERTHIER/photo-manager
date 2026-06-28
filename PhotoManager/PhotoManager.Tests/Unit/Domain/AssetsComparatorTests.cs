@@ -31,90 +31,56 @@ public class AssetsComparatorTests
     [SetUp]
     public void SetUp()
     {
-        _asset1 = new()
-        {
-            FolderId = new("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new() { Size = FileSize.IMAGE_1_JPG },
-            ThumbnailCreationDateTime = _oldDateTime1,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset2 = new()
-        {
-            FolderId = new("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = FileNames.IMAGE_9_PNG,
-            ImageRotation = ImageRotation.Rotate90,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
-            },
-            FileProperties = new() { Size = FileSize.IMAGE_9_PNG },
-            ThumbnailCreationDateTime = _oldDateTime2,
-            Hash = Hashes.IMAGE_9_PNG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = FileNames.HOMER_GIF,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
-            },
-            FileProperties = new() { Size = FileSize.HOMER_GIF },
-            ThumbnailCreationDateTime = _oldDateTime1,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.HOMER_GIF,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset4 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = FileNames.IMAGE_11_HEIC,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new() { Size = FileSize.IMAGE_11_HEIC },
-            ThumbnailCreationDateTime = _oldDateTime2,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFolderId(new("010233a2-8ea6-4cb0-86e4-156fef7cd772"))
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(FileSize.IMAGE_1_JPG)
+            .WithThumbnailCreationDateTime(_oldDateTime1)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFolderId(new("010233a2-8ea6-4cb0-86e4-156fef7cd772"))
+            .WithFileName(FileNames.IMAGE_9_PNG)
+            .WithRotation(ImageRotation.Rotate90)
+            .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+            .WithFileSize(FileSize.IMAGE_9_PNG)
+            .WithThumbnailCreationDateTime(_oldDateTime2)
+            .WithHash(Hashes.IMAGE_9_PNG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFileName(FileNames.HOMER_GIF)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
+                ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF)
+            .WithFileSize(FileSize.HOMER_GIF)
+            .WithThumbnailCreationDateTime(_oldDateTime1)
+            .WithHash(Hashes.HOMER_GIF)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset4 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFileName(FileNames.IMAGE_11_HEIC)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileSize(FileSize.IMAGE_11_HEIC)
+            .WithThumbnailCreationDateTime(_oldDateTime2)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [Test]
@@ -123,54 +89,50 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file6.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file7.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file8.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file9.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file6.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file7.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file8.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file9.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -185,78 +147,72 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file6.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file7.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file8.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file9.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file6.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file7.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file8.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file9.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -271,66 +227,61 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -344,66 +295,61 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -417,66 +363,61 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         NullReferenceException? exception =
@@ -735,54 +676,50 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file6.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file7.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file8.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file9.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file6.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file7.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file8.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file9.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -797,66 +734,61 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file6.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file7.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file8.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file9.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file6.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file7.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file8.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file9.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -871,66 +803,61 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -944,66 +871,61 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -1020,66 +942,61 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file1.jpg",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file2.png",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file3.gif",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file4.heic",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            },
-            new()
-            {
-                FolderId = Guid.Empty,
-                Folder = new() { Id = Guid.Empty, Path = "" },
-                FileName = "file5.mp4",
-                Pixel = new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
-                Hash = string.Empty
-            }
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file1.jpg")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file2.png")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file3.gif")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file4.heic")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build(),
+            AssetBuilder.Create()
+                .WithFolder(new() { Id = Guid.Empty, Path = "" })
+                .WithFileName("file5.mp4")
+                .WithRotation(ImageRotation.Rotate0)
+                .WithPixels(1280, 720, 200, 112)
+                .WithFileSize(0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build()
         ];
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>

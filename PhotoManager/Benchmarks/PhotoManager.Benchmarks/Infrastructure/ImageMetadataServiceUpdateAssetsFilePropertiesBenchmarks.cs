@@ -110,22 +110,16 @@ public class ImageMetadataServiceUpdateAssetsFilePropertiesBenchmarks
         }
     }
 
-    private static Asset CreateAsset(Folder folder, string fileName)
-    {
-        return new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 100 },
-                Thumbnail = new() { Width = 50, Height = 50 }
-            },
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = fileName,
-            ThumbnailCreationDateTime = DateTime.UnixEpoch,
-            Metadata = new()
-        };
-    }
+    private static Asset CreateAsset(Folder folder, string fileName) =>
+        AssetBenchmarkBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithPixels(100, 100, 50, 50)
+            .WithFileSize(0)
+            .WithHash(fileName)
+            .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+            .WithImageRotation(ImageRotation.Rotate0)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }

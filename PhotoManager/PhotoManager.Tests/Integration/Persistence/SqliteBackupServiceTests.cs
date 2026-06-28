@@ -6,6 +6,7 @@ using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
 using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Persistence;
@@ -248,7 +249,7 @@ public class SqliteBackupServiceTests
 
             string vacationFolderId = vacationFolder.Id.ToString().ToUpperInvariant();
             string archiveFolderId = archiveFolder.Id.ToString().ToUpperInvariant();
-            long expectedTicks = Constants.ModificationDate.Default.Ticks;
+            long expectedTicks = ModificationDate.Default.Ticks;
 
             // ─── Folders: 2 remain (Temp was deleted) ─────────────────────────
             using (SqliteCommand command = extractedConnection.CreateCommand())
@@ -659,24 +660,17 @@ public class SqliteBackupServiceTests
         int thumbnailWidth, int thumbnailHeight, ImageRotation rotation, bool isCorrupted, string? corruptedMessage,
         bool isRotated, string? rotatedMessage)
     {
-        return new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = Guid.Empty, Path = string.Empty },
-            FileName = fileName,
-            ImageRotation = rotation,
-            Pixel = new()
-            {
-                Asset = new() { Width = pixelWidth, Height = pixelHeight },
-                Thumbnail = new() { Width = thumbnailWidth, Height = thumbnailHeight }
-            },
-            ThumbnailCreationDateTime = new(2024, 6, 7, 8, 54, 37),
-            Hash = hash,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = isCorrupted, Message = corruptedMessage },
-                Rotated = new() { IsTrue = isRotated, Message = rotatedMessage }
-            }
-        };
+        return AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = string.Empty })
+            .WithFolderId(folderId)
+            .WithFileName(fileName)
+            .WithRotation(rotation)
+            .WithPixels(pixelWidth, pixelHeight, thumbnailWidth, thumbnailHeight)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(ModificationDate.Default)
+            .WithHash(hash)
+            .WithCorrupted(isCorrupted, corruptedMessage)
+            .WithRotated(isRotated, rotatedMessage)
+            .Build();
     }
 }

@@ -281,86 +281,66 @@ public class ImageMetadataServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName1,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
-                },
-                Hash = string.Empty
-            };
-            Asset asset2 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName2,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset3 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName3,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
-                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset4 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName4,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset5 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName5,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset1 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName1)
+                .WithPixels(PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
+                    ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset2 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName2)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset3 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName3)
+                .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                    ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset4 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName4)
+                .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                    ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset5 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName5)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, PixelHeightAsset.NON_EXISTENT_IMAGE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
@@ -466,86 +446,66 @@ public class ImageMetadataServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName1,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
-                },
-                Hash = string.Empty
-            };
-            Asset asset2 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName2,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset3 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName3,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_9_PNG,
-                        Height = ThumbnailHeightAsset.IMAGE_9_PNG
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset4 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName4,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset5 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName5,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset1 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName1)
+                .WithPixels(PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
+                    ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset2 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName2)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset3 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName3)
+                .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG,
+                    ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset4 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName4)
+                .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                    ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset5 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName5)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, PixelHeightAsset.NON_EXISTENT_IMAGE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
@@ -633,71 +593,55 @@ public class ImageMetadataServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName1,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
-                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
-                },
-                Hash = string.Empty
-            };
-            Asset asset2 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName2,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset1 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName1)
+                .WithPixels(PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF,
+                    ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset2 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName2)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
             Asset? asset3 = null;
-            Asset asset4 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName4,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                        Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                    }
-                },
-                Hash = string.Empty
-            };
-            Asset asset5 = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName5,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset4 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName4)
+                .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC,
+                    ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
+            Asset asset5 = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName5)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, PixelHeightAsset.NON_EXISTENT_IMAGE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
@@ -763,22 +707,18 @@ public class ImageMetadataServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
@@ -810,25 +750,18 @@ public class ImageMetadataServiceTests
             const string fileName = FileNames.NON_EXISTENT_IMAGE_JPG;
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
-            Asset asset = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
-                {
-                    Asset = new()
-                    {
-                        Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                        Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName)
+                .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, PixelHeightAsset.NON_EXISTENT_IMAGE_JPG,
+                    ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             DateTime creationTime = default;
             DateTime modificationTime = default;
@@ -876,22 +809,18 @@ public class ImageMetadataServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new()
-            {
-                FolderId = folder.Id,
-                Folder = folder,
-                FileName = fileName,
-                Pixel = new()
-                {
-                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                    Thumbnail = new()
-                    {
-                        Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                        Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                    }
-                },
-                Hash = string.Empty
-            };
+            Asset asset = AssetBuilder.Create()
+                .WithFolder(folder)
+                .WithFileName(fileName)
+                .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                    ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                .WithFileSize(0)
+                .WithRotation(ImageRotation.Rotate0)
+                .WithThumbnailCreationDateTime(default)
+                .WithHash(string.Empty)
+                .WithCorrupted(false, null)
+                .WithRotated(false, null)
+                .Build();
 
             Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));

@@ -67,27 +67,16 @@ public class CatalogAssetsServiceCatalogChangeCallbackBenchmarks
         return observedCount;
     }
 
-    private static Asset CreateAsset(int index)
-    {
-        return new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "C:\\Assets" },
-            FileName = $"asset_{index:D5}.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new() { Size = 1024 },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = $"hash_{index:D5}",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-    }
+    private static Asset CreateAsset(int index) =>
+        AssetBenchmarkBuilder.Create()
+            .WithFolderPath("C:\\Assets", Guid.Empty)
+            .WithFileName($"asset_{index:D5}.jpg")
+            .WithPixels(1920, 1080, 200, 112)
+            .WithFileSize(1024)
+            .WithHash($"hash_{index:D5}")
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithImageRotation(ImageRotation.Rotate0)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }

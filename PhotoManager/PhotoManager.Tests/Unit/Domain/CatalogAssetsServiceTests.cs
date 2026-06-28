@@ -543,25 +543,16 @@ public class CatalogAssetsServiceTests
         Path = AssetsDirectory
     };
 
-    private static Asset CreateAsset(Folder folder, string fileName, string? hash = null) => new()
-    {
-        FolderId = folder.Id,
-        Folder = folder,
-        FileName = fileName,
-        FileProperties = new()
-        {
-            Size = 1,
-            Creation = DateTime.UnixEpoch,
-            Modification = DateTime.UnixEpoch
-        },
-        Pixel = new()
-        {
-            Asset = new() { Width = 100, Height = 100 },
-            Thumbnail = new() { Width = 50, Height = 50 }
-        },
-        ImageRotation = ImageRotation.Rotate0,
-        Hash = hash ?? fileName,
-        ThumbnailCreationDateTime = DateTime.UnixEpoch,
-        Metadata = new()
-    };
+    private static Asset CreateAsset(Folder folder, string fileName, string? hash = null) =>
+        AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName)
+            .WithFileProperties(1, DateTime.UnixEpoch, DateTime.UnixEpoch)
+            .WithPixels(100, 100, 50, 50)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithHash(hash ?? fileName)
+            .WithThumbnailCreationDateTime(DateTime.UnixEpoch)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }

@@ -70,20 +70,18 @@ public class DateTimeAssetComparerCompareBenchmarks
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static Asset CreateAsset(Guid folderId, string fileName, DateTime modification) => new()
-    {
-        FolderId = folderId,
-        Folder = new() { Id = folderId, Path = @"C:\Photos" },
-        FileName = fileName,
-        Pixel = new()
-        {
-            Asset = new() { Width = 1280, Height = 720 },
-            Thumbnail = new() { Width = 200, Height = 112 }
-        },
-        FileProperties = new() { Size = 29000, Creation = modification, Modification = modification },
-        ThumbnailCreationDateTime = modification,
-        Hash = "abc"
-    };
+    private static Asset CreateAsset(Guid folderId, string fileName, DateTime modification) =>
+        AssetBenchmarkBuilder.Create()
+            .WithFolderPath(@"C:\Photos", folderId)
+            .WithFileName(fileName)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(29000, modification, modification)
+            .WithHash("abc")
+            .WithThumbnailCreationDateTime(modification)
+            .WithImageRotation(ImageRotation.Rotate0)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }
 
 // Caches the LongAssetComparer as a field instead of creating it (+ a closure) on every Compare() call

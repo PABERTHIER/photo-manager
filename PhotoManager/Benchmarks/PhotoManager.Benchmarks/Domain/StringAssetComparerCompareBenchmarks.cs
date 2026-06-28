@@ -53,20 +53,18 @@ public class StringAssetComparerCompareBenchmarks
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static Asset CreateAsset(Guid folderId, string fileName) => new()
-    {
-        FolderId = folderId,
-        Folder = new() { Id = folderId, Path = @"C:\Photos" },
-        FileName = fileName,
-        Pixel = new()
-        {
-            Asset = new() { Width = 1280, Height = 720 },
-            Thumbnail = new() { Width = 200, Height = 112 }
-        },
-        FileProperties = new() { Size = 29000, Creation = DateTime.Now, Modification = DateTime.Now },
-        ThumbnailCreationDateTime = DateTime.Now,
-        Hash = "abc"
-    };
+    private static Asset CreateAsset(Guid folderId, string fileName) =>
+        AssetBenchmarkBuilder.Create()
+            .WithFolderPath(@"C:\Photos", folderId)
+            .WithFileName(fileName)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(29000, DateTime.Now, DateTime.Now)
+            .WithHash("abc")
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithImageRotation(ImageRotation.Rotate0)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 }
 
 // Replaces string.Compare(..., StringComparison.Ordinal) with string.CompareOrdinal

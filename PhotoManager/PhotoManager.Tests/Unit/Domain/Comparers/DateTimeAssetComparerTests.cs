@@ -25,166 +25,104 @@ public class DateTimeAssetComparerTests
         Guid folderId = Guid.NewGuid();
         DateTime actualDate = DateTime.Now;
 
-        _asset1 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "Image 1.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 29000,
-                Creation = actualDate,
-                Modification = actualDate
-            },
-            ThumbnailCreationDateTime = actualDate,
-            Hash =
-                "d83f8c94118726480bb48ad2cbeb62b1e4081cae0248a98546edd40e25c0b115402dbf046d8a187c91e1e2f238cad5d41793ec892774f21c98eba8423c442bba"
-        };
-        _asset2 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "image 1.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 30000,
-                Creation = actualDate.AddDays(-1),
-                Modification = actualDate.AddDays(-1)
-            },
-            ThumbnailCreationDateTime = actualDate.AddDays(-1),
-            Hash =
-                "2b7ead7db283e3df1a04260143aa4e6528afe2ab17d528d382eaeb482f4e2ce55681a0a94735e6e35f54001c6a6c85299f1ad327a15215b8faed7f6e2d098532"
-        };
-        _asset3 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "Image_1.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 31000,
-                Creation = actualDate.AddDays(-2),
-                Modification = actualDate.AddDays(-2)
-            },
-            ThumbnailCreationDateTime = actualDate.AddDays(-2),
-            Hash =
-                "a36c0a32e17e40e43f80232d068231ff74be137e723cc12150442eac5acfaa0a88c5ebe25160230d80a1455f6dbc5ac90b1ecf3b527bed3a687379503c202005"
-        };
-        _asset4 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "IMAGE 1.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 32000,
-                Creation = actualDate.AddDays(-3),
-                Modification = actualDate.AddDays(-3)
-            },
-            ThumbnailCreationDateTime = actualDate.AddDays(-3),
-            Hash =
-                "fd64c9cd647ce85a5e3061594ccae50d9c11ff272af4593c0a3b5124099932cb4146484ce5c37b7a95c3046725179fc1d0bd40c363beacddec238c8dde48a676"
-        };
-        _asset5 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "Image1.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 33000,
-                Creation = actualDate.AddDays(-4),
-                Modification = actualDate.AddDays(-4)
-            },
-            ThumbnailCreationDateTime = actualDate.AddDays(-4),
-            Hash =
-                "fe11ba801fa93829ddd6201eab5218f870b106051b4eec7aa007551f70aa2a044ee986257fe030cd5138cdb0f3ef7f43930712e0ac5d2868af84d1b817bc64d9"
-        };
-        _asset6 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "Image 1_duplicate.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 29000,
-                Creation = actualDate,
-                Modification = actualDate
-            },
-            ThumbnailCreationDateTime = actualDate,
-            Hash =
-                "d9399eea541dcc90af870995587be118b0e615f71317248c48c8ac9389b920af4e070f3b9c1965c8801a1c5e5f489df72c475070cd7a58770224b41a82b6dfe7"
-        };
-        _asset7 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "Image 10.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 35000,
-                Creation = new(2020, 12, 31),
-                Modification = new(2020, 12, 31)
-            },
-            ThumbnailCreationDateTime = new(2020, 12, 31),
-            Hash =
-                "e2ab4b48e17e3e8cca3a349514f49251e377075c756a0687f7db7ccee6aa4f658dcb7341a859a728ee20b9bd1c3ed44ecba352753770ce5c0738c4d851920335"
-        };
-        _asset8 = new()
-        {
-            FolderId = folderId,
-            Folder = new() { Id = folderId, Path = _assetsDirectory },
-            FileName = "picture.png",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            FileProperties = new()
-            {
-                Size = 36000,
-                Creation = new(2005, 02, 15),
-                Modification = new(2005, 02, 15)
-            },
-            ThumbnailCreationDateTime = new(2005, 02, 15),
-            Hash =
-                "ff51412ee4982849d4db953b794e20ce6335277b7c8426543e955b9ae448c94541322e0f59aa88612abb3db166129cfe60aaa6cc20daff6aac2ae9ad896fcc01"
-        };
+        Folder folder = new() { Id = folderId, Path = _assetsDirectory };
+
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("Image 1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(29000, actualDate, actualDate)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(
+                "d83f8c94118726480bb48ad2cbeb62b1e4081cae0248a98546edd40e25c0b115402dbf046d8a187c91e1e2f238cad5d41793ec892774f21c98eba8423c442bba")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("image 1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(30000, actualDate.AddDays(-1), actualDate.AddDays(-1))
+            .WithThumbnailCreationDateTime(actualDate.AddDays(-1))
+            .WithHash(
+                "2b7ead7db283e3df1a04260143aa4e6528afe2ab17d528d382eaeb482f4e2ce55681a0a94735e6e35f54001c6a6c85299f1ad327a15215b8faed7f6e2d098532")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("Image_1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(31000, actualDate.AddDays(-2), actualDate.AddDays(-2))
+            .WithThumbnailCreationDateTime(actualDate.AddDays(-2))
+            .WithHash(
+                "a36c0a32e17e40e43f80232d068231ff74be137e723cc12150442eac5acfaa0a88c5ebe25160230d80a1455f6dbc5ac90b1ecf3b527bed3a687379503c202005")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset4 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("IMAGE 1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(32000, actualDate.AddDays(-3), actualDate.AddDays(-3))
+            .WithThumbnailCreationDateTime(actualDate.AddDays(-3))
+            .WithHash(
+                "fd64c9cd647ce85a5e3061594ccae50d9c11ff272af4593c0a3b5124099932cb4146484ce5c37b7a95c3046725179fc1d0bd40c363beacddec238c8dde48a676")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset5 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("Image1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(33000, actualDate.AddDays(-4), actualDate.AddDays(-4))
+            .WithThumbnailCreationDateTime(actualDate.AddDays(-4))
+            .WithHash(
+                "fe11ba801fa93829ddd6201eab5218f870b106051b4eec7aa007551f70aa2a044ee986257fe030cd5138cdb0f3ef7f43930712e0ac5d2868af84d1b817bc64d9")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset6 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("Image 1_duplicate.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(29000, actualDate, actualDate)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(
+                "d9399eea541dcc90af870995587be118b0e615f71317248c48c8ac9389b920af4e070f3b9c1965c8801a1c5e5f489df72c475070cd7a58770224b41a82b6dfe7")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset7 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("Image 10.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(35000, new(2020, 12, 31), new(2020, 12, 31))
+            .WithThumbnailCreationDateTime(new(2020, 12, 31))
+            .WithHash(
+                "e2ab4b48e17e3e8cca3a349514f49251e377075c756a0687f7db7ccee6aa4f658dcb7341a859a728ee20b9bd1c3ed44ecba352753770ce5c0738c4d851920335")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset8 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("picture.png")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileProperties(36000, new(2005, 02, 15), new(2005, 02, 15))
+            .WithThumbnailCreationDateTime(new(2005, 02, 15))
+            .WithHash(
+                "ff51412ee4982849d4db953b794e20ce6335277b7c8426543e955b9ae448c94541322e0f59aa88612abb3db166129cfe60aaa6cc20daff6aac2ae9ad896fcc01")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [Test]

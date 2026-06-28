@@ -353,18 +353,18 @@ public class FileOperationsServiceTests
     public void FileExists_ExistingFile_ReturnsTrue()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            Hash = string.Empty
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         bool exists = _fileOperationsService!.FileExists(folder, asset);
 
@@ -377,26 +377,18 @@ public class FileOperationsServiceTests
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _assetsDirectory! };
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = FileNames.NON_EXISTENT_IMAGE_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                    Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG,
-                    Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG
-                }
-            },
-            Hash = string.Empty
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(FileNames.NON_EXISTENT_IMAGE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, PixelHeightAsset.NON_EXISTENT_IMAGE_JPG,
+                ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         bool exists = _fileOperationsService!.FileExists(folder, asset);
 
@@ -412,18 +404,18 @@ public class FileOperationsServiceTests
         string exceptionParameter)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = path! };
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = fileName!,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            Hash = string.Empty
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName(fileName!)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         ArgumentNullException? exception =
             Assert.Throws<ArgumentNullException>(() => _fileOperationsService!.FileExists(folder, asset));

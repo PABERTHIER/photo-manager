@@ -51,426 +51,174 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     {
         DateTime actualDate = DateTime.Now;
 
-        _asset1 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset2 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_2_DUPLICATED_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG,
-                    Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_2_DUPLICATED_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_2_DUPLICATED_JPG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset3 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_2_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_2_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_2_JPG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset4 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_PNG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_9_PNG,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset5 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_11_HEIC,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = SkiaImageData.Empty(),
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset6 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset7 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG,
-                    Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset8 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_PNG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_PNG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_9_PNG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset9 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG,
-                    Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG,
-                    Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset10 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_11_HEIC,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_11_HEIC,
-                    Height = ThumbnailHeightAsset.IMAGE_11_HEIC
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_11_HEIC,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_11_HEIC,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset11 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames._1336_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_JPG, Height = ThumbnailHeightAsset._1336_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize._1336_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes._1336_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset12 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames._1336_ORIGINAL_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset._1336_ORIGINAL_JPG,
-                    Height = PixelHeightAsset._1336_ORIGINAL_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG,
-                    Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize._1336_ORIGINAL_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes._1336_ORIGINAL_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset13 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames._1336_4_K_ORIGINAL_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG,
-                    Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG,
-                    Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize._1336_4_K_ORIGINAL_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes._1336_4_K_ORIGINAL_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        _asset14 = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG,
-                    Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1336_ORIGINAL_JPG,
-                Creation = actualDate,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = actualDate,
-            ImageRotation = ImageRotation.Rotate0,
-            Hash = Hashes.IMAGE_1336_ORIGINAL_JPG,
-            ImageData = null,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset2 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_2_DUPLICATED_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_2_DUPLICATED_JPG, PixelHeightAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG)
+            .WithFileProperties(FileSize.IMAGE_2_DUPLICATED_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_2_DUPLICATED_JPG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset3 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_2_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_2_JPG, PixelHeightAsset.IMAGE_2_JPG, ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG)
+            .WithFileProperties(FileSize.IMAGE_2_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_2_JPG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset4 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_9_PNG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_PNG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_9_PNG)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset5 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_11_HEIC)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithImageData(SkiaImageData.Empty())
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset6 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset7 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_1_DUPLICATE_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, PixelHeightAsset.IMAGE_1_DUPLICATE_JPG, ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_DUPLICATE_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_1_DUPLICATE_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset8 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_9_PNG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_9_PNG, PixelHeightAsset.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_PNG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_9_PNG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset9 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_9_DUPLICATE_PNG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, PixelHeightAsset.IMAGE_9_DUPLICATE_PNG, ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG)
+            .WithFileProperties(FileSize.IMAGE_9_DUPLICATE_PNG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_9_DUPLICATE_PNG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset10 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_11_HEIC)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC)
+            .WithFileProperties(FileSize.IMAGE_11_HEIC, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_11_HEIC)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset11 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames._1336_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset._1336_JPG, PixelHeightAsset._1336_JPG, ThumbnailWidthAsset._1336_JPG, ThumbnailHeightAsset._1336_JPG)
+            .WithFileProperties(FileSize._1336_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes._1336_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset12 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames._1336_ORIGINAL_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset._1336_ORIGINAL_JPG, PixelHeightAsset._1336_ORIGINAL_JPG, ThumbnailWidthAsset._1336_ORIGINAL_JPG, ThumbnailHeightAsset._1336_ORIGINAL_JPG)
+            .WithFileProperties(FileSize._1336_ORIGINAL_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes._1336_ORIGINAL_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset13 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames._1336_4_K_ORIGINAL_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset._1336_4_K_ORIGINAL_JPG, PixelHeightAsset._1336_4_K_ORIGINAL_JPG, ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG)
+            .WithFileProperties(FileSize._1336_4_K_ORIGINAL_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes._1336_4_K_ORIGINAL_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        _asset14 = AssetBuilder.Create()
+            .WithFolderPath("", Guid.Empty) // Initialised later
+            .WithFileName(FileNames.IMAGE_1336_ORIGINAL_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG, PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG)
+            .WithFileProperties(FileSize.IMAGE_1336_ORIGINAL_JPG, actualDate, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(actualDate)
+            .WithHash(Hashes.IMAGE_1336_ORIGINAL_JPG)
+            .WithImageData(null)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]

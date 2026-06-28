@@ -11,25 +11,19 @@ public class TernaryConverterTests
     public void Convert_AssetCorrupted_ReturnsValue(bool assertion, string? message, string? expected)
     {
         TernaryConverter ternaryConverter = new();
-        Asset asset = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "toto.jpg",
-            Hash = string.Empty,
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = assertion, Message = message! },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFileName("toto.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(assertion, message!)
+            .WithRotated(false, null)
+            .Build();
 
-        object[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
+        object?[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,
@@ -44,25 +38,19 @@ public class TernaryConverterTests
     public void Convert_AssetRotated_ReturnsValue(bool assertion, string? message, string? expected)
     {
         TernaryConverter ternaryConverter = new();
-        Asset asset = new()
-        {
-            FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "toto.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            Hash = string.Empty,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = assertion, Message = message! }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFileName("toto.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(1280, 720, 200, 112)
+            .WithFileSize(0)
+            .WithThumbnailCreationDateTime(default)
+            .WithHash(string.Empty)
+            .WithCorrupted(false, null)
+            .WithRotated(assertion, message!)
+            .Build();
 
-        object[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
+        object?[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!,

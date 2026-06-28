@@ -79,39 +79,19 @@ public class AssetRepositoryTests
         _assetRepository = new(_imageProcessingServiceMock, _imageMetadataServiceMock, userConfigurationService,
             _persistenceContextMock, _testLogger);
 
-        _asset1 = new()
-        {
-            Folder = new() { Id = Guid.Empty, Path = "" },
-            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
-            FileName = FileNames.IMAGE_1_JPG,
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new()
-                {
-                    Width = PixelWidthAsset.IMAGE_1_JPG,
-                    Height = PixelHeightAsset.IMAGE_1_JPG
-                },
-                Thumbnail = new()
-                {
-                    Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                    Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = Hashes.IMAGE_1_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        _asset1 = AssetBuilder.Create()
+            .WithFolder(new() { Id = Guid.Empty, Path = "" })
+            .WithFolderId(new("876283c6-780e-4ad5-975c-be63044c087a"))
+            .WithFileName(FileNames.IMAGE_1_JPG)
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+            .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash(Hashes.IMAGE_1_JPG)
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
     }
 
     [TearDown]
@@ -179,31 +159,17 @@ public class AssetRepositoryTests
         Folder knownFolder = new() { Id = Guid.NewGuid(), Path = @"C:\KnownFolder" };
         Folder originalFolder = new() { Id = assetFolderId, Path = @"C:\OriginalPath" };
 
-        Asset asset = new()
-        {
-            Folder = originalFolder,
-            FolderId = assetFolderId,
-            FileName = "orphan.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 100 },
-                Thumbnail = new() { Width = 50, Height = 50 }
-            },
-            FileProperties = new()
-            {
-                Size = 1000,
-                Creation = DateTime.Now,
-                Modification = DateTime.Now
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "orphanHash",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(originalFolder)
+            .WithFileName("orphan.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(100, 100, 50, 50)
+            .WithFileProperties(1000, DateTime.Now, DateTime.Now)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("orphanHash")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         IFolderPersistence folderPersistenceMock = Substitute.For<IFolderPersistence>();
         folderPersistenceMock.GetAll().Returns([knownFolder]);
@@ -458,39 +424,18 @@ public class AssetRepositoryTests
 
             for (int i = 0; i < threadCount; i++)
             {
-                assets[i] = new()
-                {
-                    Folder = folder,
-                    FolderId = folder.Id,
-                    FileName = FileNames.IMAGE_1_JPG,
-                    ImageRotation = ImageRotation.Rotate0,
-                    Pixel = new()
-                    {
-                        Asset = new()
-                        {
-                            Width = PixelWidthAsset.IMAGE_1_JPG,
-                            Height = PixelHeightAsset.IMAGE_1_JPG
-                        },
-                        Thumbnail = new()
-                        {
-                            Width = ThumbnailWidthAsset.IMAGE_1_JPG,
-                            Height = ThumbnailHeightAsset.IMAGE_1_JPG
-                        }
-                    },
-                    FileProperties = new()
-                    {
-                        Size = FileSize.IMAGE_1_JPG,
-                        Creation = DateTime.Now,
-                        Modification = ModificationDate.Default
-                    },
-                    ThumbnailCreationDateTime = DateTime.Now,
-                    Hash = Hashes.IMAGE_1_JPG,
-                    Metadata = new()
-                    {
-                        Corrupted = new() { IsTrue = false, Message = null },
-                        Rotated = new() { IsTrue = false, Message = null }
-                    }
-                };
+                assets[i] = AssetBuilder.Create()
+                    .WithFolder(folder)
+                    .WithFileName(FileNames.IMAGE_1_JPG)
+                    .WithRotation(ImageRotation.Rotate0)
+                    .WithPixels(PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG,
+                        ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG)
+                    .WithFileProperties(FileSize.IMAGE_1_JPG, DateTime.Now, ModificationDate.Default)
+                    .WithThumbnailCreationDateTime(DateTime.Now)
+                    .WithHash(Hashes.IMAGE_1_JPG)
+                    .WithCorrupted(false, null)
+                    .WithRotated(false, null)
+                    .Build();
             }
 
             Task[] tasks = new Task[threadCount];
@@ -1007,31 +952,17 @@ public class AssetRepositoryTests
         Folder folder = new() { Id = folderId, Path = @"C:\Gallery" };
         byte[] thumbnailData = [0xFF, 0xD8, 0xFF, 0xE0];
 
-        Asset asset = new()
-        {
-            Folder = folder,
-            FolderId = folderId,
-            FileName = "sunset.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 200, Height = 150 },
-                Thumbnail = new() { Width = 80, Height = 60 }
-            },
-            FileProperties = new()
-            {
-                Size = 5000,
-                Creation = DateTime.Now,
-                Modification = DateTime.Now
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "sunsetHash",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("sunset.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(200, 150, 80, 60)
+            .WithFileProperties(5000, DateTime.Now, DateTime.Now)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("sunsetHash")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         _folderPersistenceMock!.GetAll().Returns([folder]);
         _assetPersistenceMock!.GetAll().Returns([asset]);
@@ -1083,56 +1014,28 @@ public class AssetRepositoryTests
         Folder folder = new() { Id = folderId, Path = @"C:\TestFolder" };
         byte[] validThumbnail = [0xFF, 0xD8, 0xFF, 0xE0];
 
-        Asset asset1 = new()
-        {
-            Folder = folder,
-            FolderId = folderId,
-            FileName = "img1.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 100 },
-                Thumbnail = new() { Width = 50, Height = 50 }
-            },
-            FileProperties = new()
-            {
-                Size = 1000,
-                Creation = DateTime.Now,
-                Modification = DateTime.Now
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "hash1",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
-        Asset asset2 = new()
-        {
-            Folder = folder,
-            FolderId = folderId,
-            FileName = "img2.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 100, Height = 100 },
-                Thumbnail = new() { Width = 50, Height = 50 }
-            },
-            FileProperties = new()
-            {
-                Size = 2000,
-                Creation = DateTime.Now,
-                Modification = DateTime.Now
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "hash2",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset1 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("img1.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(100, 100, 50, 50)
+            .WithFileProperties(1000, DateTime.Now, DateTime.Now)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("hash1")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
+        Asset asset2 = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("img2.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(100, 100, 50, 50)
+            .WithFileProperties(2000, DateTime.Now, DateTime.Now)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("hash2")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         IFolderPersistence folderPersistenceMock = Substitute.For<IFolderPersistence>();
         folderPersistenceMock.GetAll().Returns([folder]);
@@ -1201,31 +1104,17 @@ public class AssetRepositoryTests
         Guid folderId = Guid.NewGuid();
         Folder folder = new() { Id = folderId, Path = @"C:\Empty" };
 
-        Asset asset = new()
-        {
-            Folder = folder,
-            FolderId = folderId,
-            FileName = "orphan.jpg",
-            ImageRotation = ImageRotation.Rotate0,
-            Pixel = new()
-            {
-                Asset = new() { Width = 200, Height = 150 },
-                Thumbnail = new() { Width = 80, Height = 60 }
-            },
-            FileProperties = new()
-            {
-                Size = 3000,
-                Creation = DateTime.Now,
-                Modification = DateTime.Now
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "orphanHash",
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        Asset asset = AssetBuilder.Create()
+            .WithFolder(folder)
+            .WithFileName("orphan.jpg")
+            .WithRotation(ImageRotation.Rotate0)
+            .WithPixels(200, 150, 80, 60)
+            .WithFileProperties(3000, DateTime.Now, DateTime.Now)
+            .WithThumbnailCreationDateTime(DateTime.Now)
+            .WithHash("orphanHash")
+            .WithCorrupted(false, null)
+            .WithRotated(false, null)
+            .Build();
 
         _folderPersistenceMock!.GetAll().Returns([folder]);
         _assetPersistenceMock!.GetAll().Returns([asset]);
