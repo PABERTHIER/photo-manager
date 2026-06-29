@@ -173,45 +173,41 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             return [];
         }
 
-        List<DuplicatedAssetViewModel> exemptedAssets = [];
-        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = [];
+        // A duplicate set already groups true duplicates whatever the hash mode (exact hash or PHash), so we reason
+        // per set instead of cross-matching hashes: if a set holds an asset from the exempted folder, every other
+        // visible member of that same set is a duplicate to delete. This is a single linear pass over all assets
+        // (O(total)) instead of the previous O(filtered x exempted) scan, and it stays correct under PHash where set
+        // members are within a Hamming threshold rather than sharing the exact same Hash.
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
 
         for (int i = 0; i < DuplicatedAssetSets.Count; i++)
         {
             DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
 
+            bool hasExemptedAsset = false;
+
+            for (int j = 0; j < duplicatedAssetSet.Count; j++)
+            {
+                if (duplicatedAssetSet[j].Asset.Folder.Path == exemptedFolderPath)
+                {
+                    hasExemptedAsset = true;
+                    break;
+                }
+            }
+
+            if (!hasExemptedAsset)
+            {
+                continue;
+            }
+
             for (int j = 0; j < duplicatedAssetSet.Count; j++)
             {
                 DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[j];
 
-                if (duplicatedAsset.Asset.Folder.Path == exemptedFolderPath)
+                if (duplicatedAsset.IsVisible && duplicatedAsset.Asset.Folder.Path != exemptedFolderPath)
                 {
-                    exemptedAssets.Add(duplicatedAsset);
+                    assetsToDelete.Add(duplicatedAsset);
                 }
-                else if (duplicatedAsset.IsVisible)
-                {
-                    duplicatedAssetsFiltered.Add(duplicatedAsset);
-                }
-            }
-        }
-
-        List<DuplicatedAssetViewModel> assetsToDelete = [];
-
-        for (int i = 0; i < duplicatedAssetsFiltered.Count; i++)
-        {
-            DuplicatedAssetViewModel filteredAsset = duplicatedAssetsFiltered[i];
-
-            for (int j = 0; j < exemptedAssets.Count; j++)
-            {
-                DuplicatedAssetViewModel exemptedAsset = exemptedAssets[j];
-
-                if (filteredAsset.Asset.Hash != exemptedAsset.Asset.Hash)
-                {
-                    continue;
-                }
-
-                assetsToDelete.Add(filteredAsset);
-                break;
             }
         }
 
