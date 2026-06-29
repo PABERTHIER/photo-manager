@@ -37,5 +37,22 @@ public static class AssetTestExtensions
                 Metadata = asset.Metadata
             };
         }
+
+        public Asset WithFileName(string fileName)
+        {
+            return new()
+            {
+                FolderId = asset.FolderId,
+                Folder = asset.Folder,
+                FileName = fileName,
+                FileProperties = asset.FileProperties,
+                Pixel = asset.Pixel,
+                ImageRotation = asset.ImageRotation,
+                Hash = asset.Hash,
+                ImageData = asset.ImageData,
+                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
+                Metadata = asset.Metadata
+            };
+        }
     }
 }

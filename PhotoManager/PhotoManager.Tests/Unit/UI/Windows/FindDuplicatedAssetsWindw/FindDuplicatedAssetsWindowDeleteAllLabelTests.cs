@@ -112,10 +112,10 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             .Build();
         _asset6 = AssetBuilder.Create()
             .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
-            .WithFileName(FileNames.IMAGE_5_JPG)
+            .WithFileName(FileNames.IMAGE_6_JPG)
             .WithRotation(ImageRotation.Rotate0)
-            .WithPixels(PixelWidthAsset.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG,
-                ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG,
+                ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG)
             .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
             .WithThumbnailCreationDateTime(new(2020, 6, 1))
             .WithHash(string.Empty) // Set in each tests
@@ -3041,7 +3041,8 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         const string hash = Hashes.IMAGE_1_JPG;
 
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
-        _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
+        // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
+        _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
         List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 
@@ -3130,7 +3131,8 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         const string hash = Hashes.IMAGE_1_JPG;
 
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
-        _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
+        // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
+        _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
         List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 

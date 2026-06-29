@@ -117,50 +117,54 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             return [];
         }
 
-        string assetHash = asset.Hash;
         string assetFolderPath = asset.Folder.Path;
         string assetFileName = asset.FileName;
 
-        DuplicatedSetViewModel duplicatedSetViewModel = [];
+        // Locate the set that actually contains the clicked asset by its identity (folder path + file name) instead of
+        // re-deriving it from the hash: under PHash a set groups near-duplicates that do NOT share the same Hash, so
+        // the previous match against the set's representative hash (set[0].Hash) failed to find the set whenever the
+        // clicked asset was not that representative, and "Delete all and keep this one" then silently deleted nothing.
+        // (folder path + file name) is the catalogued asset identity (the Assets table primary key), so it uniquely
+        // designates the clicked asset across every set.
+        DuplicatedSetViewModel? duplicatedAssetSet = null;
 
         for (int i = 0; i < DuplicatedAssetSets.Count; i++)
         {
-            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+            DuplicatedSetViewModel currentSet = DuplicatedAssetSets[i];
 
-            for (int j = 0; j < duplicatedAssetSet.Count;)
+            for (int j = 0; j < currentSet.Count; j++)
             {
-                if (duplicatedAssetSet[j].Asset.Hash != assetHash)
+                if (currentSet[j].Asset.Folder.Path == assetFolderPath && currentSet[j].Asset.FileName == assetFileName)
                 {
+                    duplicatedAssetSet = currentSet;
                     break;
                 }
-
-                duplicatedSetViewModel = duplicatedAssetSet;
-                break;
             }
 
-            if (duplicatedSetViewModel.Count != 0)
+            if (duplicatedAssetSet != null)
             {
                 break;
             }
         }
 
-        if (duplicatedSetViewModel.Count == 0)
+        if (duplicatedAssetSet == null)
         {
             return [];
         }
 
         List<DuplicatedAssetViewModel> assetsToDelete = [];
 
-        for (int i = 0; i < duplicatedSetViewModel.Count; i++)
+        for (int i = 0; i < duplicatedAssetSet.Count; i++)
         {
-            if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
-                 && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
-                || !duplicatedSetViewModel[i].IsVisible)
+            DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[i];
+
+            if ((duplicatedAsset.Asset.Folder.Path == assetFolderPath && duplicatedAsset.Asset.FileName == assetFileName)
+                || !duplicatedAsset.IsVisible)
             {
                 continue;
             }
 
-            assetsToDelete.Add(duplicatedSetViewModel[i]);
+            assetsToDelete.Add(duplicatedAsset);
         }
 
         return assetsToDelete;

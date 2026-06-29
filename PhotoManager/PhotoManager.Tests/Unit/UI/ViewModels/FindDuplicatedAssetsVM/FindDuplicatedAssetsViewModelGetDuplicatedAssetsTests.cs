@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
+using PHashes = PhotoManager.Tests.Unit.Constants.PHashes;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
 using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
@@ -104,10 +105,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             .Build();
         _asset6 = AssetBuilder.Create()
             .WithFolder(new() { Id = Guid.Empty, Path = "" }) // Set in each tests
-            .WithFileName(FileNames.IMAGE_5_JPG)
+            .WithFileName(FileNames.IMAGE_6_JPG)
             .WithRotation(ImageRotation.Rotate0)
-            .WithPixels(PixelWidthAsset.IMAGE_5_JPG, PixelHeightAsset.IMAGE_5_JPG,
-                ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG)
+            .WithPixels(PixelWidthAsset.IMAGE_6_JPG, PixelHeightAsset.IMAGE_6_JPG,
+                ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG)
             .WithFileProperties(2048, new(2020, 6, 1), new(2020, 7, 1))
             .WithThumbnailCreationDateTime(new(2020, 6, 1))
             .WithHash(string.Empty) // Set in each tests
@@ -2147,7 +2148,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         const string hash = Hashes.IMAGE_1_JPG;
 
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
-        _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
+        // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
+        _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
         List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 
@@ -2225,7 +2227,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         const string hash = Hashes.IMAGE_1_JPG;
 
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
-        _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
+        // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
+        _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
         List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 
@@ -2938,6 +2941,93 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             0,
             [],
             null);
+    }
+
+    [Test]
+    public void
+        GetDuplicatedAssets_PHashSetMembersHaveDifferentHashesAndClickedAssetIsNotSetRepresentative_ReturnsOtherDuplicatedAssetsInTheSet()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, true, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        CheckBeforeChanges();
+
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
+
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+
+        // Under PHash, near-duplicates grouped in the same set do NOT share the same Hash.
+        const string representativeHash = PHashes.IMAGE_1_JPG;
+        const string nearDuplicateHash = PHashes.IMAGE_2_JPG;
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(representativeHash);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(nearDuplicateHash);
+
+        List<List<Asset>> assetsSets = [[_asset1, _asset3]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
+
+        DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
+
+        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
+        {
+            Asset = _asset1,
+            ParentViewModel = expectedDuplicatedAssetSet
+        };
+        expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
+
+        DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
+        {
+            Asset = _asset3,
+            ParentViewModel = expectedDuplicatedAssetSet
+        };
+        expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
+
+        // Click the second member (the near-duplicate), which is NOT the set representative (set[0]). The legacy
+        // hash-based lookup compared the clicked asset's hash to set[0].Hash, found nothing because the hashes differ,
+        // and silently deleted nothing. The identity-based lookup finds the set and returns the other member.
+        List<DuplicatedAssetViewModel> duplicatedAssets =
+            _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
+                _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1].Asset);
+
+        Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+        AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
+        AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset1);
+
+        CheckAfterChanges(
+            _findDuplicatedAssetsViewModel!,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            expectedDuplicatedAssetSet,
+            expectedDuplicatedAssetViewModel1);
+
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+        // SetDuplicates
+        Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+        Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+        Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+        Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+        Assert.That(messagesInformationSent, Is.Empty);
+
+        CheckInstance(
+            findDuplicatedAssetsViewModelInstances,
+            expectedDuplicatedAssetsSets,
+            0,
+            0,
+            expectedDuplicatedAssetSet,
+            expectedDuplicatedAssetViewModel1);
     }
 
     private
