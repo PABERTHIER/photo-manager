@@ -189,12 +189,15 @@ public partial class MainWindow : Window
     {
         try
         {
-            List<List<Asset>> assetsSets = _application.GetDuplicatedAssets();
+            // The catalog read + grouping and the view-model construction are the heavy part and must not
+            // freeze the UI thread; only the assignment that raises PropertyChanged stays on the UI thread.
+            List<DuplicatedSetViewModel> duplicatedAssetSets = await Task.Run(() =>
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(_application.GetDuplicatedAssets()));
 
-            if (assetsSets.Count > 0)
+            if (duplicatedAssetSets.Count > 0)
             {
                 FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new(_application);
-                findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
+                findDuplicatedAssetsViewModel.SetDuplicates(duplicatedAssetSets);
                 FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new(findDuplicatedAssetsViewModel,
                     _loggerFactory.CreateLogger<FindDuplicatedAssetsWindow>());
 

@@ -1015,7 +1015,8 @@ public class FindDuplicatedAssetsViewModelDHashTests
                 duplicatedAssetSet7
             ];
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,

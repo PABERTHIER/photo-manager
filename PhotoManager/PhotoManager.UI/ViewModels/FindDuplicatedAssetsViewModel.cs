@@ -76,13 +76,13 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         }
     }
 
-    public void SetDuplicates(List<List<Asset>> assetsSets)
+    public void SetDuplicates(List<DuplicatedSetViewModel> duplicatedAssetSets)
     {
-        if (assetsSets == null)
-        {
-            throw new ArgumentNullException(nameof(assetsSets));
-        }
+        DuplicatedAssetSets = duplicatedAssetSets;
+    }
 
+    public static List<DuplicatedSetViewModel> CreateDuplicatedAssetSets(List<List<Asset>> assetsSets)
+    {
         List<DuplicatedSetViewModel> duplicatedAssetSets = [];
 
         foreach (List<Asset> assets in assetsSets)
@@ -97,13 +97,17 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             duplicatedAssetSets.Add(duplicatedSetViewModel);
         }
 
-        DuplicatedAssetSets = duplicatedAssetSets;
+        return duplicatedAssetSets;
     }
 
-    public void Refresh()
+    public async Task Refresh()
     {
-        List<List<Asset>> duplicatedAssetsSets = application.GetDuplicatedAssets();
-        SetDuplicates(duplicatedAssetsSets);
+        // The catalog read + grouping and the view-model construction are the heavy part and must not
+        // freeze the UI thread; only the assignment that raises PropertyChanged stays on the UI thread.
+        List<DuplicatedSetViewModel> duplicatedAssetSets = await Task.Run(() =>
+            CreateDuplicatedAssetSets(application.GetDuplicatedAssets()));
+
+        SetDuplicates(duplicatedAssetSets);
     }
 
     public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset asset)

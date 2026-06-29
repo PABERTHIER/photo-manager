@@ -1449,12 +1449,13 @@ public class MainWindowFindDuplicatesTests
 
     private string FindDuplicates()
     {
-        List<List<Asset>> assetsSets = _application!.GetDuplicatedAssets();
+        List<DuplicatedSetViewModel> duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(_application!.GetDuplicatedAssets());
 
-        if (assetsSets.Count > 0)
+        if (duplicatedAssetSets.Count > 0)
         {
             _findDuplicatedAssetsViewModel = new(_application);
-            _findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
+            _findDuplicatedAssetsViewModel.SetDuplicates(duplicatedAssetSets);
 
             GetExemptedFolderPathEvent += GetExemptedFolderPath;
             DeleteDuplicatedAssetsEvent += DeleteDuplicatedAssets;

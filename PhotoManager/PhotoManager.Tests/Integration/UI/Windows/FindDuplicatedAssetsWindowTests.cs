@@ -322,7 +322,9 @@ public class FindDuplicatedAssetsWindowTests
             SkiaImageData.Empty());
         Asset fourthAsset = CreateWindowTestAsset(@"C:\Photos\Set2", "fourth.jpg", "hash-2", 1280, 16384,
             SkiaImageData.Empty());
-        viewModel.SetDuplicates([[firstAsset, secondAsset], [thirdAsset, fourthAsset]]);
+        viewModel.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(
+                [[firstAsset, secondAsset], [thirdAsset, fourthAsset]]));
 
         FindDuplicatedAssetsWindow? window = null;
 
@@ -472,7 +474,8 @@ public class FindDuplicatedAssetsWindowTests
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             // First Delete
             Delete(FindDuplicatedAssetVm(_asset1));
@@ -1532,7 +1535,8 @@ public class FindDuplicatedAssetsWindowTests
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             // First DeleteAll - 1336 set (current position [0])
             DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]);
@@ -2516,7 +2520,8 @@ public class FindDuplicatedAssetsWindowTests
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             DeleteNotExemptedDuplicatedAssets();
 

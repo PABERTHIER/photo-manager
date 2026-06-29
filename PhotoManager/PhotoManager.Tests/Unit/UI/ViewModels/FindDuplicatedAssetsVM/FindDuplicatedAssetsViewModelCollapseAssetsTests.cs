@@ -193,7 +193,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -304,7 +305,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -401,7 +403,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
@@ -531,7 +534,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
@@ -652,7 +656,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
         _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
@@ -770,7 +775,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
 
@@ -884,7 +890,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -997,7 +1004,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -1109,7 +1117,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3, _asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -1218,7 +1227,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -1329,7 +1339,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -1437,7 +1448,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]]);
 
@@ -1520,7 +1532,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]]);
 
@@ -1628,7 +1641,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]]);
 
@@ -1735,7 +1749,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -1877,7 +1892,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]]);
 
@@ -1982,7 +1998,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]]);
 
@@ -2111,7 +2128,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -2220,7 +2238,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]]);
 
@@ -2325,7 +2344,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets(
         [
@@ -2460,7 +2480,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
 
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]]);
 
@@ -2754,7 +2775,8 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
         List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         _findDuplicatedAssetsViewModel!.CollapseAssets([]);
 

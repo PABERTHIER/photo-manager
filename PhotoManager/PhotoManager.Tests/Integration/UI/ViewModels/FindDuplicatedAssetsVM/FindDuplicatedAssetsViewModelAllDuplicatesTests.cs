@@ -506,7 +506,8 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 duplicatedAssetSet5
             ];
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -838,7 +839,8 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             // Compute set indices dynamically for order-independent access
             int image1336SetIdx =
@@ -1956,7 +1958,8 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             // First GetDuplicatedAssets
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
@@ -2747,7 +2750,8 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Because _asset11 is the first in the first set (1336) and is not in the current directory
             _asset11.ImageData = SkiaImageData.Empty();
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];

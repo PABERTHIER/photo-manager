@@ -524,7 +524,8 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
                 duplicatedAssetSet5
             ];
 
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+            _findDuplicatedAssetsViewModel!.SetDuplicates(
+                FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,

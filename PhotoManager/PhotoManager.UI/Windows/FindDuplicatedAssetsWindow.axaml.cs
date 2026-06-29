@@ -96,9 +96,14 @@ public partial class FindDuplicatedAssetsWindow : Window
 
     private void RefreshButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        _ = RefreshAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
         try
         {
-            ViewModel.Refresh();
+            await ViewModel.Refresh();
         }
         catch (Exception ex)
         {
