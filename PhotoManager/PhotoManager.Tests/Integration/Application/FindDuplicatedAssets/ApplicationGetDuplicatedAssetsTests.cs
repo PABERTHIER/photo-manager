@@ -167,7 +167,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsBasicHash_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssetsBasicHash_ReturnsArrayOfDuplicatedSets()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
@@ -188,17 +188,17 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash1));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash2));
-        List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash3));
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash1));
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash2));
+        Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == hash3));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                       && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
@@ -237,7 +237,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsDHash_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssetsDHash_ReturnsArrayOfDuplicatedSets()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
@@ -262,25 +262,25 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(7));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(7));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash1));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash2));
-        List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash3));
-        List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash4));
-        List<Asset> fifthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash5));
-        List<Asset> sixthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash6));
-        List<Asset> seventhDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash7));
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash1));
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash2));
+        Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash3));
+        Asset[] fourthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash4));
+        Asset[] fifthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash5));
+        Asset[] sixthDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash6));
+        Asset[] seventhDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == dHash7));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
-        Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(4));
-        Assert.That(fifthDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(sixthDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(seventhDuplicatedAssetsSet, Has.Count.EqualTo(2));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(4));
+        Assert.That(fourthDuplicatedAssetsSet, Has.Length.EqualTo(4));
+        Assert.That(fifthDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(sixthDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(seventhDuplicatedAssetsSet, Has.Length.EqualTo(2));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                       && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
@@ -363,7 +363,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsMD5Hash_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssetsMD5Hash_ReturnsArrayOfDuplicatedSets()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
@@ -384,17 +384,17 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash1));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash2));
-        List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash3));
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash1));
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash2));
+        Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == mD5Hash3));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                       && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
@@ -433,7 +433,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsPHash_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssetsPHash_ReturnsArrayOfDuplicatedSets()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
@@ -454,17 +454,17 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash1));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash2));
-        List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash3));
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash1));
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash2));
+        Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash3));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                       && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
@@ -503,7 +503,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsPHashAndDetectThumbnails_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssetsPHashAndDetectThumbnails_ReturnsArrayOfDuplicatedSets()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES);
 
@@ -571,22 +571,22 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(4));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(4));
 
-            List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash1));
-            List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash2));
-            List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash3));
-            List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets.First(s =>
+            Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash1));
+            Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash2));
+            Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s => s.All(a => a.Hash == pHash3));
+            Asset[] fourthDuplicatedAssetsSet = duplicatedAssets.First(s =>
                 s.Any(a => a.FullPath == Path.Combine(duplicatesResolutionDirectory, FileNames._1336_1_K_JPG)));
 
-            Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-            Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-            Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
-            Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(2));
+            Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+            Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+            Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(4));
+            Assert.That(fourthDuplicatedAssetsSet, Has.Length.EqualTo(2));
 
             Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                           && a.FullPath == Path.Combine(duplicatesNewFolder1Directory,
@@ -636,7 +636,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssets_ReturnsListOfDuplicatedSets()
+    public async Task GetDuplicatedAssets_CataloguedAssets_ReturnsArrayOfDuplicatedSets()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -651,26 +651,26 @@ public class ApplicationGetDuplicatedAssetsTests
 
         await _application!.CatalogAssetsAsync(_ => { });
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(5));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(5));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s =>
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_1_JPG)));
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets.First(s =>
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_2_DUPLICATED_JPG)));
-        List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets.First(s =>
+        Asset[] thirdDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_9_PNG)));
-        List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets.First(s =>
+        Asset[] fourthDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(_assetsDirectory!, FileNames.IMAGE_11_HEIC)));
-        List<Asset> fifthDuplicatedAssetsSet = duplicatedAssets.First(s =>
+        Asset[] fifthDuplicatedAssetsSet = duplicatedAssets.First(s =>
             s.Any(a => a.FullPath == Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(3));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(3));
-        Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(fifthDuplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(3));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(thirdDuplicatedAssetsSet, Has.Length.EqualTo(3));
+        Assert.That(fourthDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(fifthDuplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Assert.That(firstDuplicatedAssetsSet.Any(a => a.FileName == FileNames.IMAGE_1_JPG
                                                       && a.FullPath == Path.Combine(_assetsDirectory!,
@@ -726,7 +726,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
+    public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsArrayOfDuplicatedSets()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -751,17 +751,17 @@ public class ApplicationGetDuplicatedAssetsTests
         _testableAssetRepository.AddAsset(_asset4!, assetData2);
         _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Not.Empty);
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(2));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-        List<Asset> secondDuplicatedAssetsSet =
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
+        Asset[] secondDuplicatedAssetsSet =
             duplicatedAssets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
 
         Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
         Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
@@ -781,7 +781,7 @@ public class ApplicationGetDuplicatedAssetsTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
+    public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsArrayOfDuplicatedSets()
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -802,14 +802,14 @@ public class ApplicationGetDuplicatedAssetsTests
         _testableAssetRepository.AddAsset(_asset4!, assetData);
         _testableAssetRepository.AddAsset(_asset5!, assetData);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Not.Empty);
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(1));
 
-        List<Asset> duplicatedAssetsSet = duplicatedAssets[0];
+        Asset[] duplicatedAssetsSet = duplicatedAssets[0];
 
-        Assert.That(duplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(duplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Asset? duplicatedAsset2 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
         Asset? duplicatedAsset3 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
@@ -846,7 +846,7 @@ public class ApplicationGetDuplicatedAssetsTests
         _testableAssetRepository!.AddAsset(_asset1!, assetData1);
         _testableAssetRepository.AddAsset(_asset3!, assetData1);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -877,7 +877,7 @@ public class ApplicationGetDuplicatedAssetsTests
         _testableAssetRepository.AddAsset(_asset4!, assetData2);
         _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -887,7 +887,7 @@ public class ApplicationGetDuplicatedAssetsTests
     {
         ConfigureApplication(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -910,7 +910,7 @@ public class ApplicationGetDuplicatedAssetsTests
         _testableAssetRepository!.AddAsset(_asset1!, assetData1);
         _testableAssetRepository.AddAsset(_asset2!, assetData2);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }

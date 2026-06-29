@@ -344,9 +344,9 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -407,9 +407,9 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -485,9 +485,9 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -628,9 +628,9 @@ public class ApplicationGetDuplicatedAssetsThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _application!.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {

@@ -66,7 +66,7 @@ public partial class FindDuplicatedAssetsWindow : Window
         {
             if (((Control)sender!).DataContext is DuplicatedAssetViewModel duplicatedAssetViewModel)
             {
-                List<DuplicatedAssetViewModel> assetsToDelete =
+                DuplicatedAssetViewModel[] assetsToDelete =
                     ViewModel.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
 
                 DeleteAssets(assetsToDelete);
@@ -83,7 +83,7 @@ public partial class FindDuplicatedAssetsWindow : Window
         try
         {
             string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
-            List<DuplicatedAssetViewModel> assetsToDelete =
+            DuplicatedAssetViewModel[] assetsToDelete =
                 ViewModel.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
             DeleteAssets(assetsToDelete);
@@ -148,11 +148,11 @@ public partial class FindDuplicatedAssetsWindow : Window
         RefreshAssetsCounter?.Invoke(this);
     }
 
-    private void DeleteAssets(List<DuplicatedAssetViewModel> assetsToDelete)
+    private void DeleteAssets(DuplicatedAssetViewModel[] assetsToDelete)
     {
-        Asset[] assets = new Asset[assetsToDelete.Count];
+        Asset[] assets = new Asset[assetsToDelete.Length];
 
-        for (int i = 0; i < assetsToDelete.Count; i++)
+        for (int i = 0; i < assetsToDelete.Length; i++)
         {
             assets[i] = assetsToDelete[i].Asset;
         }

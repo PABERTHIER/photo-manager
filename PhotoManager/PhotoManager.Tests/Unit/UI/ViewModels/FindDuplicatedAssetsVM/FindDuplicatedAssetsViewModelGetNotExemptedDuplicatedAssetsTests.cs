@@ -225,7 +225,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -283,10 +283,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -357,7 +357,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -418,10 +418,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -500,7 +500,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -558,10 +558,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
 
@@ -630,7 +630,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset4], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset4], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -688,10 +688,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel2);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
 
@@ -760,7 +760,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -820,10 +820,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
 
@@ -893,7 +893,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -944,10 +944,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(5));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(5));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel2);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset2);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -1019,7 +1019,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1056,10 +1056,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel2);
@@ -1122,7 +1122,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
         _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1159,10 +1159,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel2);
@@ -1230,7 +1230,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1, _asset3], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset4, _asset1, _asset3], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1276,10 +1276,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
 
@@ -1339,7 +1339,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset4, _asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1369,10 +1369,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
 
@@ -1439,7 +1439,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash1);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1485,7 +1485,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -1554,7 +1554,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset4, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset4, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1600,10 +1600,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel4);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset5);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel5);
@@ -1675,7 +1675,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1736,10 +1736,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel3);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset2);
 
@@ -1808,7 +1808,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1869,10 +1869,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -1940,7 +1940,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset5, _asset3]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset5, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1994,10 +1994,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet2
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel3);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset2);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel4);
@@ -2068,7 +2068,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2131,10 +2131,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel3);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset2);
 
@@ -2203,7 +2203,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2270,7 +2270,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -2340,7 +2340,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2403,10 +2403,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -2477,7 +2477,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash3);
         _asset6 = _asset6!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2540,10 +2540,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             expectedDuplicatedAssetSet3
         ];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(2));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset4);
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel3);
@@ -2612,7 +2612,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset5], [_asset1, _asset4]];
+        Asset[][] assetsSets = [[_asset2, _asset5], [_asset1, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2651,7 +2651,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -2719,7 +2719,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2742,7 +2742,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -2806,7 +2806,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
         _asset3 = _asset3!.WithFolder(folder).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset3], [_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset2, _asset3], [_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2845,10 +2845,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel3);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset5);
 
@@ -2909,7 +2909,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2932,7 +2932,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -2998,7 +2998,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3044,7 +3044,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3110,7 +3110,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3156,7 +3156,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3219,7 +3219,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3265,7 +3265,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3330,7 +3330,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3376,7 +3376,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3426,7 +3426,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3488,7 +3488,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
             _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+            Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3534,7 +3534,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
                 [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-            List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+            DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
             Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3593,7 +3593,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
             Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-            List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+            DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
             Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3656,7 +3656,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3702,7 +3702,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3752,7 +3752,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3808,7 +3808,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3854,7 +3854,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3902,7 +3902,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
 
         CheckBeforeChanges();
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         Assert.That(notExemptedDuplicatedAssets, Is.Empty);
@@ -3962,7 +3962,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         _asset5 = _asset5!.WithFolder(folder1).WithHash(PHashes.IMAGE_5_JPG);
         _asset4 = _asset4!.WithFolder(folder2).WithHash(PHashes.IMAGE_4_JPG);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset1], [_asset5, _asset4]];
+        Asset[][] assetsSets = [[_asset2, _asset1], [_asset5, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -4001,10 +4001,10 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
 
-        List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+        DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
             _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-        Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(1));
         AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
         AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset2);
 

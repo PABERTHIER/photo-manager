@@ -269,9 +269,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset7, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -336,9 +336,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset7, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -380,9 +380,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset2, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -424,9 +424,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset4, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -470,9 +470,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset7, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -587,9 +587,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _testableAssetRepository.AddAsset(_asset7, assetData);
         _testableAssetRepository.AddAsset(_asset8, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {

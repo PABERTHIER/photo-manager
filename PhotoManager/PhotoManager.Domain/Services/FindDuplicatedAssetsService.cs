@@ -12,9 +12,9 @@ public class FindDuplicatedAssetsService(
     /// <summary>
     /// Detects duplicated assets in the catalog.
     /// </summary>
-    /// <returns>A list of duplicated sets of assets (corresponding to the same image),
-    /// where each item is a list of duplicated assets.</returns>
-    public List<List<Asset>> GetDuplicatedAssets()
+    /// <returns>An array of duplicated sets of assets (corresponding to the same image),
+    /// where each item is an array of duplicated assets.</returns>
+    public Asset[][] GetDuplicatedAssets()
     {
         Asset[] assets = assetRepository.GetCataloguedAssets();
         Array.Sort(assets, CompareByFileNameThenFolderPath);
@@ -33,7 +33,7 @@ public class FindDuplicatedAssetsService(
     // DHash the hammingDistance is 5/14
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    private List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(Asset[] assets, ushort threshold)
+    private Asset[][] GetDuplicatesBetweenOriginalAndThumbnail(Asset[] assets, ushort threshold)
     {
         List<Asset> validAssets = assets
             .AsParallel()
@@ -51,20 +51,20 @@ public class FindDuplicatedAssetsService(
             }
         }
 
-        List<List<Asset>> duplicateGroups = [];
+        List<Asset[]> duplicateGroups = [];
 
         foreach (List<Asset> group in bkTree.GetAllGroups())
         {
             if (group.Count > 1)
             {
-                duplicateGroups.Add(group);
+                duplicateGroups.Add([.. group]);
             }
         }
 
-        return duplicateGroups;
+        return [.. duplicateGroups];
     }
 
-    private List<List<Asset>> GetDuplicatesByExactHash(Asset[] assets)
+    private Asset[][] GetDuplicatesByExactHash(Asset[] assets)
     {
         Dictionary<string, HashGroup> groupsByHash = new(assets.Length, StringComparer.Ordinal);
         List<HashGroup> duplicateGroupsInOrder = [];
@@ -89,7 +89,7 @@ public class FindDuplicatedAssetsService(
             group.Assets.Add(asset);
         }
 
-        List<List<Asset>> duplicateGroups = [];
+        List<Asset[]> duplicateGroups = [];
 
         for (int i = 0; i < duplicateGroupsInOrder.Count; i++)
         {
@@ -108,11 +108,11 @@ public class FindDuplicatedAssetsService(
 
             if (existingAssets.Count > 1)
             {
-                duplicateGroups.Add(existingAssets);
+                duplicateGroups.Add([.. existingAssets]);
             }
         }
 
-        return duplicateGroups;
+        return [.. duplicateGroups];
     }
 
     private static int CompareByFileNameThenFolderPath(Asset left, Asset right)

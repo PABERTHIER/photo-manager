@@ -619,44 +619,44 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(7));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(7));
 
             // First set (6 items)
-            List<Asset> image1DuplicatesSet =
+            Asset[] image1DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(6));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(6));
 
             // Second set (2 items)
-            List<Asset> image5DuplicatesSet =
+            Asset[] image5DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image5DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image5DuplicatesSet, Has.Length.EqualTo(2));
 
             // Third set (2 items)
-            List<Asset> image7DuplicatesSet =
+            Asset[] image7DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset7!.FileName));
-            Assert.That(image7DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image7DuplicatesSet, Has.Length.EqualTo(2));
 
             // Fourth set (3 items)
-            List<Asset> image13DuplicatesSet =
+            Asset[] image13DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset13!.FileName));
-            Assert.That(image13DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image13DuplicatesSet, Has.Length.EqualTo(3));
 
             // Fifth set (2 items)
-            List<Asset> image15DuplicatesSet =
+            Asset[] image15DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset15!.FileName));
-            Assert.That(image15DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image15DuplicatesSet, Has.Length.EqualTo(2));
 
             // Sixth set (4 items)
-            List<Asset> image24DuplicatesSet =
+            Asset[] image24DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset24!.FileName));
-            Assert.That(image24DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image24DuplicatesSet, Has.Length.EqualTo(4));
 
             // Seventh set (2 items)
-            List<Asset> image26DuplicatesSet =
+            Asset[] image26DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset26!.FileName));
-            Assert.That(image26DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image26DuplicatesSet, Has.Length.EqualTo(2));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -1160,34 +1160,34 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(5));
 
             // First set (6 items)
-            List<Asset> image1DuplicatesSet =
+            Asset[] image1DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(6));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(6));
 
             // Second set (2 items)
-            List<Asset> image5DuplicatesSet =
+            Asset[] image5DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image5DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image5DuplicatesSet, Has.Length.EqualTo(2));
 
             // Third set (3 items)
-            List<Asset> image13DuplicatesSet =
+            Asset[] image13DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset13!.FileName));
-            Assert.That(image13DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image13DuplicatesSet, Has.Length.EqualTo(3));
 
             // Fourth set (2 items)
-            List<Asset> image15DuplicatesSet =
+            Asset[] image15DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset15!.FileName));
-            Assert.That(image15DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image15DuplicatesSet, Has.Length.EqualTo(2));
 
             // Fifth set (4 items)
-            List<Asset> image24DuplicatesSet =
+            Asset[] image24DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset24!.FileName));
-            Assert.That(image24DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image24DuplicatesSet, Has.Length.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -1684,7 +1684,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
         if (expectedDuplicatedAssetSets.Count > 0)
         {
             Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets,
-                Has.Count.EqualTo(expectedDuplicatedAssetSets.Count));
+                Has.Length.EqualTo(expectedDuplicatedAssetSets.Count));
 
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {

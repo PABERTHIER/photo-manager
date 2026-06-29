@@ -322,34 +322,34 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(5));
 
             // Image 1336
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets
+            Asset[] image1336DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset11!.FileName));
-            Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image1336DuplicatesSet, Has.Length.EqualTo(4));
 
             // Image 1
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets
+            Asset[] image1DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 2
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets
+            Asset[] image2DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset2!.FileName));
-            Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image2DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 9
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets
+            Asset[] image9DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset4!.FileName));
-            Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image9DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 11
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets
+            Asset[] image11DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image11DuplicatesSet, Has.Length.EqualTo(2));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -773,34 +773,34 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(5));
 
             // Image 1336
-            List<Asset> image1336DuplicatesSet = duplicatedAssetsSets
+            Asset[] image1336DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset11!.FileName));
-            Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image1336DuplicatesSet, Has.Length.EqualTo(4));
 
             // Image 1
-            List<Asset> image1DuplicatesSet = duplicatedAssetsSets
+            Asset[] image1DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 2
-            List<Asset> image2DuplicatesSet = duplicatedAssetsSets
+            Asset[] image2DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset2!.FileName));
-            Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image2DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 9
-            List<Asset> image9DuplicatesSet = duplicatedAssetsSets
+            Asset[] image9DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset4!.FileName));
-            Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image9DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 11
-            List<Asset> image11DuplicatesSet = duplicatedAssetsSets
+            Asset[] image11DuplicatesSet = duplicatedAssetsSets
                 .First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image11DuplicatesSet, Has.Length.EqualTo(2));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -1892,34 +1892,34 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(5));
 
             // Image 1
-            List<Asset> image1DuplicatesSet =
+            Asset[] image1DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 2
-            List<Asset> image2DuplicatesSet =
+            Asset[] image2DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
-            Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image2DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 9
-            List<Asset> image9DuplicatesSet =
+            Asset[] image9DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
-            Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image9DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 11
-            List<Asset> image11DuplicatesSet =
+            Asset[] image11DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image11DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 1336
-            List<Asset> image1336DuplicatesSet =
+            Asset[] image1336DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
-            Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image1336DuplicatesSet, Has.Length.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -2080,12 +2080,12 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet5
             ];
 
-            List<DuplicatedAssetViewModel> duplicatedAssets =
+            DuplicatedAssetViewModel[] duplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
                     _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
             // CurrentDuplicatedAsset is _asset11 (first in 1336 set) → returns other 1336 duplicates
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
             DuplicatedAssetViewModel duplicatedAssetViewModel13 =
                 duplicatedAssets.First(a => a.Asset.FullPath == _asset13!.FullPath);
@@ -2134,7 +2134,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             duplicatedAssets = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel12.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
             DuplicatedAssetViewModel duplicatedAssetViewModel11 =
                 duplicatedAssets.First(a => a.Asset.FullPath == _asset11!.FullPath);
@@ -2176,7 +2176,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             duplicatedAssets = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel9.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(2));
 
             DuplicatedAssetViewModel duplicatedAssetViewModel4 =
                 duplicatedAssets.First(a => a.Asset.FullPath == _asset4!.FullPath);
@@ -2214,7 +2214,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
                     _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
             duplicatedAssetViewModel11 = duplicatedAssets.First(a => a.Asset.FullPath == _asset11!.FullPath);
             AssertDuplicatedAsset(duplicatedAssetViewModel11, expectedDuplicatedAssetViewModel11);
@@ -2269,7 +2269,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             duplicatedAssets = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel3.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel4);
             AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset2);
 
@@ -2317,7 +2317,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
                     _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(1));
             AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel10);
             AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset10);
 
@@ -2371,7 +2371,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(
                     _findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssets, Has.Length.EqualTo(3));
 
             duplicatedAssetViewModel12 = duplicatedAssets.First(a => a.Asset.FullPath == _asset12!.FullPath);
             AssertDuplicatedAsset(duplicatedAssetViewModel12, expectedDuplicatedAssetViewModel12);
@@ -2684,34 +2684,34 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+            Asset[][] duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets, Has.Length.EqualTo(5));
 
             // Image 1
-            List<Asset> image1DuplicatesSet =
+            Asset[] image1DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset1!.FileName));
-            Assert.That(image1DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image1DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 2
-            List<Asset> image2DuplicatesSet =
+            Asset[] image2DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset2!.FileName));
-            Assert.That(image2DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image2DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 9
-            List<Asset> image9DuplicatesSet =
+            Asset[] image9DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset4!.FileName));
-            Assert.That(image9DuplicatesSet, Has.Count.EqualTo(3));
+            Assert.That(image9DuplicatesSet, Has.Length.EqualTo(3));
 
             // Image 11
-            List<Asset> image11DuplicatesSet =
+            Asset[] image11DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset5!.FileName));
-            Assert.That(image11DuplicatesSet, Has.Count.EqualTo(2));
+            Assert.That(image11DuplicatesSet, Has.Length.EqualTo(2));
 
             // Image 1336
-            List<Asset> image1336DuplicatesSet =
+            Asset[] image1336DuplicatesSet =
                 duplicatedAssetsSets.First(s => s.Any(a => a.FileName == _asset11!.FileName));
-            Assert.That(image1336DuplicatesSet, Has.Count.EqualTo(4));
+            Assert.That(image1336DuplicatesSet, Has.Length.EqualTo(4));
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -2871,10 +2871,10 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet5
             ];
 
-            List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
+            DuplicatedAssetViewModel[] notExemptedDuplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
-            Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(4));
+            Assert.That(notExemptedDuplicatedAssets, Has.Length.EqualTo(4));
 
             DuplicatedAssetViewModel duplicatedAssetViewModel1 =
                 notExemptedDuplicatedAssets.First(a => a.Asset.FullPath == _asset1!.FullPath);
@@ -3207,7 +3207,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
         if (expectedDuplicatedAssetSets.Count > 0)
         {
             Assert.That(findDuplicatedAssetsViewModelInstance.DuplicatedAssetSets,
-                Has.Count.EqualTo(expectedDuplicatedAssetSets.Count));
+                Has.Length.EqualTo(expectedDuplicatedAssetSets.Count));
 
             for (int i = 0; i < expectedDuplicatedAssetSets.Count; i++)
             {

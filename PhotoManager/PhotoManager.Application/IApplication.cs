@@ -7,7 +7,7 @@ namespace PhotoManager.Application;
 public interface IApplication
 {
     Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken token = default);
-    List<List<Asset>> GetDuplicatedAssets();
+    Asset[][] GetDuplicatedAssets();
     Asset[] GetAssetsByPath(string directory);
     Folder[] GetRootCatalogFolders();
     void LoadThumbnail(Asset asset);

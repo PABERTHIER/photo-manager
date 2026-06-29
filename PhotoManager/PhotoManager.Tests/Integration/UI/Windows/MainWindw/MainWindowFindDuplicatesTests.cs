@@ -1427,7 +1427,7 @@ public class MainWindowFindDuplicatesTests
 
     private void DeleteAll(DuplicatedAssetViewModel duplicatedAssetViewModel)
     {
-        List<DuplicatedAssetViewModel> assetsToDelete =
+        DuplicatedAssetViewModel[] assetsToDelete =
             _findDuplicatedAssetsViewModel?.GetDuplicatedAssets(duplicatedAssetViewModel.Asset) ?? [];
 
         DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
@@ -1439,7 +1439,7 @@ public class MainWindowFindDuplicatesTests
     {
         string exemptedFolderPath = GetExemptedFolderPathEvent?.Invoke(this) ?? string.Empty;
 
-        List<DuplicatedAssetViewModel> assetsToDelete =
+        DuplicatedAssetViewModel[] assetsToDelete =
             _findDuplicatedAssetsViewModel?.GetNotExemptedDuplicatedAssets(exemptedFolderPath) ?? [];
 
         DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
@@ -1449,10 +1449,10 @@ public class MainWindowFindDuplicatesTests
 
     private string FindDuplicates()
     {
-        List<DuplicatedSetViewModel> duplicatedAssetSets =
+        DuplicatedSetViewModel[] duplicatedAssetSets =
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(_application!.GetDuplicatedAssets());
 
-        if (duplicatedAssetSets.Count > 0)
+        if (duplicatedAssetSets.Length > 0)
         {
             _findDuplicatedAssetsViewModel = new(_application);
             _findDuplicatedAssetsViewModel.SetDuplicates(duplicatedAssetSets);

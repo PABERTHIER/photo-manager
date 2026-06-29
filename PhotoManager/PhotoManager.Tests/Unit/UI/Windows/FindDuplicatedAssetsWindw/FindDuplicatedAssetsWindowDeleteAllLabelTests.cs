@@ -236,7 +236,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -581,7 +581,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -939,7 +939,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1270,7 +1270,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1505,7 +1505,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1737,7 +1737,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1866,7 +1866,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -1991,7 +1991,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2098,7 +2098,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2210,7 +2210,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2322,7 +2322,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2429,7 +2429,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2541,7 +2541,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
         _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset1, _asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2647,7 +2647,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2744,7 +2744,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2846,7 +2846,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -2943,7 +2943,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3]];
+        Asset[][] assetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3044,7 +3044,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
         _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3134,7 +3134,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         // Force the impossible "same file name in the same folder" state to assert the lookup ignores such assets.
         _asset6 = _asset6!.WithFolder(folder).WithFileName(_asset5.FileName).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset5, _asset6]];
+        Asset[][] assetsSets = [[_asset5, _asset6]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3226,7 +3226,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3334,7 +3334,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3444,7 +3444,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3552,7 +3552,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3657,7 +3657,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
         _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
 
-        List<List<Asset>> assetsSets = [[_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -3830,7 +3830,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
@@ -4193,7 +4193,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
     private void DeleteAll(DuplicatedAssetViewModel duplicatedAssetViewModel)
     {
-        List<DuplicatedAssetViewModel> assetsToDelete =
+        DuplicatedAssetViewModel[] assetsToDelete =
             _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
 
         DeleteDuplicatedAssets?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);

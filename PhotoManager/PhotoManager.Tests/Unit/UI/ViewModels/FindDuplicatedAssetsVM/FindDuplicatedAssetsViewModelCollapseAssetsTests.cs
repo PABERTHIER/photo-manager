@@ -191,7 +191,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -303,7 +303,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -401,7 +401,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -532,7 +532,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -654,7 +654,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -773,7 +773,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -888,7 +888,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1002,7 +1002,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1115,7 +1115,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
         _asset5 = _asset5!.WithFolder(folder1).WithHash(hash);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3, _asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3, _asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1225,7 +1225,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1337,7 +1337,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1446,7 +1446,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
         _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1530,7 +1530,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1639,7 +1639,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1747,7 +1747,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1890,7 +1890,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -1996,7 +1996,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset2, _asset3], [_asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2126,7 +2126,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2236,7 +2236,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2342,7 +2342,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2478,7 +2478,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2773,7 +2773,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2867,7 +2867,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
         _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -2882,9 +2882,9 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
         set1.PropertyChanged += (_, e) => set1Events.Add(e.PropertyName!);
         set2.PropertyChanged += (_, e) => set2Events.Add(e.PropertyName!);
 
-        List<DuplicatedAssetViewModel> collapsedAssets = [set1[0], set1[1], set2[0], set2[1], set2[2]];
+        DuplicatedAssetViewModel[] collapsedAssets = [set1[0], set1[1], set2[0], set2[1], set2[2]];
 
-        for (int i = 0; i < collapsedAssets.Count; i++)
+        for (int i = 0; i < collapsedAssets.Length; i++)
         {
             collapsedAssets[i].PropertyChanged += (_, e) => assetEvents.Add(e.PropertyName!);
         }

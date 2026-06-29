@@ -219,7 +219,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -386,7 +386,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -517,7 +517,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
@@ -661,7 +661,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
         _findDuplicatedAssetsViewModel!.SetDuplicates(
             FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
