@@ -4,7 +4,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 {
     public event MessageBoxInformationSentEventHandler? MessageBoxInformationSent;
 
-    public List<DuplicatedSetViewModel> DuplicatedAssetSets
+    public DuplicatedSetViewModel[] DuplicatedAssetSets
     {
         get;
         private set
@@ -48,9 +48,9 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         {
             DuplicatedSetViewModel result = [];
 
-            if (DuplicatedAssetSets.Count > 0
+            if (DuplicatedAssetSets.Length > 0
                 && DuplicatedAssetSetsPosition >= 0
-                && DuplicatedAssetSetsPosition < DuplicatedAssetSets.Count)
+                && DuplicatedAssetSetsPosition < DuplicatedAssetSets.Length)
             {
                 result = DuplicatedAssetSets[DuplicatedAssetSetsPosition];
             }
@@ -76,17 +76,18 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         }
     }
 
-    public void SetDuplicates(List<List<Asset>> assetsSets)
+    public void SetDuplicates(DuplicatedSetViewModel[] duplicatedAssetSets)
     {
-        if (assetsSets == null)
-        {
-            throw new ArgumentNullException(nameof(assetsSets));
-        }
+        DuplicatedAssetSets = duplicatedAssetSets;
+    }
 
-        List<DuplicatedSetViewModel> duplicatedAssetSets = [];
+    public static DuplicatedSetViewModel[] CreateDuplicatedAssetSets(Asset[][] assetsSets)
+    {
+        DuplicatedSetViewModel[] duplicatedAssetSets = new DuplicatedSetViewModel[assetsSets.Length];
 
-        foreach (List<Asset> assets in assetsSets)
+        for (int i = 0; i < assetsSets.Length; i++)
         {
+            Asset[] assets = assetsSets[i];
             DuplicatedSetViewModel duplicatedSetViewModel = [];
 
             foreach (Asset asset in assets)
@@ -94,131 +95,150 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
                 duplicatedSetViewModel.Add(new() { Asset = asset, ParentViewModel = duplicatedSetViewModel });
             }
 
-            duplicatedAssetSets.Add(duplicatedSetViewModel);
+            duplicatedAssetSets[i] = duplicatedSetViewModel;
         }
 
-        DuplicatedAssetSets = duplicatedAssetSets;
+        return duplicatedAssetSets;
     }
 
-    public void Refresh()
+    public async Task Refresh()
     {
-        List<List<Asset>> duplicatedAssetsSets = application.GetDuplicatedAssets();
-        SetDuplicates(duplicatedAssetsSets);
+        // The catalog read + grouping and the view-model construction are the heavy part and must not
+        // freeze the UI thread; only the assignment that raises PropertyChanged stays on the UI thread.
+        DuplicatedSetViewModel[] duplicatedAssetSets = await Task.Run(() =>
+            CreateDuplicatedAssetSets(application.GetDuplicatedAssets()));
+
+        SetDuplicates(duplicatedAssetSets);
     }
 
-    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset asset)
+    public DuplicatedAssetViewModel[] GetDuplicatedAssets(Asset asset)
     {
-        if (DuplicatedAssetSets.Count == 0)
+        if (DuplicatedAssetSets.Length == 0)
         {
             return [];
         }
 
-        string assetHash = asset.Hash;
         string assetFolderPath = asset.Folder.Path;
         string assetFileName = asset.FileName;
 
-        DuplicatedSetViewModel duplicatedSetViewModel = [];
+        // Locate the set that actually contains the clicked asset by its identity (folder path + file name) instead of
+        // re-deriving it from the hash: under PHash a set groups near-duplicates that do NOT share the same Hash, so
+        // the previous match against the set's representative hash (set[0].Hash) failed to find the set whenever the
+        // clicked asset was not that representative, and "Delete all and keep this one" then silently deleted nothing.
+        // (folder path + file name) is the catalogued asset identity (the Assets table primary key), so it uniquely
+        // designates the clicked asset across every set.
+        DuplicatedSetViewModel? duplicatedAssetSet = null;
 
-        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        for (int i = 0; i < DuplicatedAssetSets.Length; i++)
         {
-            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+            DuplicatedSetViewModel currentSet = DuplicatedAssetSets[i];
 
-            for (int j = 0; j < duplicatedAssetSet.Count;)
+            for (int j = 0; j < currentSet.Count; j++)
             {
-                if (duplicatedAssetSet[j].Asset.Hash != assetHash)
+                if (currentSet[j].Asset.Folder.Path == assetFolderPath && currentSet[j].Asset.FileName == assetFileName)
                 {
+                    duplicatedAssetSet = currentSet;
                     break;
                 }
-
-                duplicatedSetViewModel = duplicatedAssetSet;
-                break;
             }
 
-            if (duplicatedSetViewModel.Count != 0)
+            if (duplicatedAssetSet != null)
             {
                 break;
             }
         }
 
-        if (duplicatedSetViewModel.Count == 0)
+        if (duplicatedAssetSet == null)
         {
             return [];
         }
 
         List<DuplicatedAssetViewModel> assetsToDelete = [];
 
-        for (int i = 0; i < duplicatedSetViewModel.Count; i++)
+        for (int i = 0; i < duplicatedAssetSet.Count; i++)
         {
-            if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
-                 && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
-                || !duplicatedSetViewModel[i].IsVisible)
+            DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[i];
+
+            if ((duplicatedAsset.Asset.Folder.Path == assetFolderPath && duplicatedAsset.Asset.FileName == assetFileName)
+                || !duplicatedAsset.IsVisible)
             {
                 continue;
             }
 
-            assetsToDelete.Add(duplicatedSetViewModel[i]);
+            assetsToDelete.Add(duplicatedAsset);
         }
 
-        return assetsToDelete;
+        return [.. assetsToDelete];
     }
 
-    public List<DuplicatedAssetViewModel> GetNotExemptedDuplicatedAssets(string exemptedFolderPath)
+    public DuplicatedAssetViewModel[] GetNotExemptedDuplicatedAssets(string exemptedFolderPath)
     {
-        if (DuplicatedAssetSets.Count == 0)
+        if (DuplicatedAssetSets.Length == 0)
         {
             return [];
         }
 
-        List<DuplicatedAssetViewModel> exemptedAssets = [];
-        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = [];
+        // A duplicate set already groups true duplicates whatever the hash mode (exact hash or PHash), so we reason
+        // per set instead of cross-matching hashes: if a set holds an asset from the exempted folder, every other
+        // visible member of that same set is a duplicate to delete. This is a single linear pass over all assets
+        // (O(total)) instead of the previous O(filtered x exempted) scan, and it stays correct under PHash where set
+        // members are within a Hamming threshold rather than sharing the exact same Hash.
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
 
-        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        for (int i = 0; i < DuplicatedAssetSets.Length; i++)
         {
             DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            bool hasExemptedAsset = false;
+
+            for (int j = 0; j < duplicatedAssetSet.Count; j++)
+            {
+                if (duplicatedAssetSet[j].Asset.Folder.Path == exemptedFolderPath)
+                {
+                    hasExemptedAsset = true;
+                    break;
+                }
+            }
+
+            if (!hasExemptedAsset)
+            {
+                continue;
+            }
 
             for (int j = 0; j < duplicatedAssetSet.Count; j++)
             {
                 DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[j];
 
-                if (duplicatedAsset.Asset.Folder.Path == exemptedFolderPath)
+                if (duplicatedAsset.IsVisible && duplicatedAsset.Asset.Folder.Path != exemptedFolderPath)
                 {
-                    exemptedAssets.Add(duplicatedAsset);
-                }
-                else if (duplicatedAsset.IsVisible)
-                {
-                    duplicatedAssetsFiltered.Add(duplicatedAsset);
+                    assetsToDelete.Add(duplicatedAsset);
                 }
             }
         }
 
-        List<DuplicatedAssetViewModel> assetsToDelete = [];
-
-        for (int i = 0; i < duplicatedAssetsFiltered.Count; i++)
-        {
-            DuplicatedAssetViewModel filteredAsset = duplicatedAssetsFiltered[i];
-
-            for (int j = 0; j < exemptedAssets.Count; j++)
-            {
-                DuplicatedAssetViewModel exemptedAsset = exemptedAssets[j];
-
-                if (filteredAsset.Asset.Hash != exemptedAsset.Asset.Hash)
-                {
-                    continue;
-                }
-
-                assetsToDelete.Add(filteredAsset);
-                break;
-            }
-        }
-
-        return assetsToDelete;
+        return [.. assetsToDelete];
     }
 
-    public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
+    public void CollapseAssets(DuplicatedAssetViewModel[] duplicatedAssets)
     {
-        for (int i = 0; i < duplicatedAssets.Count; i++)
+        // Collapsing an asset only flips its own IsVisible (the asset's setter does not notify its set). The set's
+        // DuplicatesCount/IsVisible aggregates are recomputed here once per distinct affected set, instead of once
+        // per collapsed asset: each NotifyAssetChanged re-runs two LINQ Count scans, so notifying per asset made a
+        // large "delete all but this" O(deleted); notifying per set makes it O(affected sets) for an identical
+        // final state.
+        HashSet<DuplicatedSetViewModel> affectedSets = [];
+
+        for (int i = 0; i < duplicatedAssets.Length; i++)
         {
-            duplicatedAssets[i].IsVisible = false;
+            DuplicatedAssetViewModel duplicatedAsset = duplicatedAssets[i];
+
+            duplicatedAsset.IsVisible = false;
+            affectedSets.Add(duplicatedAsset.ParentViewModel);
+        }
+
+        foreach (DuplicatedSetViewModel affectedSet in affectedSets)
+        {
+            affectedSet.NotifyAssetChanged();
         }
 
         // We want to navigate to another set only when we are collapsing the last duplicate of the current set
@@ -237,7 +257,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void ResetDuplicatedAssetPosition()
     {
-        if (DuplicatedAssetSets.Count == 0 || !CurrentDuplicatedAssetSet.IsVisible)
+        if (DuplicatedAssetSets.Length == 0 || !CurrentDuplicatedAssetSet.IsVisible)
         {
             DuplicatedAssetPosition = 0;
 
@@ -259,17 +279,17 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private int NormalizeDuplicatedAssetSetsPosition(int position)
     {
-        if (DuplicatedAssetSets.Count == 0)
+        if (DuplicatedAssetSets.Length == 0)
         {
             return 0;
         }
 
-        if (position >= 0 && position < DuplicatedAssetSets.Count)
+        if (position >= 0 && position < DuplicatedAssetSets.Length)
         {
             return position;
         }
 
-        return Math.Clamp(DuplicatedAssetSetsPosition, 0, DuplicatedAssetSets.Count - 1);
+        return Math.Clamp(DuplicatedAssetSetsPosition, 0, DuplicatedAssetSets.Length - 1);
     }
 
     private int NormalizeDuplicatedAssetPosition(int position)
@@ -291,7 +311,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void NavigateToNextVisibleSet(int currentIndex)
     {
-        for (int i = currentIndex; i < DuplicatedAssetSets.Count; i++)
+        for (int i = currentIndex; i < DuplicatedAssetSets.Length; i++)
         {
             if (DuplicatedAssetSets[i].IsVisible)
             {
@@ -306,7 +326,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void NavigateToPreviousVisibleSet(int currentIndex)
     {
-        int duplicatedAssetSetsCount = DuplicatedAssetSets.Count;
+        int duplicatedAssetSetsCount = DuplicatedAssetSets.Length;
 
         // If currentIndex is out of range, adjust it to the last valid index
         if (currentIndex >= duplicatedAssetSetsCount)

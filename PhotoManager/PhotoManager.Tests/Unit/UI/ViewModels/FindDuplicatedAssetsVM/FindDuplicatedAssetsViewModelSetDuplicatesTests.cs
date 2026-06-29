@@ -187,7 +187,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             notifyPropertyChangedEvents.Add(e.PropertyName!);
         };
 
-        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+        viewModel.SetDuplicates(FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets([[firstAsset, secondAsset]]));
         notifyPropertyChangedEvents.Clear();
 
         viewModel.DuplicatedAssetPosition = 1;
@@ -196,7 +196,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Length.EqualTo(1));
             Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
             Assert.That(viewModel.DuplicatedAssetPosition, Is.EqualTo(1));
             Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(secondAsset));
@@ -221,13 +221,13 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         Asset firstAsset = CreateTestAsset(@"C:\Photos", "first.jpg", "hash1", SkiaImageData.Empty());
         Asset secondAsset = CreateTestAsset(@"C:\Photos", "second.jpg", "hash1", SkiaImageData.Empty());
 
-        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+        viewModel.SetDuplicates(FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets([[firstAsset, secondAsset]]));
 
         viewModel.DuplicatedAssetSetsPosition = 10;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Length.EqualTo(1));
             Assert.That(viewModel.DuplicatedAssetSetsPosition, Is.Zero);
             Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
             Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(firstAsset));
@@ -243,13 +243,13 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         Asset firstAsset = CreateTestAsset(@"C:\Photos", "first.jpg", "hash1", SkiaImageData.Empty());
         Asset secondAsset = CreateTestAsset(@"C:\Photos", "second.jpg", "hash1", SkiaImageData.Empty());
 
-        viewModel.SetDuplicates([[firstAsset, secondAsset]]);
+        viewModel.SetDuplicates(FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets([[firstAsset, secondAsset]]));
 
         viewModel.DuplicatedAssetSetsPosition = -1;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(viewModel.DuplicatedAssetSets, Has.Count.EqualTo(1));
+            Assert.That(viewModel.DuplicatedAssetSets, Has.Length.EqualTo(1));
             Assert.That(viewModel.DuplicatedAssetSetsPosition, Is.Zero);
             Assert.That(viewModel.CurrentDuplicatedAssetSet, Has.Count.EqualTo(2));
             Assert.That(viewModel.CurrentDuplicatedAsset!.Asset, Is.SameAs(firstAsset));
@@ -323,9 +323,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -420,9 +425,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -576,9 +586,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -734,9 +749,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -851,9 +871,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         // SetDuplicates as load the ImageData of _asset1
         _asset1.ImageData = SkiaImageData.Empty();
@@ -959,9 +984,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -1059,9 +1089,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -1125,9 +1160,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet.Add(duplicatedAssetViewModel2);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet, [], []];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [], []];
+        Asset[][] assetsSets = [[_asset1, _asset3], [], []];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -1169,9 +1209,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         CheckBeforeChanges();
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [[], []];
-        List<List<Asset>> assetsSets = [[], []];
+        Asset[][] assetsSets = [[], []];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -1212,9 +1257,14 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
         CheckBeforeChanges();
 
-        List<List<Asset>> assetsSets = [];
+        Asset[][] assetsSets = [];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -1243,7 +1293,7 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
     }
 
     [Test]
-    public void SetDuplicates_AssetsSetsIsNull_ThrowsArgumentNullException()
+    public void SetDuplicates_PreBuiltDuplicatedAssetSets_SetsDuplicates()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -1255,25 +1305,223 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
         CheckBeforeChanges();
 
-        List<List<Asset>> assetsSets = null!;
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets));
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'assetsSets')"));
-        Assert.That(exception?.ParamName, Is.EqualTo(nameof(assetsSets)));
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
-        CheckAfterChanges(
-            _findDuplicatedAssetsViewModel!,
-            [],
-            0,
-            0,
-            [],
-            null);
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
 
-        Assert.That(notifyPropertyChangedEvents, Is.Empty);
-        Assert.That(messagesInformationSent, Is.Empty);
-        Assert.That(findDuplicatedAssetsViewModelInstances, Is.Empty);
+        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
+        {
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
+        {
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        using (Assert.EnterMultipleScope())
+        {
+            // The assign overload publishes the pre-built list as-is, without rebuilding it.
+            Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                duplicatedAssetSet1,
+                duplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                duplicatedAssetSet1,
+                duplicatedAssetViewModel1);
+        }
+    }
+
+    [Test]
+    public void CreateDuplicatedAssetSets_AssetsSets_BuildsDuplicatedAssetSets()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        CheckBeforeChanges();
+
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
+
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
+
+        DuplicatedSetViewModel duplicatedAssetSet1 = [];
+        DuplicatedSetViewModel duplicatedAssetSet2 = [];
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
+        {
+            Asset = _asset1,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
+        {
+            Asset = _asset3,
+            ParentViewModel = duplicatedAssetSet1
+        };
+        duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
+        {
+            Asset = _asset2,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel3);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
+        {
+            Asset = _asset4,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
+
+        DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
+        {
+            Asset = _asset5,
+            ParentViewModel = duplicatedAssetSet2
+        };
+        duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
+
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(duplicatedAssetSets, Has.Length.EqualTo(2));
+            AssertDuplicatedAssetsSet(duplicatedAssetSets[0], duplicatedAssetSet1);
+            AssertDuplicatedAssetsSet(duplicatedAssetSets[1], duplicatedAssetSet2);
+
+            // The build does not publish anything to the view-model.
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(findDuplicatedAssetsViewModelInstances, Is.Empty);
+        }
+    }
+
+    [Test]
+    public void CreateDuplicatedAssetSets_AssetsSetsIsNull_ThrowsNullReferenceException()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        CheckBeforeChanges();
+
+        Asset[][] assetsSets = null!;
+
+        Assert.Throws<NullReferenceException>(() =>
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets));
+
+        using (Assert.EnterMultipleScope())
+        {
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(findDuplicatedAssetsViewModelInstances, Is.Empty);
+        }
     }
 
     // This test is only about checking if all props in FindDuplicatedAssetsViewModel are well set
@@ -1344,12 +1592,17 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] assetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+        DuplicatedSetViewModel[] duplicatedAssetSets =
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(assetsSets);
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetSets);
+
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Is.SameAs(duplicatedAssetSets));
 
         // Check DuplicatedAssetSets
-        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Has.Count.EqualTo(2));
+        Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets, Has.Length.EqualTo(2));
 
         // Check first DuplicatedAssetSet
         Assert.That(_findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0],

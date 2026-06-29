@@ -2,5 +2,5 @@
 
 public interface IFindDuplicatedAssetsService
 {
-    List<List<Asset>> GetDuplicatedAssets();
+    Asset[][] GetDuplicatedAssets();
 }

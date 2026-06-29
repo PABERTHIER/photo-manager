@@ -827,7 +827,7 @@ None — all required types are in the BCL:
 | Project | Changes |
 |---------|---------|
 | `PhotoManager.Domain` | New pipeline interfaces, `PipelineOptions`, refactored `CatalogAssetsService` |
-| `PhotoManager.Infrastructure` | New `ImageMagickThumbnailGenerator`, refactored `AssetCreationService` |
+| `PhotoManager.Infrastructure` | New `ThumbnailGenerator`, refactored `AssetCreationService` |
 | `PhotoManager.Persistence` | Batch thumbnail write, dedicated write connection |
 | `PhotoManager.Common` | Streaming hash helper methods |
 | `PhotoManager.Tests` | Pipeline unit/integration tests |

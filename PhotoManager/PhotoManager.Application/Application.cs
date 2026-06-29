@@ -24,9 +24,9 @@ public class Application(
     /// <summary>
     /// Detects duplicated assets in the catalog.
     /// </summary>
-    /// <returns>A list of duplicated sets of assets (corresponding to the same image),
-    /// where each item is a list of duplicated assets.</returns>
-    public List<List<Asset>> GetDuplicatedAssets() => findDuplicatedAssetsService.GetDuplicatedAssets();
+    /// <returns>An array of duplicated sets of assets (corresponding to the same image),
+    /// where each item is an array of duplicated assets.</returns>
+    public Asset[][] GetDuplicatedAssets() => findDuplicatedAssetsService.GetDuplicatedAssets();
 
     // AssetRepository
     public Asset[] GetAssetsByPath(string directory)

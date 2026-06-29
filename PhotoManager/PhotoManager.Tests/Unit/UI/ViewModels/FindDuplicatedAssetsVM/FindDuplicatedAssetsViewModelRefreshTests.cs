@@ -170,7 +170,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_DuplicatesAndPreviousNotSameDuplicatedAssetSets_SetsNewDuplicatedAssetSets()
+    public async Task Refresh_DuplicatesAndPreviousNotSameDuplicatedAssetSets_SetsNewDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -219,9 +219,10 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -239,7 +240,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Refresh
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         duplicatedAssetSet1 = [];
         DuplicatedSetViewModel duplicatedAssetSet2 = [];
@@ -314,7 +315,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_DuplicatesAndPreviousSameDuplicatedAssetSets_SetsSameDuplicatedAssetSets()
+    public async Task Refresh_DuplicatesAndPreviousSameDuplicatedAssetSets_SetsSameDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -385,9 +386,10 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -405,7 +407,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Refresh
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -440,7 +442,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void
+    public async Task
         Refresh_DuplicatesAndPreviousSameDuplicatedAssetSetsAndSomeFilesDoNotExistAnymore_SetsNewDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
@@ -515,9 +517,10 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -535,7 +538,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Refresh
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         duplicatedAssetSet2 = [];
 
@@ -595,7 +598,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_NoDuplicatesAndPreviousDuplicatedAssetSets_SetsNoDuplicatedAssetSets()
+    public async Task Refresh_NoDuplicatesAndPreviousDuplicatedAssetSets_SetsNoDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -658,9 +661,10 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
-        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+        Asset[][] duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
 
-        _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -678,7 +682,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
         Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
         // Refresh
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -713,7 +717,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_DuplicatesAndNoPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
+    public async Task Refresh_DuplicatesAndNoPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -785,7 +789,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
         List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [duplicatedAssetSet1, duplicatedAssetSet2];
 
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,
@@ -814,7 +818,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
     }
 
     [Test]
-    public void Refresh_NoDuplicates_SetsDuplicatedAssetSetsToEmpty()
+    public async Task Refresh_NoDuplicates_SetsDuplicatedAssetSetsToEmpty()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
 
@@ -826,7 +830,7 @@ public class FindDuplicatedAssetsViewModelRefreshTests
 
         CheckBeforeChanges();
 
-        _findDuplicatedAssetsViewModel!.Refresh();
+        await _findDuplicatedAssetsViewModel!.Refresh();
 
         CheckAfterChanges(
             _findDuplicatedAssetsViewModel!,

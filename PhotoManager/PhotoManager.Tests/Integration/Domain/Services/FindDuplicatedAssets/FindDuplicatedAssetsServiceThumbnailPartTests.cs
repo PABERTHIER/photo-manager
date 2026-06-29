@@ -313,9 +313,9 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -379,9 +379,9 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -460,9 +460,9 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {
@@ -606,9 +606,9 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         _testableAssetRepository.AddAsset(_asset9, assetData);
         _testableAssetRepository.AddAsset(_asset10, assetData);
 
-        List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(expected));
 
         if (expected > 0)
         {

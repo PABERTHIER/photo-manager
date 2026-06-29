@@ -128,6 +128,7 @@ public class DuplicatedSetViewModelTests
             true);
 
         duplicatedAssetViewModel1.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -137,6 +138,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel2.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -146,6 +148,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel1.IsVisible = true;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -155,6 +158,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel2.IsVisible = true;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -212,6 +216,7 @@ public class DuplicatedSetViewModelTests
             true);
 
         duplicatedAssetViewModel1.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -221,6 +226,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel2.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -274,6 +280,7 @@ public class DuplicatedSetViewModelTests
             true);
 
         duplicatedAssetViewModel1.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -283,6 +290,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel2.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -336,6 +344,7 @@ public class DuplicatedSetViewModelTests
             true);
 
         duplicatedAssetViewModel1.IsVisible = true;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -345,6 +354,7 @@ public class DuplicatedSetViewModelTests
             true);
 
         duplicatedAssetViewModel2.IsVisible = true;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,
@@ -394,6 +404,7 @@ public class DuplicatedSetViewModelTests
             false);
 
         duplicatedAssetViewModel1.IsVisible = false;
+        _duplicatedSetViewModel!.NotifyAssetChanged();
 
         CheckAfterChanges(
             _duplicatedSetViewModel!,

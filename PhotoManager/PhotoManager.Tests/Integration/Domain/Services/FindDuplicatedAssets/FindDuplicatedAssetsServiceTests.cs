@@ -131,7 +131,7 @@ public class FindDuplicatedAssetsServiceTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
+    public void GetDuplicatedAssets_DuplicatedAssetsFound_ReturnsArrayOfDuplicatedSets()
     {
         string sourcePath1 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
         string sourcePath2 = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
@@ -154,16 +154,16 @@ public class FindDuplicatedAssetsServiceTests
         _testableAssetRepository.AddAsset(_asset4!, assetData2);
         _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Not.Empty);
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(2));
 
-        List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
-        List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
+        Asset[] firstDuplicatedAssetsSet = duplicatedAssets[0];
+        Asset[] secondDuplicatedAssetsSet = duplicatedAssets[1];
 
-        Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-        Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
+        Assert.That(firstDuplicatedAssetsSet, Has.Length.EqualTo(2));
+        Assert.That(secondDuplicatedAssetsSet, Has.Length.EqualTo(2));
 
         Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
         Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
@@ -183,7 +183,7 @@ public class FindDuplicatedAssetsServiceTests
     }
 
     [Test]
-    public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
+    public void GetDuplicatedAssets_MultiplesAssetsSameHash_ReturnsArrayOfDuplicatedSets()
     {
         const string hash = Hashes.IMAGE_9_PNG;
         string sourcePath = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
@@ -202,14 +202,14 @@ public class FindDuplicatedAssetsServiceTests
         _testableAssetRepository.AddAsset(_asset4!, assetData);
         _testableAssetRepository.AddAsset(_asset5!, assetData);
 
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Not.Empty);
-        Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
+        Assert.That(duplicatedAssets, Has.Length.EqualTo(1));
 
-        List<Asset> duplicatedAssetsSet = duplicatedAssets[0];
+        Asset[] duplicatedAssetsSet = duplicatedAssets[0];
 
-        Assert.That(duplicatedAssetsSet, Has.Count.EqualTo(4));
+        Assert.That(duplicatedAssetsSet, Has.Length.EqualTo(4));
 
         Asset? duplicatedAsset2 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
         Asset? duplicatedAsset3 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
@@ -244,7 +244,7 @@ public class FindDuplicatedAssetsServiceTests
         _testableAssetRepository!.AddAsset(_asset1!, assetData);
         _testableAssetRepository.AddAsset(_asset3!, assetData);
 
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -273,7 +273,7 @@ public class FindDuplicatedAssetsServiceTests
         _testableAssetRepository.AddAsset(_asset4!, assetData2);
         _testableAssetRepository.AddAsset(_asset5!, assetData1);
 
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -281,7 +281,7 @@ public class FindDuplicatedAssetsServiceTests
     [Test]
     public void GetDuplicatedAssets_NoAssets_ReturnsEmptyList()
     {
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }
@@ -302,7 +302,7 @@ public class FindDuplicatedAssetsServiceTests
         _testableAssetRepository!.AddAsset(_asset1!, assetData1);
         _testableAssetRepository.AddAsset(_asset2!, assetData2);
 
-        List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
+        Asset[][] duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
         Assert.That(duplicatedAssets, Is.Empty);
     }

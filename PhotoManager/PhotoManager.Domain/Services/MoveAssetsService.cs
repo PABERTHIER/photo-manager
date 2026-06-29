@@ -70,9 +70,29 @@ public class MoveAssetsService(
     {
         ValidateParameters(assets);
 
+        Dictionary<string, List<string>> fileNamesByFolderPath = new(StringComparer.Ordinal);
+
         foreach (Asset asset in assets)
         {
-            DeleteAsset(asset);
+            if (!fileNamesByFolderPath.TryGetValue(asset.Folder.Path, out List<string>? fileNames))
+            {
+                fileNames = [];
+                fileNamesByFolderPath[asset.Folder.Path] = fileNames;
+            }
+
+            fileNames.Add(asset.FileName);
+        }
+
+        foreach ((string folderPath, List<string> fileNames) in fileNamesByFolderPath)
+        {
+            _ = assetRepository.DeleteAssets(folderPath, fileNames);
+
+            // Physical deletes stay per file (each is an independent filesystem op) and run after the DB rows are gone, preserving the existing "row removed before file delete" failure window.
+            // DeleteFile swallows and logs its own exceptions, so one bad file does not abort the batch.
+            foreach (string fileName in fileNames)
+            {
+                fileOperationsService.DeleteFile(folderPath, fileName);
+            }
         }
     }
 
