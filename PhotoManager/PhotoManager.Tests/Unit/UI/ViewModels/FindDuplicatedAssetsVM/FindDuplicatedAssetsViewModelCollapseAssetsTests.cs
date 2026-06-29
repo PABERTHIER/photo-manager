@@ -2847,6 +2847,69 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             null);
     }
 
+    [Test]
+    public void CollapseAssets_MultipleAssetsAcrossSets_NotifiesEachAffectedSetOnceAndEachAssetIndividually()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
+
+        string otherDirectory = Path.Combine(_assetsDirectory!, Directories.FOLDER_1);
+
+        Folder folder1 = _testableAssetRepository!.AddFolder(_assetsDirectory!);
+        Folder folder2 = _testableAssetRepository!.AddFolder(otherDirectory);
+
+        const string hash1 = Hashes.IMAGE_1_JPG;
+        const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+
+        _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+        _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+
+        _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+        _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+        _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
+
+        List<List<Asset>> duplicatedAssetsSets = [[_asset1, _asset3], [_asset2, _asset4, _asset5]];
+
+        _findDuplicatedAssetsViewModel!.SetDuplicates(
+            FindDuplicatedAssetsViewModel.CreateDuplicatedAssetSets(duplicatedAssetsSets));
+
+        DuplicatedSetViewModel set1 = _findDuplicatedAssetsViewModel.DuplicatedAssetSets[0];
+        DuplicatedSetViewModel set2 = _findDuplicatedAssetsViewModel.DuplicatedAssetSets[1];
+
+        List<string> set1Events = [];
+        List<string> set2Events = [];
+        List<string> assetEvents = [];
+
+        set1.PropertyChanged += (_, e) => set1Events.Add(e.PropertyName!);
+        set2.PropertyChanged += (_, e) => set2Events.Add(e.PropertyName!);
+
+        List<DuplicatedAssetViewModel> collapsedAssets = [set1[0], set1[1], set2[0], set2[1], set2[2]];
+
+        for (int i = 0; i < collapsedAssets.Count; i++)
+        {
+            collapsedAssets[i].PropertyChanged += (_, e) => assetEvents.Add(e.PropertyName!);
+        }
+
+        _findDuplicatedAssetsViewModel.CollapseAssets(collapsedAssets);
+
+        // Each affected set is notified exactly once (one NotifyAssetChanged => DuplicatesCount + IsVisible),
+        // regardless of how many of its assets were collapsed (2 in set1, 3 in set2).
+        Assert.That(set1Events, Has.Count.EqualTo(2));
+        Assert.That(set1Events[0], Is.EqualTo("DuplicatesCount"));
+        Assert.That(set1Events[1], Is.EqualTo("IsVisible"));
+        Assert.That(set2Events, Has.Count.EqualTo(2));
+        Assert.That(set2Events[0], Is.EqualTo("DuplicatesCount"));
+        Assert.That(set2Events[1], Is.EqualTo("IsVisible"));
+
+        // The per-asset IsVisible notification is still raised once for every collapsed asset.
+        Assert.That(assetEvents, Has.Count.EqualTo(5));
+        Assert.That(assetEvents, Is.All.EqualTo("IsVisible"));
+
+        Assert.That(set1.DuplicatesCount, Is.Zero);
+        Assert.That(set1.IsVisible, Is.False);
+        Assert.That(set2.DuplicatesCount, Is.Zero);
+        Assert.That(set2.IsVisible, Is.False);
+    }
+
     private
         (
         List<string> notifyPropertyChangedEvents,

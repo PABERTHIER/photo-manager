@@ -220,9 +220,24 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
     {
+        // Collapsing an asset only flips its own IsVisible (the asset's setter does not notify its set). The set's
+        // DuplicatesCount/IsVisible aggregates are recomputed here once per distinct affected set, instead of once
+        // per collapsed asset: each NotifyAssetChanged re-runs two LINQ Count scans, so notifying per asset made a
+        // large "delete all but this" O(deleted); notifying per set makes it O(affected sets) for an identical
+        // final state.
+        HashSet<DuplicatedSetViewModel> affectedSets = [];
+
         for (int i = 0; i < duplicatedAssets.Count; i++)
         {
-            duplicatedAssets[i].IsVisible = false;
+            DuplicatedAssetViewModel duplicatedAsset = duplicatedAssets[i];
+
+            duplicatedAsset.IsVisible = false;
+            affectedSets.Add(duplicatedAsset.ParentViewModel);
+        }
+
+        foreach (DuplicatedSetViewModel affectedSet in affectedSets)
+        {
+            affectedSet.NotifyAssetChanged();
         }
 
         // We want to navigate to another set only when we are collapsing the last duplicate of the current set
