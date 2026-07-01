@@ -1,4 +1,7 @@
-﻿using PhotoManager.UI.ViewModels.Enums;
+﻿using Avalonia.Controls;
+using Microsoft.Extensions.Logging.Abstractions;
+using PhotoManager.UI.ViewModels.Enums;
+using PhotoManager.UI.Windows;
 using System.ComponentModel;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
@@ -17,10 +20,12 @@ public class SyncAssetsWindowTests
     private MoveAssetsService? _moveAssetsService;
     private FileOperationsService? _fileOperationsService;
     private TestableAssetRepository? _testableAssetRepository;
+    private SyncAssetsWindow? _window;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        AvaloniaTestSetup.EnsureInitialized();
         _assetsDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         _databaseDirectory = Path.Combine(_assetsDirectory, Directories.DATABASE_TESTS);
     }
@@ -28,8 +33,15 @@ public class SyncAssetsWindowTests
     [TearDown]
     public void TearDown()
     {
+        if (_window != null)
+        {
+            AvaloniaTestSetup.RunOnUiThreadAsync(() => _window.Close()).GetAwaiter().GetResult();
+        }
+
         _testableAssetRepository?.Dispose();
         TearDownHelper.DeleteTempDbDirectories(_databaseDirectory!);
+
+        _window = null;
     }
 
     private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth,
@@ -1163,6 +1175,23 @@ public class SyncAssetsWindowTests
         };
 
         return (notifyPropertyChangedEvents, syncAssetsViewModelInstances);
+    }
+
+    [Test]
+    public Task Constructor_SyncAssetsViewModel_SetsMaximizedWindowAndDataContext()
+    {
+        ConfigureSyncAssetsViewModel(100, _assetsDirectory!, 200, 150, false, false, false, false);
+
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            _window = new(_syncAssetsViewModel!, NullLogger<SyncAssetsWindow>.Instance);
+
+            Assert.That(_window.Title, Is.EqualTo("Sync Assets"));
+            Assert.That(_window.Width, Is.EqualTo(900));
+            Assert.That(_window.Height, Is.EqualTo(600));
+            Assert.That(_window.WindowState, Is.EqualTo(WindowState.Maximized));
+            Assert.That(_window.DataContext, Is.SameAs(_syncAssetsViewModel));
+        });
     }
 
     private void CheckBeforeChanges()
