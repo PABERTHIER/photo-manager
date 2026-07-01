@@ -1,4 +1,6 @@
-﻿using PhotoManager.UI.Models;
+﻿using Avalonia.Input;
+using PhotoManager.UI.Controls;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -25,8 +27,6 @@ public class ThumbnailsUserControlTests
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
-
-    private event EventHandler? ThumbnailSelected;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -1216,13 +1216,22 @@ public class ThumbnailsUserControlTests
     }
 
     [Test]
-    public void ContentControlMouseDoubleClick_Event_SendsEvent()
+    [TestCase(2, true)]
+    [TestCase(1, false)]
+    public Task ThumbnailPointerPressed_ClickCount_RaisesThumbnailSelectedOnlyOnDoubleClick(int clickCount,
+        bool expectedRaised)
     {
-        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            bool raised = false;
+            ThumbnailsUserControl control = new();
+            control.ThumbnailSelected += (_, _) => raised = true;
 
-        ThumbnailSelected?.Invoke(this, EventArgs.Empty);
+            PointerPressedEventArgs args = AvaloniaTestSetup.CreatePointerPressedEventArgs(control, clickCount);
+            AvaloniaTestSetup.InvokeNonPublicInstanceMethod(control, "Thumbnail_PointerPressed", control, args);
 
-        Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
+            Assert.That(raised, Is.EqualTo(expectedRaised));
+        });
     }
 
     [Test]
@@ -1474,18 +1483,6 @@ public class ThumbnailsUserControlTests
         };
 
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
-    }
-
-    private List<string> NotifyThumbnailSelected()
-    {
-        List<string> thumbnailSelectedEvents = [];
-
-        ThumbnailSelected += delegate
-        {
-            thumbnailSelectedEvents.Add(string.Empty);
-        };
-
-        return thumbnailSelectedEvents;
     }
 
     private void CheckBeforeChanges(string expectedRootDirectory)

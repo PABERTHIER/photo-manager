@@ -271,56 +271,63 @@ public class MainWindowLoadedAndClosingTests
                 true,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(47));
-            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(53));
+            // First InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("TotalFilesCountWording"));
-            // Second CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("TotalFilesCountWording"));
+            // Second InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("TotalFilesCountWording"));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("TotalFilesCountWording"));
+            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("TotalFilesCountWording"));
+            // Third InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -425,12 +432,15 @@ public class MainWindowLoadedAndClosingTests
                 false,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(6));
 
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("TotalFilesCountWording"));
+            // InitializeOnceAsync sets IsCataloging true then false around the (cancelled) catalog
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -538,41 +548,44 @@ public class MainWindowLoadedAndClosingTests
                 true,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(33));
-            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(35));
+            // InitializeOnceAsync: SetIsCataloging(true), then CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("TotalFilesCountWording"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            // finally: SetIsCataloging(false), then counters
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -673,17 +686,20 @@ public class MainWindowLoadedAndClosingTests
                 false,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
-            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            // InitializeOnceAsync: SetIsCataloging(true), then CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("TotalFilesCountWording"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            // finally: SetIsCataloging(false), then counters
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1180,19 +1196,25 @@ public class MainWindowLoadedAndClosingTests
 
     private async Task InitializeOnceAsync()
     {
-        _catalogTask = _applicationViewModel!.CatalogAssets(
-            e => _applicationViewModel!.NotifyCatalogChange(e),
-            _cancellationTokenSource!.Token
-        );
+        _applicationViewModel!.SetIsCataloging(true);
 
         try
         {
+            _catalogTask = _applicationViewModel!.CatalogAssets(
+                e => _applicationViewModel!.NotifyCatalogChange(e),
+                _cancellationTokenSource!.Token
+            );
+
             await _catalogTask;
         }
         catch (OperationCanceledException)
         {
             // Expected: the user requested cancellation (window closing). The service has already
             // saved any in-flight catalog state and emitted CatalogProcessCancelled/CatalogProcessEnded.
+        }
+        finally
+        {
+            _applicationViewModel!.SetIsCataloging(false);
         }
 
         _applicationViewModel!.CalculateGlobalAssetsCounter();

@@ -30,7 +30,9 @@ public class FindDuplicatedAssetsWindowTests
     private UserConfigurationService? _userConfigurationService;
     private TestLogger<FindDuplicatedAssetsWindow> _testLogger = new();
 
+#pragma warning disable CS0067 // Event is never used (raised through the real window in the closing test)
     private event RefreshAssetsCounterEventHandler? RefreshAssetsCounter;
+#pragma warning restore CS0067 // Event is never used
     private event GetExemptedFolderPathEventHandler? GetExemptedFolderPath;
     private event DeleteDuplicatedAssetsEventHandler? DeleteDuplicatedAssets;
 
@@ -2990,14 +2992,34 @@ public class FindDuplicatedAssetsWindowTests
     }
 
     [Test]
-    public void FindDuplicatedAssetsWindowClosing_RefreshAssetsCounter_InvokesRefreshAssetsCounterEvent()
+    public Task FindDuplicatedAssetsWindowClosing_RefreshAssetsCounter_InvokesRefreshAssetsCounterEvent()
     {
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+        IApplication application = Substitute.For<IApplication>();
+        FindDuplicatedAssetsViewModel viewModel = new(application);
 
-        RefreshAssetsCounter?.Invoke(this);
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
+        {
+            List<string> refreshAssetsCounterEvents = [];
+            FindDuplicatedAssetsWindow window = new(viewModel, _testLogger);
 
-        Assert.That(refreshAssetsCounterEvents, Has.Count.EqualTo(1));
-        Assert.That(refreshAssetsCounterEvents[0], Is.EqualTo(string.Empty));
+            window.RefreshAssetsCounter += delegate { refreshAssetsCounterEvents.Add(string.Empty); };
+
+            try
+            {
+                // Executes the real FindDuplicatedAssetsWindow_Closing handler wired in XAML on the Closing event.
+                AvaloniaTestSetup.InvokeNonPublicInstanceMethod(window, "FindDuplicatedAssetsWindow_Closing", window,
+                    null);
+
+                Assert.That(refreshAssetsCounterEvents, Has.Count.EqualTo(1));
+                Assert.That(refreshAssetsCounterEvents[0], Is.EqualTo(string.Empty));
+            }
+            finally
+            {
+                window.Close();
+            }
+
+            _testLogger.AssertLogExceptions([], typeof(FindDuplicatedAssetsWindow));
+        });
     }
 
     private DuplicatedAssetViewModel FindDuplicatedAssetVm(Asset asset)

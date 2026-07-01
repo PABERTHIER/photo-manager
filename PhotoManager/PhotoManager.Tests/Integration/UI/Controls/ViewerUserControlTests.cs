@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using PhotoManager.UI.Controls;
 using PhotoManager.UI.Models;
@@ -27,8 +28,6 @@ public class ViewerUserControlTests
 
     private ApplicationViewModel? _applicationViewModel;
     private TestableAssetRepository? _testableAssetRepository;
-
-    private event EventHandler? ThumbnailSelected;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -171,8 +170,6 @@ public class ViewerUserControlTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
-
         CheckBeforeChanges(assetsDirectory);
 
         await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
@@ -191,9 +188,7 @@ public class ViewerUserControlTests
         const string expectedStatusMessage = "The catalog process has ended.";
         Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-        ThumbnailSelected?.Invoke(this, EventArgs.Empty);
-
-        Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
+        Assert.That(await DoubleClickViewer(), Is.True);
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -246,9 +241,7 @@ public class ViewerUserControlTests
 
         _applicationViewModel!.GoToNextAsset();
 
-        ThumbnailSelected?.Invoke(this, EventArgs.Empty);
-
-        Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(2));
+        Assert.That(await DoubleClickViewer(), Is.True);
 
         CheckAfterChanges(
             _applicationViewModel!,
@@ -318,7 +311,7 @@ public class ViewerUserControlTests
     }
 
     [Test]
-    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNull_SendsEvent()
+    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNull_DoesNotSendEvent()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
@@ -329,8 +322,6 @@ public class ViewerUserControlTests
             List<ApplicationViewModel> applicationViewModelInstances,
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
-
-        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
 
         try
         {
@@ -345,9 +336,8 @@ public class ViewerUserControlTests
                 $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
-            ThumbnailSelected?.Invoke(this, EventArgs.Empty);
-
-            Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
+            // The real Image_PointerPressed only raises ThumbnailSelected when CurrentAsset is not null.
+            Assert.That(await DoubleClickViewer(), Is.False);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -766,16 +756,31 @@ public class ViewerUserControlTests
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
     }
 
-    private List<string> NotifyThumbnailSelected()
+    // Drives the real ViewerUserControl.Image_PointerPressed handler with a synthesized double click and reports
+    // whether the control raised its ThumbnailSelected event.
+    private Task<bool> DoubleClickViewer()
     {
-        List<string> thumbnailSelectedEvents = [];
-
-        ThumbnailSelected += delegate
+        return AvaloniaTestSetup.RunOnUiThreadAsync(() =>
         {
-            thumbnailSelectedEvents.Add(string.Empty);
-        };
+            bool raised = false;
+            ViewerUserControl control = new()
+            {
+                DataContext = _applicationViewModel
+            };
+            control.ThumbnailSelected += (_, _) => raised = true;
 
-        return thumbnailSelectedEvents;
+            try
+            {
+                PointerPressedEventArgs args = AvaloniaTestSetup.CreatePointerPressedEventArgs(control, clickCount: 2);
+                AvaloniaTestSetup.InvokeNonPublicInstanceMethod(control, "Image_PointerPressed", control, args);
+
+                return raised;
+            }
+            finally
+            {
+                control.DataContext = null;
+            }
+        });
     }
 
     private void CheckBeforeChanges(string expectedRootDirectory)

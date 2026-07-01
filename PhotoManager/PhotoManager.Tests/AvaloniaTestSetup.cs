@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Headless;
+using Avalonia.Input;
 using Avalonia.Threading;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -34,6 +35,7 @@ public static class AvaloniaTestSetup
                 BlockingCollection<Action> workItems = [];
                 _workItems = workItems;
                 UiThreadState uiThreadState = new(initializedEvent, workItems);
+
                 Thread uiThread = new(static state =>
                 {
                     UiThreadState currentState = (UiThreadState)state!;
@@ -43,6 +45,7 @@ public static class AvaloniaTestSetup
                     IsBackground = true,
                     Name = "Avalonia test UI thread"
                 };
+
                 uiThread.Start(uiThreadState);
                 initializedEvent.Wait();
 
@@ -164,11 +167,17 @@ public static class AvaloniaTestSetup
         return taskCompletionSource.Task;
     }
 
+    public static PointerPressedEventArgs CreatePointerPressedEventArgs(Visual source, int clickCount)
+    {
+        Avalonia.Input.Pointer pointer = new(0, PointerType.Mouse, true);
+        PointerPointProperties properties = new(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed);
+
+        return new(source, pointer, source, new Point(0, 0), 0, properties, KeyModifiers.None, clickCount);
+    }
+
     public static object? InvokeNonPublicInstanceMethod(object target, string methodName, params object?[] parameters)
     {
-        MethodInfo methodInfo = target.GetType().GetMethod(
-            methodName,
-            BindingFlags.Instance | BindingFlags.NonPublic)
+        MethodInfo methodInfo = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)
             ?? throw new MissingMethodException(target.GetType().FullName, methodName);
 
         return methodInfo.Invoke(target, parameters);
