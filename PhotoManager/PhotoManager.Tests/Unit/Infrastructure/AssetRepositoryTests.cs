@@ -281,7 +281,7 @@ public class AssetRepositoryTests
             _assetRepository!.AddFolder(folderPath);
             _persistenceContextMock!
                 .When(context => context.UpsertAssetWithThumbnail(
-                    Arg.Is<Asset>(candidate => candidate.FolderId == asset.FolderId
+                    Arg.Is<Asset>(candidate => candidate!.FolderId == asset.FolderId
                                                && candidate.FileName == asset.FileName),
                     thumbnailData))
                 .Do(_ => throw expectedException);
@@ -295,7 +295,7 @@ public class AssetRepositoryTests
                 Assert.That(assetsUpdatedEvents, Is.Empty);
 
                 _persistenceContextMock!.Received(1).UpsertAssetWithThumbnail(
-                    Arg.Is<Asset>(candidate => candidate.FolderId == asset.FolderId
+                    Arg.Is<Asset>(candidate => candidate!.FolderId == asset.FolderId
                                                && candidate.FileName == asset.FileName),
                     thumbnailData);
                 _thumbnailPersistenceMock!.DidNotReceive().GetByFolderId(Arg.Any<Guid>());
@@ -340,7 +340,7 @@ public class AssetRepositoryTests
                 Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
 
                 _persistenceContextMock!.Received(1).UpsertAssetWithThumbnail(
-                    Arg.Is<Asset>(candidate => candidate.FolderId == trackedFolder.Id
+                    Arg.Is<Asset>(candidate => candidate!.FolderId == trackedFolder.Id
                                                && candidate.Folder.Path == trackedPath),
                     thumbnailData);
 
@@ -615,7 +615,7 @@ public class AssetRepositoryTests
 
                 _persistenceContextMock!.Received(1).DeleteAssetsWithThumbnails(
                     folder.Id,
-                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 1 && fileNames[0] == "missing.jpg"));
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames!.Count == 1 && fileNames[0] == "missing.jpg"));
 
                 _testLogger!.AssertLogExceptions([], typeof(AssetRepository));
             }
@@ -658,7 +658,7 @@ public class AssetRepositoryTests
 
                 _persistenceContextMock!.Received(1).DeleteAssetsWithThumbnails(
                     folder.Id,
-                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 2
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames!.Count == 2
                                                                && fileNames[0] == asset.FileName
                                                                && fileNames[1] == missingFileName));
 
