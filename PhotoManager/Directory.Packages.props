@@ -48,7 +48,7 @@
     Linux native came only from Avalonia 12.0.5's transitive SkiaSharp.NativeAssets.Linux 3.119.4 -->
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="4.150.1" />
     <PackageVersion Include="System.Numerics.Tensors" Version="10.0.10" />
-    <PackageVersion Include="System.Reactive" Version="6.1.0" />
+    <PackageVersion Include="System.Reactive" Version="7.0.0" />
     <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.2" />
   </ItemGroup>
 </Project>
