@@ -31,33 +31,45 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Step 3: Restore dependencies
+      # Step 3: Cache NuGet packages
+      - name: 💾 Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # Step 4: Restore dependencies
       - name: 🛠️ Restore dependencies
         run: dotnet restore ${{ env.PROJECT_NAME }}
 
-      # Step 4: Build the project for release
+      # Step 5: Build the project for release
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Step 5: Publish the project
+      # Step 6: Publish the project
       - name: 📦 Publish
-        run: dotnet publish --configuration Release --runtime win-x64 --output ./output/win-x64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+        run: >-
+          dotnet publish --configuration Release --runtime win-x64 --output ./output/win-x64
+          PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 
-      # Step 6: Compress output into a ZIP file
+      # Step 7: Compress output into a ZIP file
       - name: 📂 Create ZIP File
         run: |
           Compress-Archive -Path ./output/win-x64/* -DestinationPath ./photo-manager-${{ github.ref_name }}-win-x64.zip
 
-      # Step 7: Create Release with GitHub CLI
+      # Step 8: Create Release with GitHub CLI
       - name: 🏷️ Create Release
         run: |
-          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes 2>$null
+          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" `
+            --generate-notes 2>$null
           if ($LASTEXITCODE -ne 0) { Write-Host "Release already exists or creation skipped, continuing..." }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      # Step 8: Wait for Release availability
+      # Step 9: Wait for Release availability
       - name: ⏳ Wait for Release availability
         run: |
           for ($i = 0; $i -lt 10; $i++) {
@@ -71,14 +83,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Upload File as Artifact
+      # Step 10: Upload File as Artifact
       - name: 📤 Upload Release Asset
         run: |
           gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-win-x64.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 10: Upload Build Artifacts
+      # Step 11: Upload Build Artifacts
       - name: 💾 Upload Build Artifacts
         uses: actions/upload-artifact@v6
         with:

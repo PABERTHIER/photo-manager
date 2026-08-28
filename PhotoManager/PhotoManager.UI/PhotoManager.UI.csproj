@@ -6,6 +6,7 @@
     <AssemblyName>PhotoManager.UI</AssemblyName>
     <RootNamespace>PhotoManager.UI</RootNamespace>
     <Product>PhotoManager</Product>
+    <UseAppHost>true</UseAppHost>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
