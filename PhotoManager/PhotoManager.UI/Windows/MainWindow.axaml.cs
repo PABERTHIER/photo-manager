@@ -163,6 +163,30 @@ public partial class MainWindow : Window
         }
     }
 
+    private void CatalogAssets_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _ = CatalogAssetsManuallyAsync();
+    }
+
+    private async Task CatalogAssetsManuallyAsync()
+    {
+        try
+        {
+            if (ViewModel.IsCataloging)
+            {
+                return;
+            }
+
+            _backgroundWorkTask = StartBackgroundWorkAsync();
+
+            await _backgroundWorkTask;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{ExMessage}", ex.Message);
+        }
+    }
+
     private void FolderTreeView_FolderSelected(object? sender, EventArgs e)
     {
         _ = FolderTreeViewFolderSelectedAsync();
