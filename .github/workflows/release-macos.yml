@@ -105,6 +105,8 @@ jobs:
             test -f "${BUNDLE_DIR}/Contents/Info.plist"
             test -f "${BUNDLE_DIR}/Contents/Resources/AppIcon.icns"
             plutil -lint "${BUNDLE_DIR}/Contents/Info.plist"
+            codesign --deep --force --verbose --sign - "${BUNDLE_DIR}"
+            codesign --verify --deep --strict --verbose "${BUNDLE_DIR}"
           done
 
       # Step 10: Compress .app bundles into tar.gz files
