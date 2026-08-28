@@ -90,17 +90,27 @@ public class App : Avalonia.Application
 
     private static IConfigurationRoot BuildConfiguration()
     {
+        string configurationFilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
         IConfigurationBuilder builder =
-            new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            new ConfigurationBuilder().AddJsonFile(configurationFilePath, optional: false, reloadOnChange: true);
         return builder.Build();
     }
 
     private static void ConfigureServices(IServiceCollection services, IConfigurationRoot configuration)
     {
+        string applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (string.IsNullOrWhiteSpace(applicationDataPath))
+        {
+            applicationDataPath = Path.GetTempPath();
+        }
+
+        string logDirectory = Path.Combine(applicationDataPath, "PhotoManager");
+        Directory.CreateDirectory(logDirectory);
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
             .WriteTo.File(
-                "log.txt",
+                Path.Combine(logDirectory, "log.txt"),
                 outputTemplate:
                 "{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u5} {SourceContext} - {Message:lj}{NewLine}{Exception}",
                 fileSizeLimitBytes: 10L * 1024 * 1024,
