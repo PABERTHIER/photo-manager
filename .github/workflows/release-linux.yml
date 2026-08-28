@@ -43,21 +43,28 @@ jobs:
       - name: 📦 Publish
         run: dotnet publish --configuration Release --runtime linux-x64 --output ./output/linux-x64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 
-      # Step 6: Compress output into a tar.gz file
+      # Step 6: Add Linux desktop integration files
+      - name: 📂 Add Desktop Integration Files
+        run: |
+          chmod +x ./output/linux-x64/PhotoManager.UI
+          cp PhotoManager/PhotoManager.UI/Assets/PhotoManager.desktop ./output/linux-x64/
+          cp PhotoManager/PhotoManager.UI/Assets/AppIcon.png ./output/linux-x64/photomanager.png
+
+      # Step 7: Compress output into a tar.gz file
       - name: 📂 Create tar.gz Archive
         run: |
           cd ./output/linux-x64
           tar -czf ../../photo-manager-${{ github.ref_name }}-linux-x64.tar.gz .
           cd ../..
 
-      # Step 7: Create Release with GitHub CLI
+      # Step 8: Create Release with GitHub CLI
       - name: 🏷️ Create Release (if not exists)
         run: |
           gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 8: Wait for Release availability
+      # Step 9: Wait for Release availability
       - name: ⏳ Wait for Release availability
         run: |
           for i in $(seq 1 10); do
@@ -73,14 +80,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Upload File as Artifact
+      # Step 10: Upload File as Artifact
       - name: 📤 Upload Release Asset
         run: |
           gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-linux-x64.tar.gz --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 10: Upload Build Artifacts
+      # Step 11: Upload Build Artifacts
       - name: 💾 Upload Build Artifacts
         uses: actions/upload-artifact@v6
         with:
