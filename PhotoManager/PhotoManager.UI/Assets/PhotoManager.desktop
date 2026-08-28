@@ -1,4 +1,4 @@
-[Desktop Entry]
+﻿[Desktop Entry]
 Name=PhotoManager
 Comment=Photo collection manager with duplicate detection
 Exec=PhotoManager.UI
