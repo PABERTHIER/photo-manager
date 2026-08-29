@@ -23,10 +23,11 @@ public class FolderNavigationViewModel(
                 return false;
             }
 
-            string sourceFolderPathFormatted =
-                SourceFolder.Path.EndsWith('\\') ? SourceFolder.Path[..^1] : SourceFolder.Path;
+            string sourceFolderPathFormatted = Path.TrimEndingDirectorySeparator(SourceFolder.Path);
 
-            return sourceFolderPathFormatted != SelectedFolder.Path;
+            return !string.Equals(sourceFolderPathFormatted,
+                Path.TrimEndingDirectorySeparator(SelectedFolder.Path),
+                StringComparison.OrdinalIgnoreCase);
         }
     }
 
@@ -40,7 +41,7 @@ public class FolderNavigationViewModel(
         get;
         set
         {
-            string? targetPath = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
+            string? targetPath = string.IsNullOrWhiteSpace(value) ? value : Path.TrimEndingDirectorySeparator(value);
 
             if (field == targetPath)
             {

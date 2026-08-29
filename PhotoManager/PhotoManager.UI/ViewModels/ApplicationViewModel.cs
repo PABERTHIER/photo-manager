@@ -325,7 +325,8 @@ public class ApplicationViewModel : BaseViewModel
         switch (e.Reason)
         {
             case CatalogChangeReason.AssetCreated:
-                if (e.Asset?.Folder.Path == CurrentFolderPath)
+                if (e.Asset?.Folder.Path is { } assetFolderPath
+                    && AreSameDirectory(assetFolderPath, CurrentFolderPath))
                 {
                     _application.LoadThumbnail(e.Asset);
                     AddAsset(e.Asset);
@@ -334,7 +335,8 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetUpdated:
-                if (e.Asset?.Folder.Path == CurrentFolderPath)
+                if (e.Asset?.Folder.Path is { } updatedAssetFolderPath
+                    && AreSameDirectory(updatedAssetFolderPath, CurrentFolderPath))
                 {
                     _application.LoadThumbnail(e.Asset);
                     UpdateAsset(e.Asset);
@@ -343,7 +345,8 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetDeleted:
-                if (e.Asset?.Folder.Path == CurrentFolderPath)
+                if (e.Asset?.Folder.Path is { } deletedAssetFolderPath
+                    && AreSameDirectory(deletedAssetFolderPath, CurrentFolderPath))
                 {
                     RemoveAssets([e.Asset]);
                 }
@@ -495,6 +498,14 @@ public class ApplicationViewModel : BaseViewModel
             nameof(CanGoToNextAsset),
             nameof(CurrentAsset));
         UpdateAppTitle();
+    }
+
+    private static bool AreSameDirectory(string firstPath, string secondPath)
+    {
+        string normalizedFirstPath = Path.TrimEndingDirectorySeparator(firstPath);
+        string normalizedSecondPath = Path.TrimEndingDirectorySeparator(secondPath);
+
+        return string.Equals(normalizedFirstPath, normalizedSecondPath, StringComparison.OrdinalIgnoreCase);
     }
 
     private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new() { Folder = folder });

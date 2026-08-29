@@ -1,4 +1,5 @@
-﻿using PhotoManager.UI.Models;
+﻿using PhotoManager.Application;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -166,6 +167,40 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     // AssetCreated SECTION (Start) ----------------------------------------------------------------------------------------------
+    [Test]
+    public void NotifyCatalogChange_AssetFolderPathHasTrailingSeparator_AddsAssetToCurrentFolder()
+    {
+        string folderPath = _assetsDirectory!;
+        IApplication application = Substitute.For<IApplication>();
+        application.GetInitialFolderPath().Returns(folderPath);
+        application.GetAboutInformation(typeof(ApplicationViewModel).Assembly).Returns(new AboutInformation
+        {
+            Product = "PhotoManager",
+            Author = "Toto",
+            Version = Constants.VERSION
+        });
+
+        ApplicationViewModel applicationViewModel = new(application);
+        applicationViewModel.SetAssets(folderPath, []);
+
+        Asset asset = _asset1!;
+        asset.Folder = new()
+        {
+            Id = asset.FolderId,
+            Path = folderPath + Path.DirectorySeparatorChar
+        };
+
+        applicationViewModel.NotifyCatalogChange(new()
+        {
+            Asset = asset,
+            Reason = CatalogChangeReason.AssetCreated,
+            Message = "Asset created."
+        });
+
+        Assert.That(applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
+        Assert.That(applicationViewModel.CurrentAsset, Is.SameAs(asset));
+    }
+
     [Test]
     public void NotifyCatalogChange_CataloguedAssetsAndOneNewAssetAndCurrentFolder_NotifiesCatalogChangeAndAddsAsset()
     {
