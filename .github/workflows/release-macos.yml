@@ -31,40 +31,112 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Step 3: Restore dependencies
+      # Step 3: Cache NuGet packages
+      - name: 💾 Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # Step 4: Restore dependencies
       - name: 🛠️ Restore dependencies
         run: dotnet restore ${{ env.PROJECT_NAME }}
 
-      # Step 4: Build the project for release
+      # Step 5: Build the project for release
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Step 5: Publish the project (x64)
+      # Step 6: Publish the project (x64)
       - name: 📦 Publish (x64)
-        run: dotnet publish --configuration Release --runtime osx-x64 --output ./output/osx-x64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+        run: >-
+          dotnet publish --configuration Release --runtime osx-x64 --output ./output/osx-x64
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          && test -f ./output/osx-x64/PhotoManager.UI
+          && test -f ./output/osx-x64/appsettings.json
 
-      # Step 6: Publish the project (arm64)
+      # Step 7: Publish the project (arm64)
       - name: 📦 Publish (arm64)
-        run: dotnet publish --configuration Release --runtime osx-arm64 --output ./output/osx-arm64 PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+        run: >-
+          dotnet publish --configuration Release --runtime osx-arm64 --output ./output/osx-arm64
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          && test -f ./output/osx-arm64/PhotoManager.UI
+          && test -f ./output/osx-arm64/appsettings.json
 
-      # Step 7: Compress output into a tar.gz file
+      # Step 8: Generate .icns icon from PNG
+      - name: 🎨 Generate macOS Icon (.icns)
+        run: |
+          mkdir -p AppIcon.iconset
+          sips -z 16 16     PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_16x16.png
+          sips -z 32 32     PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_16x16@2x.png
+          sips -z 32 32     PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_32x32.png
+          sips -z 64 64     PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_32x32@2x.png
+          sips -z 128 128   PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_128x128.png
+          sips -z 256 256   PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_128x128@2x.png
+          sips -z 256 256   PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_256x256.png
+          sips -z 512 512   PhotoManager/PhotoManager.UI/Assets/AppIcon.png --out AppIcon.iconset/icon_256x256@2x.png
+          iconutil -c icns AppIcon.iconset -o AppIcon.icns
+          test -s AppIcon.icns
+
+      # Step 9: Create .app bundles
+      - name: 📦 Create macOS .app Bundles
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+
+          for ARCH in osx-x64 osx-arm64; do
+            APP_NAME="PhotoManager.app"
+            BUNDLE_DIR="./bundle/${ARCH}/${APP_NAME}"
+
+            mkdir -p "${BUNDLE_DIR}/Contents/MacOS"
+            mkdir -p "${BUNDLE_DIR}/Contents/Resources"
+
+            # Copy published output into MacOS directory
+            cp -R ./output/${ARCH}/* "${BUNDLE_DIR}/Contents/MacOS/"
+
+            # Copy icon
+            cp AppIcon.icns "${BUNDLE_DIR}/Contents/Resources/AppIcon.icns"
+
+            # Generate Info.plist with correct version
+            sed "s/1.0.0/${VERSION}/g" \
+              PhotoManager/PhotoManager.UI/Assets/Info.plist \
+              > "${BUNDLE_DIR}/Contents/Info.plist"
+
+            # Ensure executable permission
+            chmod +x "${BUNDLE_DIR}/Contents/MacOS/PhotoManager.UI"
+            test -x "${BUNDLE_DIR}/Contents/MacOS/PhotoManager.UI"
+            test -f "${BUNDLE_DIR}/Contents/Info.plist"
+            test -f "${BUNDLE_DIR}/Contents/Resources/AppIcon.icns"
+            plutil -lint "${BUNDLE_DIR}/Contents/Info.plist"
+            file "${BUNDLE_DIR}/Contents/MacOS/PhotoManager.UI" | grep -q "Mach-O"
+            codesign --deep --force --verbose --sign - "${BUNDLE_DIR}"
+            codesign --verify --deep --strict --verbose "${BUNDLE_DIR}"
+          done
+
+      # Step 10: Compress .app bundles into tar.gz files
       - name: 📂 Create tar.gz Archives
         run: |
-          cd ./output/osx-x64
-          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-x64.tar.gz .
+          cd ./bundle/osx-x64
+          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-x64.tar.gz PhotoManager.app
           cd ../..
-          cd ./output/osx-arm64
-          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-arm64.tar.gz .
+          cd ./bundle/osx-arm64
+          tar -czf ../../photo-manager-${{ github.ref_name }}-osx-arm64.tar.gz PhotoManager.app
           cd ../..
+          tar -tzf ./photo-manager-${{ github.ref_name }}-osx-x64.tar.gz |
+            grep -Fx "PhotoManager.app/Contents/MacOS/PhotoManager.UI"
+          tar -tzf ./photo-manager-${{ github.ref_name }}-osx-arm64.tar.gz |
+            grep -Fx "PhotoManager.app/Contents/MacOS/PhotoManager.UI"
 
-      # Step 8: Create Release with GitHub CLI
+      # Step 11: Create Release with GitHub CLI
       - name: 🏷️ Create Release (if not exists)
         run: |
-          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes || true
+          gh release create ${{ github.ref_name }} --title "PhotoManager ${{ github.ref_name }}" \
+            --generate-notes || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Wait for Release availability
+      # Step 12: Wait for Release availability
       - name: ⏳ Wait for Release availability
         run: |
           for i in $(seq 1 10); do
@@ -80,7 +152,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 10: Upload File as Artifact
+      # Step 13: Upload File as Artifact
       - name: 📤 Upload Release Assets
         run: |
           gh release upload ${{ github.ref_name }} ./photo-manager-${{ github.ref_name }}-osx-x64.tar.gz --clobber
@@ -88,16 +160,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 11: Upload Build Artifacts (x64)
+      # Step 14: Upload Build Artifacts (x64)
       - name: 💾 Upload Build Artifacts (x64)
         uses: actions/upload-artifact@v6
         with:
           name: photo-manager-osx-x64
-          path: ./output/osx-x64
+          path: ./bundle/osx-x64/PhotoManager.app
 
-      # Step 12: Upload Build Artifacts (arm64)
+      # Step 15: Upload Build Artifacts (arm64)
       - name: 💾 Upload Build Artifacts (arm64)
         uses: actions/upload-artifact@v6
         with:
           name: photo-manager-osx-arm64
-          path: ./output/osx-arm64
+          path: ./bundle/osx-arm64/PhotoManager.app
