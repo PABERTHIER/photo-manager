@@ -52,13 +52,17 @@ jobs:
       - name: 📦 Publish (x64)
         run: >-
           dotnet publish --configuration Release --runtime osx-x64 --output ./output/osx-x64
-          -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          && test -f ./output/osx-x64/PhotoManager.UI
+          && test -f ./output/osx-x64/appsettings.json
 
       # Step 7: Publish the project (arm64)
       - name: 📦 Publish (arm64)
         run: >-
           dotnet publish --configuration Release --runtime osx-arm64 --output ./output/osx-arm64
-          -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          && test -f ./output/osx-arm64/PhotoManager.UI
+          && test -f ./output/osx-arm64/appsettings.json
 
       # Step 8: Generate .icns icon from PNG
       - name: 🎨 Generate macOS Icon (.icns)
@@ -105,6 +109,7 @@ jobs:
             test -f "${BUNDLE_DIR}/Contents/Info.plist"
             test -f "${BUNDLE_DIR}/Contents/Resources/AppIcon.icns"
             plutil -lint "${BUNDLE_DIR}/Contents/Info.plist"
+            file "${BUNDLE_DIR}/Contents/MacOS/PhotoManager.UI" | grep -q "Mach-O"
             codesign --deep --force --verbose --sign - "${BUNDLE_DIR}"
             codesign --verify --deep --strict --verbose "${BUNDLE_DIR}"
           done

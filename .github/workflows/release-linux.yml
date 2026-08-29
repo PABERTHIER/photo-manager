@@ -52,7 +52,7 @@ jobs:
       - name: 📦 Publish
         run: >-
           dotnet publish --configuration Release --runtime linux-x64 --output ./output/linux-x64
-          -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 
       # Step 7: Add Linux desktop integration files
       - name: 📂 Add Desktop Integration Files

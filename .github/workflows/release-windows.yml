@@ -52,7 +52,7 @@ jobs:
       - name: 📦 Publish
         run: >-
           dotnet publish --configuration Release --runtime win-x64 --output ./output/win-x64
-          PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+          --self-contained true -p:UseAppHost=true PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 
       # Step 7: Compress output into a ZIP file
       - name: 📂 Create ZIP File
