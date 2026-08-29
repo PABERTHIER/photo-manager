@@ -9,6 +9,7 @@ public static class InfrastructureServiceCollectionExtensions
     {
         public void AddInfrastructure()
         {
+            services.AddSingleton<IApplicationDataPathProvider, ApplicationDataPathProvider>();
             services.AddSingleton<IPathProviderService, PathProviderService>();
 
             services.AddPersistence();
