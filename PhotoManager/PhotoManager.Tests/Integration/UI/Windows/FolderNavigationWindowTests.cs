@@ -1047,13 +1047,13 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderPathEndsWithAntiSlash_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, $"{Directories.TEMP_EMPTY_FOLDER}\\");
-        string expectedTargetPath = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string sourceFolderPath = assetsDirectory + Path.DirectorySeparatorChar;
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
-        Folder folder = _testableAssetRepository!.AddFolder(assetsDirectory);
-        List<string> recentTargetPaths = [assetsDirectory];
+        Folder folder = _testableAssetRepository!.AddFolder(sourceFolderPath);
+        List<string> recentTargetPaths = [sourceFolderPath];
 
         _applicationViewModel!.SetMoveAssetsLastSelectedFolder(folder);
 
@@ -1070,12 +1070,12 @@ public class FolderNavigationWindowTests
 
         string expectedAppTitle =
             $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = expectedTargetPath };
+        Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
         string selectedPath = Init();
 
         Assert.That(selectedPath, Is.EqualTo(folder.Path));
-        Assert.That(selectedPath, Is.EqualTo(assetsDirectory));
+        Assert.That(selectedPath, Is.EqualTo(sourceFolderPath));
 
         FolderSelected(selectedPath);
 
@@ -1094,7 +1094,7 @@ public class FolderNavigationWindowTests
             false,
             false,
             [.. recentTargetPaths],
-            expectedTargetPath);
+            assetsDirectory);
 
         Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
@@ -1118,7 +1118,7 @@ public class FolderNavigationWindowTests
             false,
             false,
             [.. recentTargetPaths],
-            expectedTargetPath);
+            assetsDirectory);
 
         // Because the root folder is already added
         Assert.That(folderAddedEvents, Is.Empty);
