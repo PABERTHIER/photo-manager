@@ -2,10 +2,22 @@
 
 public class PathProviderService : IPathProviderService
 {
-    private static readonly string DatabaseDirectory = Path.Combine(AppContext.BaseDirectory, "Database");
+    private readonly string _databaseDirectory;
+
+    public PathProviderService(IApplicationDataPathProvider applicationDataPathProvider)
+    {
+        string applicationDataPath = applicationDataPathProvider.GetPath();
+
+        if (string.IsNullOrWhiteSpace(applicationDataPath))
+        {
+            applicationDataPath = Path.GetTempPath();
+        }
+
+        _databaseDirectory = Path.Combine(applicationDataPath, "PhotoManager", "Database");
+    }
 
     public string ResolveDatabaseDirectory()
     {
-        return DatabaseDirectory;
+        return _databaseDirectory;
     }
 }
