@@ -202,7 +202,7 @@ public partial class FolderNavigationControl : UserControl
 
         item.IsExpanded = true;
 
-        if (Path.TrimEndingDirectorySeparator(folder.Path) == Path.TrimEndingDirectorySeparator(folderFullPath))
+        if (folder.Path == folderFullPath)
         {
             item.IsSelected = true;
             return;
