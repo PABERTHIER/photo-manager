@@ -160,7 +160,7 @@ public class MainWindowKeyDownTests
                 Assert.That(applicationViewModel.ObservableAssets, Does.Not.Contain(firstAsset));
                 Assert.That(applicationViewModel.ObservableAssets, Does.Contain(secondAsset));
 
-                application.Received(1).DeleteAssets(Arg.Is<Asset[]>(a => a.Length == 1 && a[0] == firstAsset));
+                application.Received(1).DeleteAssets(Arg.Is<Asset[]>(a => a!.Length == 1 && a[0] == firstAsset));
 
                 _testLogger.AssertLogExceptions([], typeof(MainWindow));
             }

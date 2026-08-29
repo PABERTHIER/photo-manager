@@ -54,7 +54,7 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 - Run the application:
   - **Windows**: Run `PhotoManager.UI.exe`
   - **Linux / macOS**: Run `./PhotoManager.UI` (you may need to `chmod +x PhotoManager.UI` first)
-- The application automatically creates a `Database/` folder next to the executable to store the database and backups.
+- The application automatically creates a `PhotoManager/Database/` folder in the user's local application-data directory to store the database and backups.
 
 ## Config file :card_file_box:
 

@@ -121,7 +121,7 @@ public class SettingsViewModelTests
         Assert.That(saved, Is.True);
 
         _application!.Received(1).SaveEditableConfiguration(Arg.Is<EditableUserConfiguration>(configuration =>
-            configuration.PathSettings.AssetsDirectory == PathHelper.ToPlatformAbsolutePath("D:\\Photos")
+            configuration!.PathSettings.AssetsDirectory == PathHelper.ToPlatformAbsolutePath("D:\\Photos")
             && configuration.PathSettings.ExemptedFolderPath ==
             PathHelper.ToPlatformAbsolutePath("D:\\Photos\\Exempted")
             && configuration.PathSettings.FirstFrameVideosFolderName == "VideoFrames"

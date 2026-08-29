@@ -1,4 +1,4 @@
----
+﻿---
 applyTo: "**/PhotoManager.Persistence/**/*.cs"
 ---
 
@@ -33,7 +33,7 @@ When adding tables:
 
 - Filename: `yyyyMMdd.zip` containing a single `photomanager.db` entry
 - Created via SQLite online-backup API (`SqliteConnection.BackupDatabase`)
-- Stored in `<AppContext.BaseDirectory>/Database/Backups/`
+- Stored in `<LocalApplicationData>/PhotoManager/Database/Backups/`
 
 ## Testing the Persistence Layer
 

@@ -175,7 +175,7 @@ public class CatalogAssetsServiceTests
 
                 assetRepository.Received(1).DeleteAssets(
                     AssetsDirectory,
-                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 2
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames!.Count == 2
                                                                && fileNames[0] == firstDeletedFileName
                                                                && fileNames[1] == secondDeletedFileName));
 
@@ -226,7 +226,7 @@ public class CatalogAssetsServiceTests
 
                 assetRepository.Received(1).DeleteAssets(
                     AssetsDirectory,
-                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames.Count == 1
+                    Arg.Is<IReadOnlyList<string>>(fileNames => fileNames!.Count == 1
                                                                && fileNames[0] == firstDeletedFileName));
                 assetRepository.DidNotReceive().DeleteAsset(AssetsDirectory, secondDeletedFileName);
 
@@ -264,9 +264,9 @@ public class CatalogAssetsServiceTests
             await catalogAssetsService.CatalogAssetsAsync(_ => { });
 
             imageMetadataService.Received(1).UpdateAssetsFileProperties(
-                Arg.Is<List<Asset>>(assets => assets.Count == 1 && assets[0] == existingAsset),
+                Arg.Is<List<Asset>>(assets => assets!.Count == 1 && assets[0] == existingAsset),
                 Arg.Is<IReadOnlyDictionary<string, FileProperties>>(filePropertiesByName =>
-                    ContainsFileProperties(filePropertiesByName, fileName, 3)));
+                    ContainsFileProperties(filePropertiesByName!, fileName, 3)));
 
             _testLogger.AssertLogExceptions([], typeof(CatalogAssetsService));
         }
@@ -293,7 +293,7 @@ public class CatalogAssetsServiceTests
 
         fileOperationsService.FolderExists(AssetsDirectory).Returns(true);
         fileOperationsService.GetFileInfos(AssetsDirectory).Returns([missingFileInfo]);
-        assetsComparator.GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames.Length == 0)).Returns(([], []));
+        assetsComparator.GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames!.Length == 0)).Returns(([], []));
         assetsComparator.GetNewFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
         assetsComparator.GetUpdatedFileNames(Arg.Any<List<Asset>>()).Returns([]);
         assetsComparator.GetDeletedFileNames(Arg.Any<string[]>(), Arg.Any<List<Asset>>()).Returns([]);
@@ -305,8 +305,8 @@ public class CatalogAssetsServiceTests
             imageMetadataService.Received(1).UpdateAssetsFileProperties(
                 Arg.Any<List<Asset>>(),
                 Arg.Is<IReadOnlyDictionary<string, FileProperties>>(filePropertiesByName =>
-                    filePropertiesByName.Count == 0));
-            assetsComparator.Received(1).GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames.Length == 0));
+                    filePropertiesByName!.Count == 0));
+            assetsComparator.Received(1).GetImageAndVideoNames(Arg.Is<string[]>(fileNames => fileNames!.Length == 0));
 
             _testLogger.AssertLogInfos(
                 [$"Skipped file metadata snapshot for {missingFileInfo.FullName}."],
@@ -413,7 +413,7 @@ public class CatalogAssetsServiceTests
             assetRepository.GetCataloguedAssetsByPath(Arg.Any<string>()).Returns([]);
             assetRepository
                 .When(repository => repository.DeleteFolder(Arg.Any<Folder>()))
-                .Do(call => foldersByPath.Remove(call.Arg<Folder>().Path));
+                .Do(call => foldersByPath.Remove(call.Arg<Folder>()!.Path));
 
             fileOperationsService.FolderExists(Arg.Any<string>())
                 .Returns(call => Directory.Exists(call.ArgAt<string>(0)));

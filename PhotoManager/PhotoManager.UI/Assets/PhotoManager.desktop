@@ -1,0 +1,9 @@
+﻿[Desktop Entry]
+Name=PhotoManager
+Comment=Photo collection manager with duplicate detection
+Exec=PhotoManager.UI
+Icon=photomanager
+Type=Application
+Categories=Graphics;Photography;
+Terminal=false
+StartupWMClass=PhotoManager.UI
