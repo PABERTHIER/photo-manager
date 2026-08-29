@@ -184,7 +184,7 @@ UI → Application → Domain ← Infrastructure ← Persistence
 
 4. **Microsoft Extensions Logging**: The application uses `ILogger<T>` throughout. The UI layer configures Serilog for file logging and console output in `App.axaml.cs`.
 
-5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings). The database directory is **not** configurable — it is always resolved at runtime as `AppContext.BaseDirectory + "Database"` by `PathProviderService`.
+5. **Configuration**: All settings are in `appsettings.json` with strongly-typed settings classes in `PhotoManager.Domain/UserConfigurationSettings/` (AssetSettings, HashSettings, PathSettings, StorageSettings, ProjectSettings). The database directory is **not** configurable — it is resolved at runtime under the user's local application-data directory in the `PhotoManager/Database` subdirectory by `PathProviderService`.
 
 ## Important Files
 
@@ -340,8 +340,8 @@ Quick test before relying on an assertion: "If `\` stops being a separator and a
 
 The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a single database file:
 
-- Database file: `<AppContext.BaseDirectory>/Database/photomanager.db` (auto-created on first run, always next to the executable)
-- Backups: `<AppContext.BaseDirectory>/Database/Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
+- Database file: `<LocalApplicationData>/PhotoManager/Database/photomanager.db` (auto-created on first run)
+- Backups: `<LocalApplicationData>/PhotoManager/Database/Backups/yyyyMMdd.zip` (contains a `photomanager.db` snapshot)
 - Connection model: one connection per operation, WAL journal mode, `busy_timeout = 5000`
 
 ### Schema (v1 — defined in `SqliteSchema.cs`)

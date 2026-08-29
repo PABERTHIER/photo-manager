@@ -29,6 +29,7 @@ internal static class Program
     private static void WriteStartupError(Exception exception)
     {
         string applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
         if (string.IsNullOrWhiteSpace(applicationDataPath))
         {
             applicationDataPath = Path.GetTempPath();

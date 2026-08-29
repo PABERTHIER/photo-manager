@@ -1,4 +1,4 @@
-# PhotoManager.Persistence
+﻿# PhotoManager.Persistence
 
 The persistence layer for PhotoManager backed by **SQLite**
 (`Microsoft.Data.Sqlite` + `SQLitePCLRaw.bundle_e_sqlite3`). It provides all
@@ -173,7 +173,7 @@ In `App.xaml.cs`, the call chain remains
 is wired transitively through `AddInfrastructure`.
 
 The `SqlitePersistenceContext` calls `Initialize(databaseDirectory)` lazily on first repository read;
-`databaseDirectory` is resolved by `PathProviderService` as`AppContext.BaseDirectory + "Database"` (always next to the executable).
+`databaseDirectory` is resolved by `PathProviderService` under the user's local application-data directory, in the `PhotoManager/Database` subdirectory.
 Data goes to `<databaseDirectory>/photomanager.db` and backups to `<databaseDirectory>/Backups/`.
 
 ---
