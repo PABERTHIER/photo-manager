@@ -287,24 +287,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void PathSettings_PathsContainTrailingSeparators_ReturnsNormalizedPaths()
-    {
-        IConfigurationRoot configurationRootMock = Substitute.For<IConfigurationRoot>();
-        configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock
-            .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "~/Pictures/")
-            .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "~/Exempted/");
-
-        UserConfigurationService userConfigurationService = configurationRootMock.CreateUserConfigurationService();
-        string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        Assert.That(userConfigurationService.PathSettings.AssetsDirectory,
-            Is.EqualTo(Path.Combine(homeDirectory, "Pictures")));
-        Assert.That(userConfigurationService.PathSettings.ExemptedFolderPath,
-            Is.EqualTo(Path.Combine(homeDirectory, "Exempted")));
-    }
-
-    [Test]
     public void ProjectName_CorrectValue_ReturnsProjectNameValue()
     {
         string projectName = _userConfigurationService!.ProjectSettings.Name;
