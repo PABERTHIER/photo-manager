@@ -257,7 +257,7 @@ public partial class UserConfigurationService : IUserConfigurationService
             return value ?? match.Value;
         });
 
-        return Path.GetFullPath(expandedPath);
+        return Path.TrimEndingDirectorySeparator(Path.GetFullPath(expandedPath));
     }
 
     public static string ExpandHomeDirectory(string path, string homeDirectory)
