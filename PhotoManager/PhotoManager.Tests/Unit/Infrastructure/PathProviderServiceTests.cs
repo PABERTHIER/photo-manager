@@ -7,7 +7,7 @@ public class PathProviderServiceTests
     public void ResolveDatabaseDirectory_ReturnsPathInLocalApplicationData()
     {
         ApplicationDataPathProvider applicationDataPathProvider = new();
-        PathProviderService pathProviderService = new(applicationDataPathProvider);   
+        PathProviderService pathProviderService = new(applicationDataPathProvider);
 
         string result = pathProviderService.ResolveDatabaseDirectory();
 
