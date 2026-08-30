@@ -1455,6 +1455,7 @@ public class FolderNavigationWindowTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortAscending, Is.True);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsRefreshingFolders, Is.False);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsCataloging, Is.False);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanCatalog, Is.True);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsThumbnailsVisible, Is.True);
@@ -1551,6 +1552,7 @@ public class FolderNavigationWindowTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortAscending, Is.True);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsRefreshingFolders, Is.False);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsCataloging, Is.False);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanCatalog, Is.True);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria,
             Is.EqualTo(SortCriteria.FileName));

@@ -123,6 +123,8 @@ public class ApplicationViewModel : BaseViewModel
 
     public bool IsCataloging { get; private set; }
 
+    public bool CanCatalog => !IsCataloging;
+
     public string AppTitle
     {
         get => _appTitle;
@@ -217,7 +219,7 @@ public class ApplicationViewModel : BaseViewModel
     public void SetIsCataloging(bool isCataloging)
     {
         IsCataloging = isCataloging;
-        NotifyPropertyChanged(nameof(IsCataloging));
+        NotifyPropertyChanged(nameof(IsCataloging), nameof(CanCatalog));
     }
 
     public void SetMoveAssetsLastSelectedFolder(Folder? folder)
