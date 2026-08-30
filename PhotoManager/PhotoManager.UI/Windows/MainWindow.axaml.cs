@@ -37,13 +37,7 @@ public partial class MainWindow : Window
         {
             InitializeComponent();
             DataContext = viewModel;
-
-            FolderNavigationViewModel folderNavigationViewModel = new(
-                ViewModel,
-                new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
-                application.GetRecentTargetPaths());
-            FolderTreeView.DataContext = folderNavigationViewModel;
-            FolderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
+            SetFolderNavigationViewModel(ViewModel.CurrentFolderPath);
         }
         catch (Exception ex)
         {
@@ -72,6 +66,17 @@ public partial class MainWindow : Window
             copyAssetsMenuItem?.Header = "Copy Assets (Cmd+C)";
             moveAssetsMenuItem?.Header = "Move Assets (Cmd+M)";
         }
+    }
+
+    private void SetFolderNavigationViewModel(string folderPath)
+    {
+        FolderNavigationViewModel folderNavigationViewModel = new(
+            ViewModel,
+            new() { Id = Guid.NewGuid(), Path = folderPath },
+            _application.GetRecentTargetPaths());
+
+        FolderTreeView.DataContext = folderNavigationViewModel;
+        FolderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
     }
 
     private void Window_Opened(object? sender, EventArgs e)
@@ -294,10 +299,34 @@ public partial class MainWindow : Window
             SettingsViewModel settingsViewModel = new(_application);
             SettingsWindow settingsWindow = new(settingsViewModel, _loggerFactory.CreateLogger<SettingsWindow>());
             await settingsWindow.ShowDialog(this);
+
+            string assetsDirectory = _application.GetInitialFolderPath();
+
+            if (!string.Equals(ViewModel.CurrentFolderPath, assetsDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                await RefreshAssetsDirectoryAsync(assetsDirectory);
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "{ExMessage}", ex.Message);
+        }
+    }
+
+    private async Task RefreshAssetsDirectoryAsync(string assetsDirectory)
+    {
+        ViewModel.SetIsRefreshingFolders(true);
+
+        try
+        {
+            Asset[] assets = await Task.Run(() => _application.GetAssetsByPath(assetsDirectory));
+            ViewModel.SetAssets(assetsDirectory, assets);
+
+            SetFolderNavigationViewModel(assetsDirectory);
+        }
+        finally
+        {
+            ViewModel.SetIsRefreshingFolders(false);
         }
     }
 
