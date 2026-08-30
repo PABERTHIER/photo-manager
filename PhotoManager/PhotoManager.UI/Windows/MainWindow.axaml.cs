@@ -13,7 +13,7 @@ public partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IApplication _application;
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private CancellationTokenSource _catalogCancellationTokenSource;
     private Task _backgroundWorkTask = Task.CompletedTask;
     private Task _catalogTask = Task.CompletedTask;
 
@@ -31,7 +31,7 @@ public partial class MainWindow : Window
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<MainWindow>();
         _application = application;
-        _cancellationTokenSource = new();
+        _catalogCancellationTokenSource = new();
 
         try
         {
@@ -315,6 +315,8 @@ public partial class MainWindow : Window
 
     private async Task RefreshAssetsDirectoryAsync(string assetsDirectory)
     {
+        await CancelBackgroundWorkAsync();
+
         ViewModel.SetIsRefreshingFolders(true);
 
         try
@@ -328,6 +330,14 @@ public partial class MainWindow : Window
         {
             ViewModel.SetIsRefreshingFolders(false);
         }
+    }
+
+    private async Task CancelBackgroundWorkAsync()
+    {
+        await _catalogCancellationTokenSource.CancelAsync();
+        await _backgroundWorkTask;
+        _catalogCancellationTokenSource.Dispose();
+        _catalogCancellationTokenSource = new();
     }
 
     private void Shortcuts_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -439,7 +449,7 @@ public partial class MainWindow : Window
 
     private void Window_Closing(object? sender, WindowClosingEventArgs e)
     {
-        _cancellationTokenSource.Cancel();
+        _catalogCancellationTokenSource.Cancel();
 
         _ = _backgroundWorkTask.ContinueWith(task =>
         {
@@ -466,11 +476,11 @@ public partial class MainWindow : Window
                 ushort minutes = ViewModel.GetCatalogCooldownMinutes();
                 TimeSpan delay = TimeSpan.FromMinutes(minutes);
 
-                while (!_cancellationTokenSource.Token.IsCancellationRequested)
+                while (!_catalogCancellationTokenSource.Token.IsCancellationRequested)
                 {
                     try
                     {
-                        await Task.Delay(delay, _cancellationTokenSource.Token);
+                        await Task.Delay(delay, _catalogCancellationTokenSource.Token);
                     }
                     catch (OperationCanceledException)
                     {
@@ -493,7 +503,8 @@ public partial class MainWindow : Window
 
         try
         {
-            _catalogTask = ViewModel.CatalogAssets(NotifyCatalogChangeOnUiThread, _cancellationTokenSource.Token);
+            _catalogTask = ViewModel.CatalogAssets(NotifyCatalogChangeOnUiThread,
+                _catalogCancellationTokenSource.Token);
 
             await _catalogTask;
         }
