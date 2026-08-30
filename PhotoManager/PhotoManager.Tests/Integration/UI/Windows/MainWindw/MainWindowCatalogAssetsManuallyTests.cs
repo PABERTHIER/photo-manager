@@ -19,9 +19,9 @@ namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 [TestFixture]
 [Apartment(ApartmentState.STA)]
 [NonParallelizable]
-public class MainWindowLoadedAndClosingTests
+public class MainWindowCatalogAssetsManuallyTests
 {
-    private static readonly ILogger Log = new TestLogger<MainWindowLoadedAndClosingTests>();
+    private static readonly ILogger Log = new TestLogger<MainWindowCatalogAssetsManuallyTests>();
 
     private string? _assetsDirectory;
     private string? _databaseDirectory;
@@ -172,11 +172,11 @@ public class MainWindowLoadedAndClosingTests
         AssetsComparator assetsComparator = new();
         CatalogFolderPipeline catalogFolderPipeline = new(fileOperationsService, assetCreationService,
             _testableAssetRepository);
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
-            assetCreationService, _userConfigurationService, assetsComparator, catalogFolderPipeline,
-            new TestLogger<CatalogAssetsService>());
-        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService,
-            new TestLogger<MoveAssetsService>());
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService,
+            imageMetadataService, assetCreationService, _userConfigurationService, assetsComparator,
+            catalogFolderPipeline, new TestLogger<CatalogAssetsService>());
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService,
+            assetCreationService, new TestLogger<MoveAssetsService>());
         SyncAssetsService syncAssetsService = new(_testableAssetRepository, fileOperationsService, assetsComparator,
             moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, fileOperationsService,
@@ -192,13 +192,12 @@ public class MainWindowLoadedAndClosingTests
     }
 
     [Test]
-    public async Task
-        WindowLoaded_CataloguedAssetsAndSyncAssetsEveryXMinutesAndIsCancellationRequestedAndWindowClosing_CatalogsAssetsThreeTimesAndClosesWindowSafely()
+    public async Task CatalogAssetsManually_WithAssets_CatalogsAssetsSuccessfully()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
-        ConfigureApplicationViewModel(100, 1, assetsDirectory, 200, 150, true, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
+        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
+        TestLogger<MainWindowCatalogAssetsManuallyTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -212,12 +211,10 @@ public class MainWindowLoadedAndClosingTests
 
             MainWindowsInit();
 
-            await WindowLoaded();
-
-            await _cancellationTokenSource!.CancelAsync();
+            await CatalogAssetsManually();
 
             Assert.That(_stopwatch, Is.Not.Null);
-            Assert.That(_stopwatch.IsRunning, Is.False);
+            Assert.That(_stopwatch!.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -235,14 +232,6 @@ public class MainWindowLoadedAndClosingTests
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
             const string expectedTotalFilesCountWording = "4 files found";
             const string expectedStatusMessage = "The catalog process has ended.";
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            await WindowClosing();
-
-            Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
-            Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
 
             Assert.That(_catalogTask.IsCompleted, Is.True);
 
@@ -271,11 +260,13 @@ public class MainWindowLoadedAndClosingTests
                 true,
                 _sourceFolder!);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(59));
-            // First InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(37));
+            // StartBackgroundWorkAsync: SetStatusMessage
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            // InitializeOnceAsync: SetIsCataloging(true)
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanCatalog"));
+            // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
@@ -305,35 +296,12 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            // finally: SetIsCataloging(false), then counters
             Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("IsCataloging"));
             Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CanCatalog"));
             Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("GlobalAssetsCounterWording"));
             Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("ExecutionTimeWording"));
             Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("TotalFilesCountWording"));
-            // Second InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("TotalFilesCountWording"));
-            // Third InitializeOnceAsync: SetIsCataloging(true), CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("TotalFilesCountWording"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -352,7 +320,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowCatalogAssetsManuallyTests));
         }
         finally
         {
@@ -365,12 +333,175 @@ public class MainWindowLoadedAndClosingTests
     }
 
     [Test]
-    public async Task WindowLoaded_CataloguedAssetsAndIsCancellationRequestedAndWindowClosing_ClosesWindowSafely()
+    public async Task CatalogAssetsManually_NoAssetsInFolder_CatalogsEmptyFolder()
+    {
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
+
+        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
+        TestLogger<MainWindowCatalogAssetsManuallyTests> logger = new();
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(assetsDirectory);
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            MainWindowsInit();
+
+            await CatalogAssetsManually();
+
+            Assert.That(_stopwatch, Is.Not.Null);
+            Assert.That(_stopwatch!.IsRunning, Is.False);
+            Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
+
+            string expectedAppTitle =
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
+            string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
+            const string expectedTotalFilesCountWording = "0 files found";
+            const string expectedStatusMessage = "The catalog process has ended.";
+
+            Assert.That(_catalogTask.IsCompleted, Is.True);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                expectedAppTitle,
+                [],
+                expectedGlobalAssetsCounterWording,
+                expectedExecutionTimeWording,
+                expectedTotalFilesCountWording,
+                expectedStatusMessage,
+                null,
+                false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedAppTitle,
+                [],
+                expectedGlobalAssetsCounterWording,
+                expectedExecutionTimeWording,
+                expectedTotalFilesCountWording,
+                expectedStatusMessage,
+                null,
+                false,
+                _sourceFolder!);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
+            // StartBackgroundWorkAsync: SetStatusMessage
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            // InitializeOnceAsync: SetIsCataloging(true)
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanCatalog"));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            // finally: SetIsCataloging(false), then counters
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("IsCataloging"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanCatalog"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("GlobalAssetsCounterWording"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ExecutionTimeWording"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("TotalFilesCountWording"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                expectedAppTitle,
+                [],
+                expectedGlobalAssetsCounterWording,
+                expectedExecutionTimeWording,
+                expectedTotalFilesCountWording,
+                expectedStatusMessage,
+                null,
+                false);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+
+            Exception[] expectedExceptions = [];
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowCatalogAssetsManuallyTests));
+        }
+        finally
+        {
+            // Rider (debug/coverage mode) seems to hold references longer, causing file locks (zip and db files)
+            // Forcing GC ensures cleanup before deletion
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            Directory.Delete(assetsDirectory, true);
+            logger.LoggingAssertTearDown();
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsManually_AlreadyCataloging_DoesNotStartSecondCatalog()
     {
         string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
+        TestLogger<MainWindowCatalogAssetsManuallyTests> logger = new();
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(assetsDirectory);
+
+            MainWindowsInit();
+
+            // Simulate already cataloging
+            _applicationViewModel!.SetIsCataloging(true);
+
+            // Clear events from SetIsCataloging
+            notifyPropertyChangedEvents.Clear();
+            applicationViewModelInstances.Clear();
+
+            await CatalogAssetsManuallyWhenAlreadyCataloging();
+
+            // No events should have been fired because the method returned early
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(applicationViewModelInstances, Is.Empty);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+
+            // CanCatalog should be false because IsCataloging is true
+            Assert.That(_applicationViewModel!.IsCataloging, Is.True);
+            Assert.That(_applicationViewModel!.CanCatalog, Is.False);
+
+            Exception[] expectedExceptions = [];
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowCatalogAssetsManuallyTests));
+        }
+        finally
+        {
+            // Rider (debug/coverage mode) seems to hold references longer, causing file locks (zip and db files)
+            // Forcing GC ensures cleanup before deletion
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            logger.LoggingAssertTearDown();
+        }
+    }
+
+    [Test]
+    public async Task CatalogAssetsManually_CancellationRequested_CancelsCatalogGracefully()
+    {
+        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+
+        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
+        TestLogger<MainWindowCatalogAssetsManuallyTests> logger = new();
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -386,10 +517,10 @@ public class MainWindowLoadedAndClosingTests
 
             await _cancellationTokenSource!.CancelAsync();
 
-            await WindowLoaded();
+            await CatalogAssetsManually();
 
             Assert.That(_stopwatch, Is.Not.Null);
-            Assert.That(_stopwatch.IsRunning, Is.False);
+            Assert.That(_stopwatch!.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -405,13 +536,9 @@ public class MainWindowLoadedAndClosingTests
 
             Assert.That(_catalogTask.IsCompleted, Is.True);
 
-            await WindowClosing();
-
             Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
             Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
             Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -467,7 +594,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(folderRemovedEvents, Is.Empty);
 
             Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
+            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowCatalogAssetsManuallyTests));
         }
         finally
         {
@@ -475,457 +602,6 @@ public class MainWindowLoadedAndClosingTests
             // Forcing GC ensures cleanup before deletion
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            logger.LoggingAssertTearDown();
-        }
-    }
-
-    [Test]
-    public async Task WindowLoaded_CataloguedAssetsAndWindowClosing_CatalogsAssetsAndClosesWindowSafely()
-    {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
-
-        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
-
-            MainWindowsInit();
-
-            await WindowLoaded();
-
-            Assert.That(_stopwatch, Is.Not.Null);
-            Assert.That(_stopwatch.IsRunning, Is.False);
-            Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.That(folder, Is.Not.Null);
-
-            _asset1 = _asset1!.WithFolder(folder!);
-            _asset2 = _asset2!.WithFolder(folder!);
-            _asset3 = _asset3!.WithFolder(folder!);
-            _asset4 = _asset4!.WithFolder(folder!);
-
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
-            const string expectedGlobalAssetsCounterWording = "Total number of assets: 4";
-            string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
-            const string expectedTotalFilesCountWording = "4 files found";
-            const string expectedStatusMessage = "The catalog process has ended.";
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            await WindowClosing();
-
-            Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
-            Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                _asset1,
-                true);
-
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                _asset1,
-                true,
-                _sourceFolder!);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(37));
-            // InitializeOnceAsync: SetIsCataloging(true), then CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
-            // finally: SetIsCataloging(false), then counters
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("TotalFilesCountWording"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                expectedAssets,
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                _asset1,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-
-            Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
-        }
-        finally
-        {
-            // Rider (debug/coverage mode) seems to hold references longer, causing file locks (zip and db files)
-            // Forcing GC ensures cleanup before deletion
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            logger.LoggingAssertTearDown();
-        }
-    }
-
-    [Test]
-    public async Task WindowLoaded_NoCataloguedAssetsAndWindowClosing_ClosesWindowSafely()
-    {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
-
-        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
-
-            Directory.CreateDirectory(assetsDirectory);
-
-            MainWindowsInit();
-
-            await WindowLoaded();
-
-            Assert.That(_stopwatch, Is.Not.Null);
-            Assert.That(_stopwatch.IsRunning, Is.False);
-            Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
-
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-            const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
-            string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
-            const string expectedTotalFilesCountWording = "0 files found";
-            const string expectedStatusMessage = "The catalog process has ended.";
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            await WindowClosing();
-
-            Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
-            Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                null,
-                false);
-
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                null,
-                false,
-                _sourceFolder!);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            // InitializeOnceAsync: SetIsCataloging(true), then CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            // finally: SetIsCataloging(false), then counters
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("IsCataloging"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanCatalog"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("GlobalAssetsCounterWording"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ExecutionTimeWording"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("TotalFilesCountWording"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                expectedGlobalAssetsCounterWording,
-                expectedExecutionTimeWording,
-                expectedTotalFilesCountWording,
-                expectedStatusMessage,
-                null,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-
-            Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
-        }
-        finally
-        {
-            // Rider (debug/coverage mode) seems to hold references longer, causing file locks (zip and db files)
-            // Forcing GC ensures cleanup before deletion
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            Directory.Delete(assetsDirectory, true);
-            logger.LoggingAssertTearDown();
-        }
-    }
-
-    [Test]
-    public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsCompleted_CancelsTaskAndCancellationToken()
-    {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
-
-        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
-
-            Directory.CreateDirectory(assetsDirectory);
-
-            MainWindowsInit();
-
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-
-            TaskCompletionSource<bool> taskCompletionSource = new();
-            _catalogTask = taskCompletionSource.Task;
-
-            Task windowClosingTask = Task.Run(WindowClosing);
-
-            Assert.That(_catalogTask.IsCompleted, Is.False);
-
-            taskCompletionSource.SetResult(true);
-            await windowClosingTask;
-
-            Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
-            Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
-
-            Assert.That(_catalogTask.IsCompleted, Is.True);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false);
-
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false,
-                _sourceFolder!);
-
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-
-            Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
-        }
-        finally
-        {
-            Directory.Delete(assetsDirectory, true);
-            logger.LoggingAssertTearDown();
-        }
-    }
-
-    [Test]
-    public async Task WindowClosing_WindowNotLoadedAndCatalogTaskIsNotCompleted_CancelsTaskAndCancellationToken()
-    {
-        string assetsDirectory = Path.Combine(_assetsDirectory!, Directories.TEMP_EMPTY_FOLDER);
-
-        ConfigureApplicationViewModel(100, 5, assetsDirectory, 200, 150, false, false, false, false, true);
-        TestLogger<MainWindowLoadedAndClosingTests> logger = new();
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(assetsDirectory);
-
-            Directory.CreateDirectory(assetsDirectory);
-
-            MainWindowsInit();
-
-            string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
-
-            TaskCompletionSource<bool> taskCompletionSource = new();
-            _catalogTask = taskCompletionSource.Task;
-
-            Task windowClosingTask = Task.Run(WindowClosing);
-
-            Assert.That(_catalogTask.IsCompleted, Is.False);
-
-            await windowClosingTask;
-
-            Assert.That(_cancellationTokenSource!.IsCancellationRequested, Is.True);
-            Assert.That(_cancellationTokenSource.Token.CanBeCanceled, Is.True);
-            Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.True);
-
-            Assert.That(_catalogTask.IsCompleted, Is.False);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false);
-
-            CheckFolderNavigationViewModel(
-                _folderNavigationViewModel!,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false,
-                _sourceFolder!);
-
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                expectedAppTitle,
-                [],
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                null,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-
-            Exception[] expectedExceptions = [];
-            logger.AssertLogExceptions(expectedExceptions, typeof(MainWindowLoadedAndClosingTests));
-        }
-        finally
-        {
-            Directory.Delete(assetsDirectory, true);
             logger.LoggingAssertTearDown();
         }
     }
@@ -1162,8 +838,25 @@ public class MainWindowLoadedAndClosingTests
         Assert.That(_cancellationTokenSource.Token.IsCancellationRequested, Is.False);
     }
 
-    private Task WindowLoaded()
+    private Task CatalogAssetsManually()
     {
+        if (_applicationViewModel!.IsCataloging)
+        {
+            return Task.CompletedTask;
+        }
+
+        _backgroundWorkTask = StartBackgroundWorkAsync();
+
+        return _backgroundWorkTask;
+    }
+
+    private Task CatalogAssetsManuallyWhenAlreadyCataloging()
+    {
+        if (_applicationViewModel!.IsCataloging)
+        {
+            return Task.CompletedTask;
+        }
+
         _backgroundWorkTask = StartBackgroundWorkAsync();
 
         return _backgroundWorkTask;
@@ -1182,11 +875,9 @@ public class MainWindowLoadedAndClosingTests
             if (_applicationViewModel!.GetSyncAssetsEveryXMinutes())
             {
                 ushort minutes = _applicationViewModel!.GetCatalogCooldownMinutes();
-                // TimeSpan delay = TimeSpan.FromMinutes(minutes);
-                TimeSpan delay = TimeSpan.FromSeconds(minutes * 10); // To reduce the test duration
-                int counter = 0; // Adding a counter just for the test
+                TimeSpan delay = TimeSpan.FromMinutes(minutes);
 
-                while (!_cancellationTokenSource!.Token.IsCancellationRequested && counter < 2)
+                while (!_cancellationTokenSource!.Token.IsCancellationRequested)
                 {
                     try
                     {
@@ -1198,7 +889,6 @@ public class MainWindowLoadedAndClosingTests
                     }
 
                     await InitializeOnceAsync();
-                    counter++;
                 }
             }
         }
@@ -1235,22 +925,5 @@ public class MainWindowLoadedAndClosingTests
         _stopwatch!.Stop();
         _applicationViewModel!.SetExecutionTime(_stopwatch.Elapsed);
         _applicationViewModel!.CalculateTotalFilesCount();
-    }
-
-    private Task WindowClosing()
-    {
-        _cancellationTokenSource?.Cancel();
-
-        _ = _backgroundWorkTask.ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Log.LogError(task.Exception, "BackgroundWorkTask faulted during shutdown");
-            }
-        }, TaskScheduler.Default);
-
-        _backgroundWorkTask = Task.CompletedTask;
-
-        return _backgroundWorkTask;
     }
 }

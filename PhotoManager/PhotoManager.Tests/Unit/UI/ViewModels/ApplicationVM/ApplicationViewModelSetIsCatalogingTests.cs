@@ -50,8 +50,9 @@ public class ApplicationViewModelSetIsCatalogingTests
 
         CheckAfterChanges(_applicationViewModel!, _assetsDirectory!, true);
 
-        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(1));
+        Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
         Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo(nameof(ApplicationViewModel.IsCataloging)));
+        Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo(nameof(ApplicationViewModel.CanCatalog)));
 
         CheckInstance(applicationViewModelInstances, _assetsDirectory!, true);
 
@@ -108,6 +109,7 @@ public class ApplicationViewModelSetIsCatalogingTests
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.IsCataloging, Is.False);
+        Assert.That(_applicationViewModel!.CanCatalog, Is.True);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.IsThumbnailsVisible, Is.True);
@@ -140,6 +142,7 @@ public class ApplicationViewModelSetIsCatalogingTests
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.IsCataloging, Is.EqualTo(isCataloging));
+        Assert.That(applicationViewModelInstance.CanCatalog, Is.EqualTo(!isCataloging));
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.IsThumbnailsVisible, Is.True);
