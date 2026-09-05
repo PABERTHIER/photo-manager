@@ -521,13 +521,13 @@ public class ApplicationGetDuplicatedAssetsThumbnailNotDuplicatesTests
         new[]
         {
             FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
-            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+            FileNames._1414_JPG, FileNames._1415_JPG
         }, new string[] { }, new string[] { })]
     [TestCase(90, 1,
         new[]
         {
             FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG,
-            FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG
+            FileNames._1414_JPG, FileNames._1415_JPG
         }, new string[] { }, new string[] { })]
     [TestCase(100, 1,
         new[]

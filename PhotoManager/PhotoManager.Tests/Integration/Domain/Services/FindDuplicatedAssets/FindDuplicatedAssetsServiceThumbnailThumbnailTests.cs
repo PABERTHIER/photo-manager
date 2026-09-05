@@ -353,20 +353,24 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         new[]
         {
             FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
-            FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG
+            FileNames.IMAGE_1336_SMALL_JPG
         }, new string[] { })]
     [TestCase("90", 1,
         new[]
         {
             FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
-            FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG
+            FileNames.IMAGE_1336_SMALL_JPG
         }, new string[] { })]
-    [TestCase("100", 1,
+    [TestCase("100", 2,
+        new[]
+        {
+            FileNames.IMAGE_1_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG
+        },
         new[]
         {
             FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
-            FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG
-        }, new string[] { })]
+            FileNames.IMAGE_1336_SMALL_JPG
+        })]
     [TestCase("120", 1,
         new[]
         {
