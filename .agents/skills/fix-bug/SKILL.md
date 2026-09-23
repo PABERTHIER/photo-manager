@@ -1,4 +1,4 @@
----
+﻿---
 name: fix-bug
 description: >
   Investigate and fix a bug in PhotoManager with a structured workflow.

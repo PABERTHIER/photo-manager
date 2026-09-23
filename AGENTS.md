@@ -346,13 +346,13 @@ The persistence layer uses **SQLite** (via `Microsoft.Data.Sqlite`) with a singl
 
 ### Schema (v1 — defined in `SqliteSchema.cs`)
 
-| Table              | Primary key              | Notes                                |
-|--------------------|--------------------------|--------------------------------------|
-| `Folders`          | `Id` (TEXT, GUID)        | Index on `Path`                      |
-| `Assets`           | (`FolderId`, `FileName`) | Index on `Hash`. FK → `Folders(Id)`  |
-| `Thumbnails`       | (`FolderId`, `FileName`) | `Data BLOB`. FK → `Folders(Id)`      |
-| `RecentPaths`      | `Position` (INTEGER)     | Single ordered list                  |
-| `SyncDefinitions`  | `Position` (INTEGER)     | Single ordered list                  |
+| Table             | Primary key              | Notes                               |
+|-------------------|--------------------------|-------------------------------------|
+| `Folders`         | `Id` (TEXT, GUID)        | Index on `Path`                     |
+| `Assets`          | (`FolderId`, `FileName`) | Index on `Hash`. FK → `Folders(Id)` |
+| `Thumbnails`      | (`FolderId`, `FileName`) | `Data BLOB`. FK → `Folders(Id)`     |
+| `RecentPaths`     | `Position` (INTEGER)     | Single ordered list                 |
+| `SyncDefinitions` | `Position` (INTEGER)     | Single ordered list                 |
 
 ### Key classes (all in `PhotoManager.Persistence`)
 
@@ -402,3 +402,81 @@ HEIC/HEVC image handling is provided by Magick.NET; CI does not install OS codec
 ### Rule
 
 If the user says "commit the changes" or "push", **ask for confirmation first** and show exactly what will be committed/pushed before running the command. Never commit speculatively at the end of a task.
+
+## Shared Agent Skills
+
+The reusable skills for Claude Code, GitHub Copilot, and other compatible agents live in `.agents/skills/`:
+
+| Skill       | File                                                                       | When to consult                                      |
+|-------------|----------------------------------------------------------------------------|------------------------------------------------------|
+| Avalonia    | [.agents/skills/avalonia/SKILL.md](.agents/skills/avalonia/SKILL.md)       | Working on Avalonia UI, MVVM, or image handling      |
+| Feature     | [.agents/skills/feature/SKILL.md](.agents/skills/feature/SKILL.md)         | Adding a new PhotoManager feature                    |
+| Fix bug     | [.agents/skills/fix-bug/SKILL.md](.agents/skills/fix-bug/SKILL.md)         | Investigating or fixing unexpected behavior          |
+| Performance | [.agents/skills/perf/SKILL.md](.agents/skills/perf/SKILL.md)               | Optimizing speed, allocations, or runtime behavior   |
+| Persistence | [.agents/skills/persistence/SKILL.md](.agents/skills/persistence/SKILL.md) | Changing SQLite persistence, repositories, or schema |
+| Refactoring | [.agents/skills/refactor/SKILL.md](.agents/skills/refactor/SKILL.md)       | Restructuring code while preserving behavior         |
+| Testing     | [.agents/skills/test/SKILL.md](.agents/skills/test/SKILL.md)               | Adding or modifying tests                            |
+
+Agents should use the shared skill instead of a tool-specific duplicate under `.claude/` or `.github/`.
+
+## Claude Code Customizations
+
+Claude Code-specific agents, commands, and settings live under `.claude/`:
+
+### Agents
+
+| Agent         | File                                                               | Purpose                                               |
+|---------------|--------------------------------------------------------------------|-------------------------------------------------------|
+| Code reviewer | [.claude/agents/code-reviewer.md](.claude/agents/code-reviewer.md) | Review code quality, architecture, and .NET practices |
+
+### Commands
+
+| Command           | File                                                                         | Purpose                              |
+|-------------------|------------------------------------------------------------------------------|--------------------------------------|
+| Avalonia          | [.claude/commands/avalonia.md](.claude/commands/avalonia.md)                 | Work with Avalonia UI code           |
+| Build             | [.claude/commands/build.md](.claude/commands/build.md)                       | Build the solution                   |
+| Fix issue         | [.claude/commands/fix-issue.md](.claude/commands/fix-issue.md)               | Investigate and fix a reported issue |
+| Format            | [.claude/commands/format.md](.claude/commands/format.md)                     | Format and validate code style       |
+| Persistence tests | [.claude/commands/test-persistence.md](.claude/commands/test-persistence.md) | Run persistence-focused tests        |
+
+### Settings
+
+| File                                           | Purpose                      |
+|------------------------------------------------|------------------------------|
+| [.claude/settings.json](.claude/settings.json) | Claude Code project settings |
+
+## GitHub Copilot Customizations
+
+Copilot-specific instructions and prompts live under `.github/`:
+
+### Repository Instructions
+
+| Instruction         | File                                                               | Purpose                              |
+|---------------------|--------------------------------------------------------------------|--------------------------------------|
+| Repository guidance | [.github/copilot-instructions.md](.github/copilot-instructions.md) | Copilot-specific repository behavior |
+
+### File Instructions
+
+| Instruction | File                                                                                                 | When applied                |
+|-------------|------------------------------------------------------------------------------------------------------|-----------------------------|
+| Avalonia    | [.github/instructions/avalonia.instructions.md](.github/instructions/avalonia.instructions.md)       | Editing Avalonia UI files   |
+| Benchmarks  | [.github/instructions/benchmarks.instructions.md](.github/instructions/benchmarks.instructions.md)   | Editing benchmark C# files  |
+| CI          | [.github/instructions/ci.instructions.md](.github/instructions/ci.instructions.md)                   | Working on CI configuration |
+| C#          | [.github/instructions/csharp.instructions.md](.github/instructions/csharp.instructions.md)           | Editing C# files            |
+| Persistence | [.github/instructions/persistence.instructions.md](.github/instructions/persistence.instructions.md) | Working on persistence code |
+| Tests       | [.github/instructions/tests.instructions.md](.github/instructions/tests.instructions.md)             | Editing test C# files       |
+
+### Prompts
+
+| Prompt      | File                                                                           | Use case                              |
+|-------------|--------------------------------------------------------------------------------|---------------------------------------|
+| Avalonia    | [.github/prompts/avalonia.prompt.md](.github/prompts/avalonia.prompt.md)       | Plan or implement Avalonia UI changes |
+| Build       | [.github/prompts/build.prompt.md](.github/prompts/build.prompt.md)             | Build and validate the solution       |
+| Feature     | [.github/prompts/feature.prompt.md](.github/prompts/feature.prompt.md)         | Implement a new feature               |
+| Fix bug     | [.github/prompts/fix-bug.prompt.md](.github/prompts/fix-bug.prompt.md)         | Investigate and fix a bug             |
+| Fix issue   | [.github/prompts/fix-issue.prompt.md](.github/prompts/fix-issue.prompt.md)     | Work through a tracked issue          |
+| Format      | [.github/prompts/format.prompt.md](.github/prompts/format.prompt.md)           | Apply or verify formatting            |
+| Performance | [.github/prompts/perf.prompt.md](.github/prompts/perf.prompt.md)               | Benchmark and optimize performance    |
+| Persistence | [.github/prompts/persistence.prompt.md](.github/prompts/persistence.prompt.md) | Work on SQLite persistence            |
+| Refactoring | [.github/prompts/refactor.prompt.md](.github/prompts/refactor.prompt.md)       | Refactor while preserving behavior    |
+| Testing     | [.github/prompts/test.prompt.md](.github/prompts/test.prompt.md)               | Add or modify tests                   |

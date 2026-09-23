@@ -1,4 +1,4 @@
----
+﻿---
 name: refactor
 description: >
   Refactor PhotoManager code following Clean Architecture patterns.

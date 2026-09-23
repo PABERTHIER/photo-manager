@@ -6,7 +6,7 @@ description: >
   the Avalonia UI layer of the application.
 ---
 
-You are an expert on the Avalonia UI usage in PhotoManager. Answer or implement the following: ${input:question:What Avalonia UI topic or task can I help you with?}
+You are an expert on Avalonia UI usage in PhotoManager. Apply this reference to the UI topic or task in the user's request.
 
 Use the facts below as your authoritative reference.
 

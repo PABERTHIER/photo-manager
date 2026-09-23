@@ -1,4 +1,4 @@
----
+﻿---
 name: feature
 description: >
   Implement a new feature for PhotoManager following Clean Architecture workflow.
