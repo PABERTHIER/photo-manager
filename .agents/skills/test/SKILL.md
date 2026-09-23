@@ -1,4 +1,4 @@
----
+﻿---
 name: test
 description: >
   Add or modify tests for PhotoManager following project conventions.
@@ -70,8 +70,10 @@ Follow this workflow in order:
 
 7. **100% coverage** for all new code — every branch, exception path, and edge case.
 
-8. **Cross-platform (NON-NEGOTIABLE)**: tests run on Windows, Linux, and macOS CI and must pass on all three. On Linux/macOS `\` is not a path separator and `C:\...` is not rooted, so `Path.*` calls diverge from Windows.
-   Never assert on a Windows-only absolute path routed through a `Path` API — wrap it with `PathHelper.ToPlatformAbsolutePath(@"C:\Dir")` (or `PathHelper.ToResolvedConfigPath(...)` for a resolved config path), build expected paths with `Path.Combine` exactly as production does, and reference test files with their exact on-disk case.
+8. **Cross-platform (NON-NEGOTIABLE)**: tests run on Windows, Linux, and macOS CI and must pass on all three.
+   On Linux/macOS `\` is not a path separator and `C:\...` is not rooted, so `Path.*` calls diverge from Windows.
+   Never assert on a Windows-only absolute path routed through a `Path` API.
+   Wrap it with `PathHelper.ToPlatformAbsolutePath(@"C:\Dir")` (or `PathHelper.ToResolvedConfigPath(...)` for a resolved config path), build expected paths with `Path.Combine` exactly as production does, and reference test files with their exact on-disk case.
    Opaque path strings (stored/asserted verbatim, e.g. config values or sync definitions) are fine.
 
 9. **Build**: `dotnet build PhotoManager/PhotoManager.slnx` — zero warnings.

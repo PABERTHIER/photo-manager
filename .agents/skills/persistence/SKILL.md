@@ -1,13 +1,11 @@
----
+﻿---
 name: persistence
 description: >
   SQLite persistence layer reference for PhotoManager.
   Use this skill when working on database code, repositories, backup service, or schema changes.
-disable-model-invocation: true
-argument-hint: <persistence topic or task>
 ---
 
-You are working on the PhotoManager persistence layer: $ARGUMENTS
+You are working on the PhotoManager persistence layer.
 
 Use the facts below as your authoritative reference.
 

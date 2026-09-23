@@ -1,4 +1,4 @@
----
+﻿---
 name: perf
 description: >
   Performance optimization for PhotoManager with benchmarking first.
