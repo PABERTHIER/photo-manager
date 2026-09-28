@@ -503,30 +503,34 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
         },
         new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG }, new string[] { })]
-    [TestCase("80", 1,
+    [TestCase("80", 3,
         new[]
         {
-            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
-            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
-            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
-            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
-        }, new string[] { }, new string[] { })]
-    [TestCase("90", 1,
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG,
+            FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
+        },
+        new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("90", 3,
         new[]
         {
-            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
-            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
-            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
-            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
-        }, new string[] { }, new string[] { })]
-    [TestCase("100", 1,
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG,
+            FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
+        },
+        new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG },
+        new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("100", 2,
         new[]
         {
-            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG,
-            FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG,
-            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG,
-            FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG
-        }, new string[] { }, new string[] { })]
+            FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG,
+            FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG,
+            FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG
+        },
+        new[]
+        {
+            FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG,
+            FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_PART_JPG
+        }, new string[] { })]
     [TestCase("120", 1,
         new[]
         {

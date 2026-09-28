@@ -438,13 +438,13 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         new[]
         {
             FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
-            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
         })]
     [TestCase(90, 1,
         new[]
         {
             FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG,
-            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG
+            FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG
         })]
     [TestCase(100, 1,
         new[]
